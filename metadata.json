@@ -1,0 +1,6 @@
+{
+  "name": "Wedding Invitation Creator",
+  "description": "Platform SaaS untuk pembuatan undangan pernikahan digital dengan kustomisasi desain, manajemen tamu, RSVP, dan analitik real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
