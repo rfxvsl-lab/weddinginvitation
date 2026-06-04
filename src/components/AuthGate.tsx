@@ -217,32 +217,37 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
       }
 
       const promptMsg = `
-Analisis bukti transfer bank ini sebagai sistem Verifikator AI otomatis untuk wedding builder RFX.visual.
+Anda adalah Sistem Verifikator AI Finansial otomatis tingkat lanjut untuk wedding builder RFX.visual.
+Tugas Anda adalah membaca gambar struk bukti transfer dan melakukan validasi ketat, mendetail, dan tanpa toleransi kesalahan.
 
-Parameter Target Verifikasi:
-- Rekening Penerima diperbolehkan: 
-  * Bank Mandiri (No Rekening: 123-00-9988776-5 a/n RFX Visual Utama)
-  * SeaBank (No Rekening: 9012-3456-7890 a/n RFX Visual Utama)
-  * ShopeePay / QRIS (QRIS a/n RFX.visual)
-- Nominal Wajib Dibayar: Rp ${price.toLocaleString('id-ID')}
-- Paket Terpilih: Paket ${packageId.toUpperCase()} (${isCustomByRfx ? 'Custom Full RFX.visual' : 'Custom Mandiri'})
+===== PARAMETER WAJIB (TARGET VERIFIKASI) =====
+1. REKENING / DOMPET PENERIMA YANG SAH (Pilih Salah Satu):
+   - Bank Mandiri: 123-00-9988776-5 a/n RFX Visual Utama
+   - SeaBank: 9012-3456-7890 a/n RFX Visual Utama
+   - ShopeePay / QRIS: QRIS a/n RFX.visual
+2. NOMINAL TAGIHAN TEPAT: Rp ${price.toLocaleString('id-ID')} (Tidak boleh kurang, tidak boleh lebih)
+3. PAKET ITEM YANG DIBELI: Paket ${packageId.toUpperCase()} (${isCustomByRfx ? 'Custom Full RFX.visual' : 'Custom Mandiri'})
+4. TANGGAL TRANSAKSI: Harus transaksi baru (mendekati hari ini atau dalam batas waktu wajar).
 
-Instruksi Analisis:
-1. Temukan tanggal, jam, nominal yang tertera di struk.
-2. Pastikan nominal transfer persis sama dengan target (yaitu Rp ${price}).
-3. Cari tahu apakah rekening atau dompet penerima cocok dengan Mandiri, SeaBank, atau ShopeePay/QRIS milik RFX Visual Utama.
-4. Periksa apakah struk ini adalah dokumen asli, bukan tempelan digital palsu photoshop, atau struk transaksi lama yang dipakai kembali.
-5. Berikan kesimpulan (Status: "success" jika valid, "failed" jika tidak cocok, palsu, atau kurang bayar).
+===== INSTRUKSI ANALISIS FORENSIK =====
+Lakukan pemindaian OCR dan forensik digital pada struk:
+1. IDENTIFIKASI TANGGAL & JAM: Pastikan ada Tahun, Bulan, Tanggal, dan Jam yang jelas. Jika ini struk lama dari tahun/bulan lalu, langsung tolak (failed)!
+2. VALIDASI NOMINAL (PERHATIKAN BIAYA ADMIN): Angka transfer bersih yang diterima di struk harus SAMA PERSIS dengan nominal wajib (Rp ${price.toLocaleString('id-ID')}). Hati-hati! Seringkali struk menampilkan "Total" yang merupakan gabungan dari Nominal Transfer + Biaya Admin (misal Rp 2.500 atau Rp 6.500). Fokus HANYA pada nominal yang ditransfer/diterima, abaikan biaya admin bank.
+3. VALIDASI PENERIMA: Pastikan rekening tujuan benar milik RFX Visual Utama. Hati-hati dengan struk transfer palsu yang dikirim ke nama/rekening orang lain.
+4. DETEKSI MANIPULASI (ANTI-FRAUD): Cek kejanggalan visual (font berbeda ukuran/warna, artefak piksel, editan Photoshop/Canva, atau hasil generator struk palsu). Jika dicurigai palsu, langsung tolak (failed)!
+5. KESIMPULAN AKHIR:
+   - Beri status "success" HANYA JIKA: Nominal transfer pas (tidak termasuk biaya admin), Penerima benar, Tanggal valid/baru, dan Struk terbukti asli.
+   - Beri status "failed" JIKA: Kurang bayar, penerima salah, editan palsu, struk kedaluwarsa/bekas, atau gambar tidak relevan.
 
-Format Respon WAJIB berupa JSON murni sebagai berikut:
+Format Respon WAJIB berupa JSON murni (Tanpa markdown block \`\`\`, cukup kurung kurawal buka dan tutup):
 {
-  "status": "success" atau "failed",
-  "timestampDetected": "Hari, Tanggal, Jam",
-  "recipientAccount": "Mandiri / SeaBank / ShopeePay",
-  "nominalDetected": 12345,
-  "isAuthentic": true atau false,
-  "reasons": ["Alasan detail 1", "Alasan detail 2"],
-  "summaryMarkdown": "## LAPORAN VERIFIKASI PEMBAYARAN\\n\\nMenyatakan bahwa transaksi telah divalidasi oleh AI system.\\n\\n- **Nama Pengirim**: ...\\n- **Bank Penerima**: ...\\n- **Nominal Terbaca**: Rp ...\\n- **Tanggal Transaksi**: ...\\n- **Keaslian**: Asli/Palsu\\n\\n**Alasan**: ..."
+  "status": "success" | "failed",
+  "timestampDetected": "[Hari], [Tanggal] [Bulan] [Tahun] - [Jam]",
+  "recipientAccount": "Tuliskan nama bank/tujuan yang terdeteksi di struk",
+  "nominalDetected": 123456,
+  "isAuthentic": true | false,
+  "reasons": ["Alasan detail 1 mengapa sukses/gagal (sebutkan kecocokan nominal, tanggal, anti-fraud)", "Alasan 2"],
+  "summaryMarkdown": "## LAPORAN VERIFIKASI PEMBAYARAN\\n\\n- **Nama Pengirim**: [Nama di Struk]\\n- **Bank Penerima**: [Penerima Terdeteksi]\\n- **Nominal Terbaca**: Rp [Angka]\\n- **Tanggal Transaksi**: [Tahun/Bulan/Tanggal]\\n- **Status Forensik**: Asli / Palsu / Editan Photoshop\\n\\n**Alasan**: [Rangkuman alasan]"
 }
 `;
 
@@ -315,30 +320,28 @@ Format Respon WAJIB berupa JSON murni sebagai berikut:
   const fallbackVerifier = (imageSrc: string, price: number) => {
     if (!activeUser) return;
     
-    // Simulate smart AI scan delay
+    // Simulate AI scan delay
     setTimeout(async () => {
-      const randomSuccess = true; // High success path to prevent developer larping blocks
-      
       const parsed = {
-        status: randomSuccess ? 'success' : 'failed',
+        status: 'pending',
         timestampDetected: new Date().toLocaleString('id-ID'),
         recipientAccount: selectedMethod === 'mandiri' ? 'Mandiri' : selectedMethod === 'seabank' ? 'SeaBank' : 'QRIS ShopeePay',
         nominalDetected: price,
-        isAuthentic: true,
-        reasons: ["Semua parameter visual terverifikasi cocok.", "Nominal sesuai tagihan.", "Bukti transfer asli."],
-        summaryMarkdown: `## LAPORAN VERIFIKASI PEMBAYARAN (Murni AI Fallback)
+        isAuthentic: false,
+        reasons: ["Sistem AI Verifikasi saat ini sedang sibuk.", "Bukti transfer telah dikirim ke antrean manual.", "Admin akan segera meninjau pembayaran Anda."],
+        summaryMarkdown: `## LAPORAN VERIFIKASI PEMBAYARAN (PENDING)
         
-Menyatakan bahwa transaksi telah divalidasi oleh sistem asisten digital cadangan.
+Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual oleh Admin.
 
 - **Pembayar**: ${activeUser.fullName}
 - **Metode**: ${selectedMethod?.toUpperCase()}
 - **Nominal**: Rp ${price.toLocaleString('id-ID')}
 - **Waktu Transaksi**: ${new Date().toLocaleString('id-ID')}
-- **Status Validasi**: Berhasil (Lolos Verifikasi AI)`
+- **Status Validasi**: Menunggu Review Manual`
       };
 
       setAiAnalysisResult(parsed);
-      setScanSuccess(true);
+      setScanSuccess(false);
 
       const newTx = await auth.createTransaction({
         userId: activeUser.id,
@@ -361,7 +364,8 @@ Menyatakan bahwa transaksi telah divalidasi oleh sistem asisten digital cadangan
         }
       });
 
-      await auth.approveTransaction(newTx.id, activeUser.id);
+      // Show manual review message instead of auto-approving
+      setPaymentError("Server Verifikasi AI sedang sibuk. Bukti pembayaran Anda berhasil diunggah dan sedang dalam antrean review manual oleh admin. Mohon tunggu beberapa saat.");
     }, 2500);
   };
 

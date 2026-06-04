@@ -29,12 +29,15 @@ import { Guest } from '../types';
 
 interface GuestManagerProps {
   guests: Guest[];
+  appUrl: string;
+  slug: string;
+  coupleNames: string;
   onAddGuest: (guest: Omit<Guest, 'id' | 'invitationCode'>) => void;
   onRemoveGuest: (id: string) => void;
   onUpdateGuestStatus: (id: string, status: Guest['status']) => void;
 }
 
-export default function GuestManager({ guests, onAddGuest, onRemoveGuest, onUpdateGuestStatus }: GuestManagerProps) {
+export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddGuest, onRemoveGuest, onUpdateGuestStatus }: GuestManagerProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string>('Semua');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -91,9 +94,9 @@ export default function GuestManager({ guests, onAddGuest, onRemoveGuest, onUpda
 
   // Generate real link referencing current development URL
   const generateInvitationLink = (guest: Guest) => {
-    const currentLoc = window.location.origin + window.location.pathname;
-    // Embed code and recipient name in URL query string
-    return `${currentLoc}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
+    // Generate public link based on user slug and appUrl
+    const baseUrl = appUrl || 'https://undangankita.rfx.web.id';
+    return `${baseUrl}/${slug}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
   };
 
   const handleCopyLink = (guest: Guest) => {
@@ -107,35 +110,13 @@ export default function GuestManager({ guests, onAddGuest, onRemoveGuest, onUpda
 
   const handleSimulateWhatsApp = (guest: Guest) => {
     const link = generateInvitationLink(guest);
-    const textMsg = `Halo *${guest.name}*, Kami mengundang Anda untuk hadir di acara pernikahan Rian & Salsa. Silakan buka tautan undangan digital berikut untuk detail acara dan konfirmasi RSVP: ${link}`;
+    const textMsg = `Halo *${guest.name}*, Kami mengundang Anda untuk hadir di acara pernikahan ${coupleNames}. Silakan buka tautan undangan digital berikut untuk detail acara dan konfirmasi RSVP: ${link}`;
     const waUrl = `https://api.whatsapp.com/send?phone=${guest.phoneNumber}&text=${encodeURIComponent(textMsg)}`;
     
     onUpdateGuestStatus(guest.id, 'Opened');
     window.open(waUrl, '_blank');
   };
 
-  // Dynamically extract the registered couple's name from database/SaaS profile
-  const getWeddingNames = () => {
-    try {
-      const savedUserStr = localStorage.getItem('saas_current_user');
-      const savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
-      let data: any = null;
-      if (savedUser) {
-        const savedData = localStorage.getItem(`wedding_data_user_${savedUser.id}`);
-        if (savedData) data = JSON.parse(savedData);
-      } else {
-        const savedData = localStorage.getItem('wedding_data');
-        if (savedData) data = JSON.parse(savedData);
-      }
-      
-      if (data && data.couple) {
-        return `${data.couple.groom.nickname} & ${data.couple.bride.nickname}`;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    return "Rian & Salsa"; // Elegant default
-  };
 
   // Perform standard UTF-8 CSV downloads with BOM preamble for Microsoft Excel compliance
   const handleExportCSV = (scope: 'all' | 'filtered') => {
@@ -721,7 +702,7 @@ export default function GuestManager({ guests, onAddGuest, onRemoveGuest, onUpda
                   {/* Ledger Header */}
                   <div className="text-center border-b-2 border-slate-800 pb-3">
                     <span className="text-[9px] font-mono font-bold tracking-widest text-[#4f46e5]/80 uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
-                    <h2 className="text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {getWeddingNames()}</h2>
+                    <h2 className="text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {coupleNames}</h2>
                     <div className="flex justify-between items-center text-[9px] text-slate-500 font-mono mt-2">
                       <span>Platform Portal: undangankita.rfx.web.id</span>
                       <span>Dicetak: {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>

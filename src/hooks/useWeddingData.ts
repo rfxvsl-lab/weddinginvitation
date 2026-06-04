@@ -245,12 +245,16 @@ export function useWeddingData(): UseWeddingDataReturn {
 
   // Guest operations
   const addGuest = useCallback(async (guestData: Omit<Guest, 'id' | 'invitationCode'>) => {
-    if (!invitation?.id) return;
+    if (!invitation?.id) {
+      alert("Error: ID Undangan tidak ditemukan. Silakan muat ulang halaman.");
+      return;
+    }
     try {
       const newGuest = await api.addGuest(invitation.id, guestData);
       setGuestsLocal(prev => [newGuest, ...prev]);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to add guest:', err);
+      alert("Gagal menyimpan tamu: " + err.message);
     }
   }, [invitation?.id]);
 
@@ -274,7 +278,10 @@ export function useWeddingData(): UseWeddingDataReturn {
 
   // RSVP operations
   const addRSVP = useCallback(async (rsvpData: Omit<RSVP, 'id'>) => {
-    if (!invitation?.id) return;
+    if (!invitation?.id) {
+      alert("Error: ID Undangan tidak ditemukan.");
+      return;
+    }
     try {
       const newRSVP = await api.addRSVP(invitation.id, rsvpData);
       setRsvpsLocal(prev => [newRSVP, ...prev]);
@@ -303,8 +310,9 @@ export function useWeddingData(): UseWeddingDataReturn {
           ...prev.visitorLogs,
         ],
       }));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to add RSVP:', err);
+      alert("Gagal menyimpan RSVP: " + err.message);
     }
   }, [invitation?.id]);
 

@@ -40,11 +40,8 @@ import {
   SaaSUser
 } from './types';
 
-import { 
   DEFAULT_THEMES, 
-  DEFAULT_WEDDING_DATA, 
-  INITIAL_GUESTS, 
-  INITIAL_RSVPS, 
+  DEFAULT_WEDDING_DATA,
   INITIAL_ANALYTICS 
 } from './data/defaultData';
 
@@ -349,6 +346,8 @@ export default function App() {
       setTimeout(() => setIsCopiedMain(false), 2000);
     });
   };
+
+  const isAdmin = auth.currentUser?.email === 'mhmmadridho64@gmail.com';
 
   // Switch from invitation view back to builder
   const handleBackToBuilder = () => {
@@ -902,6 +901,9 @@ export default function App() {
                 <div className="text-slate-800">
                   <GuestManager 
                     guests={guests}
+                    appUrl={import.meta.env.VITE_APP_URL || 'https://undangankita.rfx.web.id'}
+                    slug={activeSaaSUser.activeSlug}
+                    coupleNames={`${weddingData.couple.groom.nickname} & ${weddingData.couple.bride.nickname}`}
                     onAddGuest={handleAddGuest}
                     onRemoveGuest={handleRemoveGuest}
                     onUpdateGuestStatus={wedding.updateGuestStatus}
@@ -914,13 +916,22 @@ export default function App() {
             {activeSegment === 'analytics' && (
               <div className="animate-fadeIn">
                 <div className="text-slate-800">
-                  <AnalyticsDashboard 
-                    analytics={analytics}
-                    rsvps={rsvps}
-                    onDeleteRSVP={handleDeleteRSVP}
-                    onSimulateGuestRSVP={simulateGuestRSVP}
-                    onSimulatePageView={simulatePageView}
-                  />
+                  {isAdmin && (
+                    <AnalyticsDashboard 
+                      analytics={analytics} 
+                      rsvps={rsvps}
+                      onDeleteRSVP={handleDeleteRSVP}
+                      onSimulateGuestRSVP={simulateGuestRSVP}
+                      onSimulatePageView={simulatePageView}
+                    />
+                  )}
+                  {!isAdmin && (
+                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl text-center text-slate-500">
+                      <Activity className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                      <p className="text-sm font-semibold">Statistik Riil sedang berjalan...</p>
+                      <p className="text-xs">Data kunjungan dan RSVPs akan otomatis tampil di sini ketika undangan Anda disebar ke publik.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1000,11 +1011,11 @@ export default function App() {
 
                     <div className="flex gap-2 items-center bg-[#070709] p-2 rounded-xl border border-zinc-850">
                       <span className="font-mono text-[11px] text-zinc-300 break-all select-all flex-1 px-1">
-                        undangankita.rfx.web.id/{activeSaaSUser.activeSlug}
+                        https://undangankita.rfx.web.id/{activeSaaSUser.activeSlug}
                       </span>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(`undangankita.rfx.web.id/${activeSaaSUser.activeSlug}`);
+                          navigator.clipboard.writeText(`https://undangankita.rfx.web.id/${activeSaaSUser.activeSlug}`);
                           setLinkCopiedInPublishModal(true);
                         }}
                         className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition ${
