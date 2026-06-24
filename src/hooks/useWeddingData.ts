@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * useWeddingData Hook — Wedding data management with Turso
  * Menggantikan semua localStorage read/write di App.tsx
@@ -95,7 +97,7 @@ export function useWeddingData(): UseWeddingDataReturn {
   const currentUserRef = useRef<SaaSUser | null>(null);
 
   // Auto-save wedding data to Turso (debounced 2 seconds)
-  const scheduleAutoSave = useCallback((data: WeddingData, theme: string) => {
+  const scheduleAutoSave = useCallback((data: WeddingData) => {
     if (!invitation?.id) return;
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -103,7 +105,7 @@ export function useWeddingData(): UseWeddingDataReturn {
     saveTimerRef.current = setTimeout(async () => {
       setIsSaving(true);
       try {
-        await api.updateInvitationData(invitation.id, data, theme);
+        await api.updateInvitationData(invitation.id, data);
       } catch (err) {
         console.error('Auto-save failed:', err);
       } finally {
@@ -116,10 +118,10 @@ export function useWeddingData(): UseWeddingDataReturn {
   const setWeddingData = useCallback((update: WeddingData | ((prev: WeddingData) => WeddingData)) => {
     setWeddingDataLocal(prev => {
       const newData = typeof update === 'function' ? update(prev) : update;
-      scheduleAutoSave(newData, themeId);
+      scheduleAutoSave(newData);
       return newData;
     });
-  }, [scheduleAutoSave, themeId]);
+  }, [scheduleAutoSave]);
 
   const setThemeId = useCallback((newThemeId: string) => {
     setThemeIdLocal(newThemeId);
@@ -131,6 +133,11 @@ export function useWeddingData(): UseWeddingDataReturn {
 
   // Load all user data from Turso
   const loadUserData = useCallback(async (user: SaaSUser) => {
+    if (!user || !user.id) {
+      console.error("loadUserData called with invalid user:", user);
+      throw new Error("Sistem gagal memuat data: ID Pengguna tidak valid.");
+    }
+    
     setIsLoading(true);
     currentUserRef.current = user;
     try {
@@ -405,8 +412,10 @@ export function useWeddingData(): UseWeddingDataReturn {
       };
 
       setThemeHistory(prev => [newSnap, ...prev].slice(0, 20));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save snapshot:', err);
+      alert('Gagal menyimpan checkpoint: ' + (err.message || 'Error internal'));
+      throw err;
     }
   }, [invitation?.id, themeId, weddingData]);
 
@@ -434,12 +443,21 @@ export function useWeddingData(): UseWeddingDataReturn {
   const publishInvitationAction = useCallback(async () => {
     if (!invitation?.id) return;
     try {
+      // Auto save before publish
+      try {
+        await saveDesignSnapshot("Auto-save sebelum Publish");
+      } catch (e) {
+        // Abaikan error snapshot jika gagal, tetap publish
+        console.warn("Auto-save snapshot gagal, melanjutkan publish");
+      }
+      
       await api.publishInvitation(invitation.id);
       setInvitation(prev => prev ? { ...prev, isPublished: true, publishedAt: new Date().toISOString() } : prev);
     } catch (err) {
       console.error('Failed to publish:', err);
+      alert("Gagal mempublikasi undangan: " + err);
     }
-  }, [invitation?.id]);
+  }, [invitation?.id, saveDesignSnapshot]);
 
   const unpublishInvitationAction = useCallback(async () => {
     if (!invitation?.id) return;

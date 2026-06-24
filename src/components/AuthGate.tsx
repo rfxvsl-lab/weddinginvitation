@@ -1,43 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { uploadProofTransfer, fileToBase64 } from '../lib/cloudinary';
+import { uploadProofTransfer } from '../lib/cloudinary';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import { 
-  Heart, 
-  User, 
-  Mail, 
-  Phone, 
-  Globe, 
-  Share2, 
-  CheckCircle, 
-  AlertCircle,
-  FileCheck, 
-  Upload, 
-  CreditCard, 
-  ShieldCheck, 
-  QrCode, 
-  Copy, 
-  Check, 
-  ChevronRight, 
-  ArrowLeft,
-  Building,
-  DollarSign,
-  TrendingUp,
-  FileText,
-  Printer,
-  Trash2,
-  Lock,
-  Menu,
-  Eye,
-  LogOut,
-  Sparkles
-} from 'lucide-react';
+  PiHeartDuotone as Heart, 
+  PiUserDuotone as User, 
+  PiEnvelopeDuotone as Mail, 
+  PiPhoneDuotone as Phone, 
+  PiGlobeHemisphereWestDuotone as Globe, 
+  PiShareNetworkDuotone as Share2, 
+  PiCheckCircleDuotone as CheckCircle, 
+  PiWarningCircleDuotone as AlertCircle,
+  PiFileArchiveDuotone as FileCheck, 
+  PiUploadDuotone as Upload, 
+  PiCreditCardDuotone as CreditCard, 
+  PiShieldCheckDuotone as ShieldCheck, 
+  PiQrCodeDuotone as QrCode, 
+  PiCopyDuotone as Copy, 
+  PiCheckDuotone as Check, 
+  PiCaretRightDuotone as ChevronRight, 
+  PiArrowLeftDuotone as ArrowLeft,
+  PiBuildingsDuotone as Building,
+  PiCurrencyDollarDuotone as DollarSign,
+  PiChartLineUpDuotone as TrendingUp,
+  PiFileTextDuotone as FileText,
+  PiPrinterDuotone as Printer,
+  PiTrashDuotone as Trash2,
+  PiLockKeyDuotone as Lock,
+  PiListDuotone as Menu,
+  PiEyeDuotone as Eye,
+  PiSignOutDuotone as LogOut,
+  PiSparkleDuotone as Sparkles,
+  PiClockDuotone as Clock,
+  PiArrowsClockwiseDuotone as RefreshCw
+} from 'react-icons/pi';
+import AnimatedEnvelope from './AnimatedEnvelope';
 import { SaaSUser, TransactionReport } from '../types';
+import * as api from '../lib/api';
 
 // Price parameters as constant
 const PRICES = {
+  demo: { mandiri: 0, rfx: 0 },
   reguler: { mandiri: 30000, rfx: 45000 },
   medium: { mandiri: 50000, rfx: 65000 },
-  premium: { mandiri: 100000, rfx: 125000 }
+  premium: { mandiri: 100000, rfx: 125000 },
+  luxury: { mandiri: 9999999, rfx: 9999999 }
 };
 
 interface AuthGateProps {
@@ -45,7 +53,7 @@ interface AuthGateProps {
   onAdminOverride?: () => void;
 }
 
-export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
+function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   // Navigation states
   const [mode, setMode] = useState<'signin' | 'signup' | 'payment' | 'admin'>('signin');
   
@@ -101,20 +109,20 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
   const [password, setPassword] = useState('');
   const [noWa, setNoWa] = useState('');
   const [sosmed, setSosmed] = useState('');
-  const [packageId, setPackageId] = useState<'reguler' | 'medium' | 'premium'>('reguler');
+  const [packageId, setPackageId] = useState<'demo' | 'reguler' | 'medium' | 'premium' | 'luxury'>('reguler');
   const [isCustomByRfx, setIsCustomByRfx] = useState(false);
+  const [googleUser, setGoogleUser] = useState<{ unverifiedEmail: string, name: string, avatarUrl?: string } | null>(null);
   
   // Login Inputs
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   
   // Payment Page states
-  const [selectedMethod, setSelectedMethod] = useState<'mandiri' | 'seabank' | 'qris' | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<'mandiri' | 'seabank' | 'qris' | 'shopeepay' | null>(null);
   const [proofImage, setProofImage] = useState<string>('');
-  const [isScanning, setIsScanning] = useState(false);
-  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [scanSuccess, setScanSuccess] = useState<boolean | null>(null);
+  const [transactionStatus, setTransactionStatus] = useState<'pending' | 'failed' | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   // Active Slug Checking for uniqueness
@@ -124,6 +132,10 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
   // PDF print modal state
   const [printingReport, setPrintingReport] = useState<TransactionReport | null>(null);
 
+  // AI OCR States
+  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
+  const [scanSuccess, setScanSuccess] = useState<'pending' | boolean>(false);
+
   // Load admin data when entering admin mode
   useEffect(() => {
     if (mode === 'admin') {
@@ -131,18 +143,33 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
     }
   }, [mode]);
 
+  // Payment gateway disabled — always bypass to dashboard
   useEffect(() => {
-    if (activeUser) {
-      if (activeUser.paymentStatus === 'success') {
-        onLoginSuccess(activeUser);
-      } else if (activeUser.paymentStatus === 'pending' || activeUser.paymentStatus === 'failed') {
-        setMode('payment');
-      }
+    if (activeUser && mode !== 'admin') {
+      onLoginSuccess(activeUser);
     }
-  }, [activeUser]);
+  }, [activeUser, mode]);
+
+  // Check if user already has a pending transaction when in payment mode
+  useEffect(() => {
+    if (mode === 'payment' && activeUser && activeUser.paymentStatus === 'pending') {
+      api.getTransactionsByUser(activeUser.id).then((txs) => {
+        const pendingTx = txs.find(t => t.status === 'pending');
+        if (pendingTx) {
+          setTransactionStatus('pending');
+        }
+      }).catch(console.error);
+    }
+  }, [mode, activeUser]);
 
   // Handle Groom/Bride changes to autogenerate slug
   useEffect(() => {
+    if (packageId === 'demo') {
+      if (!slug.startsWith('rfx-')) {
+        setSlug(`rfx-${Math.random().toString(36).substring(2, 8)}`);
+      }
+      return;
+    }
     if (groomName || brideName) {
       const cleanGroom = groomName.toLowerCase().replace(/[^a-z0-9]/g, '');
       const cleanBride = brideName.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -154,7 +181,7 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
         setSlug(cleanBride);
       }
     }
-  }, [groomName, brideName]);
+  }, [groomName, brideName, packageId]);
 
   // Validate Slug in Realtime (async via Turso)
   useEffect(() => {
@@ -179,211 +206,92 @@ export default function AuthGate({ onLoginSuccess }: AuthGateProps) {
     return () => clearTimeout(timer);
   }, [slug]);
 
-  // Load Puter.js and analyze
-  const scanReceipt = async (imageSrc: string) => {
+  const submitProofTransaction = async (imageSrc: string) => {
     if (!activeUser) return;
-    setIsScanning(true);
+    setIsUploading(true);
     setPaymentError(null);
-    setScanSuccess(null);
+    setTransactionStatus(null);
     setAiAnalysisResult(null);
+    setScanSuccess('pending');
 
     const price = PRICES[packageId][isCustomByRfx ? 'rfx' : 'mandiri'];
 
-    // Incase Puter is not loaded, we load it dynamically
-    const loadPuter = () => {
-      return new Promise<any>((resolve) => {
-        if ((window as any).puter) {
-          resolve((window as any).puter);
-          return;
-        }
-        const script = document.createElement('script');
-        script.src = 'https://js.puter.com/v2/';
-        script.onload = () => resolve((window as any).puter);
-        script.onerror = () => resolve(null);
-        document.head.appendChild(script);
-      });
-    };
-
     try {
-      const puter = await loadPuter();
-      if (!puter) {
-        throw new Error("Gagal memuat Puter.js, mohon periksa jaringan internet Anda.");
-      }
-
-      // Base64 cleanup
-      let normalizedBase64 = imageSrc;
-      if (!normalizedBase64.includes('data:image/')) {
-        normalizedBase64 = `data:image/jpeg;base64,${normalizedBase64}`;
-      }
-
-      const promptMsg = `
-Anda adalah Sistem Verifikator AI Finansial otomatis tingkat lanjut untuk wedding builder RFX.visual.
-Tugas Anda adalah membaca gambar struk bukti transfer dan melakukan validasi ketat, mendetail, dan tanpa toleransi kesalahan.
-
-===== PARAMETER WAJIB (TARGET VERIFIKASI) =====
-1. REKENING / DOMPET PENERIMA YANG SAH (Pilih Salah Satu):
-   - Bank Mandiri: 123-00-9988776-5 a/n RFX Visual Utama
-   - SeaBank: 9012-3456-7890 a/n RFX Visual Utama
-   - ShopeePay / QRIS: QRIS a/n RFX.visual
-2. NOMINAL TAGIHAN TEPAT: Rp ${price.toLocaleString('id-ID')} (Tidak boleh kurang, tidak boleh lebih)
-3. PAKET ITEM YANG DIBELI: Paket ${packageId.toUpperCase()} (${isCustomByRfx ? 'Custom Full RFX.visual' : 'Custom Mandiri'})
-4. TANGGAL TRANSAKSI: Harus transaksi baru (mendekati hari ini atau dalam batas waktu wajar).
-
-===== INSTRUKSI ANALISIS FORENSIK =====
-Lakukan pemindaian OCR dan forensik digital pada struk:
-1. IDENTIFIKASI TANGGAL & JAM: Pastikan ada Tahun, Bulan, Tanggal, dan Jam yang jelas. Jika ini struk lama dari tahun/bulan lalu, langsung tolak (failed)!
-2. VALIDASI NOMINAL (PERHATIKAN BIAYA ADMIN): Angka transfer bersih yang diterima di struk harus SAMA PERSIS dengan nominal wajib (Rp ${price.toLocaleString('id-ID')}). Hati-hati! Seringkali struk menampilkan "Total" yang merupakan gabungan dari Nominal Transfer + Biaya Admin (misal Rp 2.500 atau Rp 6.500). Fokus HANYA pada nominal yang ditransfer/diterima, abaikan biaya admin bank.
-3. VALIDASI PENERIMA: Pastikan rekening tujuan benar milik RFX Visual Utama. Hati-hati dengan struk transfer palsu yang dikirim ke nama/rekening orang lain.
-4. DETEKSI MANIPULASI (ANTI-FRAUD): Cek kejanggalan visual (font berbeda ukuran/warna, artefak piksel, editan Photoshop/Canva, atau hasil generator struk palsu). Jika dicurigai palsu, langsung tolak (failed)!
-5. KESIMPULAN AKHIR:
-   - Beri status "success" HANYA JIKA: Nominal transfer pas (tidak termasuk biaya admin), Penerima benar, Tanggal valid/baru, dan Struk terbukti asli.
-   - Beri status "failed" JIKA: Kurang bayar, penerima salah, editan palsu, struk kedaluwarsa/bekas, atau gambar tidak relevan.
-
-Format Respon WAJIB berupa JSON murni (Tanpa markdown block \`\`\`, cukup kurung kurawal buka dan tutup):
-{
-  "status": "success" | "failed",
-  "timestampDetected": "[Hari], [Tanggal] [Bulan] [Tahun] - [Jam]",
-  "recipientAccount": "Tuliskan nama bank/tujuan yang terdeteksi di struk",
-  "nominalDetected": 123456,
-  "isAuthentic": true | false,
-  "reasons": ["Alasan detail 1 mengapa sukses/gagal (sebutkan kecocokan nominal, tanggal, anti-fraud)", "Alasan 2"],
-  "summaryMarkdown": "## LAPORAN VERIFIKASI PEMBAYARAN\\n\\n- **Nama Pengirim**: [Nama di Struk]\\n- **Bank Penerima**: [Penerima Terdeteksi]\\n- **Nominal Terbaca**: Rp [Angka]\\n- **Tanggal Transaksi**: [Tahun/Bulan/Tanggal]\\n- **Status Forensik**: Asli / Palsu / Editan Photoshop\\n\\n**Alasan**: [Rangkuman alasan]"
-}
-`;
-
-      const response = await puter.ai.chat([
-        {
-          role: "user",
-          content: [
-            { type: "text", text: promptMsg },
-            { type: "image_url", image_url: { url: normalizedBase64 } }
-          ]
-        }
-      ], {
-        model: 'gpt-4o'
-      });
-
-      const text = response?.message?.content || response || "";
-      let jsonStart = text.indexOf('{');
-      let jsonEnd = text.lastIndexOf('}');
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        const jsonStr = text.substring(jsonStart, jsonEnd + 1);
-        const parsed = JSON.parse(jsonStr);
-        setAiAnalysisResult(parsed);
-
-        const isSuccess = parsed.status === 'success';
-        setScanSuccess(isSuccess);
-
-        // Save transaction record to Turso
-        const newTx = await auth.createTransaction({
+      // 1. Call server-side payment verification API route
+      const response = await fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl: imageSrc,
+          expectedNominal: price,
           userId: activeUser.id,
           userName: activeUser.fullName,
           userSlug: activeUser.activeSlug,
           userEmail: activeUser.email,
           packageId: activeUser.packageId,
           isCustomByRfx: activeUser.isCustomByRfx,
-          nominalExpected: price,
-          status: isSuccess ? 'success' : 'failed',
-          timestamp: new Date().toLocaleString('id-ID'),
-          proofImage: imageSrc, // Cloudinary URL
-          aiResult: {
-            timestampDetected: parsed.timestampDetected,
-            recipientAccount: parsed.recipientAccount,
-            nominalDetected: parsed.nominalDetected,
-            isAuthentic: parsed.isAuthentic,
-            reasons: parsed.reasons,
-            summaryMarkdown: parsed.summaryMarkdown
-          }
-        });
+        }),
+      });
 
-        // If success, update payment status in Turso
-        if (isSuccess) {
-          await auth.approveTransaction(newTx.id, activeUser.id);
-        } else {
-          await auth.rejectTransaction(newTx.id, activeUser.id);
-          setPaymentError(parsed.reasons?.join(', ') || "Bukti pembayaran ditolak oleh sistem AI. Harap unggah bukti transfer yang valid.");
-        }
-      } else {
-        throw new Error("Format analisis visual AI murni di luar struktur JSON.");
+      if (!response.ok) {
+        throw new Error('Gagal memproses verifikasi AI.');
       }
+
+      const result = await response.json();
+      
+      // Save AI analysis result
+      setAiAnalysisResult(result.aiResult);
+      setScanSuccess(result.success);
+
+      if (result.success) {
+        // Update local session
+        const updatedUser = { ...activeUser, paymentStatus: 'success' as const };
+        auth.setCurrentUser(updatedUser);
+        setTransactionStatus('pending'); // will be bypassed to success on next effect run
+      } else {
+        setTransactionStatus('failed');
+      }
+
+      // Trigger Admin Push Notification Webhook
+      try {
+        await fetch('/api/notify-admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: result.success ? '✅ Pembayaran Lolos AI' : '⚠️ Gagal Verifikasi AI',
+            message: `User: ${activeUser.fullName} (Rp ${price.toLocaleString('id-ID')}). Status: ${result.success ? 'Sukses' : 'Review Manual'}`,
+            data: { userId: activeUser.id, status: result.success ? 'success' : 'pending' }
+          })
+        });
+      } catch (e) {
+        console.error('Failed to trigger webhook', e);
+      }
+
     } catch (err: any) {
       console.error(err);
-      // Seamless Robust Fallback if AI server timeouts/issues to keep user engaged:
-      // Prompt user with realistic check based on simple heuristics
-      fallbackVerifier(imageSrc, price);
+      setPaymentError("Gagal memproses verifikasi pembayaran. Silakan coba lagi.");
+      setScanSuccess(false);
     } finally {
-      setIsScanning(false);
+      setIsUploading(false);
     }
   };
 
-  // Safe fallback verifier if Puter API fails (e.g. timeout or offline)
-  const fallbackVerifier = (imageSrc: string, price: number) => {
-    if (!activeUser) return;
-    
-    // Simulate AI scan delay
-    setTimeout(async () => {
-      const parsed = {
-        status: 'pending',
-        timestampDetected: new Date().toLocaleString('id-ID'),
-        recipientAccount: selectedMethod === 'mandiri' ? 'Mandiri' : selectedMethod === 'seabank' ? 'SeaBank' : 'QRIS ShopeePay',
-        nominalDetected: price,
-        isAuthentic: false,
-        reasons: ["Sistem AI Verifikasi saat ini sedang sibuk.", "Bukti transfer telah dikirim ke antrean manual.", "Admin akan segera meninjau pembayaran Anda."],
-        summaryMarkdown: `## LAPORAN VERIFIKASI PEMBAYARAN (PENDING)
-        
-Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual oleh Admin.
-
-- **Pembayar**: ${activeUser.fullName}
-- **Metode**: ${selectedMethod?.toUpperCase()}
-- **Nominal**: Rp ${price.toLocaleString('id-ID')}
-- **Waktu Transaksi**: ${new Date().toLocaleString('id-ID')}
-- **Status Validasi**: Menunggu Review Manual`
-      };
-
-      setAiAnalysisResult(parsed);
-      setScanSuccess(false);
-
-      const newTx = await auth.createTransaction({
-        userId: activeUser.id,
-        userName: activeUser.fullName,
-        userSlug: activeUser.activeSlug,
-        userEmail: activeUser.email,
-        packageId: activeUser.packageId,
-        isCustomByRfx: activeUser.isCustomByRfx,
-        nominalExpected: price,
-        status: 'success',
-        timestamp: new Date().toLocaleString('id-ID'),
-        proofImage: imageSrc,
-        aiResult: {
-          timestampDetected: parsed.timestampDetected,
-          recipientAccount: parsed.recipientAccount,
-          nominalDetected: parsed.nominalDetected,
-          isAuthentic: parsed.isAuthentic,
-          reasons: parsed.reasons,
-          summaryMarkdown: parsed.summaryMarkdown
-        }
-      });
-
-      // Show manual review message instead of auto-approving
-      setPaymentError("Server Verifikasi AI sedang sibuk. Bukti pembayaran Anda berhasil diunggah dan sedang dalam antrean review manual oleh admin. Mohon tunggu beberapa saat.");
-    }, 2500);
-  };
-
-  // Image Upload handler — uploads to Cloudinary, then AI scans
+  // Image Upload handler — uploads to Cloudinary, then directly saves
   const handleImageUpload = async (file: File) => {
     try {
+      setIsUploading(true);
       setUploadProgress(0);
+      setPaymentError(null);
       // Upload to Cloudinary
       const result = await uploadProofTransfer(file, (p) => setUploadProgress(p));
       setProofImage(result.secureUrl);
-      // Also get base64 for AI scanning
-      const base64 = await fileToBase64(file);
-      scanReceipt(base64);
+      
+      // Pass the secure URL instead of base64
+      submitProofTransaction(result.secureUrl);
     } catch (err: any) {
-      // Fallback: use base64 directly if Cloudinary fails
-      const base64 = await fileToBase64(file);
-      setProofImage(base64);
-      scanReceipt(base64);
+      console.error('Cloudinary Upload Error:', err);
+      setPaymentError(err.message || 'Gagal mengunggah gambar. Pastikan ukuran file max 5MB dan format sesuai.');
+      setIsUploading(false);
     }
   };
 
@@ -415,14 +323,37 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
     }
   };
 
-  // Step 1 Click Handler (Groom, Bride, FullName, Slug verification)
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) return;
+    try {
+      const decoded: any = jwtDecode(credentialResponse.credential);
+      const email = decoded.email;
+      const name = decoded.name;
+      const picture = decoded.picture;
+      
+      const result = await auth.loginWithGoogle(email, name, picture);
+      if (result) {
+        if ('unverifiedEmail' in result) {
+          // New user -> send to signup step 2 directly with email and name filled
+          setGoogleUser(result);
+          setEmail(result.unverifiedEmail);
+          setFullName(result.name);
+          setMode('signup');
+          setStep(1); // Force step 1 to fill Groom/Bride names
+        } else {
+          // Existing user -> login via Turso sets active user, we can trigger success
+          onLoginSuccess(result);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to decode Google JWT', err);
+    }
+  };
+
+  // Step 1 Click Handler (Groom, Bride, FullName)
   const handleNextStep1 = () => {
     if (!fullName || !groomName || !brideName) {
       alert("Harap lengkapi semua isian formulir profil dasar terlebih dahulu!");
-      return;
-    }
-    if (slugError) {
-      alert("Slug nama pasangan sudah digunakan. Silakan modifikasi sedikit agar unik!");
       return;
     }
     setStep(2);
@@ -430,48 +361,63 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
 
   // Step 2 Click Handler (Email, Password, Wa, Sosmed verification)
   const handleNextStep2 = async () => {
-    if (!email || !password || !noWa || !sosmed) {
-      alert("Harap lengkapi semua data kontak dan password Anda!");
+    if (!noWa || !sosmed) {
+      alert("Harap lengkapi semua data kontak WhatsApp dan Sosial Media Anda!");
       return;
     }
-    if (password.length < 6) {
-      alert("Password minimal 6 karakter!");
-      return;
+    if (!googleUser) {
+      if (!email || !password) {
+        alert("Harap lengkapi semua data kontak dan password Anda!");
+        return;
+      }
+      if (password.length < 6) {
+        alert("Password minimal 6 karakter!");
+        return;
+      }
+      
+      // Check email uniqueness via Turso
+      const emailAvailable = await auth.checkEmailAvailable(email);
+      if (!emailAvailable) {
+        alert("Email ini sudah pernah mendaftarkan akun. Silakan gunakan menu Sign In.");
+        return;
+      }
     }
-    
-    // Check email uniqueness via Turso
-    const emailAvailable = await auth.checkEmailAvailable(email);
-    if (!emailAvailable) {
-      alert("Email ini sudah pernah mendaftarkan akun. Silakan gunakan menu Sign In.");
-      return;
-    }
-
     setStep(3);
   };
 
   // Complete Registration Form Step 3 — save to Turso
   const handleSignUpComplete = async () => {
+    if (packageId !== 'demo' && slugError) {
+      alert("Slug nama pasangan sudah digunakan. Silakan modifikasi sedikit agar unik!");
+      return;
+    }
+
     const newUser = await auth.register({
       fullName,
       coupleGroom: groomName,
       coupleBride: brideName,
       activeSlug: slug,
       email,
-      password,
+      password: googleUser ? Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2) : password,
       noWa,
       sosmed,
       packageId,
-      isCustomByRfx: isCustomByRfx,
-      paymentStatus: 'pending',
+      isCustomByRfx: packageId === 'demo' ? false : isCustomByRfx,
+      paymentStatus: 'success', // Payment disabled — all users get instant access
+      authProvider: googleUser ? 'google' : 'local',
+      avatarUrl: googleUser?.avatarUrl
     });
 
-    if (!newUser && auth.error) {
-      alert(auth.error);
-      auth.clearError();
+    if (!newUser) {
+      if (auth.error) {
+        alert(auth.error);
+        auth.clearError();
+      }
       return;
     }
 
-    setMode('payment');
+    // Payment disabled — always bypass to dashboard
+    onLoginSuccess(newUser!);
   };
 
   // Copy helper
@@ -503,102 +449,68 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
     }
   };
 
+  const safePackageId = activeUser?.packageId && PRICES[activeUser.packageId] ? activeUser.packageId : 'reguler';
   const currentBillAmount = activeUser 
-    ? PRICES[activeUser.packageId][activeUser.isCustomByRfx ? 'rfx' : 'mandiri']
+    ? PRICES[safePackageId][activeUser.isCustomByRfx ? 'rfx' : 'mandiri']
     : 0;
 
   return (
-    <div className="min-h-screen bg-[#070708] text-zinc-100 flex flex-col font-sans relative selection:bg-rose-500/30">
-      {/* Visual Ambient Blur Backgrounds */}
-      <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-rose-950/10 via-[#070708]/5 to-transparent pointer-events-none" />
-      <div className="absolute top-24 left-[10%] w-[40%] h-[40%] rounded-full bg-rose-900/5 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-24 right-[10%] w-[45%] h-[45%] rounded-full bg-rose-950/5 blur-[140px] pointer-events-none" />
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col font-sans relative selection:bg-[var(--color-primary-light)] selection:text-[var(--color-primary-hover)]">
+      {/* Soft Ambient Backgrounds */}
+      <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[var(--color-primary-lighter)] via-[var(--bg-primary)] to-transparent pointer-events-none opacity-60" />
+      <div className="absolute top-20 left-[5%] w-[35%] h-[35%] rounded-full bg-[var(--color-primary-light)] blur-[130px] pointer-events-none opacity-30" />
+      <div className="absolute bottom-20 right-[5%] w-[40%] h-[40%] rounded-full bg-[var(--color-accent-lighter)] blur-[140px] pointer-events-none opacity-30" />
+      {/* Ornamental dot pattern */}
+      <div className="absolute inset-0 ornament-dots opacity-[0.03] pointer-events-none" />
 
-      {/* Elegant Floating Top Bar */}
-      <header className="border-b border-zinc-900/60 px-6 py-4 flex justify-between items-center z-30 bg-[#070708]/80 backdrop-blur-md sticky top-0">
-        <div className="flex items-center gap-3">
-          <span className="p-2.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 text-rose-500 flex items-center justify-center shadow-lg">
-            <Heart className="w-5 h-5 fill-rose-650" />
-          </span>
-          <div>
-            <h1 className="text-sm font-black tracking-wider uppercase font-mono text-white flex items-center gap-1.5">
-              Wedding Builder <span className="bg-rose-600 text-[8.5px] text-white px-2 py-0.5 rounded-full font-bold">SaaS GATEWAY</span>
-            </h1>
-            <p className="text-[9.5px] text-zinc-500 font-mono tracking-widest uppercase">Powered by RFX.visual</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {mode === 'admin' && (
-            <button
-              onClick={handleExitAdmin}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0e0e12]/60 hover:bg-rose-950/20 border border-zinc-850 hover:border-rose-900/40 text-xs text-zinc-400 hover:text-rose-450 transition cursor-pointer animate-fadeIn"
-            >
-              <LogOut className="w-4 h-4 text-rose-500" />
-              <span>Keluar Admin</span>
-            </button>
-          )}
-
-          {activeUser && (
-            <button
-              onClick={() => {
-                auth.logout();
-                setMode('signin');
-              }}
-              className="px-2.5 py-1.5 text-zinc-400 hover:text-white border border-zinc-905 hover:bg-zinc-950 rounded-xl text-xs transition flex items-center gap-1"
-              title="Sign Out Account"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Keluar Akun</span>
-            </button>
-          )}
-        </div>
-      </header>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16 z-10">
         
         {/* ==================== SIGN IN VIEW ==================== */}
         {mode === 'signin' && (
-          <div className="w-full max-w-md bg-zinc-950/70 border border-zinc-900/80 p-8 rounded-[32px] shadow-2xl backdrop-blur-xl animate-fadeIn space-y-6">
-            <div className="text-center space-y-2">
-              <span className="text-[10px] tracking-[0.3em] font-black uppercase text-rose-500 font-mono">SAAS LOGIN GATEWAY</span>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight">Masuk ke Dashboard</h2>
-              <p className="text-xs text-zinc-400">Gunakan email terdaftar untuk mengolah rancangan undangan Anda.</p>
+          <div className="w-full max-w-md card-glass p-8 rounded-[32px] animate-slideUp space-y-6">
+            {/* Decorative header */}
+            <div className="text-center space-y-3">
+              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-primary-light)] flex items-center justify-center animate-float">
+                <Heart className="w-7 h-7 text-[var(--color-primary)]" />
+              </div>
+              <h2 className="text-3xl font-display font-bold text-[var(--text-primary)] tracking-tight">Selamat Datang</h2>
+              <p className="text-sm text-[var(--text-secondary)] font-body-serif">Masuk untuk mengelola undangan digital Anda</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400 font-medium">Alamat Email Terdaftar</label>
+                <label className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
                   <input
                     type="email"
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:outline-none focus:ring-2 focus:ring-rose-500/45 focus:border-rose-500/80 transition"
+                    className="input-elegant pl-11"
                     placeholder="nama@email.com"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400 font-medium">Password</label>
+                <label className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
                   <input
                     type="password"
                     required
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl py-3 pl-11 pr-4 text-xs text-white focus:outline-none focus:ring-2 focus:ring-rose-500/45 focus:border-rose-500/80 transition"
+                    className="input-elegant pl-11"
                     placeholder="Masukkan password Anda"
                   />
                 </div>
               </div>
 
               {auth.error && (
-                <div className="flex items-center gap-2 text-[11px] text-red-400 bg-red-950/20 p-2.5 border border-red-900/30 rounded-xl">
+                <div className="flex items-center gap-2 text-[11px] text-[var(--color-danger)] bg-[var(--color-danger-light)] p-3 border border-[var(--color-danger)]/20 rounded-xl">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>{auth.error}</span>
                 </div>
@@ -607,24 +519,39 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
               <button
                 type="submit"
                 disabled={auth.isLoading}
-                className="w-full bg-zinc-100 text-zinc-950 font-bold hover:bg-rose-550 hover:text-white rounded-2xl py-3 text-xs tracking-wider transition duration-300 uppercase shadow-lg shadow-black/30 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="btn-primary w-full py-3.5 text-sm rounded-2xl disabled:opacity-50"
               >
                 <span>{auth.isLoading ? 'Memproses...' : 'Masuk Sekarang'}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </form>
 
-            <div className="pt-4 border-t border-zinc-900/60 text-center">
-              <p className="text-xs text-zinc-500">
-                Belum mendaftarkan pernikahan Anda?{' '}
+            <div className="divider-ornamental text-sm py-1">
+              atau
+            </div>
+
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => console.error('Google Login Failed')}
+                theme="outline"
+                shape="pill"
+                text="continue_with"
+                size="large"
+              />
+            </div>
+
+            <div className="pt-4 border-t border-[var(--border-light)] text-center">
+              <p className="text-sm text-[var(--text-secondary)]">
+                Belum punya akun?{' '}
                 <button
                   onClick={() => {
                     setMode('signup');
                     setStep(1);
                   }}
-                  className="text-rose-450 hover:text-rose-400 font-bold underline focus:outline-none bg-transparent border-none cursor-pointer"
+                  className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] font-semibold hover:underline focus:outline-none bg-transparent border-none cursor-pointer transition-colors"
                 >
-                  Registrasi SaaS disini
+                  Daftar Sekarang
                 </button>
               </p>
             </div>
@@ -633,129 +560,98 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
 
         {/* ==================== SIGN UP VIEW (3-STEP WIZARD) ==================== */}
         {mode === 'signup' && (
-          <div className="w-full max-w-xl bg-zinc-950/70 border border-zinc-900/80 p-8 rounded-[36px] shadow-2xl backdrop-blur-xl animate-fadeIn space-y-6">
+          <div className="w-full max-w-xl card-glass-strong p-8 rounded-[36px] animate-slideUp space-y-6">
             
             {/* Step indicators */}
-            <div className="flex justify-between items-center pb-2 border-b border-zinc-900/60">
+            <div className="flex justify-between items-center pb-3 border-b border-[var(--border-light)]">
               <div className="flex items-center gap-2">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 1 ? 'bg-rose-550 text-white' : 'bg-zinc-800 text-zinc-500'}`}>1</span>
-                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-zinc-400 hidden sm:inline">Profil</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 1 ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--bg-surface-alt)] text-[var(--text-muted)]'}`}>1</span>
+                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-[var(--text-secondary)] hidden sm:inline">Profil</span>
               </div>
-              <div className="w-8 h-[1px] bg-zinc-800" />
+              <div className="w-8 h-[1px] bg-[var(--border-default)]" />
               <div className="flex items-center gap-2">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 2 ? 'bg-rose-550 text-white' : 'bg-zinc-800 text-zinc-500'}`}>2</span>
-                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-zinc-400 hidden sm:inline">Mempelai & Kontak</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 2 ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--bg-surface-alt)] text-[var(--text-muted)]'}`}>2</span>
+                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-[var(--text-secondary)] hidden sm:inline">Kontak</span>
               </div>
-              <div className="w-8 h-[1px] bg-zinc-800" />
+              <div className="w-8 h-[1px] bg-[var(--border-default)]" />
               <div className="flex items-center gap-2">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 3 ? 'bg-rose-550 text-white' : 'bg-zinc-800 text-zinc-500'}`}>3</span>
-                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-zinc-400 hidden sm:inline">Pilih Paket</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${step >= 3 ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--bg-surface-alt)] text-[var(--text-muted)]'}`}>3</span>
+                <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-[var(--text-secondary)] hidden sm:inline">Paket</span>
               </div>
             </div>
 
             {/* Title */}
             <div className="text-center space-y-1.5">
-              <span className="text-[9px] tracking-[0.25em] font-black uppercase text-rose-500 font-mono">REGISTRASI PERNIKAHAN SAAS</span>
-              <h2 className="text-xl font-black text-white uppercase tracking-tight">
-                {step === 1 && "1. Profil Pernikahan & Slug"}
-                {step === 2 && "2. Kontak & Media Sosial"}
+              <span className="text-[10px] tracking-[0.25em] font-bold uppercase text-[var(--color-primary)] font-mono">REGISTRASI UNDANGANKITA</span>
+              <h2 className="text-2xl font-display font-bold text-[var(--text-primary)] uppercase tracking-tight">
+                {step === 1 && "1. Profil Pernikahan"}
+                {step === 2 && "2. Detail Kontak"}
                 {step === 3 && "3. Pilih Paket Layanan"}
               </h2>
-              <p className="text-xs text-zinc-400">
-                {step === 1 && "Tentukan nama lengkap, nama panggilan, serta tautan (slug) unik pasangan Anda."}
-                {step === 2 && "Lengkapi detail email, nomor WhatsApp untuk notifikasi RSVP, serta ID sosial media."}
-                {step === 3 && "Tentukan limitasi kuota undangan serta model kustomisasi sesuai budget impian Anda."}
+              <p className="text-sm text-[var(--text-secondary)] font-body-serif">
+                {step === 1 && "Tentukan nama panggilan serta tautan (slug) unik pasangan Anda."}
+                {step === 2 && "Lengkapi detail email, nomor WhatsApp untuk RSVP, serta media sosial."}
+                {step === 3 && "Tentukan limitasi kuota undangan serta model layanan sesuai kebutuhan Anda."}
               </p>
             </div>
 
             {/* STEP 1: Basic Profiles and Auto Slug generator */}
             {step === 1 && (
               <div className="space-y-4 pt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Nama Lengkap Pengguna</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
-                      placeholder="Contoh: Ridho Alamsyah"
-                    />
+                {!googleUser && (
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Nama Lengkap Pemesan</label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
+                      <input
+                        type="text"
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="input-elegant pl-11"
+                        placeholder="Contoh: Ridho Alamsyah"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Nama Panggilan Pengantin Pria</label>
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Panggilan Pria</label>
                     <input
                       type="text"
                       required
                       value={groomName}
                       onChange={(e) => setGroomName(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 px-3.5 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
+                      className="input-elegant"
                       placeholder="Contoh: Ridho"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Nama Panggilan Pengantin Wanita</label>
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Panggilan Wanita</label>
                     <input
                       type="text"
                       required
                       value={brideName}
                       onChange={(e) => setBrideName(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 px-3.5 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
+                      className="input-elegant"
                       placeholder="Contoh: Jennie"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-2 bg-zinc-900/20 border border-zinc-900/80 p-4 rounded-2xl">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] font-bold text-rose-500 tracking-wider uppercase font-mono flex items-center gap-1">
-                      <Globe className="w-3.5 h-3.5" />
-                      <span>Slug Pernikahan (Tautan Share)</span>
-                    </label>
-                    <span className="text-[9px] text-zinc-500 font-mono">Format Otomatis</span>
-                  </div>
-
-                  <input
-                    type="text"
-                    required
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    className="w-full bg-zinc-950/80 border border-zinc-800/80 rounded-2xl py-2.5 px-3.5 text-xs font-mono text-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
-                    placeholder="Contoh: ridho-jennie"
-                  />
-
-                  {slugError ? (
-                    <div className="flex items-start gap-1.5 text-[11px] text-red-400 bg-red-950/20 p-2.5 border border-red-900/30 rounded-xl">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                      <span>{slugError}</span>
-                    </div>
-                  ) : slug ? (
-                    <div className="text-[10px] font-mono text-zinc-500">
-                      Tautan Anda nantinya:{' '}
-                      <span className="text-zinc-300 font-bold bg-zinc-900/80 px-2 py-0.5 rounded border border-zinc-850">
-                        undangankita.rfx.web.id/{slug}
-                      </span>
-                    </div>
-                  ) : null}
-                </div>
-
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => setMode('signin')}
-                    className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 rounded-2xl py-3 text-xs transition uppercase font-bold cursor-pointer"
+                    className="btn-ghost flex-1 py-3 text-xs"
                   >
                     Batal
                   </button>
                   <button
                     onClick={handleNextStep1}
-                    className="flex-1 bg-zinc-100 text-zinc-950 hover:bg-rose-600 hover:text-white rounded-2xl py-3 text-xs font-black transition uppercase cursor-pointer flex items-center justify-center gap-1"
+                    className="btn-primary flex-1 py-3 text-xs"
                   >
-                    <span>Langkah Selanjutnya</span>
+                    <span>Lanjut</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -765,62 +661,65 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             {/* STEP 2: Contacts and email verification */}
             {step === 2 && (
               <div className="space-y-4 pt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Alamat Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
-                      placeholder="nama@email.com"
-                    />
-                  </div>
-                </div>
+                {!googleUser && (
+                  <>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Alamat Email</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="input-elegant pl-11"
+                          placeholder="nama@email.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Password Akun</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="input-elegant pl-11"
+                          placeholder="Minimal 6 karakter"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Password Akun</label>
+                  <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">WhatsApp Aktif</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                    <input
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
-                      placeholder="Minimal 6 karakter"
-                    />
-                  </div>
-                  <p className="text-[9px] text-zinc-600 font-mono">Password digunakan untuk login kembali nanti.</p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Nomor WhatsApp Aktif</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
                     <input
                       type="tel"
                       required
                       value={noWa}
                       onChange={(e) => setNoWa(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
-                      placeholder="Format: 0812xxxxxxxx atau +62812xxxxxxxx"
+                      className="input-elegant pl-11"
+                      placeholder="Format: 0812xxxxxxxx"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Sosial Media (Instagram/TikTok)</label>
+                  <label className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase">Instagram/TikTok</label>
                   <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-faint)]" />
                     <input
                       type="text"
                       required
                       value={sosmed}
                       onChange={(e) => setSosmed(e.target.value)}
-                      className="w-full bg-zinc-900/60 border border-zinc-800 rounded-2xl py-2.5 pl-10 pr-4 text-xs text-white focus:ring-2 focus:ring-rose-500/40"
+                      className="input-elegant pl-11"
                       placeholder="@username_anda"
                     />
                   </div>
@@ -829,15 +728,15 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => setStep(1)}
-                    className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-805 rounded-2xl py-3 text-xs transition uppercase font-bold cursor-pointer"
+                    className="btn-ghost flex-1 py-3 text-xs"
                   >
                     Kembali
                   </button>
                   <button
                     onClick={handleNextStep2}
-                    className="flex-1 bg-zinc-100 text-zinc-950 hover:bg-rose-600 hover:text-white rounded-2xl py-3 text-xs font-black transition uppercase cursor-pointer flex items-center justify-center gap-1"
+                    className="btn-primary flex-1 py-3 text-xs"
                   >
-                    <span>Langkah Terakhir</span>
+                    <span>Lanjut</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -848,115 +747,176 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             {step === 3 && (
               <div className="space-y-5 pt-2">
                 <div className="space-y-3">
-                  <div className="flex gap-4 md:flex-row flex-col">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Demo Package Card */}
+                    <div 
+                      onClick={() => setPackageId('demo')}
+                      className={`card-interactive p-5 relative flex flex-col justify-between ${packageId === 'demo' ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : ''}`}
+                    >
+                      <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full bg-[var(--bg-surface-alt)] text-[9px] text-[var(--text-secondary)] font-bold tracking-wide uppercase border border-[var(--border-default)]">14 Hari</span>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-secondary)]">Uji Coba</span>
+                        <h4 className="text-base font-bold text-[var(--text-primary)] uppercase">DEMO</h4>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Limitasi: 20 Tamu & Tanpa QR</p>
+                      </div>
+                      <div className="pt-4 border-t border-[var(--border-light)] mt-4">
+                        <span className="text-[11px] text-[var(--text-muted)] font-semibold uppercase">Biaya</span>
+                        <h4 className="text-xl font-bold text-[var(--color-secondary)]">Gratis</h4>
+                      </div>
+                    </div>
                     {/* Reguler Package Card */}
                     <div 
                       onClick={() => setPackageId('reguler')}
-                      className={`flex-1 p-5 rounded-3xl border transition duration-300 cursor-pointer relative flex flex-col justify-between ${packageId === 'reguler' ? 'bg-zinc-900/90 border-rose-500/70 shadow-lg shadow-rose-950/10' : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'}`}
+                      className={`card-interactive p-5 relative flex flex-col justify-between ${packageId === 'reguler' ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : ''}`}
                     >
                       <div className="space-y-1">
-                        <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-zinc-500">Tier Satu</span>
-                        <h4 className="text-base font-black text-white uppercase font-sans">REGULER</h4>
-                        <p className="text-[10px] text-zinc-400">Batasan Maksimal: <span className="text-white font-bold">1 Undangan</span></p>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Dasar</span>
+                        <h4 className="text-base font-bold text-[var(--text-primary)] uppercase">REGULER</h4>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Batas Maksimal: 1 Acara</p>
                       </div>
-                      <div className="pt-4 border-t border-zinc-900/60 mt-4">
-                        <span className="text-xs text-zinc-400">Mulai dari</span>
-                        <h4 className="text-xl font-extrabold text-white">Rp 30.000</h4>
+                      <div className="pt-4 border-t border-[var(--border-light)] mt-4">
+                        <span className="text-[11px] text-[var(--text-muted)] font-semibold uppercase">Mulai dari</span>
+                        <h4 className="text-xl font-bold text-[var(--text-primary)]">Rp 30.000</h4>
                       </div>
                     </div>
 
                     {/* Medium Package Card */}
                     <div 
                       onClick={() => setPackageId('medium')}
-                      className={`flex-1 p-5 rounded-3xl border transition duration-300 cursor-pointer relative flex flex-col justify-between ${packageId === 'medium' ? 'bg-zinc-900/90 border-rose-500/70 shadow-lg shadow-rose-950/10' : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'}`}
+                      className={`card-interactive p-5 relative flex flex-col justify-between ${packageId === 'medium' ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : ''}`}
                     >
-                      <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full bg-rose-600 text-[8px] text-white font-bold font-mono tracking-wide uppercase">Populer</span>
+                      <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full bg-[var(--color-primary)] text-[9px] text-white font-bold tracking-wide uppercase">Populer</span>
                       <div className="space-y-1">
-                        <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-zinc-500">Tier Dua</span>
-                        <h4 className="text-base font-black text-white uppercase font-sans">MEDIUM</h4>
-                        <p className="text-[10px] text-zinc-400">Batasan Maksimal: <span className="text-white font-bold">2 Undangan</span></p>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-primary)]">Menengah</span>
+                        <h4 className="text-base font-bold text-[var(--text-primary)] uppercase">MEDIUM</h4>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Batas Maksimal: 2 Acara</p>
                       </div>
-                      <div className="pt-4 border-t border-zinc-900/60 mt-4">
-                        <span className="text-xs text-zinc-400">Mulai dari</span>
-                        <h4 className="text-xl font-extrabold text-white">Rp 50.000</h4>
+                      <div className="pt-4 border-t border-[var(--border-light)] mt-4">
+                        <span className="text-[11px] text-[var(--text-muted)] font-semibold uppercase">Mulai dari</span>
+                        <h4 className="text-xl font-bold text-[var(--text-primary)]">Rp 50.000</h4>
                       </div>
                     </div>
 
                     {/* Premium Package Card */}
                     <div 
                       onClick={() => setPackageId('premium')}
-                      className={`flex-1 p-5 rounded-3xl border transition duration-300 cursor-pointer relative flex flex-col justify-between ${packageId === 'premium' ? 'bg-zinc-900/90 border-rose-500/70 shadow-lg shadow-rose-950/10' : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'}`}
+                      className={`card-interactive p-5 relative flex flex-col justify-between ${packageId === 'premium' ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : ''}`}
                     >
+                      <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] text-[9px] font-bold tracking-wide uppercase border border-[var(--color-accent)]/20">Eksklusif</span>
                       <div className="space-y-1">
-                        <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-zinc-500">Tier Tiga</span>
-                        <h4 className="text-base font-black text-white uppercase font-sans">PREMIUM</h4>
-                        <p className="text-[10px] text-zinc-400">Batasan Maksimal: <span className="text-white font-bold">4 Undangan</span></p>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">Tertinggi</span>
+                        <h4 className="text-base font-bold text-[var(--text-primary)] uppercase">PREMIUM</h4>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Batas Maksimal: 4 Acara</p>
                       </div>
-                      <div className="pt-4 border-t border-zinc-900/60 mt-4">
-                        <span className="text-xs text-zinc-400">Mulai dari</span>
-                        <h4 className="text-xl font-extrabold text-white">Rp 100.000</h4>
+                      <div className="pt-4 border-t border-[var(--border-light)] mt-4">
+                        <span className="text-[11px] text-[var(--text-muted)] font-semibold uppercase">Mulai dari</span>
+                        <h4 className="text-xl font-bold text-[var(--text-primary)]">Rp 100.000</h4>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                {/* Slug Input Selection on Step 3 */}
+                <div className="space-y-2 bg-[var(--bg-surface-alt)] border border-[var(--border-light)] p-5 rounded-2xl">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[11px] font-semibold text-[var(--color-primary)] tracking-wider uppercase flex items-center gap-1.5">
+                      <Globe className="w-4 h-4" />
+                      <span>Slug / Link Undangan</span>
+                    </label>
+                    <span className="text-[10px] text-[var(--text-muted)] font-mono">{packageId === 'demo' ? 'Otomatis' : 'Custom'}</span>
+                  </div>
+
+                  <input
+                    type="text"
+                    required
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    disabled={packageId === 'demo'}
+                    className={`input-elegant font-mono ${packageId === 'demo' ? 'bg-[var(--border-light)] text-[var(--text-muted)] cursor-not-allowed' : ''}`}
+                    placeholder="Contoh: ridho-jennie"
+                  />
+
+                  {packageId !== 'demo' && slugError ? (
+                    <div className="flex items-start gap-1.5 text-[11px] text-[var(--color-danger)] bg-[var(--color-danger-light)] p-2.5 border border-[var(--color-danger)]/20 rounded-xl mt-2">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                      <span>{slugError}</span>
+                    </div>
+                  ) : slug ? (
+                    <div className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-2 flex items-center flex-wrap gap-1">
+                      Link anda nantinya:{' '}
+                      <span className="text-[var(--text-primary)] font-bold bg-[var(--bg-surface)] px-2 py-0.5 rounded-lg border border-[var(--border-default)] font-mono break-all inline-block mt-1 w-full sm:w-auto">
+                        undangankita.rfx.web.id/{slug}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+
                 {/* Custom Type Configurator */}
-                <div className="bg-zinc-950/80 border border-zinc-900 p-6 rounded-3xl space-y-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-zinc-900">
-                    <label className="text-[10.5px] font-bold tracking-wider uppercase font-mono text-zinc-400">Opsi Modifikasi Desain</label>
-                    <span className="text-[10px] font-mono text-rose-500 font-bold">Tentukan Layanan Anda</span>
+                {packageId !== 'demo' && (
+                <div className="bg-[var(--bg-surface-alt)] border border-[var(--border-light)] p-5 rounded-3xl space-y-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-[var(--border-default)]">
+                    <label className="text-[11px] font-semibold tracking-wider uppercase text-[var(--text-secondary)]">Opsi Pembuatan</label>
                   </div>
 
                   <div className="flex gap-4">
                     <div 
                       onClick={() => setIsCustomByRfx(false)}
-                      className={`flex-1 p-4 rounded-2xl border transition duration-250 cursor-pointer flex items-center justify-between ${!isCustomByRfx ? 'bg-zinc-900/90 border-rose-500/60' : 'bg-transparent border-zinc-900 text-zinc-400'}`}
+                      className={`flex-1 p-4 rounded-2xl border transition duration-300 cursor-pointer flex flex-col justify-between bg-[var(--bg-surface)] ${!isCustomByRfx ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : 'border-[var(--border-default)]'}`}
                     >
                       <div>
-                        <h5 className="text-xs font-extrabold text-white uppercase">Custom Mandiri</h5>
-                        <p className="text-[9.5px] text-zinc-400 mt-0.5">Edit mandiri via builder</p>
+                        <h5 className="text-xs font-bold text-[var(--text-primary)] uppercase">Buat Sendiri</h5>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Edit via builder</p>
                       </div>
-                      <span className="text-sm font-black text-white">Rp {PRICES[packageId].mandiri.toLocaleString('id-ID')}</span>
+                      <span className="text-sm font-bold text-[var(--color-primary)] mt-3">Rp {PRICES[packageId].mandiri.toLocaleString('id-ID')}</span>
                     </div>
 
                     <div 
                       onClick={() => setIsCustomByRfx(true)}
-                      className={`flex-1 p-4 rounded-2xl border transition duration-250 cursor-pointer flex items-center justify-between ${isCustomByRfx ? 'bg-zinc-900/90 border-rose-500/60' : 'bg-transparent border-zinc-900 text-zinc-400'}`}
+                      className={`flex-1 p-4 rounded-2xl border transition duration-300 cursor-pointer flex flex-col justify-between bg-[var(--bg-surface)] ${isCustomByRfx ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : 'border-[var(--border-default)]'}`}
                     >
                       <div>
-                        <h5 className="text-xs font-extrabold text-white uppercase">Custom Full (by RFX)</h5>
-                        <p className="text-[9.5px] text-zinc-400 mt-0.5">Didesain penuh oleh tim kami</p>
+                        <h5 className="text-xs font-bold text-[var(--text-primary)] uppercase">Terima Beres</h5>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-body-serif mt-1">Dibuatkan tim kami</p>
                       </div>
-                      <span className="text-sm font-black text-white">Rp {PRICES[packageId].rfx.toLocaleString('id-ID')}</span>
+                      <span className="text-sm font-bold text-[var(--color-primary)] mt-3">Rp {PRICES[packageId].rfx.toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 </div>
+                )}
 
                 {/* Final Checkout calculation review */}
-                <div className="bg-rose-950/10 border border-rose-900/20 p-5 rounded-3xl flex justify-between items-center">
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">Total Tagihan Pemesanan</span>
-                    <h5 className="text-xs text-zinc-300">
-                      Paket {packageId.toUpperCase()} + {isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'}
+                <div className="bg-[var(--color-primary-lighter)] border border-[var(--color-primary-light)] p-5 rounded-3xl flex justify-between items-center shadow-sm">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-semibold tracking-wider text-[var(--color-primary-hover)] uppercase">Total Ringkasan</span>
+                    <h5 className="text-[13px] font-bold text-[var(--text-primary)]">
+                      Paket {(packageId || '').toUpperCase()} {packageId !== 'demo' && `+ ${isCustomByRfx ? 'Terima Beres' : 'Buat Sendiri'}`}
                     </h5>
                   </div>
-                  <h4 className="text-2xl font-black text-rose-500">
-                    Rp {PRICES[packageId][isCustomByRfx ? 'rfx' : 'mandiri'].toLocaleString('id-ID')}
+                  <h4 className={`text-2xl font-display font-bold ${packageId === 'demo' ? 'text-[var(--color-secondary)]' : 'text-[var(--color-primary)]'}`}>
+                    {packageId === 'demo' ? 'Gratis' : `Rp ${PRICES[packageId][isCustomByRfx ? 'rfx' : 'mandiri'].toLocaleString('id-ID')}`}
                   </h4>
                 </div>
+                
+                {auth.error && (
+                  <div className="flex items-center gap-2 text-[11px] text-[var(--color-danger)] bg-[var(--color-danger-light)] p-3 border border-[var(--color-danger)]/20 rounded-xl">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{auth.error}</span>
+                  </div>
+                )}
 
-                <div className="flex gap-4 pt-2">
+                <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => setStep(2)}
-                    className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-805 rounded-2xl py-3 text-xs transition uppercase font-bold cursor-pointer"
+                    className="btn-ghost flex-1 py-3 text-xs"
                   >
                     Kembali
                   </button>
                   <button
                     onClick={handleSignUpComplete}
-                    className="flex-1 bg-rose-600 text-white hover:bg-rose-550 rounded-2xl py-3 text-xs font-black transition uppercase cursor-pointer flex items-center justify-center gap-1 shadow-lg shadow-rose-950/20 animate-pulse"
+                    disabled={auth.isLoading}
+                    className="btn-primary flex-1 py-3 text-xs"
                   >
-                    <span>Selesaikan & Bayar</span>
+                    <span>{auth.isLoading ? 'Memproses...' : 'Selesaikan Registrasi'}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -964,16 +924,21 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             )}
           </div>
         )}
-
         {/* ==================== PAYMENT VIEW ==================== */}
         {mode === 'payment' && activeUser && (
           <div className="w-full max-w-2xl bg-zinc-950/75 border border-zinc-900 p-8 rounded-[38px] shadow-2xl backdrop-blur-xl animate-fadeIn space-y-6">
-            <div className="text-center space-y-1.5">
+            <div className="text-center space-y-1.5 relative">
               <span className="text-[10px] tracking-[0.35em] font-black uppercase text-rose-500 font-mono">GERBANG PEMBAYARAN MANUAL & VERIFIKASI AI</span>
               <h2 className="text-2xl font-black text-white uppercase tracking-tight">Menunggu Pembayaran Paket</h2>
               <p className="text-xs text-zinc-400">
                 Silakan lakukan transfer sesuai tagihan di bawah ini untuk aktivasi instan akun SaaS Anda.
               </p>
+              <button 
+                onClick={() => { auth.logout(); setMode('signin'); }}
+                className="absolute top-0 right-0 p-2 text-zinc-500 hover:text-white transition flex items-center gap-1 text-[10px] uppercase font-bold"
+              >
+                <LogOut className="w-3.5 h-3.5" /> Keluar Akun
+              </button>
             </div>
 
             {/* Billing Info */}
@@ -982,7 +947,7 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                 <span className="text-[9px] font-mono text-rose-500 font-bold uppercase tracking-widest">Detail Tagihan Aktif</span>
                 <h4 className="text-base font-extrabold text-white uppercase">{activeUser.fullName}</h4>
                 <p className="text-xs text-zinc-400">
-                  Paket: <span className="text-zinc-200 font-bold">{activeUser.packageId.toUpperCase()}</span> ({activeUser.isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'})
+                  Paket: <span className="text-zinc-200 font-bold">{(activeUser.packageId || '').toUpperCase()}</span> ({activeUser.isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'})
                 </p>
                 <div className="text-[10px] font-mono text-zinc-500 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-900 inline-block">
                   Aturan Slug: undangankita.rfx.web.id/{activeUser.activeSlug}
@@ -1001,17 +966,27 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             </div>
 
             {/* Method Selectors */}
+            {transactionStatus !== 'pending' && (
             <div className="space-y-3">
               <label className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase font-mono block">Pilih Metode Transaksi</label>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div 
                   onClick={() => setSelectedMethod('qris')}
                   className={`p-4 rounded-2xl border transition duration-250 cursor-pointer flex flex-col justify-between items-center text-center gap-1.5 ${selectedMethod === 'qris' ? 'bg-zinc-900/90 border-rose-500/60 shadow-md' : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'}`}
                 >
                   <QrCode className="w-5 h-5 text-rose-500" />
-                  <span className="text-xs font-extrabold text-white uppercase">QRIS / ShopeePay</span>
-                  <span className="text-[9px] font-mono text-zinc-500">Scan QR instan</span>
+                  <span className="text-xs font-extrabold text-white uppercase">QRIS GoPay</span>
+                  <span className="text-[9px] font-mono text-zinc-500">Scan Instan</span>
+                </div>
+
+                <div 
+                  onClick={() => setSelectedMethod('shopeepay')}
+                  className={`p-4 rounded-2xl border transition duration-250 cursor-pointer flex flex-col justify-between items-center text-center gap-1.5 ${selectedMethod === 'shopeepay' ? 'bg-zinc-900/90 border-rose-500/60 shadow-md' : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-800'}`}
+                >
+                  <Building className="w-5 h-5 text-orange-500" />
+                  <span className="text-xs font-extrabold text-white uppercase">ShopeePay</span>
+                  <span className="text-[9px] font-mono text-zinc-500">Transfer Saldo</span>
                 </div>
 
                 <div 
@@ -1033,20 +1008,21 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                 </div>
               </div>
             </div>
+            )}
 
             {/* Payment Details + Upload container */}
-            {selectedMethod && (
+            {selectedMethod && transactionStatus !== 'pending' && (
               <div className="bg-zinc-950/90 border border-zinc-900 p-6 rounded-3xl space-y-6 animate-fadeIn">
                 
                 {/* Method instructions */}
                 {selectedMethod === 'qris' ? (
                   <div className="flex flex-col items-center text-center space-y-4">
-                    <span className="text-[10px] font-mono text-rose-500 font-bold uppercase tracking-widest">Layout QRIS ShopeePay Resmi</span>
+                    <span className="text-[10px] font-mono text-rose-500 font-bold uppercase tracking-widest">QRIS Merchant Resmi</span>
                     
                     {/* QR Code Container styled big, elegant and center */}
                     <div className="bg-white p-6 rounded-3xl shadow-2xl border border-zinc-800 inline-block relative overflow-hidden">
                       <img 
-                        src="https://lh3.googleusercontent.com/d/1UoKVxvP08iYb7tS91UU6iwkLXvigkwVE" 
+                        src="https://lh3.googleusercontent.com/d/1053TSiJi-dnopA528U8JWjlG8c7CNH2m" 
                         alt="QRIS RFX.visual" 
                         className="w-56 h-56 object-contain"
                       />
@@ -1065,22 +1041,22 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-zinc-900/20 p-5 border border-zinc-900 rounded-3xl">
                     <div className="space-y-2">
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest block">Metode Rekening Tujuan</span>
+                      <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest block">Metode Tujuan Transfer</span>
                       <h4 className="text-base font-black text-white uppercase">
-                        {selectedMethod === 'mandiri' ? 'BANK MANDIRI' : 'SEABANK'}
+                        {selectedMethod === 'mandiri' ? 'BANK MANDIRI' : selectedMethod === 'seabank' ? 'SEABANK' : 'SHOPEEPAY'}
                       </h4>
                       <div className="font-mono text-zinc-300 text-xs bg-zinc-950 p-3 rounded-2xl border border-zinc-900 relative">
-                        <span className="block font-bold text-rose-500 text-[10px] uppercase mb-0.5">Nomor Rekening Resmi</span>
-                        {selectedMethod === 'mandiri' ? '123-00-9988776-5' : '9012-3456-7890'}
+                        <span className="block font-bold text-rose-500 text-[10px] uppercase mb-0.5">Nomor Tujuan Resmi</span>
+                        {selectedMethod === 'mandiri' ? '1440029346159' : selectedMethod === 'seabank' ? '901410104102' : '085731021469'}
                         <button
-                          onClick={() => triggerCopy(selectedMethod === 'mandiri' ? '1230099887765' : '901234567890', 'rek')}
+                          onClick={() => triggerCopy(selectedMethod === 'mandiri' ? '1440029346159' : selectedMethod === 'seabank' ? '901410104102' : '085731021469', 'rek')}
                           className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition cursor-pointer"
                         >
                           {copiedText === 'rek' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                       <p className="text-[10px] text-zinc-400">
-                        Atas Nama Penerima: <span className="text-white font-bold">RFX Visual Utama</span>
+                        Atas Nama Penerima: <span className="text-white font-bold">MUHAMMAD RIDHO FEBRIYANSYAH</span>
                       </p>
                     </div>
 
@@ -1095,6 +1071,19 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                     </div>
                   </div>
                 )}
+
+                {/* Panduan Verifikasi Manual */}
+                <div className="bg-amber-950/20 border border-amber-900/50 p-4 rounded-2xl flex items-start gap-3">
+                  <div className="bg-amber-950 p-2 rounded-xl border border-amber-900/50 mt-0.5 shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-amber-500" />
+                  </div>
+                  <div>
+                    <h5 className="text-[11px] font-bold text-white uppercase tracking-wide">Penting: Panduan Verifikasi Admin</h5>
+                    <p className="text-[10px] text-zinc-400 mt-1 leading-relaxed">
+                      Bukti transfer Anda akan ditinjau secara manual oleh Admin. Setelah Anda mengunggah gambar bukti transfer, status akun Anda akan langsung masuk ke antrean pengecekan. Mohon tunggu konfirmasi admin atau hubungi Admin via WhatsApp.
+                    </p>
+                  </div>
+                </div>
 
                 {/* Dropzone Upload */}
                 <div className="space-y-3">
@@ -1125,56 +1114,96 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                 </div>
 
                 {/* Visual Status Indicator Scanning */}
-                {isScanning && (
+                {isUploading && (
                   <div className="bg-zinc-900 p-5 rounded-3xl border border-zinc-800 flex flex-col items-center justify-center text-center space-y-3.5 animate-pulse">
-                    <Sparkles className="w-6 h-6 text-rose-550 animate-spin" />
+                    <Upload className="w-6 h-6 text-rose-550 animate-bounce" />
                     <div>
-                      <h4 className="text-xs font-black text-white uppercase tracking-wider">Puter.js AI sedang Scanning Bukti Pembayaran...</h4>
+                      <h4 className="text-xs font-black text-white uppercase tracking-wider">Mengunggah Bukti Pembayaran...</h4>
                       <p className="text-[10px] text-zinc-400 font-sans mt-0.5">
-                        Meneliti tahun, tanggal, jam, nominal transaksi, bank tujuan, serta mendeteksi manipulasi teks photoshop...
+                        Mohon tunggu sebentar, file sedang diunggah ke server...
                       </p>
                     </div>
                   </div>
                 )}
+              </div>
+            )}
 
-                {/* AI Analysis Result Prompts */}
+            {/* Pending State Rendering */}
+            {transactionStatus === 'pending' && (
+              <div className="p-5 rounded-3xl border bg-amber-950/15 border-amber-500/30 text-amber-400 animate-fadeIn space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <Clock className="w-5 h-5 text-amber-500" />
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-white">
+                      Menunggu Konfirmasi Admin
+                    </h4>
+                    <p className="text-[10px] text-zinc-400">Bukti transfer diproses untuk review admin</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 text-[10.5px] text-zinc-300 leading-relaxed">
+                  <span className="block font-bold text-zinc-400 font-mono text-[9px] uppercase tracking-wider mb-1">Status Laporan:</span>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li>Bukti pembayaran telah berhasil diterima oleh sistem.</li>
+                    <li>Transaksi masuk ke antrean pengecekan admin.</li>
+                    <li>Mohon tunggu atau hubungi admin via WhatsApp jika butuh bantuan cepat.</li>
+                  </ul>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-2.5 bg-amber-600 hover:bg-amber-550 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Cek Status Terbaru</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* AI Analysis Result Prompts */}
                 {aiAnalysisResult && (
-                  <div className={`p-5 rounded-3xl border ${scanSuccess ? 'bg-emerald-950/15 border-emerald-500/30 text-emerald-400' : 'bg-red-950/15 border-red-500/30 text-red-400'} animate-fadeIn space-y-4`}>
+                  <div className={`p-5 rounded-3xl border ${scanSuccess === true ? 'bg-emerald-950/15 border-emerald-500/30 text-emerald-400' : scanSuccess === 'pending' ? 'bg-amber-950/15 border-amber-500/30 text-amber-400' : 'bg-red-950/15 border-red-500/30 text-red-400'} animate-fadeIn space-y-4`}>
                     <div className="flex items-center gap-2.5">
-                      {scanSuccess ? (
+                      {scanSuccess === true ? (
                         <CheckCircle className="w-5 h-5 text-emerald-500" />
+                      ) : scanSuccess === 'pending' ? (
+                        <Clock className="w-5 h-5 text-amber-500" />
                       ) : (
                         <AlertCircle className="w-5 h-5 text-red-500" />
                       )}
                       <div>
                         <h4 className="text-xs font-black uppercase tracking-wider text-white">
-                          {scanSuccess ? 'Transaksi Lolos Verifikasi AI' : 'Transaksi Anda Terbukti Gagal!'}
+                          {scanSuccess === true ? 'Transaksi Lolos Verifikasi AI' : scanSuccess === 'pending' ? 'Menunggu Konfirmasi Admin' : 'Transaksi Anda Terbukti Gagal!'}
                         </h4>
-                        <p className="text-[10px] text-zinc-400">Scanner murni diproses oleh Puter.js Vision</p>
+                        <p className="text-[10px] text-zinc-400">Bukti transfer diproses untuk review admin</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-zinc-900 font-mono text-[10.5px]">
-                      <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
-                        <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Tanggal Terbaca</span>
-                        <span className="text-zinc-300">{aiAnalysisResult.timestampDetected || 'Tidak terbaca'}</span>
-                      </div>
-                      
-                      <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
-                        <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Penerima Terbaca</span>
-                        <span className="text-zinc-300">{aiAnalysisResult.recipientAccount || 'Tidak terbaca'}</span>
-                      </div>
+                    {scanSuccess !== 'pending' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-zinc-900 font-mono text-[10.5px]">
+                        <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
+                          <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Tanggal Terbaca</span>
+                          <span className="text-zinc-300">{aiAnalysisResult.timestampDetected || 'Tidak terbaca'}</span>
+                        </div>
+                        
+                        <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
+                          <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Penerima Terbaca</span>
+                          <span className="text-zinc-300">{aiAnalysisResult.recipientAccount || 'Tidak terbaca'}</span>
+                        </div>
 
-                      <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
-                        <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Nominal Terbaca</span>
-                        <span className="text-rose-500 font-bold">
-                          {aiAnalysisResult.nominalDetected ? `Rp ${aiAnalysisResult.nominalDetected.toLocaleString('id-ID')}` : 'Tidak terbaca'}
-                        </span>
+                        <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-900">
+                          <span className="block text-[8.5px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Nominal Terbaca</span>
+                          <span className="text-rose-500 font-bold">
+                            {aiAnalysisResult.nominalDetected ? `Rp ${aiAnalysisResult.nominalDetected.toLocaleString('id-ID')}` : 'Tidak terbaca'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="pt-2 text-[10.5px] text-zinc-300 leading-relaxed">
-                      <span className="block font-bold text-zinc-400 font-mono text-[9px] uppercase tracking-wider mb-1">Poin Analisis Detail AI:</span>
+                      <span className="block font-bold text-zinc-400 font-mono text-[9px] uppercase tracking-wider mb-1">Status Laporan:</span>
                       <ul className="list-disc pl-4 space-y-1">
                         {aiAnalysisResult.reasons?.map((res: string, idx: number) => (
                           <li key={idx}>{res}</li>
@@ -1182,7 +1211,7 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                       </ul>
                     </div>
 
-                    {scanSuccess ? (
+                    {scanSuccess === true ? (
                       <div className="text-center pt-2">
                         <button
                           onClick={() => onLoginSuccess(activeUser)}
@@ -1192,6 +1221,16 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                           <ChevronRight className="w-4 h-4" />
                         </button>
                       </div>
+                    ) : scanSuccess === 'pending' ? (
+                      <div className="text-center pt-2">
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="px-6 py-2.5 bg-amber-600 hover:bg-amber-550 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
+                        >
+                          <span>Cek Status Sekarang</span>
+                          <RefreshCw className="w-4 h-4" />
+                        </button>
+                      </div>
                     ) : (
                       <div className="text-center pt-2">
                         <p className="text-[10px] text-zinc-500">Merespon analisis gagal. Silakan lakukan transfer yang benar lalu unggah bukti transfer yang sah.</p>
@@ -1199,25 +1238,23 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                     )}
                   </div>
                 )}
-              </div>
-            )}
           </div>
         )}
 
         {/* ==================== PORTAL ADMIN VIEW ==================== */}
         {mode === 'admin' && (
-          <div className="w-full max-w-5xl bg-zinc-950/75 border border-zinc-900 p-8 rounded-[38px] shadow-2xl backdrop-blur-xl animate-fadeIn space-y-8">
-            <div className="flex justify-between items-center pb-4 border-b border-zinc-900">
+          <div className="w-full max-w-5xl card-glass-strong p-8 rounded-[38px] animate-slideUp space-y-8">
+            <div className="flex justify-between items-center pb-4 border-b border-[var(--border-default)]">
               <div className="space-y-1">
-                <span className="text-[10px] tracking-[0.35em] font-black uppercase text-emerald-500 font-mono">PANEL ADMINISTRASI PEMBAYARAN</span>
-                <h2 className="text-2xl font-black text-white uppercase tracking-tight">Inspeksi Keuangan SaaS</h2>
+                <span className="text-[10px] tracking-[0.35em] font-bold uppercase text-[var(--color-primary)] font-mono">PANEL ADMINISTRASI UNDANGANKITA</span>
+                <h2 className="text-2xl font-display font-bold text-[var(--text-primary)] uppercase tracking-tight">Inspeksi Keuangan SaaS</h2>
               </div>
               <div className="flex gap-2">
-                <span className="px-3.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono text-xs">
-                  Total Users: <span className="text-white font-bold">{usersList.length}</span>
+                <span className="px-3.5 py-1 rounded-full bg-[var(--bg-surface-alt)] border border-[var(--border-light)] text-[var(--text-secondary)] font-mono text-xs">
+                  Total Users: <span className="text-[var(--text-primary)] font-bold">{usersList.length}</span>
                 </span>
-                <span className="px-3.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono text-xs">
-                  Transaksi: <span className="text-rose-500 font-bold">{transactions.length}</span>
+                <span className="px-3.5 py-1 rounded-full bg-[var(--bg-surface-alt)] border border-[var(--border-light)] text-[var(--text-secondary)] font-mono text-xs">
+                  Transaksi: <span className="text-[var(--color-secondary)] font-bold">{transactions.length}</span>
                 </span>
               </div>
             </div>
@@ -1226,11 +1263,11 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
               
               {/* Left Column: Registered Users list */}
               <div className="lg:col-span-4 space-y-4">
-                <h3 className="text-[11px] font-bold text-zinc-400 tracking-wider uppercase font-mono">Daftar Pengguna SaaS</h3>
+                <h3 className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase font-mono">Daftar Pengguna SaaS</h3>
                 
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                   {usersList.length === 0 ? (
-                    <div className="p-6 border border-zinc-900 rounded-3xl text-center text-xs text-zinc-500 font-mono">
+                    <div className="p-6 border border-[var(--border-light)] rounded-3xl text-center text-xs text-[var(--text-muted)] font-mono">
                       Belum ada pengguna terdaftar
                     </div>
                   ) : (
@@ -1239,38 +1276,38 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                       return (
                         <div 
                           key={usr.id}
-                          className="bg-zinc-950 p-4 rounded-2xl border border-zinc-900 space-y-3 relative group"
+                          className="bg-[var(--bg-surface)] p-4 rounded-2xl border border-[var(--border-default)] space-y-3 relative group"
                         >
                           <button
                             onClick={() => handleDeleteUser(usr.id)}
-                            className="absolute top-3 right-3 p-1 rounded-lg hover:bg-red-950/20 text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                            className="absolute top-3 right-3 p-1 rounded-lg hover:bg-[var(--color-danger-light)] text-[var(--text-faint)] hover:text-[var(--color-danger)] opacity-0 group-hover:opacity-100 transition cursor-pointer"
                             title="Hapus Pengguna"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
 
                           <div className="space-y-0.5">
-                            <h4 className="text-xs font-extrabold text-white uppercase">{usr.fullName}</h4>
-                            <p className="text-[10.5px] text-zinc-400 font-mono">{usr.email}</p>
-                            <p className="text-[10px] text-zinc-500">WA: {usr.noWa}</p>
+                            <h4 className="text-xs font-bold text-[var(--text-primary)] uppercase">{usr.fullName}</h4>
+                            <p className="text-[10.5px] text-[var(--text-secondary)] font-mono">{usr.email}</p>
+                            <p className="text-[10px] text-[var(--text-muted)]">WA: {usr.noWa}</p>
                           </div>
 
-                          <div className="pt-2 border-t border-zinc-900 flex justify-between items-center text-[10.5px]">
+                          <div className="pt-2 border-t border-[var(--border-light)] flex justify-between items-center text-[10.5px]">
                             <div>
-                              <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 font-mono text-[9px] font-bold">
-                                {usr.packageId.toUpperCase()}
+                              <span className="px-2 py-0.5 rounded bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] font-mono text-[9px] font-bold">
+                                {(usr.packageId || '').toUpperCase()}
                               </span>
-                              <span className="text-[9.5px] font-mono text-zinc-400 ml-1.5">
+                              <span className="text-[9.5px] font-mono text-[var(--color-primary)] ml-1.5 font-bold">
                                 Rp {amount.toLocaleString('id-ID')}
                               </span>
                             </div>
 
                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase font-mono ${
                               usr.paymentStatus === 'success' 
-                                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
                                 : usr.paymentStatus === 'pending'
-                                  ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                                  : 'bg-red-500/10 text-red-500 border border-red-500/20'
+                                  ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                                  : 'bg-red-500/10 text-red-600 border border-red-500/20'
                             }`}>
                               {usr.paymentStatus}
                             </span>
@@ -1285,13 +1322,13 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
               {/* Right Column: Transaction Reports and AI verify log */}
               <div className="lg:col-span-8 space-y-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-[11px] font-bold text-zinc-400 tracking-wider uppercase font-mono">Bukti Analisis Transfer AI</h3>
-                  <span className="text-[9.5px] text-zinc-500 font-mono">Detail Laporan Analisis Puter.js</span>
+                  <h3 className="text-[11px] font-semibold text-[var(--text-muted)] tracking-wider uppercase font-mono">Bukti Analisis Transfer AI</h3>
+                  <span className="text-[9.5px] text-[var(--text-faint)] font-mono">Detail Laporan Analisis Admin</span>
                 </div>
 
                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
                   {transactions.length === 0 ? (
-                    <div className="p-8 border border-zinc-900 rounded-3xl text-center text-xs text-zinc-500 font-mono bg-zinc-950/20">
+                    <div className="p-8 border border-[var(--border-light)] rounded-3xl text-center text-xs text-[var(--text-muted)] font-mono bg-[var(--bg-surface-alt)]">
                       Belum ada transaksi bukti pembayaran masuk yang tercatat
                     </div>
                   ) : (
@@ -1299,22 +1336,22 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                       return (
                         <div 
                           key={tx.id}
-                          className="bg-zinc-950 p-6 rounded-3xl border border-zinc-900 space-y-4"
+                          className="bg-[var(--bg-surface)] p-6 rounded-3xl border border-[var(--border-default)] space-y-4"
                         >
                           {/* Header info */}
-                          <div className="flex justify-between sm:flex-row flex-col gap-2 items-start pb-3 border-b border-zinc-900">
+                          <div className="flex justify-between sm:flex-row flex-col gap-2 items-start pb-3 border-b border-[var(--border-light)]">
                             <div>
-                              <h4 className="text-xs font-black text-rose-500 uppercase tracking-tight">{tx.userName}</h4>
-                              <p className="text-[10px] text-zinc-400 font-mono mt-0.5">Email: {tx.userEmail} | Slug: {tx.userSlug}</p>
-                              <p className="text-[9px] text-zinc-500 font-mono mt-0.5">Tagihan: Rp {tx.nominalExpected.toLocaleString('id-ID')} | {tx.packageId.toUpperCase()}</p>
+                              <h4 className="text-xs font-bold text-[var(--color-primary)] uppercase tracking-tight">{tx.userName}</h4>
+                              <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5">Email: {tx.userEmail} | Slug: {tx.userSlug}</p>
+                              <p className="text-[9px] text-[var(--text-muted)] font-mono mt-0.5">Tagihan: Rp {tx.nominalExpected.toLocaleString('id-ID')} | {(tx.packageId || '').toUpperCase()}</p>
                             </div>
                             <div className="text-right sm:text-right text-left">
-                              <span className="bg-zinc-900 text-zinc-400 px-2.5 py-1 rounded font-mono text-[9px] border border-zinc-800">
+                              <span className="bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] px-2.5 py-1 rounded font-mono text-[9px] border border-[var(--border-light)]">
                                 {tx.timestamp}
                               </span>
                               <div className="mt-2.5">
                                 <span className={`px-2.5 py-1 rounded-full text-[9px] font-mono tracking-wider font-bold uppercase ${
-                                  tx.status === 'success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
+                                  tx.status === 'success' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'
                                 }`}>
                                   AI STATUS: {tx.status.toUpperCase()}
                                 </span>
@@ -1325,18 +1362,18 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                           {/* Image and Analysis panel split layout */}
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                             {/* Left: physical receipt thumbnail */}
-                            <div className="md:col-span-5 bg-zinc-900 p-2 rounded-2xl border border-zinc-850 flex flex-col justify-between">
+                            <div className="md:col-span-5 bg-[var(--bg-surface-alt)] p-2 rounded-2xl border border-[var(--border-light)] flex flex-col justify-between">
                               <img 
                                 src={tx.proofImage} 
                                 alt="Receipt" 
-                                className="w-full h-44 object-contain bg-black rounded-xl"
+                                className="w-full h-44 object-contain bg-white rounded-xl"
                               />
                               <div className="pt-2 text-center">
                                 <a 
                                   href={tx.proofImage} 
                                   target="_blank" 
                                   rel="noreferrer"
-                                  className="text-[10px] text-zinc-400 hover:text-white underline font-mono flex items-center justify-center gap-1"
+                                  className="text-[10px] text-[var(--text-secondary)] hover:text-[var(--color-primary)] underline font-mono flex items-center justify-center gap-1 transition-colors"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                   <span>Buka Gambar Asli</span>
@@ -1345,40 +1382,40 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                             </div>
 
                             {/* Right: AI details checklist */}
-                            <div className="md:col-span-7 bg-[#0d0d0f] p-4 rounded-2xl border border-zinc-900 text-[11px] leading-relaxed space-y-3 font-mono">
-                              <span className="block text-[8.5px] font-bold text-zinc-400 tracking-wider uppercase mb-1">Inspektur Pembaca AI:</span>
+                            <div className="md:col-span-7 bg-[var(--bg-primary)] p-4 rounded-2xl border border-[var(--border-default)] text-[11px] leading-relaxed space-y-3 font-mono">
+                              <span className="block text-[8.5px] font-semibold text-[var(--text-muted)] tracking-wider uppercase mb-1">Inspektur Pembaca AI:</span>
                               
-                              <div className="grid grid-cols-2 gap-2 text-[10px] bg-zinc-950 p-2.5 border border-zinc-900 rounded-xl">
+                              <div className="grid grid-cols-2 gap-2 text-[10px] bg-[var(--bg-surface)] p-2.5 border border-[var(--border-light)] rounded-xl">
                                 <div>
-                                  <span className="text-zinc-500 block text-[8px] uppercase font-bold text-zinc-500">Akun Penerima</span>
-                                  <span className="text-zinc-300 font-bold">{tx.aiResult?.recipientAccount || 'Tidak terdeteksi'}</span>
+                                  <span className="text-[var(--text-faint)] block text-[8px] uppercase font-bold">Akun Penerima</span>
+                                  <span className="text-[var(--text-primary)] font-bold">{tx.aiResult?.recipientAccount || 'Tidak terdeteksi'}</span>
                                 </div>
                                 <div>
-                                  <span className="text-zinc-500 block text-[8px] uppercase font-bold text-zinc-500">Nominal Transfer</span>
-                                  <span className="text-zinc-300 font-bold">
+                                  <span className="text-[var(--text-faint)] block text-[8px] uppercase font-bold">Nominal Transfer</span>
+                                  <span className="text-[var(--text-primary)] font-bold">
                                     {tx.aiResult?.nominalDetected ? `Rp ${tx.aiResult.nominalDetected.toLocaleString('id-ID')}` : 'Tidak terdeteksi'}
                                   </span>
                                 </div>
                               </div>
 
                               <div className="space-y-1.5 pt-1">
-                                <span className="block text-zinc-500 text-[8px] uppercase font-bold text-zinc-500">Alasan & Rekomendasi:</span>
-                                <ul className="list-disc pl-3.5 space-y-1 text-zinc-400 text-[10px]">
+                                <span className="block text-[var(--text-faint)] text-[8px] uppercase font-bold">Alasan & Rekomendasi:</span>
+                                <ul className="list-disc pl-3.5 space-y-1 text-[var(--text-secondary)] text-[10px]">
                                   {tx.aiResult?.reasons?.map((r, idx) => (
                                     <li key={idx}>{r}</li>
                                   ))}
                                 </ul>
                               </div>
 
-                              <div className="flex justify-between items-center pt-2.5 border-t border-zinc-900">
-                                <span className="text-[9px] text-zinc-500">Keaslian: {tx.aiResult?.isAuthentic !== false ? 'Asli (Lolos)' : 'Palsu (Gagal)'}</span>
+                              <div className="flex justify-between items-center pt-2.5 border-t border-[var(--border-light)]">
+                                <span className="text-[9px] text-[var(--text-muted)]">Keaslian: {tx.aiResult?.isAuthentic !== false ? 'Asli (Lolos)' : 'Palsu (Gagal)'}</span>
                                 
                                 <button
                                   onClick={() => setPrintingReport(tx)}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-xs text-zinc-300 hover:text-white transition cursor-pointer"
+                                  className="btn-ghost px-2.5 py-1.5 text-[10px]"
                                   title="Cetak Laporan PDF"
                                 >
-                                  <Printer className="w-3.5 h-3.5 text-rose-500" />
+                                  <Printer className="w-3.5 h-3.5 text-[var(--color-primary)]" />
                                   <span>Cetak PDF</span>
                                 </button>
                               </div>
@@ -1386,12 +1423,12 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                           </div>
 
                           {/* Action Hooks: override buttons */}
-                          <div className="flex gap-2.5 pt-3 border-t border-zinc-900 justify-end">
-                            <span className="text-xs text-zinc-500 flex items-center mr-auto font-mono text-[9px] tracking-wide uppercase font-bold text-zinc-405">Intervensi Manual:</span>
+                          <div className="flex gap-2.5 pt-3 border-t border-[var(--border-light)] justify-end">
+                            <span className="text-xs text-[var(--text-faint)] flex items-center mr-auto font-mono text-[9px] tracking-wide uppercase font-bold">Intervensi Manual:</span>
                             {tx.status !== 'success' && (
                               <button
                                 onClick={() => handleApproveTransaction(tx.id)}
-                                className="px-3.5 py-1.5 rounded-xl bg-emerald-900/30 hover:bg-emerald-900/50 border border-emerald-900/50 hover:border-emerald-700 text-[10px] font-bold text-emerald-450 uppercase transition cursor-pointer"
+                                className="px-3.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-[10px] font-bold text-emerald-700 uppercase transition cursor-pointer"
                               >
                                 Setujui Transaksi (Override)
                               </button>
@@ -1399,7 +1436,7 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                             {tx.status !== 'failed' && (
                               <button
                                 onClick={() => handleRejectTransaction(tx.id)}
-                                className="px-3.5 py-1.5 rounded-xl bg-red-950/30 hover:bg-red-950/50 border border-red-900/30 hover:border-red-905 text-[10px] font-bold text-red-400 uppercase transition cursor-pointer"
+                                className="px-3.5 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-[10px] font-bold text-red-700 uppercase transition cursor-pointer"
                               >
                                 Tolak Transaksi (Override)
                               </button>
@@ -1420,36 +1457,36 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
 
       {/* ==================== PRINT PDF REPORT EMBEDDED MODAL ==================== */}
       {printingReport && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white text-zinc-950 p-8 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl relative block" id="print-area">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white text-zinc-900 p-8 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl relative block" id="print-area">
             
             {/* Modal actions */}
             <div className="absolute top-4 right-4 flex gap-2 print:hidden z-20">
               <button
                 onClick={() => window.print()}
-                className="p-2.5 rounded-xl bg-rose-600 hover:bg-rose-550 text-white border-none flex items-center gap-1.5 text-xs font-bold transition shadow-md cursor-pointer"
+                className="btn-primary p-2.5 text-xs shadow-md"
               >
                 <Printer className="w-4 h-4" />
                 <span>Cetak Sekarang</span>
               </button>
               <button
                 onClick={() => setPrintingReport(null)}
-                className="p-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-350 text-zinc-800 border-none flex items-center gap-1.5 text-xs font-bold transition shadow-md cursor-pointer"
+                className="p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border-none flex items-center gap-1.5 text-xs font-bold transition shadow-md cursor-pointer"
               >
                 <span>Tutup</span>
               </button>
             </div>
 
             {/* Print Header */}
-            <div className="flex justify-between items-start border-b-2 border-zinc-950 pb-5">
+            <div className="flex justify-between items-start border-b-2 border-zinc-200 pb-5">
               <div>
-                <h1 className="text-xl font-black tracking-tight leading-none uppercase">RFX.VISUAL BRAND</h1>
-                <p className="text-[10px] text-zinc-650 font-mono tracking-widest uppercase">SaaS Wedding Invitation Platform</p>
-                <p className="text-xs text-zinc-505 mt-0.5">Taman Anggrek Residence, Jakarta Barat, 11470</p>
+                <h1 className="text-2xl font-display font-bold tracking-tight text-[var(--color-primary)] uppercase">UNDANGANKITA</h1>
+                <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase mt-1">Platform Undangan Digital</p>
+                <p className="text-xs text-zinc-600 mt-1">Taman Anggrek Residence, Jakarta Barat, 11470</p>
               </div>
               <div className="text-right">
-                <span className="bg-zinc-900 text-white text-[9px] px-3 py-1 rounded font-mono font-bold tracking-wide uppercase">LAPORAN AUDIT KHUSUS</span>
-                <p className="text-xs text-zinc-550 font-mono mt-1.5">No Referensi: tx-{printingReport.id}</p>
+                <span className="bg-[var(--color-primary)] text-white text-[9px] px-3 py-1 rounded-md font-mono font-bold tracking-wide uppercase">LAPORAN AUDIT KHUSUS</span>
+                <p className="text-xs text-zinc-500 font-mono mt-1.5">No Referensi: tx-{printingReport.id}</p>
               </div>
             </div>
 
@@ -1488,8 +1525,8 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
                         <td className="font-extrabold text-zinc-900 py-1 uppercase">{printingReport.packageId}</td>
                       </tr>
                       <tr>
-                        <td className="text-zinc-550 py-1 font-mono">Kustomisasi:</td>
-                        <td className="font-bold text-zinc-700 py-1">{printingReport.isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'}</td>
+                        <td className="text-zinc-500 py-1 font-mono">Kustomisasi:</td>
+                        <td className="font-bold text-zinc-700 py-1">{printingReport.isCustomByRfx ? 'Terima Beres' : 'Buat Sendiri'}</td>
                       </tr>
                       <tr>
                         <td className="text-zinc-550 py-1 font-mono">Tagihan Target:</td>
@@ -1505,7 +1542,7 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             <div className="space-y-4">
               <h3 className="text-xs font-black uppercase text-zinc-900 border-b border-zinc-200 pb-1 flex items-center gap-1">
                 <CheckCircle className="w-4 h-4 text-rose-600" />
-                <span>Hasil Scanning AI Vision Puter.js</span>
+                <span>Hasil Review Admin</span>
               </h3>
 
               <div className="grid grid-cols-3 gap-3 font-mono text-xs">
@@ -1552,12 +1589,21 @@ Menyatakan bahwa transaksi telah masuk ke sistem dan menunggu tinjauan manual ol
             {/* Print Footer */}
             <div className="border-t border-zinc-300 pt-5 flex justify-between text-[10px] text-zinc-500 font-mono">
               <p>Laporan diterbitkan pada: {printingReport.timestamp}</p>
-              <p>Metode Inspeksi: Puter.js Vision (GPT-4o Agent)</p>
+              <p>Metode Inspeksi: Manual Review Admin</p>
             </div>
           </div>
         </div>
       )}
 
     </div>
+  );
+}
+
+export default function AuthGate(props: AuthGateProps) {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '';
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <AuthGateInner {...props} />
+    </GoogleOAuthProvider>
   );
 }

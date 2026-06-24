@@ -16,6 +16,7 @@ export interface ThemeConfig {
   fontSerif: string; // e.g. Playfair Display, Great Vibes
   fontSans: string; // e.g. Inter
   pattern: 'floral' | 'classic' | 'modern' | 'minimalist';
+  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove'; // Penentu struktur HTML yang di-render
 }
 
 export interface CoupleMember {
@@ -34,6 +35,7 @@ export interface WeddingCouple {
 }
 
 export interface EventDetails {
+  enabled?: boolean;
   name: string;
   date: string;
   timeStart: string;
@@ -77,6 +79,7 @@ export interface WeddingData {
   quoteSource: string;
   ogImageUrl?: string;
   bgImageUrl?: string;
+  enableDigitalPass?: boolean;
 }
 
 export interface Guest {
@@ -136,10 +139,15 @@ export interface SaaSUser {
   email: string;
   noWa: string;
   sosmed: string;
-  packageId: 'reguler' | 'medium' | 'premium';
+  packageId: 'demo' | 'reguler' | 'medium' | 'premium' | 'luxury';
   isCustomByRfx: boolean; // true = custom full by rfx, false = custom mandiri
   paymentStatus: 'pending' | 'success' | 'failed';
   registeredAt: string;
+  warningCount?: number;
+  slugChangeCount?: number;
+  ipAddress?: string;
+  avatarUrl?: string;
+  authProvider?: 'local' | 'google';
   /** Password disimpan sebagai hash di server (Turso), tidak pernah di client */
   password?: string;
 }
@@ -150,19 +158,18 @@ export interface TransactionReport {
   userName: string;
   userSlug: string;
   userEmail: string;
-  packageId: 'reguler' | 'medium' | 'premium';
+  packageId: 'demo' | 'reguler' | 'medium' | 'premium' | 'luxury';
   isCustomByRfx: boolean;
   nominalExpected: number;
   status: 'success' | 'failed' | 'pending';
   timestamp: string;
   proofImage: string; // Cloudinary URL (bukan base64 lagi)
   aiResult?: {
+    isAuthentic: boolean;
     timestampDetected?: string;
     recipientAccount?: string;
     nominalDetected?: number;
-    isAuthentic?: boolean;
     reasons?: string[];
-    summaryMarkdown?: string;
-  };
+  } | null;
 }
 

@@ -1,46 +1,509 @@
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* ============================================
+   UndanganKita — Global Design System
+   "Blossom Ivory" Color Palette
+   ============================================ */
+
+/* Google Fonts: Cormorant Garamond (elegant heading), Lora (body serif), Inter (UI), Great Vibes (script) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+/* ============================================
+   Design Tokens
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --bg-primary: #FBF8F4;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F5F0EA;
+  --bg-surface-hover: #F0EBE3;
+
+  /* Borders */
+  --border-default: #E8E2DA;
+  --border-light: #F0EBE3;
+  --border-strong: #D5CEC5;
+
+  /* Typography */
+  --text-primary: #2D2A26;
+  --text-secondary: #6B6560;
+  --text-muted: #9C968F;
+  --text-faint: #BFB9B2;
+
+  /* Primary — Dusty Rose */
+  --color-primary: #C4727F;
+  --color-primary-hover: #A85B67;
+  --color-primary-active: #944E5A;
+  --color-primary-light: #F8E8EB;
+  --color-primary-lighter: #FDF3F5;
+
+  /* Secondary — Sage Green */
+  --color-secondary: #7D9B8A;
+  --color-secondary-hover: #6A8A78;
+  --color-secondary-light: #EDF5F0;
+
+  /* Accent — Antique Gold */
+  --color-accent: #C5A55A;
+  --color-accent-hover: #B0923E;
+  --color-accent-light: #F7F0E0;
+  --color-accent-lighter: #FBF7EE;
+
+  /* Status */
+  --color-danger: #D4594F;
+  --color-danger-light: #FBE9E7;
+  --color-warning: #D4944F;
+  --color-warning-light: #FFF4E6;
+  --color-success: #5FA37A;
+  --color-success-light: #E8F5ED;
+  --color-info: #5A8FC5;
+  --color-info-light: #E8F0FB;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(45,42,38,0.04);
+  --shadow-sm: 0 1px 3px rgba(45,42,38,0.06), 0 1px 2px rgba(45,42,38,0.04);
+  --shadow-md: 0 4px 12px rgba(45,42,38,0.08), 0 1px 3px rgba(45,42,38,0.04);
+  --shadow-lg: 0 8px 25px rgba(45,42,38,0.10), 0 2px 6px rgba(45,42,38,0.04);
+  --shadow-xl: 0 16px 40px rgba(45,42,38,0.12), 0 4px 12px rgba(45,42,38,0.04);
+  --shadow-2xl: 0 24px 60px rgba(45,42,38,0.16);
+  --shadow-inner: inset 0 2px 4px rgba(45,42,38,0.04);
+  --shadow-glow-rose: 0 0 20px rgba(196,114,127,0.15), 0 0 40px rgba(196,114,127,0.08);
+  --shadow-glow-gold: 0 0 20px rgba(197,165,90,0.15), 0 0 40px rgba(197,165,90,0.06);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255,255,255,0.72);
+  --glass-bg-strong: rgba(255,255,255,0.88);
+  --glass-border: rgba(232,226,218,0.60);
+  --glass-shadow: 0 8px 32px rgba(45,42,38,0.08), inset 0 0 0 1px rgba(255,255,255,0.30);
+}
+
+/* ============================================
+   Tailwind v4 Theme Tokens
+   ============================================ */
 @theme {
-  --font-sans: "Inter", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, Cambria, serif;
-  --font-cursive: "Alex Brush", cursive;
+  --font-sans: "Inter", "Lora", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", "Playfair Display", Georgia, Cambria, serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-script: "Great Vibes", cursive;
+  --font-body: "Lora", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-cursive: "Great Vibes", cursive;
 }
 
+/* ============================================
+   Base Reset & Defaults
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Inter", "Lora", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+::selection {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-hover);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
 }
 
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 15s linear infinite;
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
-/* Hide scrollbars but keep functionality */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
 }
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+
+/* Animation Utilities */
+.animate-fadeIn { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideDown { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideLeft { animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideRight { animation: slideRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fadeScale { animation: fadeScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--bg-surface-alt) 25%, var(--bg-surface) 50%, var(--bg-surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-heartbeat { animation: heartbeat 1.2s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 15s linear infinite; }
+.animate-gentle-pulse { animation: gentle-pulse 2s ease-in-out infinite; }
+.animate-dot-pulse { animation: dot-pulse 1.5s ease-in-out infinite; }
+
+/* ============================================
+   Glass Morphism Utilities
+   ============================================ */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-panel {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(232,226,218,0.45);
+  box-shadow: 0 8px 32px rgba(45,42,38,0.06), inset 0 0 0 1px rgba(255,255,255,0.40);
+}
+
+.glass-nav {
+  background: rgba(251,248,244,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(232,226,218,0.60);
+}
+
+/* ============================================
+   Card Utilities
+   ============================================ */
+.card-base {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-elevated {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-elevated:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.card-interactive {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary);
+  transform: translateY(-3px);
+}
+
+.card-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================
+   Button Utilities
+   ============================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(196,114,127,0.25);
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 16px rgba(196,114,127,0.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(125,155,138,0.25);
+}
+.btn-secondary:hover {
+  background: var(--color-secondary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover {
+  background: var(--bg-surface-alt);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(197,165,90,0.25);
+}
+.btn-accent:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   Input Utilities
+   ============================================ */
+.input-elegant {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-family: "Inter", system-ui, sans-serif;
+  transition: all 0.25s ease;
+  outline: none;
+}
+.input-elegant::placeholder {
+  color: var(--text-faint);
+}
+.input-elegant:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(196,114,127,0.12);
+  background: var(--bg-surface);
+}
+
+/* ============================================
+   Badge Utilities
+   ============================================ */
+.badge-rose { background: var(--color-primary-light); color: var(--color-primary); }
+.badge-gold { background: var(--color-accent-light); color: var(--color-accent); }
+.badge-sage { background: var(--color-secondary-light); color: var(--color-secondary); }
+.badge-danger { background: var(--color-danger-light); color: var(--color-danger); }
+.badge-info { background: var(--color-info-light); color: var(--color-info); }
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.scrollbar-elegant::-webkit-scrollbar { width: 5px; height: 5px; }
+.scrollbar-elegant::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-elegant::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: 10px;
+}
+.scrollbar-elegant::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-strong);
+}
+.scrollbar-elegant { scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
+
+/* Custom Scrollbar for Tabs */
+.custom-scrollbar-tabs::-webkit-scrollbar { height: 4px; }
+.custom-scrollbar-tabs::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar-tabs::-webkit-scrollbar-thumb { background-color: var(--border-default); border-radius: 10px; }
+.custom-scrollbar-tabs::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
+.custom-scrollbar-tabs { scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
+
+/* ============================================
+   Ornamental Utilities
+   ============================================ */
+.ornament-dots {
+  background-image: radial-gradient(var(--border-default) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.ornament-lines {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    var(--border-light) 10px,
+    var(--border-light) 11px
+  );
+}
+
+.divider-ornamental {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-faint);
+  font-family: "Great Vibes", cursive;
+  font-size: 1.25rem;
+}
+.divider-ornamental::before,
+.divider-ornamental::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-default), transparent);
+}
+
+/* ============================================
+   Typography Helpers
+   ============================================ */
+.font-heading {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.font-display {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.font-script {
+  font-family: "Great Vibes", cursive;
+  font-weight: 400;
+}
+
+.font-body-serif {
+  font-family: "Lora", Georgia, serif;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/* ============================================
+   Focus & Accessibility
+   ============================================ */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

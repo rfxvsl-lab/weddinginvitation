@@ -4,8 +4,8 @@
  * Preset: rfx_wedding (terpisah dari rfx_porto)
  */
 
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dxklmdbjv';
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'rfx_wedding';
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.VITE_CLOUDINARY_CLOUD_NAME || 'dxklmdbjv';
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || process.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'rfx_wedding';
 
 export type UploadResourceType = 'image' | 'video' | 'raw' | 'auto';
 

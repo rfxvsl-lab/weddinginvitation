@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -5,31 +7,31 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Heart, 
-  Settings, 
-  Users, 
-  Activity, 
-  Eye, 
-  Share2, 
-  Sparkles, 
-  Wand2, 
-  Copy, 
-  Check, 
-  MessageSquare,
-  ChevronRight,
-  ArrowLeft,
-  XCircle,
-  LogOut,
-  AlertCircle,
-  CheckCircle,
-  FileText,
-  User,
-  Globe,
-  History,
-  Save,
-  RotateCcw,
-  Trash2
-} from 'lucide-react';
+  PiHeartDuotone as Heart, 
+  PiGearDuotone as Settings, 
+  PiUsersDuotone as Users, 
+  PiPulseDuotone as Activity, 
+  PiEyeDuotone as Eye, 
+  PiShareNetworkDuotone as Share2, 
+  PiSparkleDuotone as Sparkles, 
+  PiMagicWandDuotone as Wand2, 
+  PiCopyDuotone as Copy, 
+  PiCheckDuotone as Check, 
+  PiChatCircleDuotone as MessageSquare,
+  PiCaretRightDuotone as ChevronRight,
+  PiArrowLeftDuotone as ArrowLeft,
+  PiXCircleDuotone as XCircle,
+  PiSignOutDuotone as LogOut,
+  PiWarningCircleDuotone as AlertCircle,
+  PiCheckCircleDuotone as CheckCircle,
+  PiFileTextDuotone as FileText,
+  PiUserDuotone as User,
+  PiGlobeHemisphereWestDuotone as Globe,
+  PiClockCounterClockwiseDuotone as History,
+  PiFloppyDiskDuotone as Save,
+  PiArrowCounterClockwiseDuotone as RotateCcw,
+  PiTrashDuotone as Trash2
+} from 'react-icons/pi';
 
 import { 
   WeddingData, 
@@ -52,9 +54,14 @@ import GuestManager from './components/GuestManager';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import InvitationPreview from './components/InvitationPreview';
 import AuthGate from './components/AuthGate';
+import OnboardingTour from './components/OnboardingTour';
+import Navigation from './components/Navigation';
+import AnimatedEnvelope from './components/AnimatedEnvelope';
+import LiveChat from './components/LiveChat';
 
 import { useAuth } from './hooks/useAuth';
 import { useWeddingData } from './hooks/useWeddingData';
+import { BookOpen, Image as ImageIcon, Palette, Smartphone, AlertTriangle } from 'lucide-react';
 
 export default function App() {
   // ============================================
@@ -65,6 +72,7 @@ export default function App() {
 
   // Query parameters parse for personalized invitation view
   const [isInvitationView, setIsInvitationView] = useState(false);
+  const [isInvitationNotFound, setIsInvitationNotFound] = useState(false);
   const [urlGuest, setUrlGuest] = useState<Guest | undefined>(undefined);
   const [urlGuestName, setUrlGuestName] = useState<string | null>(null);
 
@@ -90,86 +98,33 @@ export default function App() {
   const [customShareMessage, setCustomShareMessage] = useState<string>('');
   const [shareMessageCopied, setShareMessageCopied] = useState<boolean>(false);
 
-  // ============================================
-  // SLUG-BASED ROUTING
-  // ============================================
-  useEffect(() => {
-    const path = window.location.pathname;
-    const params = new URLSearchParams(window.location.search);
-    const guestTo = params.get('to');
-    const guestCode = params.get('code');
-
-    // Check if this is a slug-based public invitation URL
-    // Pattern: /slug-name or /slug-name?to=X&code=Y
-    const pathSegments = path.split('/').filter(Boolean);
-
-    if (pathSegments.length === 1 && pathSegments[0] !== 'admin') {
-      const slug = pathSegments[0];
-
-      // Load public invitation from Turso
-      wedding.loadPublicInvitation(slug).then(found => {
-        if (found) {
-          setIsInvitationView(true);
-          setIsSelectingTheme(false);
-
-          if (guestTo) {
-            setUrlGuestName(guestTo);
-            // Try to match guest from loaded data
-            const matched = wedding.guests.find(
-              g => g.name.toLowerCase() === guestTo.toLowerCase() || g.invitationCode === guestCode
-            );
-
-            if (matched) {
-              setUrlGuest(matched);
-              wedding.updateGuestStatus(matched.id, 'Opened');
-            } else {
-              setUrlGuest({
-                id: `tg-${Date.now()}`,
-                name: guestTo,
-                group: 'Tamu Berharga',
-                paxLimit: 2,
-                phoneNumber: '081234567890',
-                status: 'Opened',
-                invitationCode: guestCode || 'W-TEMP'
-              });
-            }
-
-            // Log visitor
-            wedding.addVisitorLog({
-              guestName: guestTo,
-              device: /Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-              browser: navigator.userAgent.includes('Chrome') ? 'Google Chrome' : 'Safari / Webkit',
-              timestamp: new Date().toISOString(),
-            });
-          }
-        }
-      });
-    } else if (guestTo && pathSegments.length === 0) {
-      // Legacy: root URL with ?to= param (backward compat)
-      setIsInvitationView(true);
-      setIsSelectingTheme(false);
-      setUrlGuestName(guestTo);
-
-      const matched = wedding.guests.find(
-        g => g.name.toLowerCase() === guestTo.toLowerCase() || g.invitationCode === guestCode
-      );
-
-      if (matched) {
-        setUrlGuest(matched);
-        wedding.updateGuestStatus(matched.id, 'Opened');
-      } else {
-        setUrlGuest({
-          id: `tg-${Date.now()}`,
-          name: guestTo,
-          group: 'Tamu Berharga',
-          paxLimit: 2,
-          phoneNumber: '081234567890',
-          status: 'Opened',
-          invitationCode: guestCode || 'W-TEMP'
-        });
+  // Demo Expiration & Upgrade Logic
+  const isDemoExpired = React.useMemo(() => {
+    if (auth.currentUser?.packageId === 'demo' && auth.currentUser.registeredAt) {
+      const parts = auth.currentUser.registeredAt.split('/');
+      if (parts.length === 3) {
+        // [DD, MM, YYYY] or [D, M, YYYY]
+        const [dd, mm, yyyy] = parts;
+        const regDate = new Date(`${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`);
+        const now = new Date();
+        const diffDays = Math.ceil(Math.abs(now.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays > 14;
       }
     }
-  }, []);
+    return false;
+  }, [auth.currentUser]);
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
+  const [upgradingTo, setUpgradingTo] = useState<'reguler' | 'medium' | 'premium' | null>(null);
+
+  const handleUpgradeSubmit = async () => {
+    if (!auth.currentUser || !upgradingTo) return;
+    await auth.upgradePackage(auth.currentUser.id, upgradingTo);
+    window.location.reload(); // Reload to hit AuthGate payment screen
+  };
+
+  // ============================================
+  // Legacy SLUG-BASED ROUTING removed - handled by src/app/[slug]/page.tsx
 
   // ============================================
   // WHATSAPP MESSAGE GENERATOR
@@ -183,7 +138,7 @@ export default function App() {
     const coupleString = `${groomName} & ${brideName}`;
     
     const slug = auth.currentUser?.activeSlug || '';
-    const appUrl = import.meta.env.VITE_APP_URL || 'https://undangankita.rfx.web.id';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VITE_APP_URL || 'https://undangankita.rfx.web.id';
     const personalizedLink = `${appUrl}/${slug}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
     
     if (templateId === 'casual') {
@@ -227,9 +182,14 @@ export default function App() {
     
     // Load all user data from Turso
     await wedding.loadUserData(user);
-    
-    setIsSelectingTheme(false);
   };
+
+  // Auto-load data if user is already logged in (from localStorage caching)
+  useEffect(() => {
+    if (auth.currentUser && !wedding.invitation && !wedding.isLoading) {
+      wedding.loadUserData(auth.currentUser);
+    }
+  }, [auth.currentUser, wedding.invitation]);
 
   // ============================================
   // DESIGN SNAPSHOT HANDLERS
@@ -239,8 +199,12 @@ export default function App() {
       alert("Harap masukkan nama snapshot desain!");
       return;
     }
-    await wedding.saveDesignSnapshot(snapshotName);
-    alert(`Snapshot "${snapshotName}" berhasil disimpan!`);
+    try {
+      await wedding.saveDesignSnapshot(snapshotName);
+      alert(`Snapshot "${snapshotName}" berhasil disimpan!`);
+    } catch (err) {
+      // Error alert sudah ditangani di dalam useWeddingData.ts
+    }
   };
 
   const handleRevertDesignSnapshot = (snapshot: any) => {
@@ -340,7 +304,7 @@ export default function App() {
   // Main copy link helper
   const handleCopyMainShare = () => {
     const slug = auth.currentUser?.activeSlug || '';
-    const appUrl = import.meta.env.VITE_APP_URL || 'https://undangankita.rfx.web.id';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VITE_APP_URL || 'https://undangankita.rfx.web.id';
     const mainUrl = `${appUrl}/${slug}`;
     navigator.clipboard.writeText(mainUrl).then(() => {
       setIsCopiedMain(true);
@@ -369,21 +333,48 @@ export default function App() {
   const themeHistory = wedding.themeHistory;
 
   // ============================================
+  // RENDER: INVITATION NOT FOUND
+  // ============================================
+  if (isInvitationNotFound) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] p-6 text-center">
+        <div className="max-w-md w-full bg-[#0a0a0e] rounded-3xl p-8 border border-zinc-800/50 flex flex-col items-center">
+          <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mb-6">
+            <Globe className="w-8 h-8 text-rose-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-2">Undangan Tidak Ditemukan</h1>
+          <p className="text-zinc-400 mb-8 text-sm">
+            Maaf, halaman undangan yang Anda cari tidak dapat ditemukan. Pastikan URL atau slug yang Anda masukkan sudah benar.
+          </p>
+          <a
+            href="/"
+            className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition text-sm"
+          >
+            Buat Undangan Sendiri
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
   // RENDER: STANDALONE INVITATION FOR GUESTS
   // ============================================
   if (isInvitationView) {
     return (
       <div className="relative w-full h-screen bg-[#050505] flex items-center justify-center font-sans overflow-hidden">
-        {/* Floating Back to Builder */}
-        <div className="fixed top-4 left-4 z-50 flex gap-2">
-          <button
-            onClick={handleBackToBuilder}
-            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-black/80 hover:bg-black/95 border border-zinc-800 text-white rounded-full text-xs font-semibold shadow-lg transition duration-300 cursor-pointer backdrop-blur-md"
-          >
-            <ArrowLeft className="w-4 h-4 text-red-500" />
-            Kembali ke SaaS Dashboard
-          </button>
-        </div>
+        {/* Floating Back to Builder (Hanya di mode preview builder, bukan di public slug) */}
+        {window.location.pathname === '/' && (
+          <div className="fixed top-4 left-4 z-50 flex gap-2">
+            <button
+              onClick={handleBackToBuilder}
+              className="flex items-center gap-1.5 px-4.5 py-2.5 bg-black/80 hover:bg-black/95 border border-zinc-800 text-white rounded-full text-xs font-semibold shadow-lg transition duration-300 cursor-pointer backdrop-blur-md"
+            >
+              <ArrowLeft className="w-4 h-4 text-red-500" />
+              Kembali ke SaaS Dashboard
+            </button>
+          </div>
+        )}
 
         {/* Live Invitation Full View */}
         <div className="w-full h-full relative animate-fadeIn">
@@ -407,11 +398,11 @@ export default function App() {
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="text-center space-y-4 animate-pulse">
           <div className="p-4 rounded-2xl bg-rose-955/40 text-rose-500 border border-rose-900/40 inline-flex items-center justify-center shadow-[0_0_25px_rgba(220,38,38,0.3)]">
-            <Heart className="w-8 h-8 fill-rose-800 animate-pulse" />
+            <AnimatedEnvelope size={32} color="#be123c" className="animate-pulse" />
           </div>
           <div>
             <p className="text-sm font-bold text-white font-mono uppercase tracking-widest">Memuat Data Undangan...</p>
-            <p className="text-[10px] text-zinc-500 font-mono mt-1">Menghubungkan ke server Turso</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-1">Menyiapkan aplikasi...</p>
           </div>
         </div>
       </div>
@@ -421,8 +412,100 @@ export default function App() {
   // ============================================
   // RENDER: AUTH GATE
   // ============================================
-  if (!activeSaaSUser || activeSaaSUser.paymentStatus !== 'success') {
+  const pName = window.location.pathname.toLowerCase();
+  const isAdminRoute = pName === '/admin' || pName.endsWith('/admin') || window.location.hash.toLowerCase().includes('admin');
+
+  if (!auth.currentUser || auth.currentUser.paymentStatus !== 'success' || isAdminRoute) {
     return <AuthGate onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // ============================================
+  // RENDER: UPGRADE / EXPIRED OVERLAY
+  // ============================================
+  if (isDemoExpired || showUpgradeModal) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-[var(--color-primary-light)] selection:text-[var(--color-primary-hover)]">
+        <div className="absolute inset-0 ornament-dots opacity-[0.03] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[var(--color-primary-light)] blur-[120px] pointer-events-none opacity-20" />
+
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto w-full animate-fadeIn">
+          {isDemoExpired && !showUpgradeModal && (
+            <div className="space-y-6 max-w-lg mx-auto card-glass p-10 rounded-[32px]">
+              <div className="w-20 h-20 bg-[var(--color-danger-light)] border border-[var(--color-danger)]/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+                <AlertCircle className="w-10 h-10 text-[var(--color-danger)]" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-[var(--text-primary)] uppercase tracking-tight">Masa Uji Coba Berakhir</h2>
+              <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-body-serif">
+                Masa uji coba gratis 14 hari Anda telah berakhir. Untuk melanjutkan menggunakan layanan UndanganKita dan mendapatkan akses penuh tanpa batas, silakan upgrade ke paket berbayar.
+              </p>
+              <div className="pt-4 flex gap-4 justify-center">
+                <button 
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="btn-primary px-8 py-3.5 text-sm"
+                >
+                  Lihat Paket Tersedia
+                </button>
+              </div>
+            </div>
+          )}
+
+          {showUpgradeModal && (
+            <div className="w-full card-glass-strong rounded-[36px] p-8 animate-slideUp text-left relative overflow-hidden">
+              <div className="flex justify-between items-start mb-8 relative z-10">
+                <div>
+                  <h3 className="text-2xl font-display font-bold text-[var(--text-primary)] uppercase">Upgrade Paket Undangan Anda</h3>
+                  <p className="text-sm text-[var(--text-secondary)] font-body-serif mt-1">Pilih paket layanan Premium untuk melanjutkan dan mendapatkan fitur eksklusif.</p>
+                </div>
+                {!isDemoExpired && (
+                  <button onClick={() => setShowUpgradeModal(false)} className="text-[var(--text-muted)] hover:text-[var(--color-danger)] transition-colors">
+                    <XCircle className="w-7 h-7" />
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 relative z-10">
+                {[
+                  { id: 'reguler', name: 'Reguler', price: 30000, maxGuest: 'Maks. 1 Acara' },
+                  { id: 'medium', name: 'Medium', price: 50000, maxGuest: 'Maks. 2 Acara' },
+                  { id: 'premium', name: 'Premium', price: 100000, maxGuest: 'Maks. 4 Acara' }
+                ].map(pkg => (
+                  <div 
+                    key={pkg.id}
+                    onClick={() => setUpgradingTo(pkg.id as any)}
+                    className={`card-interactive p-6 rounded-3xl flex flex-col justify-between h-full ${upgradingTo === pkg.id ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]' : ''}`}
+                  >
+                    <div>
+                      <h4 className="text-lg font-bold text-[var(--text-primary)] uppercase">{pkg.name}</h4>
+                      <p className="text-xs text-[var(--text-secondary)] mt-1 font-body-serif">{pkg.maxGuest}</p>
+                    </div>
+                    <div className="pt-5 border-t border-[var(--border-light)] mt-6">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Biaya Paket</span>
+                      <h5 className="text-2xl font-bold text-[var(--color-primary)] mt-1">Rp {pkg.price.toLocaleString('id-ID')}</h5>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-4 relative z-10">
+                <button
+                  onClick={() => { auth.logout(); window.location.href = '/'; }}
+                  className="btn-ghost px-6 py-3 text-xs"
+                >
+                  Keluar Akun
+                </button>
+                <button
+                  onClick={handleUpgradeSubmit}
+                  disabled={!upgradingTo}
+                  className="btn-primary px-8 py-3 text-xs disabled:opacity-50"
+                >
+                  Lanjut ke Pembayaran
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   // ============================================
@@ -430,38 +513,37 @@ export default function App() {
   // ============================================
   if (isSelectingTheme) {
     return (
-      <div className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col font-sans selection:bg-red-500/30 select-none overflow-x-hidden relative">
-        <div className="absolute inset-0 bg-cover bg-center opacity-[0.03] pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/d/1EhkWZdyR3SGNE8bXdrxDFTrNzN9RHx0r')" }} />
-        <div className="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-650/5 blur-[120px] pointer-events-none" />
-        <div className="absolute -bottom-[40%] -right-[20%] w-[80%] h-[85%] rounded-full bg-red-650/5 blur-[120px] pointer-events-none" />
+      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-[var(--color-primary-light)] selection:text-[var(--color-primary-hover)] select-none overflow-x-hidden relative">
+        <OnboardingTour />
+        <div className="absolute inset-0 ornament-dots opacity-[0.04] pointer-events-none" />
+        <div className="absolute -top-[30%] -left-[10%] w-[60%] h-[60%] rounded-full bg-[var(--color-primary-light)] blur-[150px] pointer-events-none opacity-40" />
+        <div className="absolute -bottom-[30%] -right-[10%] w-[60%] h-[60%] rounded-full bg-[var(--color-accent-lighter)] blur-[150px] pointer-events-none opacity-40" />
 
-        <header className="border-b border-zinc-900/60 px-8 py-4.5 flex justify-between items-center z-10 bg-[#050505]/70 backdrop-blur-md sticky top-0">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-2xl bg-red-955/40 text-red-550 border border-red-900/40 flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.25)]">
-              <Heart className="w-4.5 h-4.5 fill-red-800 animate-pulse" />
-            </span>
-            <div>
-              <h1 className="text-sm font-black tracking-wider flex items-center gap-1.5 uppercase font-mono text-white">
-                Wedding Builder <span className="bg-red-650 text-[8.5px] text-white px-2 py-0.5 rounded-full font-bold">BY RFX.VISUAL</span>
-              </h1>
-              <p className="text-[9.5px] text-zinc-500 font-mono tracking-widest uppercase">Premium Wedding SaaS Builder</p>
-            </div>
+        {(auth.currentUser?.warningCount ?? 0) > 0 && (
+          <div className="sticky top-0 z-[999] w-full bg-[var(--color-danger)] text-white px-4 py-3 flex items-center justify-center gap-3 shadow-md">
+            <AlertCircle className="w-5 h-5 animate-pulse" />
+            <p className="text-[11px] font-bold font-sans tracking-wide">
+              PERINGATAN AKUN ({auth.currentUser.warningCount}/3): Anda terdeteksi melanggar ketentuan layanan kami.
+            </p>
           </div>
-          <div className="text-[10px] text-zinc-505 font-mono hidden md:block">Theme Engine: undangankita.rfx.web.id</div>
-        </header>
+        )}
 
-        <main className="flex-1 max-w-5xl mx-auto px-6 py-12 flex flex-col items-center justify-center z-10 w-full">
-          <div className="text-center space-y-3.5 max-w-xl mb-12 animate-fadeIn">
-            <span className="text-[9.5px] uppercase font-bold tracking-[0.35em] text-red-500 font-mono block">1. CONTOH PILIH UNDANGAN DILUAR EDITOR</span>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-none text-white uppercase">PILIH TEMPLATE WARNA SOFT & CLEAN</h2>
-            <p className="text-xs text-zinc-400 leading-relaxed font-sans max-w-md mx-auto">
-              Pilih dari palet warna lembut kami yang dirancang khusus untuk memberikan kesan elegan, tenang, dan premium. Setelah memilih, Anda akan langsung masuk ke editor visual di dalam tata letak undangan impian Anda.
+        {/* Elegant Navigation for Editor */}
+        <Navigation isDashboard={true} />
+        <main className="flex-1 max-w-6xl mx-auto px-6 py-12 flex flex-col items-center z-10 w-full relative">
+          <div className="text-center space-y-4 max-w-2xl mb-14 animate-fadeIn">
+            <span className="text-[10px] font-semibold tracking-widest text-[var(--color-primary)] uppercase font-mono bg-[var(--color-primary-lighter)] px-3 py-1 rounded-full border border-[var(--color-primary-light)]">Koleksi Desain Premium</span>
+            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight text-[var(--text-primary)]">
+              {auth.currentUser?.fullName ? `Pilih Tema Undangan Anda, ${auth.currentUser.fullName.split(' ')[0]}` : 'Pilih Tema Undangan Anda'}
+            </h2>
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-body-serif max-w-xl mx-auto mt-2">
+              Pilih dari koleksi tema elegan yang dirancang khusus untuk memukau tamu Anda. Setelah memilih, Anda dapat mengubah setiap detail di dalam editor.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full animate-fadeIn" style={{ animationDelay: '100ms' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full animate-slideUp" style={{ animationDelay: '100ms' }}>
             {DEFAULT_THEMES.map((theme) => {
-              const isSFX = theme.id === 'rfx-dark';
+              const isRecommended = theme.id === 'rfx-light' || theme.id === 'rfx-gold';
               return (
                 <div
                   key={theme.id}
@@ -469,50 +551,50 @@ export default function App() {
                     wedding.setThemeId(theme.id);
                     setIsSelectingTheme(false);
                   }}
-                  className={`bg-zinc-950/85 border rounded-3xl p-6 flex flex-col justify-between h-64 transition-all duration-300 relative overflow-hidden group cursor-pointer hover:-translate-y-1 hover:shadow-2xl ${
-                    isSFX
-                      ? 'border-red-600/50 shadow-[0_0_20px_rgba(220,38,38,0.20)] hover:border-red-500'
-                      : 'border-zinc-850 hover:border-zinc-750'
+                  className={`card-interactive p-0 flex flex-col justify-between h-[300px] transition-all duration-300 relative overflow-hidden group cursor-pointer hover:-translate-y-1 ${
+                    isRecommended
+                      ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary-light)]'
+                      : ''
                   }`}
                 >
                   <div
-                    className="absolute inset-0 opacity-15 pointer-events-none group-hover:scale-105 transition-transform duration-500"
+                    className="absolute inset-0 opacity-20 pointer-events-none group-hover:scale-105 transition-transform duration-700 ease-out"
                     style={{
                       backgroundColor: theme.bgHex,
                       backgroundImage: `radial-gradient(${theme.primaryHex} 1.5px, transparent 0)`,
-                      backgroundSize: '16px 16px',
+                      backgroundSize: '24px 24px',
                     }}
                   />
 
-                  <div className="relative z-10">
+                  <div className="relative z-10 p-7 flex-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-extrabold text-base text-white tracking-tight uppercase font-sans">
+                        <h3 className="font-display font-bold text-2xl text-[var(--text-primary)] tracking-tight uppercase">
                           {theme.name}
                         </h3>
-                        <span className="inline-block text-[9px] font-mono text-zinc-550 uppercase tracking-widest mt-0.5">
-                          {theme.pattern} structural style
+                        <span className="inline-block text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-widest mt-1">
+                          {theme.pattern} design
                         </span>
                       </div>
-                      {isSFX && (
-                        <span className="bg-red-650/20 text-red-400 border border-red-900/40 text-[8px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider animate-pulse">
-                          Recommended
+                      {isRecommended && (
+                        <span className="bg-[var(--color-primary)] text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                          Pilihan
                         </span>
                       )}
                     </div>
-                    <p className="text-[10.5px] text-zinc-400 mt-3.5 leading-relaxed font-sans">
-                      Arsitektur desain dengan perpaduan font "{theme.fontSerif === 'font-serif' ? 'Georgia Editorial' : 'Space Grotesk'}" serta pernis warna {theme.primaryHex}.
+                    <p className="text-[11.5px] text-[var(--text-secondary)] mt-4 leading-relaxed font-body-serif">
+                      Estetika visual dengan kombinasi font {theme.fontSerif === 'font-serif' ? 'Cormorant / Lora' : 'Great Vibes / Inter'} serta palet warna lembut {theme.primaryHex}.
                     </p>
                   </div>
 
-                  <div className="relative z-10 pt-3 border-t border-zinc-900/80 flex justify-between items-center bg-zinc-950/90 rounded-b-xl">
-                    <div className="flex gap-1.5">
-                      <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.primaryHex }} title="Primary" />
-                      <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.bgHex }} title="Latar Belakang" />
-                      <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.textHex }} title="Font" />
+                  <div className="relative z-10 p-5 border-t border-[var(--border-light)] flex justify-between items-center bg-[var(--bg-surface-alt)] backdrop-blur-md">
+                    <div className="flex gap-2">
+                      <span className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: theme.primaryHex }} title="Warna Utama" />
+                      <span className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: theme.bgHex }} title="Warna Latar" />
+                      <span className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: theme.textHex }} title="Warna Teks" />
                     </div>
-                    <button className="flex items-center gap-0.5 text-[10px] font-bold font-mono text-white group-hover:text-red-500 transition-colors uppercase tracking-wider cursor-pointer">
-                      PILIH & EDIT <ChevronRight className="w-3.5 h-3.5" />
+                    <button className="flex items-center gap-1 text-[11px] font-bold text-[var(--color-primary)] group-hover:text-[var(--color-primary-hover)] transition-colors uppercase tracking-wider cursor-pointer">
+                      PILIH TEMA <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -528,8 +610,18 @@ export default function App() {
   // RENDER: WYSIWYG WORKSPACE (MAIN EDITOR)
   // ============================================
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black text-white font-sans selection:bg-red-600/30">
+    <div className="relative min-h-screen font-sans bg-[#050505] text-white overflow-hidden selection:bg-red-500/30">
       
+      {(auth.currentUser?.warningCount ?? 0) > 0 && !isPreviewGuestMode && (
+        <div className="absolute top-0 left-0 right-0 z-[999] bg-red-600 border-b border-red-500 text-white px-4 py-3 flex items-center justify-center gap-3 shadow-[0_4px_20px_rgba(220,38,38,0.5)]">
+          <AlertCircle className="w-5 h-5 animate-pulse" />
+          <p className="text-[11px] font-bold font-sans tracking-wide uppercase">
+            PERINGATAN AKUN ({auth.currentUser.warningCount}/3): Anda terdeteksi melanggar ketentuan layanan kami.
+          </p>
+        </div>
+      )}
+
+      <OnboardingTour />
       {/* FULL SCREEN DYNAMIC INVITATION PREVIEW BACKGROUND */}
       <div className="w-full h-full overflow-y-auto">
         <InvitationPreview 
@@ -543,15 +635,15 @@ export default function App() {
 
       {/* FLOAT TOP-LEFT BRAND BANNER */}
       {!isPreviewGuestMode && (
-        <div className="absolute top-4 left-4 z-40 bg-[#050505]/80 border border-zinc-900 shadow-md backdrop-blur-md px-4 py-2.5 rounded-2xl flex items-center gap-2.5 select-none text-[11px] font-mono leading-none font-bold">
-          <span className="w-2.5 h-2.5 bg-red-600 rounded-full animate-pulse" />
-          <span className="text-zinc-400">PANEL EDITING AKTIF</span>
-          <span className="text-zinc-650">|</span>
-          <span className="text-white">CO-SINKRONISASI</span>
+        <div className="absolute top-4 left-4 z-40 bg-white/80 border border-[var(--border-default)] shadow-sm backdrop-blur-md px-4 py-2.5 rounded-2xl flex items-center gap-2.5 select-none text-[11px] font-mono leading-none font-bold">
+          <span className="w-2.5 h-2.5 bg-[var(--color-primary)] rounded-full animate-pulse" />
+          <span className="text-[var(--text-muted)]">PANEL EDITING AKTIF</span>
+          <span className="text-[var(--text-faint)]">|</span>
+          <span className="text-[var(--text-primary)]">CO-SINKRONISASI</span>
           {wedding.isSaving && (
             <>
-              <span className="text-zinc-650">|</span>
-              <span className="text-amber-400 animate-pulse">SAVING...</span>
+              <span className="text-[var(--text-faint)]">|</span>
+              <span className="text-[var(--color-secondary)] animate-pulse">SAVING...</span>
             </>
           )}
         </div>
@@ -562,21 +654,21 @@ export default function App() {
         <div className="absolute top-4 right-4 z-[200] animate-fadeIn select-none">
           <button
             onClick={() => setIsPreviewGuestMode(false)}
-            className="flex items-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 border border-red-500 text-white rounded-full text-xs font-bold shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all cursor-pointer transform hover:scale-105"
+            className="flex items-center gap-2 px-5 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-full text-xs font-bold shadow-md transition-all cursor-pointer transform hover:scale-105"
           >
             <Eye className="w-4 h-4 animate-spin-slow animate-pulse" />
             <span>KELUAR DARI PREVIEW TAMU</span>
-            <span className="bg-black/25 px-2 py-0.5 rounded-md text-[9px] font-mono font-medium">ESC</span>
+            <span className="bg-black/10 px-2 py-0.5 rounded-md text-[9px] font-mono font-medium">ESC</span>
           </button>
         </div>
       )}
 
-      {/* FLOATING COLLAPSED RED GEM / TRIGGER BADGE */}
+      {/* FLOATING COLLAPSED GEM / TRIGGER BADGE */}
       {!isPreviewGuestMode && !editorExpanded && (
         <div className="absolute top-4 right-4 z-40 animate-bounce">
           <button
             onClick={() => setEditorExpanded(true)}
-            className="p-4 rounded-full bg-red-650 border border-red-550 text-white hover:bg-red-700 shadow-[0_0_25px_rgba(220,38,38,0.5)] flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all"
+            className="p-4 rounded-full bg-[var(--color-primary)] text-white shadow-lg flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all"
             title="Buka Panel Editor Visual"
           >
             <Settings className="w-5 h-5 animate-spin-slow" />
@@ -586,24 +678,24 @@ export default function App() {
 
       {/* FLOATING GLASSMORPHIC EDITOR CONTROL PANEL */}
       {!isPreviewGuestMode && editorExpanded && (
-        <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[460px] bg-[#050505]/95 backdrop-blur-2xl border-l border-zinc-900/60 z-[100] flex flex-col overflow-hidden text-zinc-105 shadow-[-10px_0_35px_rgba(0,0,0,0.85)] animate-slideLeft">
+        <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[460px] glass-panel border-l border-[var(--border-light)] z-[100] flex flex-col overflow-hidden text-[var(--text-primary)] shadow-[-10px_0_35px_rgba(0,0,0,0.05)] animate-slideLeft">
           
           {/* EDITOR HEAD */}
-          <div className="p-4.5 border-b border-zinc-900 flex justify-between items-center select-none bg-black/40">
+          <div className="p-4 border-b border-[var(--border-light)] flex justify-between items-center select-none bg-white/50 backdrop-blur-md">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-red-955/40 text-red-500 border border-red-900/40 flex items-center justify-center animate-pulse">
-                <Heart className="w-3.5 h-3.5 fill-red-900" />
+              <span className="p-1.5 rounded-xl bg-[var(--color-primary-light)] text-[var(--color-primary)] shadow-sm flex items-center justify-center animate-pulse">
+                <AnimatedEnvelope size={16} color="var(--color-primary)" />
               </span>
               <div>
-                <h3 className="text-xs font-black tracking-wider uppercase font-mono text-white leading-none">RFX.VISUAL CONTROL DECK</h3>
-                <p className="text-[9px] text-zinc-505 font-mono tracking-widest mt-1">REAL-TIME INLINE WEB WORKSPACE</p>
+                <h3 className="text-[11px] font-bold tracking-wide text-[var(--text-primary)] leading-none mb-1">Editor Undangan</h3>
+                <p className="text-[10px] text-[var(--text-muted)] font-sans">SaaS Builder Workspace</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsSelectingTheme(true)}
-                className="px-2.5 py-1.5 bg-zinc-90 w-auto hover:bg-zinc-800 border border-zinc-800 rounded-lg text-[9.5px] font-bold font-mono text-zinc-300 hover:text-white transition cursor-pointer"
+                className="px-2.5 py-1.5 bg-white hover:bg-[var(--bg-surface-alt)] border border-[var(--border-default)] rounded-lg text-[9.5px] font-bold font-mono text-[var(--text-secondary)] transition cursor-pointer"
                 title="Ganti Tema Warna / Desain"
               >
                 Ganti Desain
@@ -611,141 +703,148 @@ export default function App() {
               
               <button
                 onClick={() => setEditorExpanded(false)}
-                className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg transition text-[10px] font-mono font-bold leading-none cursor-pointer"
-                title="Sembunyikan Panel"
+                className="btn-ghost p-1.5 text-[10px] font-mono leading-none"
+                title="Tampilkan Live Preview"
               >
-                Sembunyikan
+                Live Preview
               </button>
             </div>
           </div>
 
           {/* TAB HEADER */}
-          <div className="flex bg-zinc-950/80 p-1 border-b border-zinc-900">
+          <div className="flex bg-[var(--bg-surface-alt)] p-1.5 border-b border-[var(--border-light)]">
             <button
               onClick={() => setActiveSegment('design')}
-              className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition ${
+              className={`flex-1 py-2.5 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 transition ${
                 activeSegment === 'design'
-                  ? 'bg-red-650/15 text-red-400 font-black border border-red-950 shadow-inner'
-                  : 'text-zinc-505 hover:text-zinc-300'
+                  ? 'bg-white text-[var(--color-primary)] font-bold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <Wand2 className="w-3.5 h-3.5" />
-              Konten Undangan
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-[0_0_10px_rgba(99,102,241,0.3)]"><Wand2 className="w-3 h-3" /></div>
+              Konten & Desain
             </button>
             <button
               onClick={() => setActiveSegment('guests')}
-              className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition ${
+              className={`flex-1 py-2.5 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 transition ${
                 activeSegment === 'guests'
-                  ? 'bg-red-650/15 text-red-400 font-black border border-red-950 shadow-inner'
-                  : 'text-zinc-505 hover:text-zinc-300'
+                  ? 'bg-white text-[var(--color-primary)] font-bold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <Users className="w-3.5 h-3.5" />
-              Buku Tamu & QR
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]"><Users className="w-3 h-3" /></div>
+              Buku Tamu
             </button>
             <button
               onClick={() => setActiveSegment('analytics')}
-              className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all ${
+              className={`flex-1 py-2.5 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all ${
                 activeSegment === 'analytics'
-                  ? 'bg-red-650/15 text-red-400 font-black border border-red-950 shadow-inner'
-                  : 'text-zinc-505 hover:text-zinc-300'
+                  ? 'bg-white text-[var(--color-primary)] font-bold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <Activity className="w-3.5 h-3.5" />
-              Analitik & RSVP
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shadow-[0_0_10px_rgba(168,85,247,0.3)]"><Activity className="w-3 h-3" /></div>
+              Analitik
             </button>
           </div>
 
           {/* SCROLLING TAB VIEW */}
-          <div className="flex-1 overflow-y-auto p-5 scrollbar-thin space-y-5">
+          <div className="flex-1 overflow-y-auto p-5 scrollbar-thin space-y-5 bg-white/40">
             {/* Quick action bar */}
-            <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-4 flex justify-between items-center select-none flex-col xs:flex-row gap-3">
+            <div className="bg-white border border-[var(--border-default)] rounded-2xl p-4 flex justify-between items-center select-none flex-col xs:flex-row gap-3 shadow-sm">
               <div>
-                <h4 className="text-[10px] font-bold font-mono uppercase tracking-wider text-zinc-500">UTILITY ACCORD</h4>
-                <p className="text-xs font-semibold text-zinc-300">Bagikan pratinjau rilis tamu</p>
+                <h4 className="text-[11px] font-bold text-[var(--text-primary)]">Simulasi Tamu</h4>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 font-body-serif">Lihat hasil undangan tanpa panel ini.</p>
               </div>
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setIsPreviewGuestMode(true)}
-                  className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 hover:border-zinc-700 text-[10px] font-bold rounded-lg flex items-center gap-1 transition cursor-pointer"
+                  className="btn-ghost px-3 py-1.5 text-[10px] font-bold border border-[var(--border-light)]"
                   title="Masuk ke mode simulasi penuh tanpa control panel"
                 >
-                  <Eye className="w-3 h-3 text-red-500" /> Mode Tamu
+                  <Eye className="w-3 h-3 text-[var(--color-primary)]" /> Mode Tamu
                 </button>
                 <button
                   onClick={() => {
                     setPublishSuccess(false);
                     setShowPublishModal(true);
                   }}
-                  className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-550 text-white border border-rose-550 font-bold rounded-lg flex items-center gap-1 transition cursor-pointer text-[10px] uppercase shadow-md shadow-rose-950/20"
+                  className="btn-primary px-3.5 py-1.5 text-[10px] uppercase tracking-wider"
                 >
-                  <Sparkles className="w-3 h-3 animate-pulse" />
+                  <Sparkles className="w-3 h-3" />
                   Publish
                 </button>
               </div>
             </div>
 
-            {/* PROFIL PENGGUNA SAAS */}
+            {/* PROFIL PENGGUNA SAAS (CLIENT CARD) */}
             {activeSaaSUser && (
-              <div className="bg-zinc-950 border border-zinc-910/80 rounded-2xl p-4.5 space-y-3 shadow-sm select-none">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
-                      <User className="w-4 h-4" />
+              <div className="bg-white border border-[var(--border-default)] rounded-2xl p-5 shadow-sm select-none transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20 flex items-center justify-center text-[var(--color-primary)] shadow-inner">
+                      <User className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase tracking-tight">{activeSaaSUser.fullName}</h4>
-                      <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider">
-                        Tier: <span className="text-rose-500 font-bold">{activeSaaSUser.packageId}</span> ({activeSaaSUser.isCustomByRfx ? 'Custom RFX' : 'Mandiri'})
+                      <h4 className="text-[13px] font-bold text-[var(--text-primary)] tracking-wide">{activeSaaSUser.fullName}</h4>
+                      <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
+                        Paket <span className="text-[var(--color-primary)] font-bold capitalize">{activeSaaSUser.packageId}</span> 
+                        <span className="mx-1.5 opacity-50">•</span>
+                        {activeSaaSUser.isCustomByRfx ? 'Terima Beres' : 'Buat Sendiri'}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setProfileExpanded(!profileExpanded)}
-                    className="p-1 px-2.5 rounded-lg bg-zinc-90 w-auto hover:bg-zinc-800 text-[10px] font-mono font-bold text-zinc-400 hover:text-white border border-zinc-850 hover:bg-zinc-855 cursor-pointer transition"
+                    className="btn-ghost px-3 py-1.5 text-[10px]"
                   >
-                    {profileExpanded ? 'Hide' : 'Show Profile'}
+                    {profileExpanded ? 'Tutup Profil' : 'Lihat Detail'}
                   </button>
                 </div>
 
                 {profileExpanded && (
-                  <div className="pt-2.5 border-t border-zinc-900/60 space-y-3 animate-slideDown">
-                    <div className="space-y-1">
-                      <span className="text-[9.5px] font-mono text-zinc-505 uppercase tracking-widest block">Tautan Undangan Aktif:</span>
-                      <div className="flex gap-1.5 items-center bg-[#070709] border border-zinc-900 p-2 rounded-xl">
-                        <Globe className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                        <span className="font-mono text-[11px] text-zinc-300 break-all select-all flex-1">
+                  <div className="mt-4 pt-4 border-t border-[var(--border-light)] space-y-4 animate-slideDown">
+                    
+                    {/* Data Klien */}
+                    <div className="grid grid-cols-2 gap-3 bg-[var(--bg-surface-alt)] border border-[var(--border-light)] p-3 rounded-xl">
+                      <div>
+                        <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest block mb-0.5 font-bold">Mempelai</span>
+                        <p className="text-[11px] text-[var(--text-primary)] font-semibold">{activeSaaSUser.coupleGroom} & {activeSaaSUser.coupleBride}</p>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest block mb-0.5 font-bold">Tgl Daftar</span>
+                        <p className="text-[11px] text-[var(--text-primary)] font-semibold">
+                          {new Date(activeSaaSUser.registeredAt || Date.now()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest block mb-0.5 font-bold">Email</span>
+                        <p className="text-[11px] text-[var(--text-primary)] font-semibold truncate" title={activeSaaSUser.email}>{activeSaaSUser.email}</p>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest block mb-0.5 font-bold">Kontak WA</span>
+                        <p className="text-[11px] text-[var(--text-primary)] font-semibold">{activeSaaSUser.noWa}</p>
+                      </div>
+                    </div>
+
+                    {/* Tautan Live */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-bold text-[var(--text-muted)] block">Tautan Undangan Aktif:</span>
+                      <div className="flex gap-2 items-center bg-[var(--bg-surface)] border border-[var(--border-light)] p-2.5 rounded-xl">
+                        <Globe className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
+                        <span className="font-mono text-[11px] text-[var(--text-secondary)] break-all select-all flex-1">
                           undangankita.rfx.web.id/{activeSaaSUser.activeSlug}
                         </span>
                         <button
                           onClick={handleCopyMainShare}
-                          className="p-1 px-2 bg-rose-950/20 hover:bg-rose-900/35 border border-rose-900/40 text-rose-450 hover:text-rose-300 text-[10px] font-bold rounded-lg cursor-pointer transition flex items-center gap-1"
-                          title="Salin Tautan"
+                          className="px-2.5 py-1.5 bg-[var(--color-primary-light)] hover:bg-[var(--color-primary-lighter)] border border-[var(--color-primary)]/20 text-[var(--color-primary)] text-[10px] font-bold rounded-lg transition-colors flex items-center gap-1.5"
                         >
-                          {isCopiedMain ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                          {isCopiedMain ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                           <span>{isCopiedMain ? 'Disalin' : 'Salin'}</span>
                         </button>
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <span className="text-[9.5px] font-mono text-zinc-505 uppercase tracking-widest block">Riwayat Desain Template:</span>
-                      {themeHistory && themeHistory.length > 0 ? (
-                        <div className="max-h-[85px] overflow-y-auto space-y-1 pr-1 scrollbar-thin">
-                          {themeHistory.map((item: any, idx: number) => (
-                            <div key={idx} className="flex justify-between items-center bg-[#08080a] border border-zinc-905 p-2 rounded-xl text-[10px] hover:border-zinc-850 transition">
-                              <span className="text-zinc-300 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                <strong className="font-bold text-zinc-200">{item.name}</strong>
-                              </span>
-                              <span className="text-[9px] text-zinc-500 font-mono bg-zinc-950/60 px-1.5 py-0.5 rounded border border-zinc-900">{item.editedAt}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-[10px] text-zinc-505 italic">Belum ada riwayat penggantian template.</p>
-                      )}
-                    </div>
                   </div>
                 )}
               </div>
@@ -764,7 +863,7 @@ export default function App() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider text-left">
-                          🕰️ Riwayat & Snapshot Desain Undangan
+                          Riwayat & Snapshot Desain Undangan
                         </h4>
                         <p className="text-[10px] text-zinc-500 mt-0.5 text-left">
                           Cadangkan kondisi tata letak dan konfigurasi teks undangan Anda agar bisa dikembalikan kapan saja.
@@ -834,17 +933,17 @@ export default function App() {
                                 <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-zinc-900/50 mt-1">
                                   {coupleLabel && (
                                     <span className="text-[9px] bg-indigo-950/30 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/20 font-medium">
-                                      🤵👰 {coupleLabel}
+                                      <Users className="w-3 h-3 inline mr-1" /> {coupleLabel}
                                     </span>
                                   )}
                                   {item.weddingData.loveStories && (
                                     <span className="text-[9px] bg-emerald-900/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-900/20 font-mono">
-                                      📖 {item.weddingData.loveStories.length} Cerita
+                                      <BookOpen className="w-3 h-3 inline mr-1" /> {item.weddingData.loveStories.length} Cerita
                                     </span>
                                   )}
                                   {item.weddingData.bgImageUrl && (
                                     <span className="text-[9px] bg-amber-900/10 text-amber-400 px-1.5 py-0.5 rounded border border-amber-900/20 font-mono">
-                                      🖼️ Image BG
+                                      <ImageIcon className="w-3 h-3 inline mr-1" /> Image BG
                                     </span>
                                   )}
                                 </div>
@@ -883,7 +982,7 @@ export default function App() {
 
                 <div className="bg-zinc-950 border border-zinc-900 p-4 rounded-3xl space-y-2">
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    🎨 TATA LETAK UNDANGAN AKTIF:
+                    <Palette className="w-4 h-4" /> TATA LETAK UNDANGAN AKTIF:
                   </h4>
                   <p className="text-[11px] text-zinc-400 leading-relaxed">
                     Undangan Anda saat ini menggunakan layout gaya <strong>{DEFAULT_THEMES.find(t => t.id === themeId)?.name || 'Default theme'}</strong>. Semua modifikasi teks di bawah ini akan tersinkronisasi instan ke seluruh bagian undangan.
@@ -898,13 +997,13 @@ export default function App() {
 
             {/* TAB-2: GUEST MANAGER */}
             {activeSegment === 'guests' && (
-              <div className="animate-fadeIn">
+              <div className="p-4 sm:p-5 lg:p-6 animate-fadeIn">
                 <div className="text-slate-800">
                   <GuestManager 
                     guests={guests}
-                    appUrl={import.meta.env.VITE_APP_URL || 'https://undangankita.rfx.web.id'}
+                    appUrl={process.env.NEXT_PUBLIC_APP_URL || process.env.VITE_APP_URL || 'https://undangankita.rfx.web.id'}
                     slug={activeSaaSUser.activeSlug}
-                    coupleNames={`${weddingData.couple.groom.nickname} & ${weddingData.couple.bride.nickname}`}
+                    coupleNames={`${weddingData?.couple?.groom?.nickname || 'Groom'} & ${weddingData?.couple?.bride?.nickname || 'Bride'}`}
                     onAddGuest={handleAddGuest}
                     onRemoveGuest={handleRemoveGuest}
                     onUpdateGuestStatus={wedding.updateGuestStatus}
@@ -915,7 +1014,7 @@ export default function App() {
 
             {/* TAB-3: ANALYTICS */}
             {activeSegment === 'analytics' && (
-              <div className="animate-fadeIn">
+              <div className="p-4 sm:p-5 lg:p-6 animate-fadeIn">
                 <div className="text-slate-800">
                   {isAdmin && (
                     <AnalyticsDashboard 
@@ -940,7 +1039,7 @@ export default function App() {
 
           {/* FOOTER */}
           <div className="p-3 border-t border-zinc-900 bg-black/60 text-center select-none text-[10px] font-mono text-zinc-650 flex justify-between items-center px-4">
-            <span>PLATFORM VERSI v5.0 — TURSO BACKED</span>
+            <span>Version 1.0.0 - by RFX VISUAL</span>
             <span className="text-red-500 font-extrabold shadow-[0_0_10px_rgba(220,38,38,0.25)]">RFX.VISUAL WEDDING SUITE</span>
           </div>
         </div>
@@ -991,7 +1090,7 @@ export default function App() {
                     <div className="flex justify-between">
                       <span className="text-zinc-500 font-mono">Paket SaaS:</span>
                       <span className="font-extrabold text-white uppercase bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded text-[10px]">
-                        {activeSaaSUser.packageId.toUpperCase()} ({activeSaaSUser.isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'})
+                        {(activeSaaSUser.packageId || '').toUpperCase() || 'ADMIN'} ({activeSaaSUser.isCustomByRfx ? 'Custom Full RFX' : 'Custom Mandiri'})
                       </span>
                     </div>
                   </div>
@@ -1105,7 +1204,7 @@ export default function App() {
                     </div>
                     <div className="text-left">
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider block">
-                        📲 Quick Share WhatsApp Generator
+                        Quick Share WhatsApp Generator
                       </h4>
                       <p className="text-[10px] text-zinc-500 mt-0.5">
                         Pilih nama tamu untuk mengirim draft pesan personal & link autentik ke WhatsApp.
@@ -1128,8 +1227,9 @@ export default function App() {
                         ))}
                       </select>
                     ) : (
-                      <div className="text-xs text-amber-500 bg-amber-955/10 border border-amber-900/20 p-2.5 rounded-xl font-mono text-left">
-                        ⚠️ Belum ada tamu. Silakan tambahkan nama tamu undangan di tab "Daftar Tamu" terlebih dahulu.
+                      <div className="text-xs text-amber-500 bg-amber-955/10 border border-amber-900/20 p-2.5 rounded-xl font-mono text-left flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 shrink-0" />
+                        Belum ada tamu. Silakan tambahkan nama tamu undangan di tab "Daftar Tamu" terlebih dahulu.
                       </div>
                     )}
                   </div>
@@ -1213,6 +1313,11 @@ export default function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* LIVE CHAT WIDGET */}
+      {!isPreviewGuestMode && !isInvitationView && auth.currentUser && (
+        <LiveChat currentUser={auth.currentUser} />
       )}
     </div>
   );

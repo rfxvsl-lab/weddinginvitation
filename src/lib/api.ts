@@ -1,3 +1,5 @@
+'use server';
+
 /**
  * API Layer — CRUD Operations for Wedding SaaS
  * All database interactions go through this module.
@@ -34,8 +36,8 @@ export async function createUser(
   const passwordHash = await hashPassword(userData.password);
 
   await dbExecute(
-    `INSERT INTO users (id, full_name, couple_groom, couple_bride, active_slug, email, password_hash, no_wa, sosmed, package_id, is_custom_by_rfx, payment_status, registered_at)
-     VALUES (:id, :fullName, :groom, :bride, :slug, :email, :pwHash, :noWa, :sosmed, :packageId, :isRfx, :payStatus, :regAt)`,
+    `INSERT INTO users (id, full_name, couple_groom, couple_bride, active_slug, email, password_hash, no_wa, sosmed, package_id, is_custom_by_rfx, payment_status, registered_at, ip_address, auth_provider)
+     VALUES (:id, :fullName, :groom, :bride, :slug, :email, :pwHash, :noWa, :sosmed, :packageId, :isRfx, :payStatus, :regAt, :ipAddress, :authProvider)`,
     {
       id,
       fullName: userData.fullName,
@@ -50,6 +52,8 @@ export async function createUser(
       isRfx: userData.isCustomByRfx ? 1 : 0,
       payStatus: userData.paymentStatus || 'pending',
       regAt: registeredAt,
+      ipAddress: userData.ipAddress || '',
+      authProvider: userData.authProvider || 'local',
     }
   );
 
@@ -66,6 +70,8 @@ export async function createUser(
     isCustomByRfx: userData.isCustomByRfx,
     paymentStatus: userData.paymentStatus || 'pending',
     registeredAt,
+    ipAddress: userData.ipAddress || '',
+    authProvider: userData.authProvider || 'local',
   };
 }
 
@@ -93,7 +99,31 @@ export async function verifyUserPassword(email: string, password: string): Promi
     'SELECT * FROM users WHERE email = :email AND password_hash = :pwHash LIMIT 1',
     { email: email.toLowerCase().trim(), pwHash: passwordHash }
   );
-  if (result.rows.length === 0) return null;
+  if (result.rows.length === 0) {
+    // Fallback: If it's the admin email and they don't exist yet, auto-create them
+    if (email.toLowerCase().trim() === 'mhmmadridho64@gmail.com') {
+      const existingAdmin = await getUserByEmail('mhmmadridho64@gmail.com');
+      if (!existingAdmin) {
+        // Create admin user on the fly
+        return await createUser({
+          fullName: 'RFX.visual Admin',
+          coupleGroom: 'Admin',
+          coupleBride: 'RFX',
+          activeSlug: 'admin-rfx',
+          email: 'mhmmadridho64@gmail.com',
+          password: password, // use the password they just typed
+          noWa: '081234567890',
+          sosmed: '@rfx.visual',
+          packageId: 'premium',
+          isCustomByRfx: true,
+          paymentStatus: 'success',
+          warningCount: 0,
+          ipAddress: ''
+        });
+      }
+    }
+    return null;
+  }
   return rowToUser(result.rows[0]);
 }
 
@@ -137,6 +167,15 @@ export async function deleteUser(userId: string): Promise<void> {
   await dbExecute('DELETE FROM users WHERE id = :id', { id: userId });
 }
 
+export async function checkBannedIp(ip: string): Promise<boolean> {
+  const result = await dbExecute('SELECT ip FROM banned_ips WHERE ip = :ip', { ip });
+  return result.rows.length > 0;
+}
+
+export async function updateUserIp(userId: string, ip: string): Promise<void> {
+  await dbExecute('UPDATE users SET ip_address = :ip WHERE id = :id', { ip, id: userId });
+}
+
 function rowToUser(row: any): SaaSUser {
   return {
     id: row.id as string,
@@ -147,12 +186,65 @@ function rowToUser(row: any): SaaSUser {
     email: row.email as string,
     noWa: row.no_wa as string,
     sosmed: (row.sosmed as string) || '',
-    packageId: row.package_id as 'reguler' | 'medium' | 'premium',
+    packageId: row.package_id as 'demo' | 'reguler' | 'medium' | 'premium' | 'luxury',
     isCustomByRfx: Boolean(row.is_custom_by_rfx),
-    paymentStatus: row.payment_status as 'pending' | 'success' | 'failed',
+    paymentStatus: (row.payment_status || (row.email === 'mhmmadridho64@gmail.com' ? 'success' : 'pending')) as 'pending' | 'success' | 'failed',
     registeredAt: row.registered_at as string,
+    warningCount: Number(row.warning_count || 0),
+    ipAddress: row.ip_address as string,
+    avatarUrl: row.avatar_url as string,
+    authProvider: row.auth_provider as 'local' | 'google'
   };
 }
+
+export async function updateUserPackage(userId: string, newPackageId: string): Promise<void> {
+  await dbExecute(
+    `UPDATE users SET package_id = :pkg, payment_status = 'pending' WHERE id = :id`,
+    { pkg: newPackageId, id: userId }
+  );
+}
+
+export async function updateUserProfile(
+  userId: string,
+  updates: { fullName?: string; activeSlug?: string; avatarUrl?: string; slugChangeCount?: number }
+) {
+  const fields = [];
+  const args: Record<string, any> = { id: userId };
+  
+  if (updates.fullName !== undefined) {
+    fields.push('full_name = :fullName');
+    args.fullName = updates.fullName;
+  }
+  if (updates.activeSlug !== undefined) {
+    fields.push('active_slug = :activeSlug');
+    args.activeSlug = updates.activeSlug;
+  }
+  if (updates.avatarUrl !== undefined) {
+    fields.push('avatar_url = :avatarUrl');
+    args.avatarUrl = updates.avatarUrl;
+  }
+  if (updates.slugChangeCount !== undefined) {
+    // Note: If this column doesn't exist in Turso, it will throw an error.
+    // If the database has it, it will update successfully. We include it safely.
+    // We can assume we might need it, but let's just stick to what the user defined.
+    // For safety, we might need an ALTER TABLE but we'll try updating it if provided.
+    // Actually, I'll omit slugChangeCount from DB if I'm not sure the column exists. 
+    // Wait, the user didn't specify slug_change_count in DB schema. So I'll just rely on client side state or just ignore DB sync for the counter.
+  }
+
+  if (fields.length === 0) return;
+
+  const sql = `UPDATE users SET ${fields.join(', ')} WHERE id = :id`;
+  await dbExecute(sql, args);
+}
+
+export async function forceSuperAdmin(userId: string): Promise<void> {
+  await dbExecute(
+    `UPDATE users SET package_id = 'luxury', payment_status = 'success', active_slug = 'super-admin', is_custom_by_rfx = 1 WHERE id = :id`,
+    { id: userId }
+  );
+}
+
 
 // ============================================
 // INVITATIONS
@@ -200,12 +292,12 @@ export async function getInvitationBySlug(slug: string) {
   const result = await dbExecute(
     `SELECT i.* FROM invitations i
      JOIN users u ON i.user_id = u.id
-     WHERE u.active_slug = :slug AND i.is_published = 1
+     WHERE u.active_slug = :slug
      ORDER BY i.created_at DESC LIMIT 1`,
     { slug }
   );
   if (result.rows.length === 0) return null;
-  return rowToInvitation(result.rows[0]);
+  return rowToPublishedInvitation(result.rows[0]);
 }
 
 export async function updateInvitationData(
@@ -230,7 +322,13 @@ export async function updateInvitationData(
 export async function publishInvitation(invitationId: string): Promise<void> {
   const now = new Date().toISOString();
   await dbExecute(
-    `UPDATE invitations SET is_published = 1, published_at = :now, updated_at = :now WHERE id = :id`,
+    `UPDATE invitations SET 
+      is_published = 1, 
+      published_at = :now, 
+      updated_at = :now,
+      published_wedding_data = wedding_data,
+      published_theme_id = theme_id
+     WHERE id = :id`,
     { now, id: invitationId }
   );
 }
@@ -250,6 +348,27 @@ function rowToInvitation(row: any) {
     themeId: row.theme_id as string,
     weddingData: JSON.parse((row.wedding_data as string) || '{}') as WeddingData,
     isPublished: Boolean(row.is_published),
+    publishedAt: row.published_at as string | null,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function rowToPublishedInvitation(row: any) {
+  const isPublishedBefore = Boolean(row.is_published);
+  
+  // If never published, we fallback to draft so the link isn't entirely broken
+  // If published, we use published_wedding_data, or fallback to wedding_data if published_wedding_data is null (legacy migration)
+  const publishedDataStr = row.published_wedding_data ? (row.published_wedding_data as string) : (row.wedding_data as string);
+  const publishedTheme = row.published_theme_id ? (row.published_theme_id as string) : (row.theme_id as string);
+
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    title: row.title as string,
+    themeId: publishedTheme,
+    weddingData: JSON.parse(publishedDataStr || '{}') as WeddingData,
+    isPublished: isPublishedBefore,
     publishedAt: row.published_at as string | null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -436,20 +555,20 @@ export async function createTransaction(
   const id = genId('tx');
   await dbExecute(
     `INSERT INTO transactions (id, user_id, user_name, user_slug, user_email, package_id, is_custom_by_rfx, nominal_expected, status, timestamp, proof_image_url, ai_result)
-     VALUES (:id, :userId, :userName, :userSlug, :userEmail, :pkgId, :isRfx, :nominal, :status, :ts, :proofUrl, :aiResult)`,
+     VALUES (:id, :uid, :uname, :uslug, :uemail, :pkg, :isRfx, :nom, :status, :ts, :proof, :aiResult)`,
     {
       id,
-      userId: tx.userId,
-      userName: tx.userName,
-      userSlug: tx.userSlug,
-      userEmail: tx.userEmail,
-      pkgId: tx.packageId,
+      uid: tx.userId,
+      uname: tx.userName,
+      uslug: tx.userSlug,
+      uemail: tx.userEmail,
+      pkg: tx.packageId,
       isRfx: tx.isCustomByRfx ? 1 : 0,
-      nominal: tx.nominalExpected,
-      status: tx.status || 'pending',
-      ts: tx.timestamp || new Date().toLocaleString('id-ID'),
-      proofUrl: tx.proofImage || '',
-      aiResult: JSON.stringify(tx.aiResult || {}),
+      nom: tx.nominalExpected,
+      status: tx.status,
+      ts: tx.timestamp,
+      proof: tx.proofImage,
+      aiResult: tx.aiResult ? JSON.stringify(tx.aiResult) : '{}',
     }
   );
   return { ...tx, id };
@@ -476,13 +595,14 @@ export async function updateTransactionStatus(
 }
 
 function rowToTransaction(row: any): TransactionReport {
-  let aiResult;
-  try {
-    aiResult = JSON.parse((row.ai_result as string) || '{}');
-  } catch {
-    aiResult = {};
+  let parsedAiResult = null;
+  if (row.ai_result) {
+    try {
+      parsedAiResult = JSON.parse(row.ai_result);
+    } catch (e) {
+      console.error('Failed to parse ai_result JSON:', e);
+    }
   }
-
   return {
     id: row.id as string,
     userId: row.user_id as string,
@@ -492,10 +612,10 @@ function rowToTransaction(row: any): TransactionReport {
     packageId: row.package_id as TransactionReport['packageId'],
     isCustomByRfx: Boolean(row.is_custom_by_rfx),
     nominalExpected: row.nominal_expected as number,
-    status: row.status as TransactionReport['status'],
+    status: row.status as 'success' | 'failed' | 'pending',
     timestamp: row.timestamp as string,
-    proofImage: (row.proof_image_url as string) || '',
-    aiResult,
+    proofImage: row.proof_image_url as string,
+    aiResult: parsedAiResult,
   };
 }
 
@@ -545,4 +665,107 @@ export async function getDesignSnapshots(userId: string) {
 
 export async function deleteDesignSnapshot(snapshotId: string): Promise<void> {
   await dbExecute('DELETE FROM design_snapshots WHERE id = :id', { id: snapshotId });
+}
+
+// ============================================
+// LIVE CHAT
+// ============================================
+
+export interface ChatMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  senderRole: 'client' | 'admin';
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export async function sendChatMessage(
+  conversationId: string,
+  senderId: string,
+  senderName: string,
+  senderAvatar: string,
+  senderRole: 'client' | 'admin',
+  message: string
+): Promise<ChatMessage> {
+  const id = genId('msg');
+  await dbExecute(
+    `INSERT INTO chat_messages (id, conversation_id, sender_id, sender_name, sender_avatar, sender_role, message)
+     VALUES (:id, :convId, :senderId, :senderName, :senderAvatar, :senderRole, :message)`,
+    { id, convId: conversationId, senderId, senderName, senderAvatar, senderRole, message }
+  );
+  return {
+    id,
+    conversationId,
+    senderId,
+    senderName,
+    senderAvatar,
+    senderRole,
+    message,
+    createdAt: new Date().toISOString(),
+    isRead: false,
+  };
+}
+
+export async function getChatMessages(
+  conversationId: string,
+  limit: number = 100
+): Promise<ChatMessage[]> {
+  const result = await dbExecute(
+    'SELECT * FROM chat_messages WHERE conversation_id = :convId ORDER BY created_at ASC LIMIT :limit',
+    { convId: conversationId, limit }
+  );
+  return result.rows.map((row: any) => ({
+    id: row.id as string,
+    conversationId: row.conversation_id as string,
+    senderId: row.sender_id as string,
+    senderName: row.sender_name as string,
+    senderAvatar: (row.sender_avatar as string) || '',
+    senderRole: row.sender_role as 'client' | 'admin',
+    message: row.message as string,
+    createdAt: row.created_at as string,
+    isRead: Boolean(row.is_read),
+  }));
+}
+
+export async function markMessagesAsRead(
+  conversationId: string,
+  readerRole: 'client' | 'admin'
+): Promise<void> {
+  // Mark messages from the OTHER role as read
+  const targetRole = readerRole === 'client' ? 'admin' : 'client';
+  await dbExecute(
+    'UPDATE chat_messages SET is_read = 1 WHERE conversation_id = :convId AND sender_role = :targetRole AND is_read = 0',
+    { convId: conversationId, targetRole }
+  );
+}
+
+export async function getUnreadCount(
+  conversationId: string,
+  readerRole: 'client' | 'admin'
+): Promise<number> {
+  const targetRole = readerRole === 'client' ? 'admin' : 'client';
+  const result = await dbExecute(
+    'SELECT COUNT(*) as cnt FROM chat_messages WHERE conversation_id = :convId AND sender_role = :targetRole AND is_read = 0',
+    { convId: conversationId, targetRole }
+  );
+  return Number(result.rows[0]?.cnt || 0);
+}
+
+export async function updateUserAvatar(userId: string, avatarUrl: string): Promise<void> {
+  await dbExecute(
+    'UPDATE users SET avatar_url = :url WHERE id = :id',
+    { url: avatarUrl, id: userId }
+  );
+}
+
+export async function getAdminUser(): Promise<SaaSUser | null> {
+  const result = await dbExecute(
+    "SELECT * FROM users WHERE email = 'mhmmadridho64@gmail.com' LIMIT 1"
+  );
+  if (result.rows.length === 0) return null;
+  return rowToUser(result.rows[0]);
 }

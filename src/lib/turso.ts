@@ -1,47 +1,48 @@
 /**
- * Turso Database Client
- * Koneksi ke Turso LibSQL database untuk Wedding SaaS Builder
+ * Turso Database Client (Server-Side)
+ * Koneksi langsung ke database Turso untuk eksekusi server-side query.
  */
 
-import { createClient } from '@libsql/client/web';
+import { createClient } from '@libsql/client';
 
-// Singleton client instance
-let _client: ReturnType<typeof createClient> | null = null;
+const url = process.env.TURSO_DATABASE_URL || process.env.VITE_TURSO_DATABASE_URL || '';
+const authToken = process.env.TURSO_AUTH_TOKEN || process.env.VITE_TURSO_AUTH_TOKEN || '';
 
-export function getTursoClient() {
-  if (_client) return _client;
-
-  const url = import.meta.env.VITE_TURSO_DATABASE_URL;
-  const authToken = import.meta.env.VITE_TURSO_AUTH_TOKEN;
-
-  if (!url || !authToken) {
-    console.error(
-      'Turso env vars missing! Set VITE_TURSO_DATABASE_URL and VITE_TURSO_AUTH_TOKEN in .env.local'
-    );
-    throw new Error('Turso database not configured');
-  }
-
-  _client = createClient({ url, authToken });
-  return _client;
-}
+// Initialize client only if config is present (prevents build crash if env variables are empty at build time)
+const client = url ? createClient({ url, authToken }) : null;
 
 /**
- * Execute a single SQL statement with params
+ * Execute a single SQL statement securely on the server
  */
 export async function dbExecute(sql: string, args: Record<string, any> = {}) {
-  const client = getTursoClient();
-  return client.execute({ sql, args });
+  if (!client) {
+    throw new Error('Database client not initialized. Check your TURSO_DATABASE_URL environment variable.');
+  }
+
+  // Convert undefined values to null to prevent client errors
+  const safeArgs = Object.fromEntries(
+    Object.entries(args).map(([k, v]) => [k, v === undefined ? null : v])
+  );
+
+  return await client.execute({ sql, args: safeArgs });
 }
 
 /**
- * Execute a batch of SQL statements in a transaction
+ * Execute a batch of SQL statements securely on the server
  */
 export async function dbBatch(statements: { sql: string; args?: Record<string, any> }[]) {
-  const client = getTursoClient();
-  return client.batch(
-    statements.map((s) => ({ sql: s.sql, args: s.args || {} })),
-    'write'
-  );
+  if (!client) {
+    throw new Error('Database client not initialized. Check your TURSO_DATABASE_URL environment variable.');
+  }
+
+  const safeStatements = statements.map(stmt => ({
+    sql: stmt.sql,
+    args: stmt.args 
+      ? Object.fromEntries(Object.entries(stmt.args).map(([k, v]) => [k, v === undefined ? null : v]))
+      : []
+  }));
+
+  return await client.batch(safeStatements);
 }
 
 /**

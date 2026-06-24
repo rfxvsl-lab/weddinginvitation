@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Check, Flame, Flower, ShieldAlert, Sparkles, Wand2 } from 'lucide-react';
+import { PiCheckDuotone as Check, PiFireDuotone as Flame, PiFlowerDuotone as Flower, PiShieldWarningDuotone as ShieldAlert, PiSparkleDuotone as Sparkles, PiMagicWandDuotone as Wand2 } from 'react-icons/pi';
 import { ThemeConfig } from '../types';
 import { DEFAULT_THEMES } from '../data/defaultData';
 

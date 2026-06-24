@@ -12,8 +12,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const TURSO_URL = 'libsql://rfxwedding-ridhofbry.aws-ap-south-1.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODA1NTk1MzYsImlkIjoiMDE5ZTkxOGQtYjcwMS03YjVhLWFhZGQtM2ZkYzBhMTVlZWU3IiwicmlkIjoiOWJlOGZjM2EtOWUyOS00NTc2LWFkMTMtZWI2OTJkNDhjNzNmIn0.-OXOXoHh7y92RSpT732iaiLBTtM3_5T8n-dhS6pp3YZBkd-3rPEP9i-aePsXukT1gqb-XnH1BzQ66iYQ8CQDBA';
+const TURSO_URL = process.env.VITE_TURSO_DATABASE_URL || 'libsql://rfxwedding-ridhofbry.aws-ap-south-1.turso.io';
+const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN || process.env.VITE_TURSO_AUTH_TOKEN;
+
+if (!TURSO_TOKEN) {
+  console.error("Fatal: TURSO_AUTH_TOKEN is missing!");
+  process.exit(1);
+}
 
 async function main() {
   console.log('='.repeat(50));
@@ -131,11 +136,47 @@ async function main() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (invitation_id) REFERENCES invitations(id) ON DELETE CASCADE
     )`,
+
+    // 8. Admin Settings (for Push Notifications etc)
+    `CREATE TABLE IF NOT EXISTS admin_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT DEFAULT (datetime('now'))
+    )`,
+
+    // 9. Chat Conversations
+    `CREATE TABLE IF NOT EXISTS chat_conversations (
+      id TEXT PRIMARY KEY,
+      client_id TEXT NOT NULL,
+      client_name TEXT NOT NULL,
+      client_avatar TEXT DEFAULT '',
+      last_message TEXT DEFAULT '',
+      last_message_at TEXT DEFAULT (datetime('now')),
+      unread_admin INTEGER DEFAULT 0,
+      unread_client INTEGER DEFAULT 0,
+      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE
+    )`,
+
+    // 10. Chat Messages
+    `CREATE TABLE IF NOT EXISTS chat_messages (
+      id TEXT PRIMARY KEY,
+      conversation_id TEXT NOT NULL,
+      sender_id TEXT NOT NULL,
+      sender_name TEXT NOT NULL,
+      sender_avatar TEXT DEFAULT '',
+      sender_role TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      is_read INTEGER DEFAULT 0,
+      FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE
+    )`,
   ];
 
   const indexStatements = [
     `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`,
     `CREATE INDEX IF NOT EXISTS idx_users_slug ON users(active_slug)`,
+    `CREATE INDEX IF NOT EXISTS idx_chat_conv_client ON chat_conversations(client_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_chat_msg_conv ON chat_messages(conversation_id)`,
     `CREATE INDEX IF NOT EXISTS idx_invitations_user ON invitations(user_id)`,
     `CREATE INDEX IF NOT EXISTS idx_guests_invitation ON guests(invitation_id)`,
     `CREATE INDEX IF NOT EXISTS idx_rsvps_invitation ON rsvps(invitation_id)`,
