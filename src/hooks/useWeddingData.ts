@@ -246,12 +246,16 @@ export function useWeddingData(): UseWeddingDataReturn {
           id: invId,
           userId: user.id,
           title: `Undangan ${user.coupleGroom} & ${user.coupleBride}`,
+          slug: null,
           themeId: 'rfx-dark',
           weddingData: defaultData,
           isPublished: false,
           publishedAt: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          activatedAt: null,
+          expiresAt: null,
+          isExpired: false,
         };
       }
 
