@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.5
@@ -5,26 +7,34 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Heart, 
-  Calendar, 
-  MapPin, 
-  Clock, 
-  Gift, 
-  Copy, 
-  Check, 
-  Instagram, 
-  Music, 
-  Volume2, 
-  VolumeX, 
-  BookOpen, 
-  Send,
-  Sparkles,
-  ArrowRight,
-  ExternalLink,
-  ChevronDown
-} from 'lucide-react';
+  PiHeartDuotone as Heart, 
+  PiCalendarDuotone as Calendar, 
+  PiMapPinDuotone as MapPin, 
+  PiClockDuotone as Clock, 
+  PiGiftDuotone as Gift, 
+  PiCopyDuotone as Copy, 
+  PiCheckDuotone as Check, 
+  PiInstagramLogoDuotone as Instagram, 
+  PiMusicNotesDuotone as Music, 
+  PiSpeakerHighDuotone as Volume2, 
+  PiSpeakerSlashDuotone as VolumeX, 
+  PiBookOpenDuotone as BookOpen, 
+  PiPaperPlaneTiltDuotone as Send,
+  PiSparkleDuotone as Sparkles,
+  PiArrowRightDuotone as ArrowRight,
+  PiArrowSquareOutDuotone as ExternalLink,
+  PiCaretDownDuotone as ChevronDown
+} from 'react-icons/pi';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeddingData, RSVP, ThemeConfig, Guest } from '../types';
+import DarkLuxuryLayout from './templates/DarkLuxuryLayout';
+import LuxuryPinkLayout from './templates/LuxuryPinkLayout';
+import NetflixLuxuryLayout from './templates/NetflixLuxuryLayout';
+import GrandBallroomLayout from './templates/GrandBallroomLayout';
+import RoyalArabianLayout from './templates/RoyalArabianLayout';
+import SpotiLoveLayout from './templates/SpotiLoveLayout';
+import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
+
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { convertGoogleDriveUrl } from '../utils/googleDrive';
 
@@ -57,7 +67,7 @@ const LuxuryCorner = ({ className = 'w-8 h-8' }: { className?: string }) => (
 
 export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, guest, embedded = false }: InvitationPreviewProps) {
   const currentTheme = DEFAULT_THEMES.find(t => t.id === themeId) || DEFAULT_THEMES[0];
-  
+
   // States
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -93,7 +103,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
   };
 
   // Music URL is now always a direct URL (Cloudinary or external link)
-  const resolvedMusicUrl = data.musicUrl || '';
+  const resolvedMusicUrl = data?.musicUrl || '';
 
   // Audio Playback Lifecycle
   useEffect(() => {
@@ -143,7 +153,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
   // Countdown target logic
   useEffect(() => {
     const calculateCountdown = () => {
-      const difference = +new Date(data.countdownDate) - +new Date();
+      const difference = +new Date(data?.countdownDate) - +new Date();
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -159,7 +169,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
     calculateCountdown();
     const interval = setInterval(calculateCountdown, 1000);
     return () => clearInterval(interval);
-  }, [data.countdownDate]);
+  }, [data?.countdownDate]);
 
   const handleCopyGift = (id: string, accountNumber: string) => {
     navigator.clipboard.writeText(accountNumber).then(() => {
@@ -199,6 +209,97 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
   const goldTextAccent = isRFX ? 'text-amber-500' : 'text-amber-700';
   const goldenLineBorder = isRFX ? 'border-amber-950/40' : 'border-amber-100';
 
+  if (currentTheme.layout === 'javanese-classic') {
+    return (
+      <JavaneseClassicLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'spotilove') {
+    return (
+      <SpotiLoveLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'royal-arabian') {
+    return (
+      <RoyalArabianLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'grand-ballroom') {
+    return (
+      <GrandBallroomLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'netflix-luxury') {
+    return (
+      <NetflixLuxuryLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'luxury-pink') {
+    return (
+      <LuxuryPinkLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'dark-luxury') {
+    return (
+      <DarkLuxuryLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
   return (
     <div 
       className={`relative w-full h-full overflow-y-auto overflow-x-hidden ${isRFX ? 'font-sans bg-[#020202] text-zinc-100' : 'font-sans'}`}
@@ -206,8 +307,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
         backgroundColor: currentTheme.bgHex, 
         color: currentTheme.textHex,
         // BG image for opened state (parallax layout)
-        backgroundImage: (isOpen && data.bgImageUrl)
-          ? `linear-gradient(to bottom, ${isRFX ? 'rgba(2,2,2,0.85), rgba(5,5,5,0.92)' : 'rgba(255,253,250,0.93), rgba(254,251,245,0.975)'}), url('${getImageUrl(data.bgImageUrl)}')`
+        backgroundImage: (isOpen && data?.bgImageUrl)
+          ? `linear-gradient(to bottom, ${isRFX ? 'rgba(2,2,2,0.85), rgba(5,5,5,0.92)' : 'rgba(255,253,250,0.93), rgba(254,251,245,0.975)'}), url('${getImageUrl(data?.bgImageUrl)}')`
           : 'none',
         backgroundAttachment: 'fixed',
         backgroundSize: 'cover',
@@ -309,12 +410,12 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
             <div className={`mx-auto w-24 h-24 rounded-full border-2 flex items-center justify-center p-2 mb-4 relative ${isRFX ? 'border-amber-500/20 bg-zinc-950/60' : 'border-amber-200 bg-white/70'}`}>
               <div className="absolute -inset-1 border border-amber-500/10 rounded-full animate-spin-slow" />
               <span className="text-3xl font-cursive text-amber-500">
-                {data.couple.groom.nickname[0]} & {data.couple.bride.nickname[0]}
+                {data?.couple?.groom.nickname[0]} & {data?.couple?.bride.nickname[0]}
               </span>
             </div>
 
             <h1 className="text-5xl md:text-6xl font-cursive leading-tight text-amber-550 select-none drop-shadow-sm tracking-wide">
-              {data.couple.groom.nickname} & {data.couple.bride.nickname}
+              {data?.couple?.groom.nickname} & {data?.couple?.bride.nickname}
             </h1>
             
             <p className="text-xs uppercase tracking-[0.25em] font-serif text-slate-500">
@@ -389,7 +490,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.2em] font-serif text-slate-400">Pertemuan Jiwa & Komitmen Abadi</p>
               <h2 className="text-6xl md:text-7xl font-cursive tracking-wide text-amber-550 py-2 filter drop-shadow-sm select-none">
-                {data.couple.groom.nickname} & {data.couple.bride.nickname}
+                {data?.couple?.groom.nickname} & {data?.couple?.bride.nickname}
               </h2>
               <p className="text-xs font-bold font-mono tracking-widest text-slate-500">SABTU, 08 AGUSTUS 2026</p>
             </div>
@@ -407,29 +508,29 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                 MENGHITUNG HARI SAKRAL
               </h4>
               
-              <div className="grid grid-cols-4 gap-2.5">
-                <div className={`p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
-                  <span className="text-2xl font-serif font-black text-amber-600 leading-none">{timeLeft.days}</span>
-                  <span className="text-[9.5px] text-zinc-505 font-medium mt-1">Hari</span>
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5">
+                <div className={`p-2 sm:p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
+                  <span className="text-lg sm:text-xl md:text-2xl font-black font-sans text-amber-500">{String(timeLeft.days).padStart(2, '0')}</span>
+                  <span className="text-[8.5px] sm:text-[9.5px] text-zinc-505 font-medium mt-1">Hari</span>
                 </div>
-                <div className={`p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
-                  <span className="text-2xl font-serif font-black text-amber-600 leading-none">{timeLeft.hours}</span>
-                  <span className="text-[9.5px] text-zinc-505 font-medium mt-1">Jam</span>
+                <div className={`p-2 sm:p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
+                  <span className="text-lg sm:text-xl md:text-2xl font-black font-sans text-amber-500">{String(timeLeft.hours).padStart(2, '0')}</span>
+                  <span className="text-[8.5px] sm:text-[9.5px] text-zinc-505 font-medium mt-1">Jam</span>
                 </div>
-                <div className={`p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
-                  <span className="text-2xl font-serif font-black text-amber-600 leading-none">{timeLeft.minutes}</span>
-                  <span className="text-[9.5px] text-zinc-505 font-medium mt-1">Menit</span>
+                <div className={`p-2 sm:p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
+                  <span className="text-lg sm:text-xl md:text-2xl font-black font-sans text-amber-500">{String(timeLeft.minutes).padStart(2, '0')}</span>
+                  <span className="text-[8.5px] sm:text-[9.5px] text-zinc-505 font-medium mt-1">Menit</span>
                 </div>
-                <div className={`p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
-                  <span className="text-2xl font-serif font-black text-amber-600 leading-none">{timeLeft.seconds}</span>
-                  <span className="text-[9.5px] text-zinc-505 font-medium mt-1">Detik</span>
+                <div className={`p-2 sm:p-3 rounded-2xl flex flex-col items-center border ${isRFX ? 'bg-zinc-900/60 border-zinc-800' : 'bg-amber-50/40 border-amber-100/50'}`}>
+                  <span className="text-lg sm:text-xl md:text-2xl font-black font-sans text-amber-500">{String(timeLeft.seconds).padStart(2, '0')}</span>
+                  <span className="text-[8.5px] sm:text-[9.5px] text-zinc-505 font-medium mt-1">Detik</span>
                 </div>
               </div>
             </div>
           </section>
 
           {/* ==================== 2. HOLY VERSE / QUOTE SECTION ==================== */}
-          <section className={`p-8 md:p-12 text-center space-y-4 border-y ${isRFX ? 'bg-black/40 border-zinc-900' : 'bg-amber-50/20 border-amber-50'}`}>
+          <section className={`px-4 py-8 md:p-12 text-center space-y-4 border-y ${isRFX ? 'bg-black/40 border-zinc-900' : 'bg-amber-50/20 border-amber-50'}`}>
             <div className="flex justify-center opacity-40">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mx-1" />
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 mx-1" />
@@ -440,12 +541,12 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
               "{data.quoteText}"
             </p>
             <span className="block text-[11px] font-black tracking-widest text-amber-600 uppercase font-serif">
-              — {data.quoteSource}
+              â€” {data.quoteSource}
             </span>
           </section>
 
           {/* ==================== 3. BRIDE & GROOM PROFILES LAYER ==================== */}
-          <section className="p-8 md:p-12 text-center space-y-12">
+          <section className="px-4 py-8 md:p-12 text-center space-y-12">
             <div className="space-y-2">
               <span className="text-[9.5px] uppercase font-bold tracking-[0.25em] text-amber-550 block">THE HAPPY COUPLE</span>
               <h3 className="text-2xl font-serif font-semibold text-amber-700">Mempelai Pernikahan</h3>
@@ -458,8 +559,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                 isRFX ? 'border-amber-950/60 bg-zinc-950' : 'border-white bg-white'
               }`}>
                 <img 
-                  src={getImageUrl(data.couple.groom.photoUrl)} 
-                  alt={data.couple.groom.fullName} 
+                  src={getImageUrl(data?.couple?.groom.photoUrl)} 
+                  alt={data?.couple?.groom.fullName} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -468,24 +569,24 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-[0.2em] text-amber-550 uppercase">MEMPELAI PRIA</span>
                 <h3 className="text-2xl font-serif font-black tracking-wide text-amber-700">
-                  {data.couple.groom.fullName}
+                  {data?.couple?.groom.fullName}
                 </h3>
                 <p className="text-xs font-medium max-w-xs mx-auto leading-relaxed text-zinc-500 pt-1">
-                  {data.couple.groom.about}
+                  {data?.couple?.groom.about}
                 </p>
                 <div className="text-[10.5px] text-zinc-455 font-serif py-1">
                   <span className="block font-bold">Putra Pertama dari:</span>
-                  <span className="block italic text-zinc-500">{data.couple.groom.fatherName} & {data.couple.groom.motherName}</span>
+                  <span className="block italic text-zinc-500">{data?.couple?.groom.fatherName} & {data?.couple?.groom.motherName}</span>
                 </div>
                 
                 <a 
-                  href={`https://instagram.com/${data.couple.groom.instagram.replace('@','')}`}
+                  href={`https://instagram.com/${data?.couple?.groom.instagram.replace('@','')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10.5px] font-bold mt-2 text-stone-500 hover:text-amber-600 transition"
                 >
                   <Instagram className="w-3.5 h-3.5 text-amber-600" />
-                  {data.couple.groom.instagram}
+                  {data?.couple?.groom.instagram}
                 </a>
               </div>
             </div>
@@ -504,8 +605,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                 isRFX ? 'border-amber-950/60 bg-zinc-950' : 'border-white bg-white'
               }`}>
                 <img 
-                  src={getImageUrl(data.couple.bride.photoUrl)} 
-                  alt={data.couple.bride.fullName} 
+                  src={getImageUrl(data?.couple?.bride.photoUrl)} 
+                  alt={data?.couple?.bride.fullName} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -514,31 +615,31 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-[0.2em] text-amber-550 uppercase">MEMPELAI WANITA</span>
                 <h3 className="text-2xl font-serif font-black tracking-wide text-amber-700">
-                  {data.couple.bride.fullName}
+                  {data?.couple?.bride.fullName}
                 </h3>
                 <p className="text-xs font-medium max-w-xs mx-auto leading-relaxed text-zinc-500 pt-1">
-                  {data.couple.bride.about}
+                  {data?.couple?.bride.about}
                 </p>
                 <div className="text-[10.5px] text-zinc-455 font-serif py-1">
                   <span className="block font-bold">Putri Bungsu dari:</span>
-                  <span className="block italic text-zinc-500">{data.couple.bride.fatherName} & {data.couple.bride.motherName}</span>
+                  <span className="block italic text-zinc-500">{data?.couple?.bride.fatherName} & {data?.couple?.bride.motherName}</span>
                 </div>
                 
                 <a 
-                  href={`https://instagram.com/${data.couple.bride.instagram.replace('@','')}`}
+                  href={`https://instagram.com/${data?.couple?.bride.instagram.replace('@','')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10.5px] font-bold mt-2 text-stone-500 hover:text-amber-600 transition"
                 >
                   <Instagram className="w-3.5 h-3.5 text-amber-600" />
-                  {data.couple.bride.instagram}
+                  {data?.couple?.bride.instagram}
                 </a>
               </div>
             </div>
           </section>
 
           {/* ==================== 4. AGENDA / EVENTS STRUCTURE ==================== */}
-          <section className={`p-8 md:p-12 space-y-8 ${isRFX ? 'bg-black/30' : 'bg-amber-50/5'}`}>
+          <section className={`px-4 py-8 md:p-12 space-y-8 ${isRFX ? 'bg-black/30' : 'bg-amber-50/5'}`}>
             <div className="text-center space-y-1.5">
               <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-550 block font-serif">THE CELEBRATION</span>
               <h3 className="text-3xl font-serif text-amber-800">Detail Rangkaian Acara</h3>
@@ -558,8 +659,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                   </div>
                   
                   <div className="space-y-1">
-                    <h4 className="font-serif font-bold text-lg text-amber-800 leading-tight">{data.events.akad.venueName}</h4>
-                    <p className="text-[11px] text-zinc-500 max-w-xs mx-auto min-h-8">{data.events.akad.address}</p>
+                    <h4 className="font-serif font-bold text-lg text-amber-800 leading-tight">{data?.events?.akad.venueName}</h4>
+                    <p className="text-[11px] text-zinc-500 max-w-xs mx-auto min-h-8">{data?.events?.akad.address}</p>
                   </div>
 
                   <div className="flex justify-center gap-3.5 text-[11px] font-semibold text-zinc-505 border-y py-3 border-dashed border-amber-500/10 font-serif">
@@ -569,12 +670,12 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
-                      {data.events.akad.timeStart} - {data.events.akad.timeEnd} WIB
+                      {data?.events?.akad.timeStart} - {data?.events?.akad.timeEnd} WIB
                     </span>
                   </div>
 
                   <a 
-                    href={data.events.akad.googleMapsUrl}
+                    href={data?.events?.akad.googleMapsUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex w-full justify-center items-center gap-2 py-3.5 rounded-full text-xs font-bold text-amber-900 border border-amber-250 bg-amber-500/10 hover:bg-amber-500/15 transition-all text-center tracking-wider font-serif"
@@ -597,8 +698,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                   </div>
                   
                   <div className="space-y-1">
-                    <h4 className="font-serif font-bold text-lg text-amber-800 leading-tight">{data.events.resepsi.venueName}</h4>
-                    <p className="text-[11px] text-zinc-505 max-w-xs mx-auto min-h-8">{data.events.resepsi.address}</p>
+                    <h4 className="font-serif font-bold text-lg text-amber-800 leading-tight">{data?.events?.resepsi.venueName}</h4>
+                    <p className="text-[11px] text-zinc-505 max-w-xs mx-auto min-h-8">{data?.events?.resepsi.address}</p>
                   </div>
 
                   <div className="flex justify-center gap-3.5 text-[11px] font-semibold text-zinc-505 border-y py-3 border-dashed border-amber-500/10 font-serif">
@@ -608,12 +709,12 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
-                      {data.events.resepsi.timeStart} - {data.events.resepsi.timeEnd} WIB
+                      {data?.events?.resepsi.timeStart} - {data?.events?.resepsi.timeEnd} WIB
                     </span>
                   </div>
 
                   <a 
-                    href={data.events.resepsi.googleMapsUrl}
+                    href={data?.events?.resepsi.googleMapsUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex w-full justify-center items-center gap-2 py-3.5 rounded-full text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all text-center shadow-md tracking-wider font-serif"
@@ -629,8 +730,8 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
           </section>
 
           {/* ==================== 5. LOVE STORY (TIMELINE LAYOUT) ==================== */}
-          {data.showLoveStories !== false && (
-            <section className="p-8 md:p-12 space-y-8">
+          {data?.showLoveStories !== false && (
+            <section className="px-4 py-8 md:p-12 space-y-8">
               <div className="text-center space-y-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-550 block font-serif">OUR STORY</span>
                 <h3 className="text-3xl font-serif text-amber-805">Perjalanan Kisah Indah</h3>
@@ -638,7 +739,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
               </div>
 
               <div className={`space-y-10 relative before:absolute before:left-3.5 before:top-4 before:bottom-4 before:w-px ${isRFX ? 'before:bg-amber-950' : 'before:bg-amber-100'}`}>
-                {data.loveStories.map((story, i) => (
+                {data?.loveStories?.map((story, i) => (
                   <div key={story.id} className="relative pl-9 space-y-2.5 group animate-fadeIn">
                     {/* Timeline bullet */}
                     <span className={`absolute left-1.5 top-1.5 w-4.5 h-4.5 rounded-full border-4 shadow-md flex items-center justify-center transition-all group-hover:scale-110 ${
@@ -646,7 +747,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                     }`} />
                     
                     <div className="text-[10px] font-bold tracking-widest text-amber-600 uppercase font-mono">
-                      TAHUN — {story.year}
+                      TAHUN â€” {story.year}
                     </div>
                     
                     <h4 className="font-serif font-black text-lg text-amber-800">
@@ -674,7 +775,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
           )}
 
           {/* ==================== 6. PREWEDDING IMAGE GALLERY ==================== */}
-          <section className={`p-8 md:p-12 space-y-8 border-y ${isRFX ? 'bg-black/30 border-zinc-900' : 'bg-white border-amber-50'}`}>
+          <section className={`px-4 py-8 md:p-12 space-y-8 border-y ${isRFX ? 'bg-black/30 border-zinc-900' : 'bg-white border-amber-50'}`}>
             <div className="text-center space-y-1.5">
               <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-550 block font-serif">PREWEDDING SCENES</span>
               <h3 className="text-3xl font-serif text-amber-800">Galeri Prewedding</h3>
@@ -682,7 +783,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
             </div>
 
             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
-              {data.gallery.map((img, idx) => (
+              {data?.gallery?.map((img, idx) => (
                 <div key={idx} className={`aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer border ${
                   isRFX ? 'border-zinc-850 hover:border-amber-500/30' : 'border-amber-100/40 hover:border-amber-400'
                 }`}>
@@ -698,7 +799,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
           </section>
 
           {/* ==================== 7. DIGITAL GIFT LAYER ==================== */}
-          <section className="p-8 md:p-12 text-center space-y-8">
+          <section className="px-4 py-8 md:p-12 text-center space-y-8">
             <div className="space-y-1.5">
               <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-550 block font-serif">WEDDING GIFT</span>
               <h3 className="text-3xl font-serif text-amber-800">Amplop & Kado Digital</h3>
@@ -708,7 +809,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
             </div>
 
             <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto">
-              {data.gifts.map((gift) => (
+              {data?.gifts?.map((gift) => (
                 <div key={gift.id} className={`p-6 rounded-[28px] text-center space-y-3 relative border transition-all hover:shadow-md ${
                   isRFX ? 'bg-zinc-950/80 border-zinc-800' : 'bg-white border-amber-100 shadow-sm'
                 }`}>
@@ -751,7 +852,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
           </section>
 
           {/* ==================== 8. RSVP & BUKU TAMU LAYER ==================== */}
-          <section className={`p-8 md:p-12 space-y-8 border-t ${isRFX ? 'bg-black/30 border-zinc-900' : 'bg-amber-500/5 border-amber-100/40'}`}>
+          <section className={`px-4 py-8 md:p-12 space-y-8 border-t ${isRFX ? 'bg-black/30 border-zinc-900' : 'bg-amber-500/5 border-amber-100/40'}`}>
             <div className="text-center space-y-1.5">
               <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-550 block font-serif">RSVP & GUESTBOOK</span>
               <h3 className="text-3xl font-serif text-amber-800">Isi Kehadiran & Doa</h3>
@@ -893,7 +994,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
                             ? (isRFX ? 'bg-rose-950/40 text-rose-450 border-rose-900/30' : 'bg-rose-50 text-rose-800 border-rose-100')
                             : (isRFX ? 'bg-zinc-900 border border-zinc-800 text-zinc-400' : 'bg-amber-50 text-amber-800 border-amber-100')
                         }`}>
-                          {wish.status === 'Hadir' ? `HADIR • ${wish.paxCount} PAX` : wish.status}
+                          {wish.status === 'Hadir' ? `HADIR â€¢ ${wish.paxCount} PAX` : wish.status}
                         </span>
                       </div>
 
@@ -912,81 +1013,83 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
           </section>
 
           {/* ==================== 9. GUEST DIGITAL BOARDING PASS & QR CHECK-IN TICKET ==================== */}
-          <section className={`p-8 md:p-12 text-center space-y-6 ${isRFX ? 'bg-black/40 border-t border-zinc-900/60' : 'bg-amber-50/20 border-t border-amber-100/40'}`}>
-            <div className="space-y-1.5">
-              <span className="text-[10px] uppercase font-bold tracking-[0.25em] block text-amber-600 font-serif">DIGITAL ENTRY PASS</span>
-              <h3 className="text-3xl font-serif text-amber-800">Tiket Akses QR Code</h3>
-              <p className="text-xs leading-relaxed max-w-sm mx-auto text-stone-500">
-                Guna mempermudah check-in tamu VIP tanpa antritangan manual, tunjukkan kode boarding pass personal Anda ini pada scanner di meja penerima tamu.
-              </p>
-            </div>
+          {data.enableDigitalPass !== false && (
+            <section className={`px-4 py-8 md:p-12 text-center space-y-6 ${isRFX ? 'bg-black/40 border-t border-zinc-900/60' : 'bg-amber-50/20 border-t border-amber-100/40'}`}>
+              <div className="space-y-1.5">
+                <span className="text-[10px] uppercase font-bold tracking-[0.25em] block text-amber-600 font-serif">DIGITAL ENTRY PASS</span>
+                <h3 className="text-3xl font-serif text-amber-800">Tiket Akses QR Code</h3>
+                <p className="text-xs leading-relaxed max-w-sm mx-auto text-stone-500">
+                  Guna mempermudah check-in tamu VIP tanpa antritangan manual, tunjukkan kode boarding pass personal Anda ini pada scanner di meja penerima tamu.
+                </p>
+              </div>
 
-            {/* CLASSY BOARDING PASS CARD DESIGN */}
-            <div className="max-w-md mx-auto relative overflow-hidden my-4">
-              <div className={`rounded-3xl border p-6 text-center space-y-5 relative ${
-                isRFX 
-                  ? 'bg-zinc-950/90 border-[#27272a] shadow-[0_10px_25px_rgba(0,0,0,0.85)]' 
-                  : 'bg-white border-amber-100/80 shadow-md text-slate-800'
-              }`}>
-                {/* Boarding pass horizontal punch notch left & right */}
-                <div className={`absolute top-1/2 -left-[15px] w-7 h-7 rounded-full border-r -translate-y-1/2 ${
-                  isRFX ? 'bg-zinc-950 border-[#27272a]' : 'bg-[#fffbf6] border-amber-100'
-                }`} />
-                <div className={`absolute top-1/2 -right-[15px] w-7 h-7 rounded-full border-l -translate-y-1/2 ${
-                  isRFX ? 'bg-zinc-950 border-[#27272a]' : 'bg-[#fffbf6] border-amber-100'
-                }`} />
+              {/* CLASSY BOARDING PASS CARD DESIGN */}
+              <div className="max-w-md mx-auto relative overflow-hidden my-4">
+                <div className={`rounded-3xl border p-6 text-center space-y-5 relative ${
+                  isRFX 
+                    ? 'bg-zinc-950/90 border-[#27272a] shadow-[0_10px_25px_rgba(0,0,0,0.85)]' 
+                    : 'bg-white border-amber-100/80 shadow-md text-slate-800'
+                }`}>
+                  {/* Boarding pass horizontal punch notch left & right */}
+                  <div className={`absolute top-1/2 -left-[15px] w-7 h-7 rounded-full border-r -translate-y-1/2 ${
+                    isRFX ? 'bg-zinc-950 border-[#27272a]' : 'bg-[#fffbf6] border-amber-100'
+                  }`} />
+                  <div className={`absolute top-1/2 -right-[15px] w-7 h-7 rounded-full border-l -translate-y-1/2 ${
+                    isRFX ? 'bg-zinc-950 border-[#27272a]' : 'bg-[#fffbf6] border-amber-100'
+                  }`} />
 
-                {/* Ticket head */}
-                <div className="flex justify-between items-center text-left border-b border-dashed pb-4 border-amber-500/20">
-                  <div>
-                    <h5 className="text-[8.5px] font-bold tracking-widest text-[#925c0e] uppercase">PASSENGER NAME</h5>
-                    <p className="text-sm font-serif font-black text-amber-800">
-                      {guest ? guest.name : 'Tamu Undangan Terhormat'}
-                    </p>
+                  {/* Ticket head */}
+                  <div className="flex justify-between items-center text-left border-b border-dashed pb-4 border-amber-500/20">
+                    <div>
+                      <h5 className="text-[8.5px] font-bold tracking-widest text-[#925c0e] uppercase">PASSENGER NAME</h5>
+                      <p className="text-sm font-serif font-black text-amber-800">
+                        {guest ? guest.name : 'Tamu Undangan Terhormat'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <h5 className="text-[8.5px] font-bold tracking-widest text-[#925c0e] uppercase">GROUP CATEGORY</h5>
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[8.5px] font-bold uppercase mt-1 border ${
+                        isRFX ? 'bg-amber-950/40 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-800 border-amber-100'
+                      }`}>
+                        {guest ? guest.group : 'VVIP INVITEE'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <h5 className="text-[8.5px] font-bold tracking-widest text-[#925c0e] uppercase">GROUP CATEGORY</h5>
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[8.5px] font-bold uppercase mt-1 border ${
-                      isRFX ? 'bg-amber-950/40 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-800 border-amber-100'
-                    }`}>
-                      {guest ? guest.group : 'VVIP INVITEE'}
-                    </span>
-                  </div>
-                </div>
 
-                {/* QR Body wrapper */}
-                <div className="py-2 flex flex-col items-center">
-                  <div className={`bg-white p-3 rounded-2xl shadow-md border ${isRFX ? 'border-amber-500/20' : 'border-amber-50'}`}>
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=${isRFX ? 'dc2626' : 'b45309'}&data=${encodeURIComponent(guest ? guest.invitationCode : 'W-SAMPLE99')}`}
-                      alt="Check-in access pass barcode"
-                      className="w-28 h-28 object-contain"
-                      referrerPolicy="no-referrer"
-                    />
+                  {/* QR Body wrapper */}
+                  <div className="py-2 flex flex-col items-center">
+                    <div className={`bg-white p-3 rounded-2xl shadow-md border ${isRFX ? 'border-amber-500/20' : 'border-amber-50'}`}>
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=${isRFX ? 'dc2626' : 'b45309'}&data=${encodeURIComponent(guest ? guest.invitationCode : 'W-SAMPLE99')}`}
+                        alt="Check-in access pass barcode"
+                        className="w-28 h-28 object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                    <div className="mt-3.5 text-center">
+                      <h4 className="text-[8.5px] font-mono tracking-widest text-zinc-500 uppercase">UNIQUE GATEWAYS KEY</h4>
+                      <p className="text-lg font-mono tracking-widest font-black text-amber-600 mt-0.5">
+                        {guest ? guest.invitationCode : 'W-SAMPLE99'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-3.5 text-center">
-                    <h4 className="text-[8.5px] font-mono tracking-widest text-zinc-500 uppercase">UNIQUE GATEWAYS KEY</h4>
-                    <p className="text-lg font-mono tracking-widest font-black text-amber-600 mt-0.5">
-                      {guest ? guest.invitationCode : 'W-SAMPLE99'}
-                    </p>
-                  </div>
-                </div>
 
-                {/* Ticket foot */}
-                <div className="border-t border-dashed pt-4 border-amber-500/20 text-[9.5px] text-zinc-500 flex justify-between items-center font-mono uppercase tracking-wider">
-                  <span>LIMIT: <strong className="text-amber-800">{guest ? guest.paxLimit : 2} PAX</strong></span>
-                  <span className="text-amber-600 font-bold">RFX.VISUAL DIGITAL BOARDING PASS</span>
+                  {/* Ticket foot */}
+                  <div className="border-t border-dashed pt-4 border-amber-500/20 text-[9.5px] text-zinc-500 flex justify-between items-center font-mono uppercase tracking-wider">
+                    <span>LIMIT: <strong className="text-amber-800">{guest ? guest.paxLimit : 2} PAX</strong></span>
+                    <span className="text-amber-600 font-bold">RFX.VISUAL DIGITAL BOARDING PASS</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* ==================== FOOTER BRANDING CARD ==================== */}
           <footer className={`text-center py-12 px-6 space-y-4 border-t ${
             isRFX ? 'bg-black border-zinc-900 text-zinc-500' : 'bg-amber-500/5 text-amber-900/60 border-amber-100/40'
           }`}>
             <h4 className="text-amber-500 text-2xl font-cursive leading-tight tracking-wide select-none">
-              {data.couple.groom.nickname} & {data.couple.bride.nickname}
+              {data?.couple?.groom.nickname} & {data?.couple?.bride.nickname}
             </h4>
             
             <p className="text-[11.5px] max-w-xs mx-auto font-serif leading-relaxed text-stone-500">
@@ -995,7 +1098,7 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
             
             <div className="flex justify-center items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase py-3 border-t border-amber-500/5 max-w-[240px] mx-auto text-amber-600">
               <span>Wedding Builder</span>
-              <span>•</span>
+              <span>â€¢</span>
               <span className="font-extrabold pb-0.5">by rfx.visual</span>
             </div>
           </footer>

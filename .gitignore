@@ -1,4 +1,5 @@
 node_modules/
+.next/
 build/
 dist/
 coverage/
@@ -6,3 +7,12 @@ coverage/
 *.log
 .env*
 !.env.example
+
+.vercel
+tsconfig.tsbuildinfo
+
+# Scratch/debug files
+scratch_*.html
+patch_*.cjs
+replace_*.cjs
+test*.ts

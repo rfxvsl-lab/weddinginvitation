@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Utility to convert Google Drive sharing URLs into direct image URLs
  */
 export function convertGoogleDriveUrl(url: string): string {

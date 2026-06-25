@@ -8,7 +8,9 @@ import { ThemeConfig, WeddingData, Guest, RSVP, WeddingAnalytics } from '../type
 export const DEFAULT_THEMES: ThemeConfig[] = [
   {
     id: 'rfx-dark',
-    name: 'RFX Cinematic Dark',
+    pattern: 'modern',
+    layout: 'dark-luxury',
+    name: 'Dark Luxury Cinematic',
     primary: 'red-600',
     primaryHex: '#DC2626',
     secondaryHex: '#EF4444',
@@ -17,22 +19,97 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
     textHex: '#E4E4E7',
     accentHex: '#DC2626',
     fontSerif: 'font-sans',
-    fontSans: 'font-mono',
-    pattern: 'modern'
+    fontSans: 'font-mono'
   },
   {
     id: 'cremy-rose',
-    name: 'Classic Cremy Rose',
+    name: 'Luxury Pink Elegant',
     primary: 'rose-500',
     primaryHex: '#E11D48',
+    pattern: 'floral',
+    layout: 'luxury-pink',
     secondaryHex: '#FDA4AF',
     bgHex: '#FFF1F2',
     bgPatternHex: '#FFE4E6',
     textHex: '#4C0519',
     accentHex: '#BE123C',
-    fontSerif: 'font-serif', // Will render beautifully
-    fontSans: 'font-sans',
-    pattern: 'floral'
+    fontSerif: 'font-serif',
+    fontSans: 'font-sans'
+  },
+  {
+    id: 'grand-ballroom',
+    name: 'Grand Ballroom',
+    primary: 'amber-700',
+    primaryHex: '#B45309',
+    pattern: 'classic',
+    layout: 'grand-ballroom',
+    secondaryHex: '#FCD34D',
+    bgHex: '#FFFBEB',
+    bgPatternHex: '#FEF3C7',
+    textHex: '#78350F',
+    accentHex: '#92400E',
+    fontSerif: 'font-serif',
+    fontSans: 'font-sans'
+  },
+  {
+    id: 'netflix-luxury',
+    name: 'Netflix Luxury',
+    primary: 'red-700',
+    primaryHex: '#B91C1C',
+    pattern: 'modern',
+    layout: 'netflix-luxury',
+    secondaryHex: '#FCA5A5',
+    bgHex: '#0A0A0A',
+    bgPatternHex: '#171717',
+    textHex: '#FAFAFA',
+    accentHex: '#EF4444',
+    fontSerif: 'font-sans',
+    fontSans: 'font-mono'
+  },
+  {
+    id: 'royal-arabian',
+    name: 'Royal Arabian Night',
+    primary: 'emerald-700',
+    primaryHex: '#047857',
+    pattern: 'classic',
+    layout: 'royal-arabian',
+    secondaryHex: '#6EE7B7',
+    bgHex: '#0C1222',
+    bgPatternHex: '#1E293B',
+    textHex: '#F1F5F9',
+    accentHex: '#D4AF37',
+    fontSerif: 'font-serif',
+    fontSans: 'font-sans'
+  },
+  {
+    id: 'spotilove',
+    name: 'SpotiLove Playlist',
+    primary: 'green-500',
+    primaryHex: '#1DB954',
+    pattern: 'modern',
+    layout: 'spotilove',
+    secondaryHex: '#1ED760',
+    bgHex: '#121212',
+    bgPatternHex: '#181818',
+    textHex: '#FFFFFF',
+    accentHex: '#1DB954',
+    fontSerif: 'font-sans',
+    fontSans: 'font-sans'
+  },
+  {
+    id: 'javanese-classic',
+    name: 'Javanese Classic',
+    primary: 'rose-900',
+    primaryHex: '#7B1E2E',
+    pattern: 'classic',
+    layout: 'javanese-classic',
+    secondaryHex: '#C9A84C',
+    bgHex: '#FDF6EC',
+    bgPatternHex: '#F5EBDA',
+    textHex: '#3A1F04',
+    accentHex: '#D4AF37',
+    fontSerif: 'font-serif',
+    fontSans: 'font-sans'
   }
 ];
 
