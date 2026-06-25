@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     // 3. Double-check via Pakasir API for security
     try {
-      const statusCheck = await pakasir.checkTransactionStatus(payload.order_id, payload.amount);
+      const statusCheck = await pakasir.checkTransactionStatus(payload.order_id, payload.amount) as any;
       if (!statusCheck || statusCheck.status !== 'completed') {
         console.warn('[pakasir-webhook] Status check mismatch. Ignoring.');
         return NextResponse.json({ error: 'Status verification failed' }, { status: 400 });
