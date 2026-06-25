@@ -86,6 +86,9 @@ interface UseWeddingDataReturn {
   // Load public invitation by slug
   loadPublicInvitation: (slug: string) => Promise<boolean>;
 
+  // Slug operations
+  updateInvitationSlug: (invitationId: string, newSlug: string) => Promise<void>;
+
   // Set analytics directly (for simulations)
   setAnalytics: (data: WeddingAnalytics | ((prev: WeddingAnalytics) => WeddingAnalytics)) => void;
   setRsvps: (data: RSVP[] | ((prev: RSVP[]) => RSVP[])) => void;

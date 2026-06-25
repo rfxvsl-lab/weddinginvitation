@@ -203,6 +203,28 @@ export async function updateUserIp(userId: string, ip: string): Promise<void> {
   await dbExecute('UPDATE users SET ip_address = :ip WHERE id = :id', { ip, id: userId });
 }
 
+export async function updateInvitationSlug(invitationId: string, newSlug: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const slug = newSlug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    // Check if slug already taken by another invitation
+    const existing = await dbExecute(
+      'SELECT id FROM invitations WHERE slug = :slug AND id != :id',
+      { slug, id: invitationId }
+    );
+    if (existing.rows.length > 0) {
+      return { success: false, error: 'Slug sudah digunakan oleh undangan lain.' };
+    }
+    await dbExecute(
+      'UPDATE invitations SET slug = :slug WHERE id = :id',
+      { slug, id: invitationId }
+    );
+    return { success: true };
+  } catch (err) {
+    console.error('[updateInvitationSlug] Failed:', err);
+    return { success: false, error: String(err) };
+  }
+}
+
 function rowToUser(row: any): SaaSUser {
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase().trim();
   return {
