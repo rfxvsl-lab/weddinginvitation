@@ -1,11 +1,23 @@
 node_modules/
+.next/
 build/
 dist/
 coverage/
 .DS_Store
 *.log
-.env*
+
+# Environment
+.env
+.env.local
+.env.production
+.env*.local
 !.env.example
-!.env.local
+
 .vercel
-.next/
+tsconfig.tsbuildinfo
+
+# Scratch/debug files
+scratch_*.html
+patch_*.cjs
+replace_*.cjs
+test*.ts
