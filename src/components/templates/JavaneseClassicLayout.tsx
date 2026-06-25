@@ -226,7 +226,7 @@ export default function JavaneseClassicLayout({ data, theme, guest, onAddRSVP, r
             status: rsvpStatus,
             paxCount: rsvpPaxCount,
             wishes: rsvpWishes,
-            submittedAt: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
         });
         setRsvpSuccess(true);
         setRsvpWishes('');
