@@ -1,164 +1,632 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     PiHeartDuotone as Heart,
     PiMapPinDuotone as MapPin,
     PiCalendarDuotone as Calendar,
     PiClockDuotone as Clock,
-    PiMusicNotesDuotone as Music,
-    PiPlayCircleDuotone as Play,
-    PiPauseCircleDuotone as Pause,
-    PiHouseDuotone as Home,
     PiUserDuotone as User,
     PiImageDuotone as ImageIcon,
     PiChatCircleDuotone as MessageCircle,
-    PiSparkleDuotone as Stars,
-    PiCheckCircleDuotone as CheckCircle,
-    PiGiftDuotone as Gift,
-    PiCopyDuotone as CopyIcon,
-    PiInstagramLogoDuotone as Instagram,
     PiBookOpenDuotone as BookOpen,
-    PiTimerDuotone as Timer,
-    PiNavigationArrowDuotone as Navigation,
+    PiGiftDuotone as Gift,
+    PiCopyDuotone as Copy,
+    PiFlowerLotusDuotone as Lotus,
+    PiCheckCircleDuotone as Check,
+    PiCaretDownDuotone as ChevronDown
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
 
-// ============================================================
-// GLOBAL STYLES & ANIMATIONS
-// ============================================================
+// --- ANIMATION VARIANTS ---
+const blurFadeIn = {
+    hidden: { opacity: 0, filter: 'blur(12px)', y: 30 },
+    visible: { opacity: 1, filter: 'blur(0px)', y: 0, transition: { duration: 1.2, ease: 'easeOut' } }
+};
+
+const slideUpPop = {
+    hidden: { opacity: 0, y: 60, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 80, damping: 20, mass: 1 } }
+};
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.25 }
+    }
+};
+
+const breatheSway = {
+    animate: {
+        rotate: [-1, 1, -1],
+        scale: [1, 1.03, 1],
+        transition: { duration: 8, repeat: Infinity, ease: 'easeInOut' }
+    }
+};
+
+const JavaneseFlower = ({ className, delay = 0 }: { className?: string, delay?: number }) => (
+    <motion.div 
+        initial={{ opacity: 0, scale: 0, rotate: -180 }}
+        animate={{ opacity: 0.8, scale: 1, rotate: 0 }}
+        transition={{ delay, type: 'spring', stiffness: 40, damping: 15, duration: 2.5 }}
+        className={`absolute pointer-events-none z-0 ${className}`}
+    >
+        <motion.img 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
+            src="/assets/flower.webp" 
+            className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+            alt="Flower Ornament"
+        />
+    </motion.div>
+);
+
+// --- STYLES & FONTS ---
 const GlobalStyles = () => (
     <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Lato:wght@300;400;700&family=Great+Vibes&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,700;1,400&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&display=swap');
 
-    .font-javanese { font-family: 'Playfair Display', serif; }
-    .font-javanese-accent { font-family: 'Great Vibes', cursive; }
-    .font-body { font-family: 'Lato', sans-serif; }
+        .font-javanese-title { font-family: 'Philosopher', sans-serif; }
+        .font-javanese-body { font-family: 'Gelasio', serif; }
+        .font-modern { font-family: 'Montserrat', sans-serif; }
+        .font-aksara { font-family: 'Noto Sans Javanese', sans-serif; }
 
-    /* Batik float pattern animation */
-    @keyframes batik-float {
-      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.04; }
-      50% { transform: translateY(-10px) rotate(1deg); opacity: 0.07; }
-    }
+        .text-sogan-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 50%, #8A6B22 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* Gold text shimmer */
-    @keyframes gold-shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-    .text-gold-shimmer {
-      background: linear-gradient(90deg, #C9A84C 0%, #F5D98E 25%, #D4AF37 50%, #F5D98E 75%, #C9A84C 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gold-shimmer 4s ease-in-out infinite;
-    }
+        .bg-sogan-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 50%, #8A6B22 100%);
+        }
 
-    /* Fade up reveal */
-    @keyframes jc-fade-up {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .jc-fade-up {
-      animation: jc-fade-up 0.8s ease-out forwards;
-    }
-    .jc-fade-up-d1 { animation: jc-fade-up 0.8s ease-out 0.15s forwards; opacity: 0; }
-    .jc-fade-up-d2 { animation: jc-fade-up 0.8s ease-out 0.3s forwards; opacity: 0; }
-    .jc-fade-up-d3 { animation: jc-fade-up 0.8s ease-out 0.45s forwards; opacity: 0; }
+        .javanese-panel {
+            background: rgba(45, 26, 15, 0.85); /* Darker Sogan Brown */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .javanese-border {
+            position: relative;
+        }
+        .javanese-border::before, .javanese-border::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #D4AF37;
+            opacity: 0.7;
+        }
+        .javanese-border::before {
+            top: -5px;
+            left: -5px;
+            border-right: none;
+            border-bottom: none;
+        }
+        .javanese-border::after {
+            bottom: -5px;
+            right: -5px;
+            border-left: none;
+            border-top: none;
+        }
 
-    /* Lock screen curtain */
-    @keyframes curtain-open {
-      0% { clip-path: inset(0 0 0 0); }
-      100% { clip-path: inset(0 0 100% 0); }
-    }
-
-    /* Ornament pulse */
-    @keyframes ornament-glow {
-      0%, 100% { filter: drop-shadow(0 0 2px rgba(212,175,55,0.3)); }
-      50% { filter: drop-shadow(0 0 8px rgba(212,175,55,0.5)); }
-    }
-
-    /* Kawung dot pattern */
-    .bg-kawung {
-      background-image: radial-gradient(circle, rgba(201,168,76,0.08) 2px, transparent 2px);
-      background-size: 24px 24px;
-    }
-
-    /* Batik parang pattern overlay */
-    .bg-batik-parang {
-      background-image: 
-        repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(201,168,76,0.04) 12px, rgba(201,168,76,0.04) 14px),
-        repeating-linear-gradient(-45deg, transparent, transparent 12px, rgba(123,30,46,0.03) 12px, rgba(123,30,46,0.03) 14px);
-    }
-
-    /* Scrollbar styling */
-    .javanese-scroll::-webkit-scrollbar { width: 4px; }
-    .javanese-scroll::-webkit-scrollbar-track { background: transparent; }
-    .javanese-scroll::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 999px; }
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #B8860B;
+            border-radius: 4px;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
     `}</style>
 );
 
-// ============================================================
-// SVG ORNAMENTS
-// ============================================================
-
-/** Gapura / Gunungan Wayang ornament — simplified inline SVG */
-const GapuraOrnament = ({ className = '', color = '#C9A84C' }: { className?: string; color?: string }) => (
-    <svg viewBox="0 0 400 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Gunungan shape */}
-        <path d="M200 10 L280 100 L120 100 Z" stroke={color} strokeWidth="1.5" fill="none" opacity="0.6" />
-        <path d="M200 25 L265 95 L135 95 Z" stroke={color} strokeWidth="0.8" fill="none" opacity="0.3" />
-        {/* Decorative side curls */}
-        <path d="M120 100 Q80 90 60 100 Q40 110 20 100" stroke={color} strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M280 100 Q320 90 340 100 Q360 110 380 100" stroke={color} strokeWidth="1" fill="none" opacity="0.4" />
-        {/* Center diamond */}
-        <path d="M200 50 L210 65 L200 80 L190 65 Z" fill={color} opacity="0.15" />
-        <path d="M200 50 L210 65 L200 80 L190 65 Z" stroke={color} strokeWidth="0.8" fill="none" opacity="0.5" />
-        {/* Small dots */}
-        <circle cx="200" cy="40" r="2" fill={color} opacity="0.4" />
-        <circle cx="190" cy="55" r="1.5" fill={color} opacity="0.3" />
-        <circle cx="210" cy="55" r="1.5" fill={color} opacity="0.3" />
+// --- SVG COMPONENTS ---
+const KawungBatik = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 100 100" className={className} xmlns="http://www.w3.org/2000/svg">
+        <pattern id="kawung" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M20 0 C30 10 30 30 20 40 C10 30 10 10 20 0 Z" fill="none" stroke="#D4AF37" strokeWidth="0.5" opacity="0.3" />
+            <path d="M0 20 C10 10 30 10 40 20 C30 30 10 30 0 20 Z" fill="none" stroke="#D4AF37" strokeWidth="0.5" opacity="0.3" />
+            <circle cx="20" cy="20" r="2" fill="#D4AF37" opacity="0.3" />
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#kawung)" />
     </svg>
 );
 
-/** Ornamental divider — Javanese motif */
-const BatikDivider = ({ color = '#C9A84C' }: { color?: string }) => (
-    <div className="flex items-center justify-center gap-3 my-8 px-8">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, transparent, ${color}40)` }} />
-        <svg viewBox="0 0 40 20" className="w-10 h-5" fill="none">
-            <path d="M20 2 L28 10 L20 18 L12 10 Z" stroke={color} strokeWidth="1" fill="none" opacity="0.6" />
-            <circle cx="20" cy="10" r="2" fill={color} opacity="0.5" />
-            <circle cx="8" cy="10" r="1.5" fill={color} opacity="0.3" />
-            <circle cx="32" cy="10" r="1.5" fill={color} opacity="0.3" />
-        </svg>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(to left, transparent, ${color}40)` }} />
-    </div>
+// --- HELPERS ---
+const getImageUrl = (url: string) => {
+    if (!url) return '';
+    if (url.includes('drive.google.com/file/d/')) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+    }
+    return url;
+};
+
+// --- PAGES ---
+const GununganEnvelope = ({ onOpen, data, guestName }: { onOpen: () => void, data: WeddingData, guestName: string }) => {
+    const [opening, setOpening] = useState(false);
+
+    const handleOpen = () => {
+        setOpening(true);
+        setTimeout(onOpen, 2000); // Wait for blur/scale exit animation
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1A0F0A] overflow-hidden">
+            {/* Background Batik */}
+            <KawungBatik className="absolute inset-0 w-full h-full opacity-10" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')] mix-blend-overlay opacity-30"></div>
+            
+            <AnimatePresence>
+                {!opening && (
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.5, filter: 'blur(20px)' }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                        className="relative z-10 w-full max-w-sm flex flex-col items-center justify-center px-6 text-center"
+                    >
+                        {/* Gunungan Graphic */}
+                        <motion.div 
+                            variants={breatheSway}
+                            animate="animate"
+                            className="relative w-64 h-80 mb-6 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                        >
+                            <div 
+                                className="w-full h-full bg-contain bg-center bg-no-repeat"
+                                style={{ 
+                                    backgroundImage: `url('/assets/wayang/gunungan.png')`,
+                                    filter: 'brightness(2.5) contrast(1.2) drop-shadow(0 0 15px rgba(212, 175, 55, 0.6))'
+                                }}
+                            ></div>
+                        </motion.div>
+
+                        <p className="font-aksara text-3xl text-[#D4AF37] mb-0 drop-shadow-md">ꦥꦮꦶꦮꦲꦤ꧀</p>
+                        <h1 className="font-javanese-title text-4xl text-sogan-gradient mb-4 drop-shadow-lg">{data?.couple?.groom?.nickname} & {data?.couple?.bride?.nickname}</h1>
+                        
+                        <div className="my-6 text-center border-t border-b border-[#D4AF37]/30 py-4 w-full">
+                            <p className="font-modern text-[10px] text-gray-400 uppercase tracking-widest mb-2">Katur Dumateng Bpk/Ibu/Sdr/i:</p>
+                            <p className="font-javanese-title text-2xl text-[#F5EBE0] drop-shadow-md">{guestName}</p>
+                        </div>
+
+                        <button 
+                            onClick={handleOpen}
+                            className="flex items-center gap-2 px-8 py-3 bg-sogan-gradient text-[#1A0F0A] font-bold font-modern text-xs uppercase tracking-[0.2em] rounded shadow-[0_5px_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.6)] transition-all"
+                        >
+                            <Lotus size={16} />
+                            Mlebet Undangan
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+const HomePage = ({ data }: { data: WeddingData }) => {
+    return (
+        <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center justify-start h-full p-6 pt-20 pb-32 overflow-y-auto hide-scrollbar text-center relative z-10"
+        >
+            <JavaneseFlower className="-top-20 -left-20 w-64 h-64 opacity-50" delay={0.2} />
+            <JavaneseFlower className="-bottom-10 -right-20 w-72 h-72 opacity-50" delay={0.4} />
+            
+            <motion.p variants={blurFadeIn} className="font-aksara text-4xl text-[#D4AF37] mb-2 drop-shadow-md">
+                ꦱꦸꦒꦼꦁꦫꦮꦸꦃ
+            </motion.p>
+            <motion.p variants={blurFadeIn} className="font-javanese-title text-xl md:text-2xl text-sogan-gradient mb-6">
+                Sugeng Rawuh
+            </motion.p>
+
+            <motion.p variants={blurFadeIn} className="font-modern text-[10px] md:text-xs text-gray-300 tracking-widest uppercase mb-8 max-w-xs leading-loose">
+                Kanthi nyuwun rida saking Gusti Allah SWT, kula sakulawarga ngaturaken pambagya harja katur panjenengan sadaya ing pahargyan dhaupipun:
+            </motion.p>
+
+            <motion.div variants={slideUpPop} className="relative w-56 h-72 md:w-64 md:h-80 mx-auto mb-10 javanese-border p-2">
+                <div className="w-full h-full overflow-hidden rounded-sm">
+                    <img 
+                        src={getImageUrl(data?.bgImageUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500&q=80")} 
+                        className="w-full h-full object-cover filter brightness-75 sepia-[0.4]"
+                        alt="Hero"
+                    />
+                </div>
+                
+                {/* Floating Gunungan Accent */}
+                <motion.div variants={breatheSway} className="absolute -bottom-8 -right-8 w-24 h-32 opacity-80 pointer-events-none">
+                    <div 
+                        className="w-full h-full bg-contain bg-center bg-no-repeat"
+                        style={{ 
+                            backgroundImage: `url('/assets/wayang/gunungan.png')`,
+                            filter: 'brightness(2.5) contrast(1.2) drop-shadow(0 0 10px rgba(212, 175, 55, 0.4))'
+                        }}
+                    ></div>
+                </motion.div>
+            </motion.div>
+
+            <motion.h1 variants={blurFadeIn} className="font-javanese-title text-4xl md:text-5xl text-sogan-gradient mb-4 drop-shadow-lg">
+                {data?.couple?.groom?.nickname} <br/> 
+                <span className="text-2xl text-white/50 font-javanese-body">&</span> <br/> 
+                {data?.couple?.bride?.nickname}
+            </motion.h1>
+
+            <motion.p variants={blurFadeIn} className="font-javanese-body text-lg text-[#D4AF37] mt-4 max-w-xs italic">
+                "Tresna iku dudu amarga rupa, nanging amarga ati kang tulus..."
+            </motion.p>
+        </motion.div>
+    );
+};
+
+const CouplePage = ({ data }: { data: WeddingData }) => (
+    <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col items-center justify-start h-full p-6 pt-24 pb-32 overflow-y-auto hide-scrollbar text-center relative z-10"
+    >
+        <JavaneseFlower className="top-1/4 -right-16 w-48 h-48 opacity-40" delay={0.2} />
+        <JavaneseFlower className="bottom-1/4 -left-16 w-48 h-48 opacity-40" delay={0.4} />
+
+        <motion.p variants={blurFadeIn} className="font-aksara text-3xl text-[#D4AF37] mb-1">ꦥꦔꦤ꧀ꦠꦺꦤ꧀</motion.p>
+        <motion.h2 variants={blurFadeIn} className="font-javanese-title text-2xl md:text-3xl text-sogan-gradient mb-12 uppercase tracking-widest border-b border-[#D4AF37] pb-2">Sang Penganten</motion.h2>
+
+        <div className="flex flex-col gap-12 w-full max-w-sm">
+            {/* Groom */}
+            <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
+                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[#1A0F0A] ring-2 ring-[#D4AF37] mb-4 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                </div>
+                <h3 className="font-javanese-title text-3xl text-[#F5EBE0] drop-shadow-md mb-2">{data?.couple?.groom?.fullName}</h3>
+                <p className="font-modern text-[10px] uppercase text-[#D4AF37] tracking-widest mb-3">Kakung Saking</p>
+                <p className="font-modern text-xs text-gray-300">Bapak {data?.couple?.groom?.fatherName} <br/> & Ibu {data?.couple?.groom?.motherName}</p>
+            </motion.div>
+
+            <motion.div variants={blurFadeIn} className="font-javanese-title text-4xl text-sogan-gradient">&</motion.div>
+
+            {/* Bride */}
+            <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
+                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[#1A0F0A] ring-2 ring-[#D4AF37] mb-4 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                </div>
+                <h3 className="font-javanese-title text-3xl text-[#F5EBE0] drop-shadow-md mb-2">{data?.couple?.bride?.fullName}</h3>
+                <p className="font-modern text-[10px] uppercase text-[#D4AF37] tracking-widest mb-3">Putri Saking</p>
+                <p className="font-modern text-xs text-gray-300">Bapak {data?.couple?.bride?.fatherName} <br/> & Ibu {data?.couple?.bride?.motherName}</p>
+            </motion.div>
+        </div>
+    </motion.div>
 );
 
-// ============================================================
-// HELPER FUNCTIONS
-// ============================================================
+const EventPage = ({ data }: { data: WeddingData }) => {
+    const formatDate = (d: string) => {
+        if(!d) return '';
+        const dt = new Date(d);
+        if(isNaN(dt.getTime())) return d;
+        return dt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
 
-function formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    try {
-        return new Date(dateStr).toLocaleDateString('id-ID', {
-            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    return (
+        <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center justify-start h-full p-6 pt-24 pb-32 overflow-y-auto hide-scrollbar text-center relative z-10"
+        >
+            <JavaneseFlower className="top-10 -left-16 w-40 h-40 opacity-40" delay={0.1} />
+            <JavaneseFlower className="bottom-20 -right-16 w-56 h-56 opacity-40" delay={0.3} />
+
+            <motion.p variants={blurFadeIn} className="font-aksara text-3xl text-[#D4AF37] mb-1">ꦥꦲꦂꦒꦾꦤ꧀</motion.p>
+            <motion.h2 variants={blurFadeIn} className="font-javanese-title text-2xl md:text-3xl text-sogan-gradient mb-8 tracking-widest uppercase border-b border-[#D4AF37] pb-2">Pahargyan</motion.h2>
+
+            <div className="w-full max-w-sm space-y-8">
+                {/* Akad */}
+                {data?.events?.akad?.enabled !== false && (
+                    <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative overflow-hidden text-left">
+                        <div className="absolute top-0 right-0 bg-sogan-gradient text-[#1A0F0A] font-javanese-title px-4 py-1 rounded-bl-lg font-bold">Ijab Kabul</div>
+                        
+                        <h3 className="font-javanese-title text-3xl text-[#F5EBE0] mb-6 mt-4">{data?.events?.akad?.name || 'Akad Nikah'}</h3>
+                        
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3 font-modern text-sm text-[#D4AF37]">
+                                <Calendar size={18} /> <span>{formatDate(data?.events?.akad?.date || '')}</span>
+                            </div>
+                            <div className="flex items-center gap-3 font-modern text-sm text-[#D4AF37]">
+                                <Clock size={18} /> <span>{data?.events?.akad?.timeStart} - {data?.events?.akad?.timeEnd || 'Selesai'}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-6 pt-4 border-t border-[#D4AF37]/30 text-sm text-gray-300 font-modern">
+                            <p className="font-bold text-[#F5EBE0] mb-1"><MapPin className="inline mr-1" /> {data?.events?.akad?.venueName}</p>
+                            <p className="text-xs leading-relaxed pl-5">{data?.events?.akad?.address}</p>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Resepsi */}
+                {data?.events?.resepsi?.enabled !== false && (
+                    <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative overflow-hidden text-left">
+                        <div className="absolute top-0 right-0 bg-sogan-gradient text-[#1A0F0A] font-javanese-title px-4 py-1 rounded-bl-lg font-bold">Pahargyan</div>
+                        
+                        <h3 className="font-javanese-title text-3xl text-[#F5EBE0] mb-6 mt-4">{data?.events?.resepsi?.name || 'Resepsi'}</h3>
+                        
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3 font-modern text-sm text-[#D4AF37]">
+                                <Calendar size={18} /> <span>{formatDate(data?.events?.resepsi?.date || '')}</span>
+                            </div>
+                            <div className="flex items-center gap-3 font-modern text-sm text-[#D4AF37]">
+                                <Clock size={18} /> <span>{data?.events?.resepsi?.timeStart} - {data?.events?.resepsi?.timeEnd || 'Selesai'}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-6 pt-4 border-t border-[#D4AF37]/30 text-sm text-gray-300 font-modern">
+                            <p className="font-bold text-[#F5EBE0] mb-1"><MapPin className="inline mr-1" /> {data?.events?.resepsi?.venueName}</p>
+                            <p className="text-xs leading-relaxed pl-5">{data?.events?.resepsi?.address}</p>
+                        </div>
+                    </motion.div>
+                )}
+
+                {(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) && (
+                    <motion.a 
+                        variants={blurFadeIn}
+                        href={(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) as string} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-[#D4AF37]/10 border border-[#D4AF37] text-[#D4AF37] hover:bg-sogan-gradient hover:text-[#1A0F0A] transition-colors font-modern font-bold text-xs uppercase tracking-widest rounded shadow-[0_5px_15px_rgba(212,175,55,0.1)]"
+                    >
+                        <MapPin size={18} /> Kunjuk Peta Lokasi
+                    </motion.a>
+                )}
+            </div>
+        </motion.div>
+    );
+};
+
+const GalleryPage = ({ data }: { data: WeddingData }) => (
+    <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col items-center justify-start h-full p-4 pt-24 pb-32 overflow-y-auto hide-scrollbar text-center relative z-10"
+    >
+        <JavaneseFlower className="-top-10 right-0 w-48 h-48 opacity-30" delay={0.2} />
+        <JavaneseFlower className="-bottom-10 left-0 w-48 h-48 opacity-30" delay={0.4} />
+
+        <motion.p variants={blurFadeIn} className="font-aksara text-3xl text-[#D4AF37] mb-1">ꦒꦭꦺꦫꦶ</motion.p>
+        <motion.h2 variants={blurFadeIn} className="font-javanese-title text-2xl md:text-3xl text-sogan-gradient mb-8 tracking-widest uppercase border-b border-[#D4AF37] pb-2">Galeri Foto</motion.h2>
+        
+        <div className="columns-2 gap-4 w-full max-w-sm space-y-4">
+            {data?.gallery && data.gallery.length > 0 ? (
+                data.gallery.map((img, i) => (
+                    <motion.div 
+                        key={i} 
+                        variants={slideUpPop}
+                        className="break-inside-avoid relative p-1 bg-[#D4AF37]/20 rounded-sm"
+                    >
+                        <img src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.3]" />
+                    </motion.div>
+                ))
+            ) : (
+                <p className="text-gray-500 font-modern text-sm col-span-2 py-10">Dereng enten foto.</p>
+            )}
+        </div>
+    </motion.div>
+);
+
+const GiftPage = ({ data }: { data: WeddingData }) => {
+    const [copiedId, setCopiedId] = useState('');
+
+    const handleCopy = (id: string, text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(''), 2000);
+    };
+
+    return (
+        <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center justify-start h-full p-6 pt-24 pb-32 overflow-y-auto hide-scrollbar text-center relative z-10"
+        >
+            <JavaneseFlower className="top-20 -right-10 w-52 h-52 opacity-30" delay={0.1} />
+
+            <motion.p variants={blurFadeIn} className="font-aksara text-3xl text-[#D4AF37] mb-1">ꦠꦤ꧀ꦝꦠꦿꦺꦱ꧀ꦤ</motion.p>
+            <motion.h2 variants={blurFadeIn} className="font-javanese-title text-2xl md:text-3xl text-sogan-gradient mb-4 tracking-widest uppercase border-b border-[#D4AF37] pb-2">Tandha Tresna</motion.h2>
+            <motion.p variants={blurFadeIn} className="font-modern text-xs text-gray-400 max-w-xs mb-8 leading-relaxed">Pangestu panjenengan minangka kado ingkang paling aji. Menawi panjenengan badhe paring tandha tresna, saged lumantar fitur ing ngandhap menika.</motion.p>
+
+            <div className="w-full max-w-sm space-y-6">
+                {data?.gifts?.map((gift, i) => (
+                    <motion.div variants={slideUpPop} key={i} className="javanese-panel p-6 javanese-border relative text-left">
+                        <div className="relative z-10">
+                            <h4 className="font-javanese-title text-2xl text-[#F5EBE0] mb-4">{gift.name}</h4>
+                            <p className="font-modern text-[10px] uppercase text-[#D4AF37] tracking-widest mb-1">Nomer Rekening / Alamat</p>
+                            <p className="font-modern font-bold text-xl text-white mb-4 tracking-wider">{gift.accountNumber}</p>
+                            
+                            <p className="font-modern text-[10px] uppercase text-[#D4AF37] tracking-widest mb-1">Atas Nama</p>
+                            <p className="font-modern text-sm text-gray-300 mb-6">{gift.accountHolder}</p>
+
+                            {gift.type !== 'address' && (
+                                <button
+                                    onClick={() => handleCopy(gift.id || String(i), gift.accountNumber)}
+                                    className="w-full flex items-center justify-center gap-2 py-3 bg-[#D4AF37]/10 hover:bg-sogan-gradient border border-[#D4AF37] hover:text-[#1A0F0A] text-[#D4AF37] transition-colors rounded font-modern text-xs uppercase font-bold tracking-wider"
+                                >
+                                    {copiedId === (gift.id || String(i)) ? (
+                                        <><Check size={16} /> Kasalin</>
+                                    ) : (
+                                        <><Copy size={16} /> Salin Nomer</>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </motion.div>
+    );
+};
+
+interface RSVPPageProps {
+    data: WeddingData;
+    guest?: Guest | null;
+    onAddRSVP: (rsvp: RSVP) => void;
+    rsvps: RSVP[];
+    embedded?: boolean;
+}
+
+const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
+    const [rsvpStatus, setRsvpStatus] = useState<'Hadir' | 'Tidak Hadir' | 'Ragu-ragu'>('Hadir');
+    const [rsvpPaxCount, setRsvpPaxCount] = useState(1);
+    const [rsvpWishes, setRsvpWishes] = useState('');
+    const [rsvpGuestName, setRsvpGuestName] = useState(guest ? guest.name : '');
+    const [rsvpSuccess, setRsvpSuccess] = useState(false);
+
+    const handleRSVPSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!rsvpGuestName || !rsvpStatus) return;
+
+        onAddRSVP({
+            id: Date.now().toString(),
+            guestId: guest?.id,
+            guestName: rsvpGuestName,
+            status: rsvpStatus,
+            paxCount: rsvpPaxCount,
+            wishes: rsvpWishes,
+            timestamp: new Date().toISOString()
         });
-    } catch { return dateStr; }
-}
 
-function getImageUrl(url: string): string {
-    if (!url) return '';
-    const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (driveMatch) return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
-    return url;
-}
+        setRsvpSuccess(true);
+        if (!guest) setRsvpGuestName('');
+        setRsvpWishes('');
+        setTimeout(() => setRsvpSuccess(false), 5000);
+    };
 
-// ============================================================
-// MAIN COMPONENT
-// ============================================================
+    return (
+        <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center justify-start h-full p-6 pt-24 pb-32 overflow-y-auto custom-scroll text-center relative z-10"
+        >
+            <JavaneseFlower className="top-32 -left-20 w-64 h-64 opacity-40" delay={0.2} />
+            
+            <motion.p variants={blurFadeIn} className="font-aksara text-3xl text-[#D4AF37] mb-1">ꦥꦔꦼꦱ꧀ꦠꦸ</motion.p>
+            <motion.h2 variants={blurFadeIn} className="font-javanese-title text-2xl md:text-3xl text-sogan-gradient mb-8 tracking-widest uppercase border-b border-[#D4AF37] pb-2">RSVP & Pandonga</motion.h2>
+            
+            <div className="w-full max-w-sm">
+                <AnimatePresence mode="wait">
+                    {rsvpSuccess ? (
+                        <motion.div 
+                            key="success"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            className="javanese-panel p-8 text-center"
+                        >
+                            <Check className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
+                            <h3 className="font-javanese-title text-2xl text-[#F5EBE0] mb-2">Matur Nuwun</h3>
+                            <p className="font-modern text-sm text-gray-300 leading-relaxed">Konfirmasi saha pandonga panjenengan sampun katampi.</p>
+                        </motion.div>
+                    ) : (
+                        <motion.form 
+                            key="form"
+                            variants={slideUpPop}
+                            onSubmit={handleRSVPSubmit}
+                            className="javanese-panel p-6 javanese-border text-left space-y-4"
+                        >
+                            <div>
+                                <label className="block font-modern text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Asma Jangkep</label>
+                                <input
+                                    type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest}
+                                    className="w-full bg-[#1A0F0A] border border-[#D4AF37]/30 rounded-sm px-3 py-2 text-[#F5EBE0] font-modern text-sm focus:border-[#D4AF37] focus:outline-none disabled:opacity-50"
+                                />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block font-modern text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Saged Rawuh?</label>
+                                    <div className="relative">
+                                        <select
+                                            value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value as any)}
+                                            className="w-full bg-[#1A0F0A] border border-[#D4AF37]/30 rounded-sm px-3 py-2 text-[#F5EBE0] font-modern text-sm focus:border-[#D4AF37] focus:outline-none appearance-none"
+                                        >
+                                            <option value="Hadir">Saged Rawuh</option>
+                                            <option value="Tidak Hadir">Boten Saged</option>
+                                            <option value="Ragu-ragu">Dereng Mesthekaken</option>
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D4AF37] pointer-events-none" size={14} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block font-modern text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Cacah Tamu</label>
+                                    <input
+                                        type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))}
+                                        className="w-full bg-[#1A0F0A] border border-[#D4AF37]/30 rounded-sm px-3 py-2 text-[#F5EBE0] font-modern text-sm focus:border-[#D4AF37] focus:outline-none"
+                                    />
+                                </div>
+                            </div>
 
-interface TemplateProps {
+                            <div>
+                                <label className="block font-modern text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Pandonga & Pangarep</label>
+                                <textarea
+                                    required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3}
+                                    className="w-full bg-[#1A0F0A] border border-[#D4AF37]/30 rounded-sm px-3 py-2 text-[#F5EBE0] font-modern text-sm focus:border-[#D4AF37] focus:outline-none resize-none"
+                                />
+                            </div>
+
+                            <button type="submit" className="w-full mt-2 py-3 bg-sogan-gradient text-[#1A0F0A] font-bold font-modern text-xs uppercase tracking-widest rounded shadow-[0_5px_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all">
+                                Kirim Konfirmasi
+                            </button>
+                        </motion.form>
+                    )}
+                </AnimatePresence>
+
+                {/* Wishes List */}
+                {rsvps && rsvps.length > 0 && (
+                    <motion.div variants={slideUpPop} className="mt-8 space-y-4 max-h-[400px] overflow-y-auto custom-scroll pr-2 text-left">
+                        {rsvps.map((rsvp, idx) => (
+                            <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="bg-[#1A0F0A]/90 p-4 rounded-sm border-l-4 border-[#D4AF37] shadow-lg"
+                            >
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="font-javanese-title text-lg text-[#F5EBE0]">{rsvp.guestName}</span>
+                                    <span className={`text-[8px] uppercase tracking-widest font-bold px-2 py-1 rounded-sm ${
+                                        rsvp.status === 'Hadir' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' :
+                                        rsvp.status === 'Tidak Hadir' ? 'bg-red-900/50 text-red-400' :
+                                        'bg-yellow-900/50 text-yellow-400'
+                                    }`}>
+                                        {rsvp.status === 'Hadir' ? 'Rawuh' : rsvp.status === 'Tidak Hadir' ? 'Boten' : 'Ragu'}
+                                    </span>
+                                </div>
+                                <p className="font-modern text-xs text-gray-400 leading-relaxed italic">"{rsvp.wishes}"</p>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+            </div>
+        </motion.div>
+    );
+};
+
+// --- MAIN LAYOUT ---
+interface JavaneseClassicProps {
     data: WeddingData;
     theme: ThemeConfig;
     guest?: Guest | null;
@@ -167,693 +635,94 @@ interface TemplateProps {
     embedded?: boolean;
 }
 
-export default function JavaneseClassicLayout({ data, theme, guest, onAddRSVP, rsvps, embedded = false }: TemplateProps) {
-    const [isOpen, setIsOpen] = useState(embedded);
-    const [isPlaying, setIsPlaying] = useState(false);
+const JavaneseClassicLayout: React.FC<JavaneseClassicProps> = ({ data, guest, onAddRSVP, rsvps, embedded = false }) => {
+    const [stage, setStage] = useState<'envelope' | 'content'>(embedded ? 'content' : 'envelope');
+    const [activeTab, setActiveTab] = useState('home');
+    const [music, setMusic] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
-
-    // RSVP Form
-    const [rsvpGuestName, setRsvpGuestName] = useState(guest?.name || '');
-    const [rsvpStatus, setRsvpStatus] = useState<'Hadir' | 'Tidak Hadir' | 'Ragu-ragu'>('Hadir');
-    const [rsvpPaxCount, setRsvpPaxCount] = useState(1);
-    const [rsvpWishes, setRsvpWishes] = useState('');
-    const [rsvpSuccess, setRsvpSuccess] = useState(false);
-    const [copiedId, setCopiedId] = useState<string | null>(null);
-
-    // Countdown
-    const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-    useEffect(() => {
-        if (!data.countdownDate) return;
-        const tick = () => {
-            const diff = new Date(data.countdownDate).getTime() - Date.now();
-            if (diff <= 0) { setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 }); return; }
-            setCountdown({
-                days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((diff / (1000 * 60)) % 60),
-                seconds: Math.floor((diff / 1000) % 60),
-            });
-        };
-        tick();
-        const interval = setInterval(tick, 1000);
-        return () => clearInterval(interval);
-    }, [data.countdownDate]);
-
-    const handleOpen = () => {
-        setIsOpen(true);
-        try {
-            audioRef.current?.play().then(() => setIsPlaying(true)).catch(() => {});
-        } catch {}
-        setTimeout(() => contentRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
-    };
 
     const toggleMusic = () => {
         if (!audioRef.current) return;
-        if (isPlaying) { audioRef.current.pause(); }
-        else { audioRef.current.play().catch(() => {}); }
-        setIsPlaying(!isPlaying);
+        if (music) audioRef.current.pause();
+        else audioRef.current.play();
+        setMusic(!music);
     };
 
-    const handleRSVPSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!rsvpGuestName.trim()) return;
-        onAddRSVP({
-            id: `rsvp-${Date.now()}`,
-            guestId: guest?.id,
-            guestName: rsvpGuestName.trim(),
-            status: rsvpStatus,
-            paxCount: rsvpPaxCount,
-            wishes: rsvpWishes,
-            timestamp: new Date().toISOString(),
-        });
-        setRsvpSuccess(true);
-        setRsvpWishes('');
+    const enterContent = () => {
+        setStage('content');
+        if (!music && audioRef.current) {
+            setMusic(true);
+            audioRef.current.play().catch(() => {});
+        }
     };
-
-    const handleCopy = (text: string, id: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 2000);
-    };
-
-    // ==========================================
-    // CONDITIONAL CHECKS
-    // ==========================================
-    const hasQuote = !!data.quoteText?.trim();
-    const hasAkad = data.events.akad.enabled !== false && !!(data.events.akad.date || data.events.akad.venueName);
-    const hasResepsi = data.events.resepsi.enabled !== false && !!(data.events.resepsi.date || data.events.resepsi.venueName);
-    const hasCountdown = !!data.countdownDate;
-    const hasLoveStories = data.showLoveStories && data.loveStories && data.loveStories.length > 0;
-    const hasGallery = data.gallery && data.gallery.filter(url => url).length > 0;
-    const hasGifts = data.gifts && data.gifts.length > 0;
-
-    const primaryColor = theme.primaryHex || '#7B1E2E';
-    const goldColor = theme.secondaryHex || '#C9A84C';
-    const accentColor = theme.accentHex || '#D4AF37';
-    const bgColor = theme.bgHex || '#FDF6EC';
-    const textColor = theme.textHex || '#3A1F04';
 
     return (
-        <div
-            className="relative w-full min-h-screen font-body javanese-scroll overflow-x-hidden"
-            style={{
-                '--theme-primary': primaryColor,
-                '--theme-secondary': goldColor,
-                '--theme-bg': bgColor,
-                '--theme-text': textColor,
-                '--theme-accent': accentColor,
-                backgroundColor: bgColor,
-                color: textColor,
-            } as React.CSSProperties}
-        >
+        <div className="relative w-full h-[100dvh] overflow-hidden bg-[#1A0F0A] text-[#F5EBE0]">
             <GlobalStyles />
-            <audio ref={audioRef} src={data.musicUrl || ''} loop preload="auto" />
+            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
 
-            {/* ============================================================ */}
-            {/* SECTION 1: LOCK SCREEN                                       */}
-            {/* ============================================================ */}
-            {!isOpen && (
-                <div
-                    className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-batik-parang"
-                    style={{ backgroundColor: primaryColor }}
-                >
-                    {/* Batik pattern overlay */}
-                    <div className="absolute inset-0 bg-kawung opacity-30" />
-                    <div className="absolute inset-0" style={{
-                        background: `radial-gradient(ellipse at center, ${primaryColor}00 0%, ${primaryColor} 70%)`
-                    }} />
+            {/* Ambient Background */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+                <KawungBatik className="absolute inset-0 w-full h-full opacity-10" />
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')] mix-blend-overlay opacity-50"></div>
+                
+                {/* Vignette */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#1A0F0A_100%)] opacity-80"></div>
+            </div>
 
-                    <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-sm">
-                        {/* Gapura ornament */}
-                        <GapuraOrnament className="w-56 mb-4 jc-fade-up" color={goldColor} />
+            <AnimatePresence>
+                {stage === 'envelope' && (
+                    <GununganEnvelope onOpen={enterContent} data={data} guestName={guest?.name || 'Tamu Undangan'} />
+                )}
+            </AnimatePresence>
 
-                        <p className="font-javanese-accent text-2xl mb-2 jc-fade-up" style={{ color: goldColor }}>
-                            Undangan Pernikahan
-                        </p>
-
-                        <h1 className="font-javanese text-3xl md:text-4xl font-bold text-white mb-1 jc-fade-up-d1 tracking-wide">
-                            {data.couple.groom.nickname}
-                        </h1>
-                        <p className="font-javanese-accent text-3xl text-white/70 mb-1 jc-fade-up-d1">&</p>
-                        <h1 className="font-javanese text-3xl md:text-4xl font-bold text-white mb-4 jc-fade-up-d1 tracking-wide">
-                            {data.couple.bride.nickname}
-                        </h1>
-
-                        {guest && (
-                            <p className="text-sm text-white/60 mb-4 jc-fade-up-d2">
-                                Kepada Yth. <span className="font-bold text-white/90">{guest.name}</span>
-                            </p>
-                        )}
-
-                        <p className="text-xs text-white/40 mb-6 jc-fade-up-d2">
-                            {data.countdownDate ? formatDate(data.countdownDate) : ''}
-                        </p>
-
-                        <button
-                            onClick={handleOpen}
-                            className="group relative px-8 py-3 rounded-full font-javanese text-sm font-bold uppercase tracking-[0.2em] transition-all duration-500 jc-fade-up-d3 cursor-pointer overflow-hidden"
-                            style={{
-                                border: `1.5px solid ${goldColor}`,
-                                color: goldColor,
-                                background: 'transparent',
-                            }}
-                        >
-                            <span className="relative z-10 group-hover:text-white transition-colors duration-300">Buka Undangan</span>
-                            <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" style={{ backgroundColor: goldColor }} />
-                        </button>
-                    </div>
-
-                    {/* Bottom ornament */}
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-                        <GapuraOrnament className="w-32 rotate-180 opacity-30" color={goldColor} />
-                    </div>
+            {/* Content Switcher */}
+            {stage === 'content' && (
+                <div className="absolute inset-0 z-10">
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'home' && <HomePage key="home" data={data} />}
+                        {activeTab === 'couple' && <CouplePage key="couple" data={data} />}
+                        {activeTab === 'event' && <EventPage key="event" data={data} />}
+                        {activeTab === 'gallery' && <GalleryPage key="gallery" data={data} />}
+                        {activeTab === 'gift' && <GiftPage key="gift" data={data} />}
+                        {activeTab === 'rsvp' && <RSVPPage key="rsvp" data={data} guest={guest} onAddRSVP={onAddRSVP} rsvps={rsvps} />}
+                    </AnimatePresence>
                 </div>
             )}
 
-            {/* ============================================================ */}
-            {/* MAIN CONTENT (scrollable after lock screen opens)             */}
-            {/* ============================================================ */}
-            <div ref={contentRef} className={`transition-opacity duration-700 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
-
-                {/* ============================================================ */}
-                {/* SECTION 2: HERO HEADER                                       */}
-                {/* ============================================================ */}
-                <section className="relative py-20 md:py-28 text-center overflow-hidden bg-batik-parang">
-                    {/* Background overlay */}
-                    <div className="absolute inset-0 bg-kawung" />
-                    <div className="absolute inset-0" style={{
-                        background: `linear-gradient(180deg, ${bgColor} 0%, transparent 30%, transparent 70%, ${bgColor} 100%)`
-                    }} />
-
-                    <div className="relative z-10 px-6">
-                        <GapuraOrnament className="w-48 mx-auto mb-6" color={goldColor} />
-
-                        <p className="font-javanese-accent text-2xl md:text-3xl mb-4" style={{ color: goldColor }}>
-                            Bismillahirrahmanirrahim
-                        </p>
-
-                        <h2 className="font-javanese text-4xl md:text-6xl font-bold mb-2 text-gold-shimmer">
-                            {data.couple.groom.nickname}
-                        </h2>
-                        <p className="font-javanese-accent text-4xl md:text-5xl my-2" style={{ color: goldColor }}>&</p>
-                        <h2 className="font-javanese text-4xl md:text-6xl font-bold mb-6 text-gold-shimmer">
-                            {data.couple.bride.nickname}
-                        </h2>
-
-                        {data.countdownDate && (
-                            <p className="font-body text-sm tracking-[0.3em] uppercase opacity-60">
-                                {formatDate(data.countdownDate)}
-                            </p>
-                        )}
-                    </div>
-                </section>
-
-                {/* ============================================================ */}
-                {/* SECTION 3: KUTIPAN SUCI (CONDITIONAL)                        */}
-                {/* ============================================================ */}
-                {hasQuote && (
-                    <section className="py-16 px-6 text-center">
-                        <div className="max-w-lg mx-auto relative">
-                            <Stars className="w-6 h-6 mx-auto mb-4" style={{ color: goldColor }} />
-                            <blockquote
-                                className="font-javanese text-lg md:text-xl italic leading-relaxed mb-3"
-                                style={{ color: textColor }}
-                            >
-                                "{data.quoteText}"
-                            </blockquote>
-                            {data.quoteSource && (
-                                <cite className="text-sm font-body not-italic opacity-50">
-                                    — {data.quoteSource}
-                                </cite>
-                            )}
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 4: PROFIL MEMPELAI                                   */}
-                {/* ============================================================ */}
-                <section className="py-12 px-6">
-                    <div className="max-w-2xl mx-auto">
-                        <h3 className="font-javanese-accent text-3xl text-center mb-10" style={{ color: goldColor }}>
-                            Mempelai
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Groom */}
-                            <div className="text-center jc-fade-up">
-                                <div className="relative w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4" style={{ borderColor: goldColor + '40' }}>
-                                    {data.couple.groom.photoUrl ? (
-                                        <img src={getImageUrl(data.couple.groom.photoUrl)} alt={data.couple.groom.nickname} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: primaryColor + '15' }}>
-                                            <User className="w-16 h-16" style={{ color: goldColor + '40' }} />
-                                        </div>
-                                    )}
-                                    {/* Gold ring accent */}
-                                    <div className="absolute inset-0 rounded-full" style={{ boxShadow: `inset 0 0 20px ${goldColor}20` }} />
-                                </div>
-                                <h4 className="font-javanese text-xl font-bold mb-1">{data.couple.groom.fullName}</h4>
-                                <p className="text-xs opacity-60 mb-2">Putra dari</p>
-                                <p className="text-sm font-medium">{data.couple.groom.fatherName}</p>
-                                <p className="text-sm opacity-70">& {data.couple.groom.motherName}</p>
-                                {data.couple.groom.instagram && (
-                                    <a href={`https://instagram.com/${data.couple.groom.instagram.replace('@', '')}`} target="_blank" rel="noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs mt-3 opacity-50 hover:opacity-100 transition">
-                                        <Instagram className="w-3.5 h-3.5" /> {data.couple.groom.instagram}
-                                    </a>
-                                )}
-                            </div>
-
-                            {/* Bride */}
-                            <div className="text-center jc-fade-up-d1">
-                                <div className="relative w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4" style={{ borderColor: goldColor + '40' }}>
-                                    {data.couple.bride.photoUrl ? (
-                                        <img src={getImageUrl(data.couple.bride.photoUrl)} alt={data.couple.bride.nickname} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: primaryColor + '15' }}>
-                                            <User className="w-16 h-16" style={{ color: goldColor + '40' }} />
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 rounded-full" style={{ boxShadow: `inset 0 0 20px ${goldColor}20` }} />
-                                </div>
-                                <h4 className="font-javanese text-xl font-bold mb-1">{data.couple.bride.fullName}</h4>
-                                <p className="text-xs opacity-60 mb-2">Putri dari</p>
-                                <p className="text-sm font-medium">{data.couple.bride.fatherName}</p>
-                                <p className="text-sm opacity-70">& {data.couple.bride.motherName}</p>
-                                {data.couple.bride.instagram && (
-                                    <a href={`https://instagram.com/${data.couple.bride.instagram.replace('@', '')}`} target="_blank" rel="noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs mt-3 opacity-50 hover:opacity-100 transition">
-                                        <Instagram className="w-3.5 h-3.5" /> {data.couple.bride.instagram}
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                    <BatikDivider color={goldColor} />
-                </section>
-
-                {/* ============================================================ */}
-                {/* SECTION 5-6: DETAIL ACARA (CONDITIONAL)                      */}
-                {/* ============================================================ */}
-                {(hasAkad || hasResepsi) && (
-                    <section className="py-12 px-6">
-                        <div className="max-w-2xl mx-auto">
-                            <h3 className="font-javanese-accent text-3xl text-center mb-10" style={{ color: goldColor }}>
-                                Waktu & Tempat
-                            </h3>
-
-                            <div className={`grid grid-cols-1 ${hasAkad && hasResepsi ? 'md:grid-cols-2' : ''} gap-6`}>
-                                {/* Akad Card */}
-                                {hasAkad && (
-                                    <div className="relative rounded-2xl p-6 text-center overflow-hidden border" style={{
-                                        borderColor: goldColor + '30',
-                                        backgroundColor: bgColor,
-                                        boxShadow: `0 4px 30px ${goldColor}10`
-                                    }}>
-                                        <div className="absolute inset-0 bg-kawung opacity-50" />
-                                        <div className="relative z-10">
-                                            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: primaryColor + '15' }}>
-                                                <BookOpen className="w-5 h-5" style={{ color: primaryColor }} />
-                                            </div>
-                                            <h4 className="font-javanese text-lg font-bold mb-3" style={{ color: primaryColor }}>
-                                                {data.events.akad.name || 'Akad Nikah'}
-                                            </h4>
-                                            {data.events.akad.date && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm mb-1.5">
-                                                    <Calendar className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {formatDate(data.events.akad.date)}
-                                                </p>
-                                            )}
-                                            {(data.events.akad.timeStart || data.events.akad.timeEnd) && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm mb-1.5">
-                                                    <Clock className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {data.events.akad.timeStart}{data.events.akad.timeEnd ? ` — ${data.events.akad.timeEnd}` : ''}
-                                                </p>
-                                            )}
-                                            {data.events.akad.venueName && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm font-bold mt-3">
-                                                    <Home className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {data.events.akad.venueName}
-                                                </p>
-                                            )}
-                                            {data.events.akad.address && (
-                                                <p className="text-xs opacity-60 mt-1">{data.events.akad.address}</p>
-                                            )}
-                                            {data.events.akad.googleMapsUrl && (
-                                                <a href={data.events.akad.googleMapsUrl} target="_blank" rel="noreferrer"
-                                                    className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition hover:opacity-80"
-                                                    style={{ backgroundColor: primaryColor + '15', color: primaryColor }}>
-                                                    <MapPin className="w-3.5 h-3.5" /> Buka Peta
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Resepsi Card */}
-                                {hasResepsi && (
-                                    <div className="relative rounded-2xl p-6 text-center overflow-hidden border" style={{
-                                        borderColor: goldColor + '30',
-                                        backgroundColor: bgColor,
-                                        boxShadow: `0 4px 30px ${goldColor}10`
-                                    }}>
-                                        <div className="absolute inset-0 bg-kawung opacity-50" />
-                                        <div className="relative z-10">
-                                            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: goldColor + '15' }}>
-                                                <Stars className="w-5 h-5" style={{ color: goldColor }} />
-                                            </div>
-                                            <h4 className="font-javanese text-lg font-bold mb-3" style={{ color: primaryColor }}>
-                                                {data.events.resepsi.name || 'Resepsi'}
-                                            </h4>
-                                            {data.events.resepsi.date && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm mb-1.5">
-                                                    <Calendar className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {formatDate(data.events.resepsi.date)}
-                                                </p>
-                                            )}
-                                            {(data.events.resepsi.timeStart || data.events.resepsi.timeEnd) && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm mb-1.5">
-                                                    <Clock className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {data.events.resepsi.timeStart}{data.events.resepsi.timeEnd ? ` — ${data.events.resepsi.timeEnd}` : ''}
-                                                </p>
-                                            )}
-                                            {data.events.resepsi.venueName && (
-                                                <p className="flex items-center justify-center gap-1.5 text-sm font-bold mt-3">
-                                                    <Home className="w-4 h-4" style={{ color: goldColor }} />
-                                                    {data.events.resepsi.venueName}
-                                                </p>
-                                            )}
-                                            {data.events.resepsi.address && (
-                                                <p className="text-xs opacity-60 mt-1">{data.events.resepsi.address}</p>
-                                            )}
-                                            {data.events.resepsi.googleMapsUrl && (
-                                                <a href={data.events.resepsi.googleMapsUrl} target="_blank" rel="noreferrer"
-                                                    className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition hover:opacity-80"
-                                                    style={{ backgroundColor: goldColor + '15', color: goldColor }}>
-                                                    <MapPin className="w-3.5 h-3.5" /> Buka Peta
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 7: COUNTDOWN (CONDITIONAL)                           */}
-                {/* ============================================================ */}
-                {hasCountdown && (
-                    <section className="py-12 px-6 text-center">
-                        <h3 className="font-javanese-accent text-3xl mb-8" style={{ color: goldColor }}>
-                            Menghitung Hari
-                        </h3>
-                        <div className="flex justify-center gap-4 md:gap-6 max-w-md mx-auto">
-                            {[
-                                { val: countdown.days, label: 'Hari' },
-                                { val: countdown.hours, label: 'Jam' },
-                                { val: countdown.minutes, label: 'Menit' },
-                                { val: countdown.seconds, label: 'Detik' },
-                            ].map(({ val, label }) => (
-                                <div key={label} className="flex flex-col items-center">
-                                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl flex items-center justify-center border"
-                                        style={{ borderColor: goldColor + '30', backgroundColor: primaryColor + '08' }}>
-                                        <span className="font-javanese text-2xl md:text-3xl font-bold tabular-nums" style={{ color: primaryColor }}>
-                                            {String(val).padStart(2, '0')}
-                                        </span>
-                                    </div>
-                                    <span className="text-[10px] uppercase tracking-wider mt-2 opacity-50 font-bold">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 8: LOVE STORIES (CONDITIONAL)                        */}
-                {/* ============================================================ */}
-                {hasLoveStories && (
-                    <section className="py-12 px-6">
-                        <div className="max-w-lg mx-auto">
-                            <h3 className="font-javanese-accent text-3xl text-center mb-10" style={{ color: goldColor }}>
-                                Cerita Cinta Kami
-                            </h3>
-
-                            <div className="relative">
-                                {/* Vertical timeline line */}
-                                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px" style={{ backgroundColor: goldColor + '30' }} />
-
-                                {data.loveStories.map((story, i) => (
-                                    <div key={story.id || i} className={`relative flex items-start gap-4 mb-8 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                                        {/* Timeline node */}
-                                        <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 z-10"
-                                            style={{ borderColor: goldColor, backgroundColor: bgColor }} />
-
-                                        {/* Content card */}
-                                        <div className={`ml-10 md:ml-0 md:w-[calc(50%-24px)] ${i % 2 === 0 ? '' : 'md:ml-auto'} rounded-xl p-4 border`}
-                                            style={{ borderColor: goldColor + '20', backgroundColor: bgColor, boxShadow: `0 2px 15px ${goldColor}08` }}>
-                                            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: goldColor }}>{story.year}</span>
-                                            <h5 className="font-javanese font-bold mt-1 mb-1.5">{story.title}</h5>
-                                            <p className="text-sm opacity-70 leading-relaxed">{story.story}</p>
-                                            {story.imageUrl && (
-                                                <img src={getImageUrl(story.imageUrl)} alt={story.title} className="w-full h-32 object-cover rounded-lg mt-3" />
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 9: GALERI FOTO (CONDITIONAL)                         */}
-                {/* ============================================================ */}
-                {hasGallery && (
-                    <section className="py-12 px-6">
-                        <div className="max-w-2xl mx-auto">
-                            <h3 className="font-javanese-accent text-3xl text-center mb-10" style={{ color: goldColor }}>
-                                Galeri Kenangan
-                            </h3>
-
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {data.gallery.filter(url => url).map((url, i) => (
-                                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden group border"
-                                        style={{ borderColor: goldColor + '20' }}>
-                                        <img src={getImageUrl(url)} alt={`Gallery ${i + 1}`}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 10: KADO DIGITAL (CONDITIONAL)                       */}
-                {/* ============================================================ */}
-                {hasGifts && (
-                    <section className="py-12 px-6">
-                        <div className="max-w-lg mx-auto">
-                            <h3 className="font-javanese-accent text-3xl text-center mb-3" style={{ color: goldColor }}>
-                                Amplop Digital
-                            </h3>
-                            <p className="text-sm text-center opacity-50 mb-8">
-                                Doa restu Anda merupakan karunia yang sangat berarti bagi kami.
-                            </p>
-
-                            <div className="space-y-3">
-                                {data.gifts.map((gift) => (
-                                    <div key={gift.id} className="rounded-xl p-4 border flex items-center justify-between gap-3"
-                                        style={{ borderColor: goldColor + '25', backgroundColor: bgColor, boxShadow: `0 2px 15px ${goldColor}08` }}>
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: goldColor + '15' }}>
-                                                <Gift className="w-5 h-5" style={{ color: goldColor }} />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: goldColor }}>{gift.name}</p>
-                                                <p className="text-sm font-mono truncate">{gift.accountNumber}</p>
-                                                <p className="text-xs opacity-50">a.n. {gift.accountHolder}</p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleCopy(gift.accountNumber, gift.id)}
-                                            className="shrink-0 p-2 rounded-lg border transition hover:opacity-80"
-                                            style={{ borderColor: goldColor + '30' }}>
-                                            {copiedId === gift.id ? (
-                                                <CheckCircle className="w-4 h-4" style={{ color: '#10B981' }} />
-                                            ) : (
-                                                <CopyIcon className="w-4 h-4" style={{ color: goldColor }} />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <BatikDivider color={goldColor} />
-                    </section>
-                )}
-
-                {/* ============================================================ */}
-                {/* SECTION 11: RSVP & GUESTBOOK                                 */}
-                {/* ============================================================ */}
-                <section className="py-12 px-6">
-                    <div className="max-w-lg mx-auto">
-                        <h3 className="font-javanese-accent text-3xl text-center mb-3" style={{ color: goldColor }}>
-                            Konfirmasi Kehadiran
-                        </h3>
-                        <p className="text-sm text-center opacity-50 mb-8">
-                            Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
-                        </p>
-
-                        {!rsvpSuccess ? (
-                            <form onSubmit={handleRSVPSubmit} className="space-y-4 rounded-2xl p-6 border"
-                                style={{ borderColor: goldColor + '25', backgroundColor: bgColor, boxShadow: `0 4px 30px ${goldColor}08` }}>
-
-                                {/* Guest Name */}
-                                <div>
-                                    <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: goldColor }}>Nama Lengkap</label>
-                                    <input type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none transition font-body"
-                                        style={{ borderColor: goldColor + '30', backgroundColor: 'transparent', color: textColor }}
-                                        placeholder="Masukkan nama Anda" />
-                                </div>
-
-                                {/* Status */}
-                                <div>
-                                    <label className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: goldColor }}>Konfirmasi</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {(['Hadir', 'Ragu-ragu', 'Tidak Hadir'] as const).map((status) => (
-                                            <button key={status} type="button" onClick={() => setRsvpStatus(status)}
-                                                className="py-2.5 rounded-xl text-xs font-bold border transition"
-                                                style={{
-                                                    borderColor: rsvpStatus === status ? primaryColor : goldColor + '30',
-                                                    backgroundColor: rsvpStatus === status ? primaryColor + '15' : 'transparent',
-                                                    color: rsvpStatus === status ? primaryColor : textColor + '80',
-                                                }}>
-                                                {status}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Pax */}
-                                {rsvpStatus === 'Hadir' && (
-                                    <div>
-                                        <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: goldColor }}>Jumlah Tamu</label>
-                                        <select value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))}
-                                            className="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none font-body"
-                                            style={{ borderColor: goldColor + '30', backgroundColor: 'transparent', color: textColor }}>
-                                            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Orang</option>)}
-                                        </select>
-                                    </div>
-                                )}
-
-                                {/* Wishes */}
-                                <div>
-                                    <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: goldColor }}>Ucapan & Doa</label>
-                                    <textarea value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3}
-                                        className="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none resize-none font-body"
-                                        style={{ borderColor: goldColor + '30', backgroundColor: 'transparent', color: textColor }}
-                                        placeholder="Tuliskan ucapan dan doa untuk kedua mempelai..." />
-                                </div>
-
-                                <button type="submit"
-                                    className="w-full py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider text-white transition hover:opacity-90"
-                                    style={{ backgroundColor: primaryColor }}>
-                                    Kirim Konfirmasi
-                                </button>
-                            </form>
-                        ) : (
-                            <div className="text-center py-8 rounded-2xl border animate-fade-up"
-                                style={{ borderColor: goldColor + '25' }}>
-                                <CheckCircle className="w-12 h-12 mx-auto mb-3" style={{ color: '#10B981' }} />
-                                <h4 className="font-javanese text-lg font-bold mb-1">Terima Kasih!</h4>
-                                <p className="text-sm opacity-60">Konfirmasi kehadiran Anda telah kami terima.</p>
-                            </div>
-                        )}
-
-                        {/* Guestbook / Wishes List */}
-                        {rsvps.length > 0 && (
-                            <div className="mt-8 space-y-3">
-                                <h4 className="font-javanese text-lg font-bold flex items-center gap-2">
-                                    <MessageCircle className="w-5 h-5" style={{ color: goldColor }} />
-                                    Ucapan ({rsvps.length})
-                                </h4>
-                                <div className="max-h-64 overflow-y-auto space-y-2 pr-1 javanese-scroll">
-                                    {rsvps.map((entry) => (
-                                        <div key={entry.id} className="rounded-xl p-3 border"
-                                            style={{ borderColor: goldColor + '15', backgroundColor: primaryColor + '05' }}>
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm font-bold">{entry.guestName}</span>
-                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                                                    entry.status === 'Hadir' ? 'bg-emerald-100 text-emerald-700' :
-                                                    entry.status === 'Ragu-ragu' ? 'bg-amber-100 text-amber-700' :
-                                                    'bg-red-100 text-red-700'
-                                                }`}>{entry.status}</span>
-                                            </div>
-                                            {entry.wishes && <p className="text-xs opacity-60 leading-relaxed">"{entry.wishes}"</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {/* ============================================================ */}
-                {/* SECTION 12: FOOTER                                           */}
-                {/* ============================================================ */}
-                <footer className="py-16 text-center px-6 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-kawung opacity-30" />
-                    <div className="relative z-10">
-                        <GapuraOrnament className="w-32 mx-auto mb-6" color={goldColor} />
-
-                        <p className="font-javanese-accent text-xl mb-2" style={{ color: goldColor }}>
-                            Wassalamu'alaikum Wr. Wb.
-                        </p>
-                        <h3 className="font-javanese text-2xl md:text-3xl font-bold text-gold-shimmer mb-4">
-                            {data.couple.groom.nickname} & {data.couple.bride.nickname}
-                        </h3>
-                        <p className="text-xs opacity-40">
-                            Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami mengucapkan terima kasih.
-                        </p>
-
-                        <div className="mt-8">
-                            <Heart className="w-5 h-5 mx-auto" style={{ color: primaryColor + '60' }} />
-                        </div>
-                    </div>
-                </footer>
-
-            </div>
-
-            {/* ============================================================ */}
-            {/* FLOATING MUSIC BUTTON                                        */}
-            {/* ============================================================ */}
-            {isOpen && (
-                <button
-                    onClick={toggleMusic}
-                    className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110 border"
-                    style={{
-                        backgroundColor: primaryColor,
-                        borderColor: goldColor + '40',
-                        color: '#fff',
-                    }}
-                    title={isPlaying ? 'Pause Musik' : 'Play Musik'}
+            {/* Navigation Bar */}
+            {stage === 'content' && (
+                <motion.div 
+                    initial={{ y: 100 }}
+                    animate={{ y: 0 }}
+                    transition={{ delay: 0.8, type: "spring", stiffness: 100, damping: 20 }}
+                    className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4"
                 >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                </button>
+                    <div className="javanese-panel px-6 py-3 flex justify-between items-center rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                        {[
+                            { id: 'home', icon: Lotus },
+                            { id: 'couple', icon: User },
+                            { id: 'event', icon: Calendar },
+                            { id: 'gallery', icon: ImageIcon },
+                            { id: 'gift', icon: Gift },
+                            { id: 'rsvp', icon: MessageCircle }
+                        ].map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`relative flex flex-col items-center justify-center p-2 transition-colors ${activeTab === item.id ? 'text-[#D4AF37]' : 'text-[#8A6B22] hover:text-[#D4AF37]'}`}
+                            >
+                                <item.icon size={22} weight={activeTab === item.id ? "fill" : "regular"} />
+                                {activeTab === item.id && (
+                                    <motion.div layoutId="nav-indicator-jawa" className="absolute -bottom-1 w-6 h-0.5 bg-[#D4AF37] rounded-full drop-shadow-[0_0_5px_#D4AF37]" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </motion.div>
             )}
         </div>
     );
-}
+};
+
+export default JavaneseClassicLayout;

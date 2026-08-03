@@ -304,7 +304,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
     <div className="overflow-hidden flex flex-col h-full relative">
       {/* Animated gradient mesh background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-pink-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-pink-50" />
         {/* Floating decorative orbs */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-rose-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute bottom-20 -right-20 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
@@ -316,7 +316,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
       {/* Mobile Tab Bar — horizontal scroll pills */}
       <div className="relative z-10 flex md:hidden gap-1.5 px-3 py-2.5 bg-white/80 backdrop-blur-xl border-b border-zinc-200/40 overflow-x-auto custom-scrollbar-tabs">
         {([
-          { id: 'couple' as const, label: 'Mempelai', icon: Heart, color: 'text-rose-500' },
+          { id: 'couple' as const, label: 'Mempelai', icon: Heart, color: 'text-amber-500' },
           { id: 'events' as const, label: 'Acara', icon: Calendar, color: 'text-amber-500' },
           { id: 'stories' as const, label: 'Cerita', icon: BookOpen, color: 'text-violet-500' },
           { id: 'gallery' as const, label: 'Galeri', icon: Image, color: 'text-sky-500' },
@@ -331,7 +331,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all duration-200 ${
                 isActive
-                  ? 'bg-rose-500 text-white font-semibold shadow-md shadow-rose-200'
+                  ? 'bg-zinc-500 text-white font-semibold shadow-md shadow-rose-200'
                   : 'text-zinc-500 bg-zinc-100/80 hover:bg-zinc-200/80 font-medium'
               }`}
             >
@@ -347,7 +347,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         <FloatingDock
           desktopClassName="shadow-xl shadow-zinc-200/40 border-zinc-200/50"
           items={[
-            { title: 'Mempelai', icon: <Heart className="h-full w-full text-rose-500" />, onClick: () => setActiveTab('couple'), active: activeTab === 'couple' },
+            { title: 'Mempelai', icon: <Heart className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('couple'), active: activeTab === 'couple' },
             { title: 'Detail Acara', icon: <Calendar className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('events'), active: activeTab === 'events' },
             { title: 'Cerita Cinta', icon: <BookOpen className="h-full w-full text-violet-500" />, onClick: () => setActiveTab('stories'), active: activeTab === 'stories' },
             { title: 'Galeri & Musik', icon: <Image className="h-full w-full text-sky-500" />, onClick: () => setActiveTab('gallery'), active: activeTab === 'gallery' },
@@ -371,10 +371,10 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'couple' && (
           <div className="space-y-5 animate-fadeIn">
             {/* Section Header */}
-            <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-rose-500" />
+                <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-amber-500" />
                 </div>
                 <div>
                   <h4 className="font-bold text-zinc-800 text-sm">Informasi Mempelai</h4>
@@ -383,7 +383,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
               <button
                 onClick={resetToTamuSampel}
-                className="flex items-center gap-1.5 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg border border-rose-200 transition-all"
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Ganti Foto Sampel
               </button>
@@ -395,7 +395,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 {/* Aksen garis gradasi atas Groom */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
                 <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
-                  <span className="bg-rose-500 text-white text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
+                  <span className="bg-zinc-500 text-white text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
                   <h5 className="font-bold text-zinc-800 text-sm">Mempelai Pria (Groom)</h5>
                 </div>
 
@@ -406,7 +406,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.groom.fullName}
                       onChange={(e) => updateGroom('fullName', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                       placeholder="e.g. Budi Hartono, S.T."
                     />
                   </div>
@@ -416,7 +416,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.groom.nickname}
                       onChange={(e) => updateGroom('nickname', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                       placeholder="e.g. Budi"
                     />
                   </div>
@@ -427,7 +427,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.groom.fatherName.replace('Bapak ', '')}
                         onChange={(e) => updateGroom('fatherName', `Bapak ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                         placeholder="Nama Ayah"
                       />
                     </div>
@@ -437,7 +437,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.groom.motherName.replace('Ibu ', '')}
                         onChange={(e) => updateGroom('motherName', `Ibu ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                         placeholder="Nama Ibu"
                       />
                     </div>
@@ -448,12 +448,12 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.groom.photoUrl}
                       onChange={(e) => updateGroom('photoUrl', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
                       placeholder="https://drive.google.com/file/d/... (atau unggah lewat tombol)"
                     />
                     {/* Slick Photo Uploader for Groom */}
                     <div className="flex items-center gap-2 mt-1.5">
-                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-rose-200 hover:border-rose-300 shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 hover:bg-zinc-500 text-zinc-700 hover:text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                         <Upload className="w-3 h-3" />
                         <span>{isUploading ? 'Mengunggah...' : 'Unggah Foto'}</span>
                         <input
@@ -477,7 +477,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {data?.couple?.groom.photoUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-rose-600 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
@@ -491,7 +491,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.groom.instagram}
                         onChange={(e) => updateGroom('instagram', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                         placeholder="@username"
                       />
                     </div>
@@ -502,7 +502,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       value={data?.couple?.groom.about}
                       onChange={(e) => updateGroom('about', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
                     />
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.bride.fullName}
                       onChange={(e) => updateBride('fullName', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                       placeholder="e.g. Salsabila Cantika, M.Ds"
                     />
                   </div>
@@ -534,7 +534,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.bride.nickname}
                       onChange={(e) => updateBride('nickname', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                       placeholder="e.g. Salsa"
                     />
                   </div>
@@ -545,7 +545,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.bride.fatherName.replace('Bapak ', '')}
                         onChange={(e) => updateBride('fatherName', `Bapak ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                         placeholder="Nama Ayah"
                       />
                     </div>
@@ -555,7 +555,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.bride.motherName.replace('Ibu ', '')}
                         onChange={(e) => updateBride('motherName', `Ibu ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
                         placeholder="Nama Ibu"
                       />
                     </div>
@@ -566,7 +566,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.couple?.bride.photoUrl}
                       onChange={(e) => updateBride('photoUrl', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
                       placeholder="https://drive.google.com/file/d/... (atau unggah lewat tombol)"
                     />
                     {/* Slick Photo Uploader for Bride */}
@@ -595,7 +595,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {data?.couple?.bride.photoUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-rose-600 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
@@ -609,7 +609,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         type="text"
                         value={data?.couple?.bride.instagram}
                         onChange={(e) => updateBride('instagram', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                         placeholder="@username"
                       />
                     </div>
@@ -620,7 +620,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       value={data?.couple?.bride.about}
                       onChange={(e) => updateBride('about', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
                     />
                   </div>
                 </div>
@@ -632,7 +632,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 2: DETIL ACARA */}
         {activeTab === 'events' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600" />
               </div>
@@ -648,8 +648,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 {/* Aksen garis gradasi atas Akad */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-                  <h5 className="font-bold text-rose-600 font-bold text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <h5 className="font-bold text-zinc-700 font-bold text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-zinc-500" />
                     Sesi 1: Akad Nikah
                   </h5>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -659,7 +659,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       checked={data?.events?.akad?.enabled !== false}
                       onChange={(e) => updateAkad('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-rose-500"></div>
+                    <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-500"></div>
                   </label>
                 </div>
 
@@ -670,7 +670,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="date"
                       value={data?.events?.akad?.date}
                       onChange={(e) => updateAkad('date', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -700,7 +700,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.events?.akad?.venueName}
                       onChange={(e) => updateAkad('venueName', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                       placeholder="Masjid Agung..."
                     />
                   </div>
@@ -710,7 +710,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       value={data?.events?.akad?.address}
                       onChange={(e) => updateAkad('address', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
                     />
                   </div>
                   <div>
@@ -734,7 +734,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 {/* Aksen garis gradasi atas Resepsi */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary/30 via-secondary to-secondary/30" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-                  <h5 className="font-bold text-rose-600 text-xs flex items-center gap-1.5">
+                  <h5 className="font-bold text-zinc-700 text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-secondary" />
                     Sesi 2: Resepsi Pernikahan
                   </h5>
@@ -756,7 +756,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="date"
                       value={data?.events?.resepsi?.date}
                       onChange={(e) => updateResepsi('date', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -786,7 +786,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       type="text"
                       value={data?.events?.resepsi?.venueName}
                       onChange={(e) => updateResepsi('venueName', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
                       placeholder="Ballroom Hotel..."
                     />
                   </div>
@@ -796,7 +796,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       value={data?.events?.resepsi?.address}
                       onChange={(e) => updateResepsi('address', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
                     />
                   </div>
                   <div>
@@ -834,7 +834,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   onChange={(e) => onChange({ ...data, showLoveStories: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
               </label>
             </div>
 
@@ -846,7 +846,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <button
                 type="button"
                 onClick={addStory}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-500/90 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-500 text-white rounded-full text-xs font-bold hover:bg-zinc-500/90 transition"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah Momen
               </button>
@@ -854,26 +854,32 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
             {data?.showLoveStories === false && (
               <div className="p-3.5 bg-white border border-zinc-300 text-zinc-800 rounded-2xl text-[11.5px] font-medium leading-relaxed animate-fade-in flex gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+                <AlertTriangle className="w-4 h-4 shrink-0 text-zinc-700 mt-0.5" />
                 <span>Bagian <strong>Perjalanan Kisah Cinta</strong> saat ini dinonaktifkan (disembunyikan) pada halaman web undangan. Pengunjung tidak akan melihat kisah cinta ini di pratinjau utama, tetapi Anda masih bisa menyimpan dan mengedit data momen di bawah ini.</span>
               </div>
             )}
 
             <div className={`space-y-4 ${data?.showLoveStories === false ? 'opacity-65 transition-opacity' : ''}`}>
-              {data?.loveStories?.map((story) => (
-                <div key={story.id} className="p-5 border border-zinc-200 rounded-2xl bg-white space-y-3 relative group shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                  {/* Aksen garis gradasi atas Cerita */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary/50 to-primary/20" />
-                  <button
-                    type="button"
-                    onClick={() => removeStory(story.id)}
-                    className="absolute top-4 right-4 p-1.5 bg-white text-rose-600 hover:bg-white text-rose-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Hapus Momen"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+              {data?.loveStories?.map((story, index) => (
+                <details key={story.id} className="rounded-[1.5rem] border border-zinc-200/50 bg-white/50 backdrop-blur-md shadow-sm relative group overflow-hidden transition-all duration-300">
+                  <summary className="cursor-pointer px-5 py-4 bg-zinc-50/50 hover:bg-white text-sm font-bold text-zinc-800 flex items-center justify-between border-b border-transparent group-open:border-zinc-200/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="bg-zinc-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-[11px] font-mono shadow-sm">{index + 1}</span>
+                      <span>{story.title || "Kisah Baru"}</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-400 font-normal group-open:hidden">Edit ▼</span>
+                  </summary>
+                  <div className="p-5 space-y-4 bg-white/40 relative">
+                    <button
+                      type="button"
+                      onClick={() => removeStory(story.id)}
+                      className="absolute top-2 right-2 p-1.5 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 rounded-lg transition-colors"
+                      title="Hapus Momen"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-2">
                     <div>
                       <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tahun Kejadian</label>
                       <input
@@ -918,7 +924,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     />
                     {/* Slick Photo Uploader for Story Moment */}
                     <div className="flex items-center gap-2 mt-1.5">
-                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-white text-rose-600 font-bold rounded-xl text-[11px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-white text-zinc-700 font-bold rounded-xl text-[11px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                         <Upload className="w-3 h-3" />
                         <span>{isUploading ? 'Mengunggah...' : 'Unggah Foto'}</span>
                         <input
@@ -942,13 +948,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {story.imageUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-rose-600 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
                     </div>
+                    </div>
                   </div>
-                </div>
+                </details>
               ))}
             </div>
           </div>
@@ -958,9 +965,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'gallery' && (
           <div className="space-y-5">
             {/* Section Header */}
-            <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
-                <Image className="w-5 h-5 text-sky-600" />
+                <Image className="w-5 h-5 text-zinc-700" />
               </div>
               <div>
                 <h4 className="font-bold text-zinc-800 text-sm">Galeri & Musik</h4>
@@ -980,7 +987,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   onChange={(e) => onChange({ ...data, enableDigitalPass: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
               </label>
             </div>
 
@@ -990,7 +997,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             </div>
 
             {/* OG IMAGE & BG IMAGE CONFIGURATION */}
-            <div className="p-5 border border-zinc-200 rounded-2xl bg-emerald-50/10 space-y-4 shadow-sm relative overflow-hidden">
+            <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-300/30 via-emerald-500 to-emerald-300/30" />
               <h5 className="font-bold text-emerald-700 text-xs flex items-center gap-1.5">
                 <ImageSquare className="w-4 h-4 text-emerald-500" /> Gambar Sampul & Latar Belakang (OG & BG Image)
@@ -1004,7 +1011,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     type="text"
                     value={data?.ogImageUrl || ''}
                     onChange={(e) => onChange({ ...data, ogImageUrl: convertGoogleDriveUrl(e.target.value) })}
-                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300"
+                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300"
                     placeholder="Tautan URL gambar sampul halaman awal..."
                   />
                   {data?.ogImageUrl && (
@@ -1013,7 +1020,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-emerald-200 hover:border-emerald-600 shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-emerald-600 shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1053,7 +1060,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     type="text"
                     value={data?.bgImageUrl || ''}
                     onChange={(e) => onChange({ ...data, bgImageUrl: convertGoogleDriveUrl(e.target.value) })}
-                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300"
+                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300"
                     placeholder="Tautan URL gambar latar belakang undangan..."
                   />
                   {data?.bgImageUrl && (
@@ -1062,7 +1069,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-emerald-200 hover:border-emerald-600 shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-emerald-600 shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1170,7 +1177,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         musicTitle: 'Beautiful Piano - Canon in D'
                       });
                     }}
-                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white rounded-xl text-xs font-bold transition active:scale-95"
+                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl text-xs font-bold transition active:scale-95"
                   >
                     Atur Ulang
                   </button>
@@ -1179,9 +1186,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             </div>
 
             {/* ITUNES / APPLE MUSIC SEARCH */}
-            <div className="p-5 border border-zinc-200 rounded-2xl bg-rose-50/10 space-y-4 shadow-sm relative overflow-hidden">
+            <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-300/30 via-rose-400 to-rose-300/30" />
-              <h5 className="font-bold text-rose-700 text-xs flex items-center gap-1.5">
+              <h5 className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Cari Lagu dari Apple Music / iTunes
               </h5>
               <p className="text-[10px] text-zinc-500 leading-relaxed">
@@ -1194,12 +1201,12 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   type="text"
                   value={itunesQuery}
                   onChange={(e) => setItunesQuery(e.target.value)}
-                  className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-300 transition-all"
+                  className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 transition-all"
                   placeholder="Cari lagu, misal: Perfect Ed Sheeran, A Thousand Years..."
                 />
                 {itunesLoading && (
                   <div className="absolute right-3 top-2.5">
-                    <div className="w-4 h-4 border-2 border-rose-300/30 border-t-primary rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-zinc-300/30 border-t-primary rounded-full animate-spin" />
                   </div>
                 )}
               </div>
@@ -1209,7 +1216,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   {itunesResults.map((track: any) => (
                     <div
                       key={track.trackId}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-white hover:border-rose-300/30 transition-all duration-200 group"
+                      className="flex items-center gap-3 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-white hover:border-zinc-300/30 transition-all duration-200 group"
                     >
                       {/* Album Art */}
                       <img
@@ -1234,8 +1241,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                             onClick={() => handleItunesPreview(track.trackId, track.previewUrl)}
                             className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
                               itunesPlayingId === track.trackId
-                                ? 'bg-rose-500 text-white border-rose-300 shadow-md'
-                                : 'bg-white text-zinc-500 border-zinc-200 hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-300/30'
+                                ? 'bg-zinc-500 text-white border-zinc-300 shadow-md'
+                                : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-500/10 hover:text-zinc-700 hover:border-zinc-300/30'
                             }`}
                             title={itunesPlayingId === track.trackId ? 'Hentikan pratinjau' : 'Dengarkan pratinjau 30 detik'}
                           >
@@ -1247,7 +1254,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         <button
                           type="button"
                           onClick={() => handleSelectItunesTrack(track)}
-                          className="px-3 py-2 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white rounded-lg text-[10px] font-bold border border-rose-200 hover:border-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                          className="px-3 py-2 bg-zinc-50 hover:bg-zinc-500 text-zinc-700 hover:text-white rounded-lg text-[10px] font-bold border border-zinc-200 hover:border-zinc-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
                         >
                           Gunakan
                         </button>
@@ -1280,19 +1287,26 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
               <div className="space-y-2">
                 {data?.gallery?.map((img, idx) => (
-                  <div key={idx} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center group border border-zinc-200 p-2.5 rounded-xl bg-white">
-                    <div className="flex items-center gap-2 w-full">
-                      <span className="text-xs font-mono font-bold text-zinc-500 w-5 text-right">{idx + 1}.</span>
-                      <input
-                        type="text"
-                        value={img}
-                        onChange={(e) => updateGalleryItem(idx, e.target.value)}
-                        className="flex-1 text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500"
-                        placeholder="Masukkan URL foto..."
-                      />
+                  <details key={idx} className="group border border-zinc-200/50 rounded-2xl bg-white/50 backdrop-blur-sm overflow-hidden transition-all shadow-sm">
+                    <summary className="cursor-pointer px-4 py-3 bg-zinc-50/50 hover:bg-white text-xs font-bold text-zinc-800 flex items-center justify-between border-b border-transparent group-open:border-zinc-200/50 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-zinc-800 text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px]">{idx + 1}</span>
+                        <span>Foto {idx + 1}</span>
+                      </div>
+                      <span className="text-[10px] text-zinc-400 font-normal">Edit ▼</span>
+                    </summary>
+                    <div className="p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white/40">
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={img}
+                          onChange={(e) => updateGalleryItem(idx, e.target.value)}
+                          className="flex-1 text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500"
+                          placeholder="Masukkan URL foto..."
+                        />
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto pl-7 sm:pl-0">
-                      <label className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-white text-rose-600 font-bold rounded-lg text-[10px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200">
+                      <label className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-white text-zinc-700 font-bold rounded-lg text-[10px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200">
                         <Upload className="w-3 h-3" />
                         <span>Unggah</span>
                         <input
@@ -1318,13 +1332,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       <button
                         type="button"
                         onClick={() => removeGalleryItem(idx)}
-                        className="p-1.5 text-rose-600 hover:bg-white rounded-lg transition"
+                        className="p-1.5 text-zinc-700 hover:bg-white rounded-lg transition"
                         title="Hapus Foto"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
+                      </div>
                     </div>
-                  </div>
+                  </details>
                 ))}
               </div>
             </div>
@@ -1334,10 +1349,10 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 5: DIGITAL GIFT */}
         {activeTab === 'gifts' && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <Gift className="w-5 h-5 text-emerald-600" />
+                  <Gift className="w-5 h-5 text-zinc-700" />
                 </div>
                 <div>
                   <h4 className="font-bold text-zinc-800 text-sm">Kado Digital</h4>
@@ -1347,7 +1362,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <button
                 type="button"
                 onClick={addGiftItem}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-500 text-white rounded-lg text-xs font-semibold hover:bg-rose-600 transition shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-500 text-white rounded-lg text-xs font-semibold hover:bg-zinc-900 transition shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah
               </button>
@@ -1361,7 +1376,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   <button
                     type="button"
                     onClick={() => removeGiftItem(gift.id)}
-                    className="absolute top-4 right-4 p-1 rounded-lg bg-white text-rose-600 hover:bg-white text-rose-600"
+                    className="absolute top-4 right-4 p-1 rounded-lg bg-white text-zinc-700 hover:bg-white text-zinc-700"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -1424,7 +1439,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 6: QUOTE & COUNTDOWN */}
         {activeTab === 'quote' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <Quote className="w-5 h-5 text-purple-600" />
               </div>
@@ -1460,7 +1475,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
               <div className="border-t border-zinc-200 pt-4">
                 <h5 className="font-bold text-zinc-800 text-xs mb-3 flex items-center gap-1.5">
-                  <Timer className="w-3.5 h-3.5 text-rose-600" />
+                  <Timer className="w-3.5 h-3.5 text-zinc-700" />
                   Waktu Hitung Mundur (Countdown Target)
                 </h5>
 

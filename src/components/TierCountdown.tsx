@@ -51,17 +51,17 @@ function getStatus(expiresAt: string | null | undefined, activatedAt: string | n
 
 const STATUS_CONFIG = {
   active: {
-    bgGradient: 'from-emerald-50 to-emerald-50/50',
-    border: 'border-emerald-200',
-    textColor: 'text-emerald-600',
-    numberColor: 'text-zinc-800',
-    dotColor: 'bg-emerald-500',
+    bgGradient: 'bg-zinc-900',
+    border: 'border-zinc-800',
+    textColor: 'text-zinc-400',
+    numberColor: 'text-white',
+    dotColor: 'bg-amber-400',
     label: 'Aktif',
     icon: Clock,
   },
   warning: {
-    bgGradient: 'from-amber-50 to-amber-50/50',
-    border: 'border-amber-200',
+    bgGradient: 'bg-white',
+    border: 'border-amber-900/10',
     textColor: 'text-amber-600',
     numberColor: 'text-zinc-800',
     dotColor: 'bg-amber-500',
@@ -69,29 +69,29 @@ const STATUS_CONFIG = {
     icon: AlertTriangle,
   },
   danger: {
-    bgGradient: 'from-red-50 to-red-50/50',
-    border: 'border-red-200',
-    textColor: 'text-red-600',
-    numberColor: 'text-red-700',
-    dotColor: 'bg-red-500',
+    bgGradient: 'bg-white',
+    border: 'border-rose-900/10',
+    textColor: 'text-rose-600',
+    numberColor: 'text-zinc-800',
+    dotColor: 'bg-rose-500',
     label: 'Hampir Habis!',
     icon: AlertTriangle,
   },
   expired: {
-    bgGradient: 'from-zinc-50 to-zinc-50/50',
+    bgGradient: 'bg-white',
     border: 'border-zinc-200',
     textColor: 'text-zinc-500',
-    numberColor: 'text-zinc-600',
-    dotColor: 'bg-zinc-400',
+    numberColor: 'text-zinc-400',
+    dotColor: 'bg-zinc-300',
     label: 'Masa Aktif Habis',
     icon: XCircle,
   },
   inactive: {
-    bgGradient: 'from-zinc-50 to-zinc-50/50',
+    bgGradient: 'bg-white',
     border: 'border-zinc-200',
     textColor: 'text-zinc-500',
-    numberColor: 'text-zinc-600',
-    dotColor: 'bg-zinc-400',
+    numberColor: 'text-zinc-400',
+    dotColor: 'bg-zinc-300',
     label: 'Belum Aktif',
     icon: Clock,
   },
@@ -131,7 +131,7 @@ export default function TierCountdown({ activatedAt, expiresAt, packageId, onUpg
   const tierLabel = packageId === 'demo' ? 'Demo' : packageId === 'reguler' ? 'Reguler' : packageId === 'premium' ? 'Premium' : 'Luxury';
 
   return (
-    <div className={`mx-3 mb-3 rounded-xl border ${config.border} bg-gradient-to-br ${config.bgGradient} p-3.5 transition-all duration-500`}>
+    <div className={`mx-3 mb-3 rounded-[1.25rem] border ${config.border} ${config.bgGradient} p-4 shadow-sm hover:shadow-md transition-all duration-500`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-1.5">

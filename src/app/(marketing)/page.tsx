@@ -273,9 +273,9 @@ export default function LandingPage() {
               The New Standard in Digital Wedding
             </div>
             <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif leading-[1.05] mb-8">
-              Curate<br/>
-              <span className="italic text-muted-foreground">the perfect</span><br/>
-              celebration.
+              Ciptakan<br/>
+              <span className="italic text-muted-foreground">undangan digital</span><br/>
+              tak terlupakan.
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-md font-light leading-relaxed mb-10">
               RuangHadir.net menghadirkan undangan pernikahan digital premium dengan desain editorial yang elegan. Buat, bagikan, dan pantau RSVP tamu Anda.
@@ -293,8 +293,8 @@ export default function LandingPage() {
           <div className="relative h-[70vh] lg:h-[85vh] w-full overflow-hidden">
             <img 
               ref={addToParallax}
-              src="https://lh3.googleusercontent.com/d/1RIEjBvUOVeDXWOExxEiuTfNkhyiEK_JC" 
-              alt="RuangHadir wedding photography"
+              src="/hero-phones.png" 
+              alt="RuangHadir digital wedding invitation on smartphones"
               className="absolute inset-0 w-full h-[120%] object-cover -top-[10%]"
             />
           </div>
@@ -356,6 +356,132 @@ export default function LandingPage() {
                 </motion.div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Theme Preview / Pilihan Desain ── */}
+      <section id="preview" className="py-32 px-6 border-y border-border bg-secondary/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-20">
+            <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground block mb-4">Koleksi Tema</span>
+            <h2 className="text-5xl font-serif">Pilihan Desain.</h2>
+            <p className="text-muted-foreground mt-4 max-w-lg">
+              Pilih dan gunakan tema undangan pernikahan yang menarik serta unik. Setiap desain dirancang untuk momen spesial Anda.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {DEFAULT_THEMES.map((theme, i) => (
+              <motion.div
+                key={theme.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.6 }}
+                className="group relative"
+              >
+                {/* Card */}
+                <div
+                  className="relative overflow-hidden border border-border bg-card transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2"
+                  style={{
+                    background: `linear-gradient(160deg, ${theme.bgHex}22 0%, ${theme.primaryHex}11 100%)`,
+                  }}
+                >
+                  {/* Card Inner */}
+                  <div className="relative p-8 pb-6 flex items-center gap-6">
+                    {/* Phone Mockup */}
+                    <div className="shrink-0 relative">
+                      <div
+                        className="relative w-[130px] h-[260px] rounded-[22px] border-[3px] shadow-2xl overflow-hidden transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2"
+                        style={{
+                          borderColor: theme.primaryHex + '40',
+                          backgroundColor: theme.bgHex,
+                        }}
+                      >
+                        {/* Notch */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-14 h-4 bg-black rounded-b-xl z-20" />
+
+                        {/* Screen */}
+                        <div
+                          className="absolute inset-0 flex flex-col items-center justify-center p-4"
+                          style={{
+                            background: `linear-gradient(180deg, ${theme.bgHex} 0%, ${theme.bgPatternHex} 100%)`,
+                          }}
+                        >
+                          <div
+                            className="absolute inset-0 opacity-20"
+                            style={{
+                              backgroundImage: `radial-gradient(circle at 2px 2px, ${theme.accentHex} 0.5px, transparent 0)`,
+                              backgroundSize: '16px 16px',
+                            }}
+                          />
+                          <div className="relative z-10 text-center space-y-2">
+                            <p className="text-[8px] uppercase tracking-[0.25em] font-medium" style={{ color: theme.accentHex }}>
+                              Pernikahan
+                            </p>
+                            <p className="text-[14px] font-serif italic leading-tight" style={{ color: theme.textHex }}>
+                              Rian & Salsa
+                            </p>
+                            <div className="w-8 h-[1px] mx-auto" style={{ backgroundColor: theme.accentHex + '60' }} />
+                            <p className="text-[7px] tracking-wider" style={{ color: theme.textHex + 'aa' }}>
+                              08 Agustus 2026
+                            </p>
+                          </div>
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-1"
+                            style={{ background: `linear-gradient(90deg, transparent, ${theme.primaryHex}, transparent)` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[90px] h-5 bg-black/10 rounded-full blur-xl" />
+                    </div>
+
+                    {/* Theme Info */}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold block mb-1" style={{ color: theme.primaryHex }}>
+                        Tema Undangan
+                      </span>
+                      <h3 className="text-lg font-serif mb-3 text-foreground leading-tight">
+                        {theme.name}
+                      </h3>
+                      <div className="flex -space-x-1 mb-3">
+                        {[theme.primaryHex, theme.secondaryHex, theme.bgHex, theme.accentHex, theme.textHex].map((hex, ci) => (
+                          <div
+                            key={ci}
+                            className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: hex, zIndex: 5 - ci }}
+                          />
+                        ))}
+                      </div>
+                      <span className="inline-block text-[10px] uppercase tracking-widest font-medium px-3 py-1 rounded-full border border-border text-muted-foreground bg-secondary/50">
+                        {theme.pattern}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 flex items-end justify-center opacity-0 group-hover:opacity-100">
+                    <Link
+                      href={`/demo/${theme.id}`}
+                      className="mb-8 bg-white text-black px-6 py-3 text-xs tracking-widest uppercase font-bold rounded-full flex items-center gap-2 shadow-xl hover:bg-primary hover:text-primary-foreground transition-colors transform translate-y-4 group-hover:translate-y-0 duration-500"
+                    >
+                      Lihat Demo <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Theme name below card */}
+                <p className="mt-4 text-sm font-medium text-foreground">{theme.name}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-16">
+            <Link href="/preview" className="text-sm tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 justify-center">
+              Lihat Semua Desain <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

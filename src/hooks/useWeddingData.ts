@@ -630,10 +630,16 @@ export function useWeddingData(): UseWeddingDataReturn {
     const user = currentUserRef.current;
     if (!user) return;
 
-    // Cancel any pending auto-save for the old invitation
+    // Cancel any pending auto-save for the old invitation and force flush it
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = null;
+      const invId = invitationIdRef.current;
+      if (invId) {
+        console.log('[DEBUG] 📡 Flushing pending save before switching projects...', { invId });
+        api.updateInvitationData(invId, weddingDataRef.current, themeIdRef.current)
+          .catch(err => console.error('[DEBUG] ❌ Flush pending save FAILED:', err));
+      }
     }
 
     setIsLoading(true);

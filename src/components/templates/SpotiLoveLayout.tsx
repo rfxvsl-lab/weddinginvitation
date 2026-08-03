@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     PiPlayFill as Play,
     PiPauseFill as Pause,
@@ -19,6 +19,7 @@ import {
     PiHouseDuotone as HomeIcon
 } from 'react-icons/pi';
 import { Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
 
 /**
@@ -73,6 +74,40 @@ const GlobalStyles = () => (
     ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #888; }
   `}</style>
+);
+
+// --- ORNAMENTS & ANIMATIONS ---
+const SpotiFlower = ({ className, delay = 0 }: { className?: string, delay?: number }) => (
+    <motion.div 
+        initial={{ opacity: 0, scale: 0, rotate: -90 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ delay, type: 'spring', stiffness: 40, damping: 15, duration: 2.5 }}
+        className={`absolute pointer-events-none z-[1] ${className}`}
+    >
+        <motion.img 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+            src="/assets/spoti-flower.webp" 
+            className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] opacity-40"
+            alt="Flower Ornament"
+        />
+    </motion.div>
+);
+
+const SpotiLeaves = ({ className, delay = 0 }: { className?: string, delay?: number }) => (
+    <motion.div 
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, type: 'spring', stiffness: 50, damping: 15, duration: 2 }}
+        className={`absolute top-0 pointer-events-none z-0 ${className}`}
+        style={{ maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' }}
+    >
+        <img 
+            src="/assets/spoti-leaves.webp" 
+            className="w-full h-full object-cover object-top opacity-30 filter drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]"
+            alt="Leaves Ornament"
+        />
+    </motion.div>
 );
 
 // --- HELPERS ---
@@ -312,10 +347,13 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
                 </div>
 
                 {/* MOBILE MENU TOGGLE */}
-                <div className="sm:hidden relative">
+                <div className="sm:hidden relative z-[60]">
                     <button
-                        onClick={() => setShowMenu(!showMenu)}
-                        className={`p-2 rounded-full transition ${showMenu ? 'text-white bg-white/10' : 'text-[#B3B3B3]'}`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowMenu(!showMenu);
+                        }}
+                        className={`p-2 rounded-full transition cursor-pointer relative z-[70] ${showMenu ? 'text-white bg-white/10' : 'text-[#B3B3B3]'}`}
                     >
                         <LayoutList size={24} />
                     </button>
@@ -323,10 +361,10 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
                     {showMenu && (
                         <>
                             {/* Backdrop to close menu */}
-                            <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)}></div>
+                            <div className="fixed inset-0 z-[65] bg-black/50" onClick={() => setShowMenu(false)}></div>
 
                             {/* Menu Items */}
-                            <div className="absolute bottom-12 right-0 bg-[#282828] rounded-xl p-2 shadow-2xl w-48 border border-white/10 z-50 animate-fade-in-up">
+                            <div className="absolute bottom-12 right-0 bg-[#282828] rounded-xl p-2 shadow-2xl w-48 border border-white/10 z-[75] animate-fade-in-up">
                                 {menuItems.map((item) => (
                                     <button
                                         key={item.id}
@@ -359,8 +397,12 @@ const HomePage = ({ DATA }: { DATA: any }) => {
     const dateDisplay = !isNaN(dtObj.getTime()) ? dtObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : DATA.date;
 
     return (
-        <div className="page-enter pb-[120px]">
-            <div className="relative h-[400px] flex items-end p-6 md:p-8 bg-gradient-to-b from-[#535353] to-[#121212]">
+        <div className="page-enter pb-[120px] relative overflow-hidden">
+            <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full" delay={0.1} />
+            <SpotiFlower className="-top-20 -left-20 w-64 h-64" delay={0.3} />
+            <SpotiFlower className="top-80 -right-20 w-64 h-64" delay={0.5} />
+
+            <div className="relative h-[400px] flex items-end p-6 md:p-8 bg-gradient-to-b from-[#535353]/80 to-[#121212] z-10">
                 <div className="absolute inset-0 bg-black/20"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-end gap-6 w-full">
                     <div className="w-40 h-40 md:w-52 md:h-52 shadow-[0_4px_60px_rgba(0,0,0,0.5)] bg-gray-800">
@@ -430,8 +472,11 @@ const HomePage = ({ DATA }: { DATA: any }) => {
 };
 
 const EventPage = ({ data }: { data: WeddingData }) => (
-    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8">
-        <div className="flex items-center justify-between mb-6">
+    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8 relative overflow-hidden">
+        <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full" delay={0.1} />
+        <SpotiFlower className="bottom-0 -left-16 w-56 h-56 z-0" delay={0.3} />
+
+        <div className="flex items-center justify-between mb-6 relative z-10">
             <h2 className="text-2xl font-bold">On Tour (Events)</h2>
             <span className="text-xs font-bold text-[#B3B3B3] uppercase tracking-widest border border-[#B3B3B3] px-3 py-1 rounded-full">Live Dates</span>
         </div>
@@ -487,8 +532,10 @@ const EventPage = ({ data }: { data: WeddingData }) => (
 );
 
 const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: string }) => (
-    <div className="page-enter pb-[120px]">
-        <div className="h-[300px] bg-cover bg-center relative" style={{ backgroundImage: `url(${cover})` }}>
+    <div className="page-enter pb-[120px] relative overflow-hidden">
+        <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full z-0" delay={0.1} />
+        
+        <div className="h-[300px] bg-cover bg-center relative z-10" style={{ backgroundImage: `url(${cover})` }}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent"></div>
             <div className="absolute bottom-6 left-6 md:left-8">
                 <div className="flex items-center gap-2 mb-2">
@@ -500,8 +547,11 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
             </div>
         </div>
 
-        <div className="p-6 md:p-8">
-            <h2 className="text-xl font-bold mb-4">About</h2>
+        <div className="p-6 md:p-8 relative z-10">
+            <SpotiFlower className="top-0 -right-16 w-48 h-48" delay={0.3} />
+            <SpotiFlower className="bottom-0 -left-16 w-48 h-48" delay={0.5} />
+
+            <h2 className="text-xl font-bold mb-4 relative z-10">About</h2>
             <div className="bg-[#181818] rounded-lg p-6 relative overflow-hidden group cursor-pointer hover:bg-[#282828] transition">
                 <p className="text-white relative z-10 max-w-2xl leading-relaxed">
                     We met and it started with a shared playlist, and now we are sharing our lives together. Join us as we embark on our greatest tour yet: Marriage.
@@ -536,9 +586,12 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
 );
 
 const GiftPage = ({ data }: { data: WeddingData }) => (
-    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8">
-        <h2 className="text-2xl font-bold mb-6">Merch (Wedding Gift)</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8 relative overflow-hidden">
+        <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full z-0" delay={0.1} />
+        <SpotiFlower className="top-1/4 -right-20 w-64 h-64 z-0" delay={0.3} />
+
+        <h2 className="text-2xl font-bold mb-6 relative z-10">Merch (Wedding Gift)</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
             {data?.gifts && data.gifts.length > 0 ? (
                 data.gifts.map((gift, idx) => (
                     <div key={idx} className="bg-[#181818] p-4 rounded-lg group hover:bg-[#282828] transition">
@@ -567,10 +620,13 @@ const GiftPage = ({ data }: { data: WeddingData }) => (
 );
 
 const GalleryPage = ({ images }: { images: string[] }) => (
-    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8">
-        <h2 className="text-2xl font-bold mb-6">Discography</h2>
+    <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 md:pt-8 relative overflow-hidden">
+        <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full z-0" delay={0.1} />
+        <SpotiFlower className="-bottom-10 -left-10 w-56 h-56 z-0" delay={0.3} />
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <h2 className="text-2xl font-bold mb-6 relative z-10">Discography</h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 relative z-10">
             {images && images.length > 0 ? (
                 images.map((img, i) => (
                     <div key={i} className="bg-[#181818] p-4 rounded-md hover:bg-[#282828] transition group cursor-pointer">
@@ -627,8 +683,11 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
     };
 
     return (
-        <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 flex flex-col items-center">
-            <div className="w-full max-w-lg bg-[#181818] p-8 rounded-xl shadow-2xl border border-white/5">
+        <div className="page-enter p-6 md:p-8 pb-[120px] pt-20 flex flex-col items-center relative overflow-hidden">
+            <SpotiLeaves className="left-0 right-0 h-32 md:h-48 w-full z-0" delay={0.1} />
+            <SpotiFlower className="top-20 -right-16 w-56 h-56 z-0" delay={0.3} />
+
+            <div className="w-full max-w-lg bg-[#181818]/90 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-white/5 relative z-10">
                 <div className="text-center mb-8">
                     <h2 className="text-3xl font-black mb-2">Join The Fan Club</h2>
                     <p className="text-[#B3B3B3] text-sm">RSVP to get exclusive access to our wedding event.</p>

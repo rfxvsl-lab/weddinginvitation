@@ -86,7 +86,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
                 }}
                 className={`group/bento w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[13px] font-semibold border transition-all duration-200 ${
                   isActive
-                    ? 'bg-rose-50 text-rose-600 border-rose-200 shadow-md shadow-rose-100'
+                    ? 'bg-amber-100/50 text-amber-800 border-amber-200/50 shadow-md shadow-amber-900/5'
                     : 'text-zinc-500 border-transparent hover:bg-white hover:border-zinc-200 hover:shadow-lg hover:text-zinc-700'
                 }`}
               >
@@ -108,7 +108,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
         <div className="p-6 pt-2">
           <button
             onClick={onPublish}
-            className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 shadow-lg shadow-rose-900/20"
+            className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-amber-400 rounded-full text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 shadow-lg shadow-zinc-900/20 transition-all duration-300"
           >
             Publish Undangan
           </button>
@@ -136,7 +136,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
         </button>
         <button
           onClick={onLogout}
-          className="w-full py-2.5 text-xs font-bold uppercase tracking-widest border border-border text-foreground hover:bg-foreground hover:text-background rounded-xl transition-all duration-300"
+          className="w-full py-2.5 text-xs font-bold uppercase tracking-widest border border-border text-foreground hover:bg-zinc-900 hover:text-amber-400 rounded-full transition-all duration-300"
         >
           Keluar Akun
         </button>
@@ -150,7 +150,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetTrigger asChild>
           <button
-            className="fixed top-2 left-4 z-[200] p-2.5 rounded-xl bg-background border border-border shadow-sm text-foreground hover:bg-muted transition-colors flex items-center justify-center cursor-pointer"
+            className="fixed top-3 left-4 z-[200] p-3 rounded-full bg-white/80 backdrop-blur-xl border border-amber-900/10 shadow-[0_8px_20px_rgba(0,0,0,0.06)] text-zinc-800 hover:bg-amber-50 transition-colors flex items-center justify-center cursor-pointer"
             aria-label="Buka menu navigasi"
           >
             <IconMenu size={20} />

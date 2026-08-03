@@ -94,8 +94,8 @@ export default function AboutPage() {
           </div>
           <div className="relative aspect-[4/5] overflow-hidden">
             <img
-              src="https://lh3.googleusercontent.com/d/1XmXftFS3PWZm4YVU97dqrUq4tJ4P27KT"
-              alt="RuangHadir wedding"
+              src="/about-hero.png"
+              alt="RuangHadir creative workspace design"
               className="w-full h-full object-cover"
             />
           </div>

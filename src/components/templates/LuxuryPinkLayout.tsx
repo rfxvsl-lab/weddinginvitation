@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import {
     PiHeartDuotone as Heart,
     PiCalendarDuotone as Calendar,
@@ -47,10 +48,18 @@ const GlobalStyles = () => (
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        filter: blur(6px);
+        transform: scale(1.1);
+        opacity: 0.7; /* Blend slightly with the creamy theme background */
     }
 
     h1, h2, h3 { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Great Vibes', cursive; }
+
+    /* Custom Text Glow for legibility on any background */
+    .text-glow {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
 
     /* --- ENVELOPE ANIMATIONS (PURE CSS) --- */
     .envelope-wrapper {
@@ -80,7 +89,6 @@ const GlobalStyles = () => (
     
     .envelope.open .invitation-card {
       transform: translateY(-150px);
-      z-index: 50;
     }
 
     /* Container Fade Out */
@@ -142,9 +150,10 @@ interface EnvelopeProps {
     onOpen: () => void;
     groomName: string;
     brideName: string;
+    guestName: string;
 }
 
-const EnvelopeOverlay: React.FC<EnvelopeProps> = ({ onOpen, groomName, brideName }) => {
+const EnvelopeOverlay: React.FC<EnvelopeProps> = ({ onOpen, groomName, brideName, guestName }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = () => {
@@ -162,9 +171,9 @@ const EnvelopeOverlay: React.FC<EnvelopeProps> = ({ onOpen, groomName, brideName
 
                     {/* Invitation Card Inside */}
                     <div className="absolute top-2 left-2 right-2 h-[90%] bg-white rounded flex flex-col items-center justify-center p-4 shadow-md invitation-card z-10">
-                        <h2 className="font-script text-3xl text-rose-600">Undangkan Kita</h2>
-                        <p className="text-xs text-gray-500 mt-2 uppercase tracking-widest">Wedding Invitation</p>
-                        <Heart size={16} className="mt-4 text-rose-400" />
+                        <h2 className="font-script text-4xl text-rose-600 mb-1">{groomName} & {brideName}</h2>
+                        <p className="text-[10px] text-gray-500 mt-2 uppercase tracking-widest font-bold">Wedding Invitation</p>
+                        <Heart size={16} className="mt-4 text-rose-300" />
                     </div>
 
                     {/* Front Pockets (Left & Right) */}
@@ -176,23 +185,32 @@ const EnvelopeOverlay: React.FC<EnvelopeProps> = ({ onOpen, groomName, brideName
 
                     {/* Flap (Top) */}
                     <div className="absolute top-0 left-0 w-full h-1/2 bg-rose-800 z-30 flap flex items-center justify-center rounded-t-xl origin-top" style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}>
-                        {!isOpen && (
-                            <button onClick={handleOpen} className="absolute top-8 z-50 group">
-                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-rose-200 group-hover:scale-110 transition-transform">
-                                    <Heart size={32} className="text-rose-600" />
-                                </div>
-                                <span className="block text-center text-white text-xs font-bold mt-2 animate-pulse">BUKA</span>
-                            </button>
-                        )}
+                        <button 
+                            onClick={handleOpen} 
+                            disabled={isOpen}
+                            className={`absolute top-8 z-50 group flex flex-col items-center transition-opacity duration-500 ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                        >
+                            {/* Elegant Wax Seal */}
+                            <div className="relative w-14 h-14 flex items-center justify-center hover:scale-110 transition-transform">
+                                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-[0_4px_8px_rgba(159,18,57,0.5)] text-rose-600" fill="currentColor">
+                                    <path d="M50 5 C75 3 95 20 97 45 C99 70 80 95 50 97 C20 98 5 75 3 50 C1 20 20 7 50 5 Z" />
+                                    <path d="M50 12 C68 10 85 22 87 45 C89 68 72 85 50 87 C25 89 12 70 12 50 C12 25 25 15 50 12 Z" fill="#9f1239" />
+                                </svg>
+                                <svg viewBox="0 0 24 24" className="relative w-6 h-6 text-rose-200 opacity-90 drop-shadow-sm" fill="currentColor">
+                                    <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" />
+                                </svg>
+                            </div>
+                            <span className="block text-center text-white text-[9px] font-bold mt-3 tracking-[0.3em] animate-pulse">BUKA</span>
+                        </button>
                     </div>
 
                 </div>
             </div>
 
             {!isOpen && (
-                <div className="absolute bottom-20 text-center">
-                    <h1 className="font-script text-4xl text-rose-600 mb-2">{groomName} & {brideName}</h1>
-                    <p className="text-rose-800 text-sm tracking-widest">SPECIAL INVITATION</p>
+                <div className="absolute bottom-20 text-center px-4 w-full">
+                    <h1 className="font-script text-5xl text-rose-600 mb-2">{guestName}</h1>
+                    <p className="text-rose-800 text-sm tracking-widest mt-4">SPECIAL INVITATION</p>
                 </div>
             )}
         </div>
@@ -217,7 +235,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setTab, data }) => {
     ].filter(item => item.visible);
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-rose-100 z-40 px-2 py-3 pb-6 md:pb-3 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5, type: "spring", bounce: 0.3 }}
+            className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-rose-100 z-40 px-2 py-3 pb-6 md:pb-3 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]"
+        >
             <div className="max-w-md mx-auto flex justify-between items-center px-4">
                 {items.map((tab) => (
                     <button
@@ -230,6 +253,66 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setTab, data }) => {
                     </button>
                 ))}
             </div>
+        </motion.div>
+    );
+};
+
+// --- ORNAMEN BUNGA BERBELIT ---
+const CreamyVineOrnament = ({ variant = 'A', className = "", size = "w-56 h-56" }: { variant?: 'A' | 'B' | 'C', className?: string, size?: string }) => {
+    // 3 model bunga berbelit yang sangat panjang (viewbox 200x200)
+    const paths = {
+        A: [
+            "M 10,190 C 10,120 40,90 60,60 C 80,30 140,20 190,10", 
+            "M 30,200 C 20,130 50,100 70,70 C 90,40 150,30 200,30"
+        ],
+        B: [
+            "M 190,10 C 190,80 160,110 140,140 C 120,170 60,180 10,190", 
+            "M 170,0 C 180,70 150,100 130,130 C 110,160 50,170 0,170"
+        ],
+        C: [
+            "M 10,10 C 10,80 40,110 60,140 C 80,170 140,180 190,190", 
+            "M 30,0 C 20,70 50,100 70,130 C 90,160 150,170 200,170"
+        ]
+    };
+    
+    const center = { A: { x: 60, y: 60 }, B: { x: 140, y: 140 }, C: { x: 60, y: 140 } };
+    const c = center[variant];
+
+    return (
+        <div className={`absolute pointer-events-none z-20 overflow-visible ${size} ${className}`}>
+            <motion.svg viewBox="0 0 200 200" className="w-full h-full overflow-visible" fill="none">
+                {/* Tangkai Berbelit Panjang */}
+                <motion.path 
+                    d={paths[variant][0]} stroke="#fecdd3" strokeWidth="6" strokeLinecap="round" fill="none"
+                    initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeOut" }} 
+                />
+                <motion.path 
+                    d={paths[variant][1]} stroke="#fda4af" strokeWidth="3" strokeLinecap="round" fill="none"
+                    initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 2, delay: 0.3, ease: "easeOut" }} 
+                />
+                
+                {/* Bunga Mekar Nutup (Skala Diperbesar) */}
+                <motion.g 
+                    initial={{ scale: 0, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ delay: 1, duration: 0.8 }}
+                    style={{ transformOrigin: `${c.x}px ${c.y}px` }}
+                >
+                    <motion.g animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Kelopak Luar */}
+                        <path d={`M ${c.x},${c.y} m -18,-18 c 22,-22 45,0 18,18 c 22,22 0,45 -18,18 c -22,22 -45,0 -18,-18 c -22,-22 0,-45 18,-18 z`} fill="#fb7185" opacity="0.85" />
+                        {/* Kelopak Dalam */}
+                        <path d={`M ${c.x},${c.y} m -12,-12 c 15,-15 30,0 12,12 c 15,15 0,30 -12,12 c -15,15 -30,0 -12,-12 c -15,-15 0,-30 12,-12 z`} fill="#f43f5e" />
+                        {/* Inti */}
+                        <circle cx={c.x} cy={c.y} r="5" fill="#ffe4e6" />
+                    </motion.g>
+                </motion.g>
+                
+                {/* Daun Kecil */}
+                <motion.path 
+                    d={`M ${c.x+20},${c.y-15} Q ${c.x+35},${c.y-40} ${c.x+50},${c.y-25} Q ${c.x+35},${c.y-10} ${c.x+20},${c.y-15} Z`} 
+                    fill="#fecdd3"
+                    initial={{ scale: 0 }} whileInView={{ scale: 1 }} transition={{ delay: 1.5 }} style={{ transformOrigin: `${c.x+20}px ${c.y-15}px` }}
+                />
+            </motion.svg>
         </div>
     );
 };
@@ -278,65 +361,128 @@ const HomePage = ({ data, guestName }: { data: WeddingData, guestName: string })
     const dateStr = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
     return (
-        <div className="text-center pt-10 pb-24 px-6 page-enter">
-            <div className="mb-6 animate-bounce text-rose-500 flex justify-center"><ChevronDown /></div>
-            <h3 className="text-rose-800 tracking-[0.2em] text-sm uppercase mb-4">The Wedding Of</h3>
-            <h1 className="font-script text-7xl text-rose-600 mb-2 leading-tight">{data?.couple?.groom?.nickname} & {data?.couple?.bride?.nickname}</h1>
-            <p className="text-gray-500 italic mb-8">{dateStr}</p>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center pt-10 pb-24 px-6"
+        >
+            <motion.div 
+                initial={{ opacity: 0, scale: 0 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                transition={{ type: "spring", bounce: 0.5 }}
+                className="mb-6 animate-bounce text-rose-500 flex justify-center"
+            >
+                <ChevronDown />
+            </motion.div>
+            
+            <motion.h3 
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                className="text-rose-900 font-bold tracking-[0.2em] text-sm uppercase mb-4 text-glow"
+            >
+                The Wedding Of
+            </motion.h3>
+            
+            <motion.h1 
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
+                className="font-script text-7xl text-rose-600 mb-2 leading-tight text-glow"
+            >
+                {data?.couple?.groom?.nickname} & {data?.couple?.bride?.nickname}
+            </motion.h1>
+            
+            <motion.p 
+                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.4 }}
+                className="text-rose-950 font-bold italic mb-8 text-glow"
+            >
+                {dateStr}
+            </motion.p>
 
-            <div className="my-10">
-                <div className="w-48 h-64 mx-auto rounded-t-full border-4 border-rose-200 p-2 overflow-hidden shadow-xl bg-white">
+            <motion.div 
+                initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                className="my-10 relative mx-auto w-max !overflow-visible"
+            >
+                <CreamyVineOrnament variant="C" className="-bottom-8 -left-12" />
+                <CreamyVineOrnament variant="B" className="-bottom-8 -right-12" />
+                <div className="w-48 h-64 mx-auto rounded-t-full border-4 border-rose-200 p-2 overflow-hidden shadow-xl bg-white relative z-10">
                     <img src={getImageUrl(data?.bgImageUrl || data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80")} alt="Couple" className="w-full h-full object-cover rounded-t-full hover:scale-110 transition-transform duration-700" />
                 </div>
-            </div>
+            </motion.div>
 
-            <Countdown targetDate={data?.events?.akad?.date || data?.countdownDate || ''} />
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+                <Countdown targetDate={data?.events?.akad?.date || data?.countdownDate || ''} />
+            </motion.div>
 
-            <div className="text-center mt-8">
-                <p className="font-body text-xs uppercase tracking-widest text-[#888] mb-2">Kepada Yth,</p>
+            <motion.div 
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="text-center mt-8"
+            >
+                <p className="font-body text-xs font-bold uppercase tracking-widest text-rose-950 mb-2 text-glow">Kepada Yth,</p>
                 <div className="inline-block bg-rose-50 px-6 py-2 rounded-full border border-rose-100">
                     <p className="font-bold text-rose-700 text-lg">{guestName}</p>
                 </div>
-            </div>
+            </motion.div>
 
             {data?.quoteText && (
-                <div className="glass-panel p-8 rounded-2xl mx-auto max-w-sm mt-12 relative overflow-hidden">
+                <motion.div 
+                    initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                    className="glass-panel p-8 rounded-2xl mx-auto max-w-sm mt-12 relative overflow-hidden"
+                >
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-200 via-rose-500 to-rose-200"></div>
                     <p className="font-serif text-lg leading-relaxed text-gray-700 italic">
                         "{data?.quoteText}"
                     </p>
                     <p className="mt-4 text-xs font-bold text-rose-600 uppercase tracking-widest">{data?.quoteSource}</p>
-                </div>
+                </motion.div>
             )}
-        </div>
+        </motion.div>
     );
 };
 
 const CouplePage = ({ data }: { data: WeddingData }) => {
     return (
-        <div className="pt-10 pb-24 px-6 text-center page-enter">
-            <h2 className="font-script text-5xl text-rose-600 mb-12">Mempelai</h2>
+        <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="pt-10 pb-24 px-6 text-center"
+        >
+            <motion.h2 
+                initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }}
+                className="font-script text-5xl text-rose-600 mb-12 text-glow"
+            >
+                Mempelai
+            </motion.h2>
 
             {/* Groom */}
-            <div className="glass-panel p-6 rounded-2xl mb-8 transform hover:scale-[1.02] transition-transform">
-                <div className="w-32 h-32 mx-auto rounded-full border-4 border-rose-100 overflow-hidden mb-4 shadow-md">
+            <motion.div 
+                initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
+                className="glass-panel relative !overflow-visible p-6 rounded-2xl mb-8 transform hover:scale-[1.02] transition-transform"
+            >
+                <CreamyVineOrnament variant="A" className="-top-10 -left-10" />
+                <div className="w-32 h-32 mx-auto rounded-full border-4 border-rose-100 overflow-hidden mb-4 shadow-md relative z-10">
                     <img src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800">{data?.couple?.groom?.fullName}</h3>
                 <p className="text-rose-600 text-sm font-semibold mt-1">Putra dari Bpk. {data?.couple?.groom?.fatherName} & Ibu {data?.couple?.groom?.motherName}</p>
-            </div>
+            </motion.div>
 
-            <div className="font-script text-4xl text-rose-400 my-8">&</div>
+            <motion.div 
+                initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }}
+                className="font-script text-4xl text-rose-400 my-8 text-glow"
+            >
+                &
+            </motion.div>
 
             {/* Bride */}
-            <div className="glass-panel p-6 rounded-2xl transform hover:scale-[1.02] transition-transform">
-                <div className="w-32 h-32 mx-auto rounded-full border-4 border-rose-100 overflow-hidden mb-4 shadow-md">
+            <motion.div 
+                initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
+                className="glass-panel relative !overflow-visible p-6 rounded-2xl transform hover:scale-[1.02] transition-transform"
+            >
+                <CreamyVineOrnament variant="B" className="-bottom-10 -right-10" />
+                <div className="w-32 h-32 mx-auto rounded-full border-4 border-rose-100 overflow-hidden mb-4 shadow-md relative z-10">
                     <img src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800">{data?.couple?.bride?.fullName}</h3>
                 <p className="text-rose-600 text-sm font-semibold mt-1">Putri dari Bpk. {data?.couple?.bride?.fatherName} & Ibu {data?.couple?.bride?.motherName}</p>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
 
@@ -349,18 +495,30 @@ const EventPage = ({ data }: { data: WeddingData }) => {
     };
 
     return (
-        <div className="pt-10 pb-24 px-6 text-center page-enter">
-            <h2 className="font-script text-5xl text-rose-600 mb-12">Rangkaian Acara</h2>
+        <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="pt-10 pb-24 px-6 text-center"
+        >
+            <motion.h2 
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                className="font-script text-5xl text-rose-600 mb-12 text-glow"
+            >
+                Rangkaian Acara
+            </motion.h2>
 
             <div className="relative border-l-2 border-rose-200 ml-4 md:ml-auto md:mr-auto md:w-full md:max-w-md space-y-12">
 
                 {/* Akad */}
                 {data?.events?.akad?.enabled !== false && (
-                    <div className="relative pl-8 text-left">
-                        <div className="absolute -left-[9px] top-0 w-4 h-4 bg-rose-600 rounded-full border-4 border-white shadow"></div>
-                        <h3 className="text-2xl font-serif text-gray-800 mb-2">{data?.events?.akad?.name || 'Akad Nikah'}</h3>
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-rose-50">
-                            <div className="flex items-center gap-3 text-gray-600 mb-2">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
+                        className="relative pl-8 text-left"
+                    >
+                        <div className="absolute -left-[9px] top-6 w-4 h-4 bg-rose-600 rounded-full border-4 border-white shadow z-10"></div>
+                        <div className="bg-white relative !overflow-visible p-6 rounded-xl shadow-sm border border-rose-50">
+                            <CreamyVineOrnament variant="C" className="-bottom-10 -left-10" />
+                            <h3 className="text-2xl font-serif text-gray-800 mb-4 border-b border-rose-100 pb-2 relative z-10">{data?.events?.akad?.name || 'Akad Nikah'}</h3>
+                            <div className="flex items-center gap-3 text-gray-600 mb-2 relative z-10">
                                 <Calendar size={18} className="text-rose-500" /> <span>{formatDate(data?.events?.akad?.date || '')}</span>
                             </div>
                             <div className="flex items-center gap-3 text-gray-600 mb-2">
@@ -370,16 +528,20 @@ const EventPage = ({ data }: { data: WeddingData }) => {
                             <p className="text-xs text-gray-500 mt-1">{data?.events?.akad?.address}</p>
                             {data?.events?.akad?.googleMapsUrl && <a href={data?.events?.akad?.googleMapsUrl} target="_blank" rel="noreferrer" className="text-xs text-rose-600 mt-2 block hover:underline">Lihat Lokasi</a>}
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Resepsi */}
                 {data?.events?.resepsi?.enabled !== false && (
-                    <div className="relative pl-8 text-left">
-                        <div className="absolute -left-[9px] top-0 w-4 h-4 bg-rose-600 rounded-full border-4 border-white shadow"></div>
-                        <h3 className="text-2xl font-serif text-gray-800 mb-2">{data?.events?.resepsi?.name || 'Resepsi'}</h3>
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-rose-50">
-                            <div className="flex items-center gap-3 text-gray-600 mb-2">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+                        className="relative pl-8 text-left"
+                    >
+                        <div className="absolute -left-[9px] top-6 w-4 h-4 bg-rose-600 rounded-full border-4 border-white shadow z-10"></div>
+                        <div className="bg-white relative !overflow-visible p-6 rounded-xl shadow-sm border border-rose-50">
+                            <CreamyVineOrnament variant="A" className="-top-12 -left-10" />
+                            <h3 className="text-2xl font-serif text-gray-800 mb-4 border-b border-rose-100 pb-2 relative z-10">{data?.events?.resepsi?.name || 'Resepsi'}</h3>
+                            <div className="flex items-center gap-3 text-gray-600 mb-2 relative z-10">
                                 <Calendar size={18} className="text-rose-500" /> <span>{formatDate(data?.events?.resepsi?.date || '')}</span>
                             </div>
                             <div className="flex items-center gap-3 text-gray-600 mb-2">
@@ -389,40 +551,59 @@ const EventPage = ({ data }: { data: WeddingData }) => {
                             <p className="text-xs text-gray-500 mt-1">{data?.events?.resepsi?.address}</p>
                             {data?.events?.resepsi?.googleMapsUrl && <a href={data?.events?.resepsi?.googleMapsUrl} target="_blank" rel="noreferrer" className="text-xs text-rose-600 mt-2 block hover:underline">Lihat Lokasi</a>}
                         </div>
-                    </div>
+                    </motion.div>
                 )}
             </div>
 
             {(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) && (
-                <a href={(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) as string} target="_blank" rel="noreferrer" className="mt-12 bg-rose-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-rose-600/30 hover:bg-rose-700 transition-colors flex items-center justify-center gap-2 mx-auto w-full max-w-xs">
+                <motion.a 
+                    initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                    href={(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) as string} target="_blank" rel="noreferrer" 
+                    className="mt-12 bg-rose-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-rose-600/30 hover:bg-rose-700 transition-colors flex items-center justify-center gap-2 mx-auto w-full max-w-xs"
+                >
                     <MapPin size={18} /> Lihat Lokasi (Maps)
-                </a>
+                </motion.a>
             )}
-        </div>
+        </motion.div>
     );
 };
 
 const GalleryPage = ({ data }: { data: WeddingData }) => (
-    <div className="pt-10 pb-24 px-4 page-enter">
-        <h2 className="font-script text-5xl text-rose-600 mb-8 text-center">Galeri Foto</h2>
+    <motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        className="pt-10 pb-24 px-4 relative !overflow-visible"
+    >
+        {/* Section Ornaments (bukan di foto) */}
+        <CreamyVineOrnament variant="A" className="-top-4 -left-12 opacity-75" size="w-48 h-48" />
+        <CreamyVineOrnament variant="B" className="top-1/3 -right-16 opacity-50" size="w-64 h-64" />
 
-        <div className="columns-2 md:columns-3 gap-4 space-y-4">
+        <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+            className="font-script text-5xl text-rose-600 mb-8 text-center text-glow relative z-10"
+        >
+            Galeri Foto
+        </motion.h2>
+
+        <div className="columns-2 md:columns-3 gap-4 space-y-4 relative z-10">
             {data?.gallery && data.gallery.length > 0 ? (
                 data.gallery.map((img, i) => (
-                    <div key={i} className="break-inside-avoid rounded-xl overflow-hidden shadow-md group relative">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
+                        key={i} className="break-inside-avoid rounded-xl overflow-hidden shadow-md group relative"
+                    >
                         <img
                             src={getImageUrl(img) || `https://source.unsplash.com/random/600x${i % 2 === 0 ? '800' : '600'}?wedding,love&sig=${i}`}
                             alt="Gallery"
                             className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-rose-900/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
+                    </motion.div>
                 ))
             ) : (
                 <p className="text-center text-gray-500 col-span-2">Belum ada foto galeri.</p>
             )}
         </div>
-    </div>
+    </motion.div>
 );
 
 const GiftPage = ({ data }: { data: WeddingData }) => {
@@ -435,13 +616,29 @@ const GiftPage = ({ data }: { data: WeddingData }) => {
     };
 
     return (
-        <div className="pt-10 pb-24 px-6 page-enter max-w-lg mx-auto">
-            <h2 className="font-script text-5xl text-rose-600 mb-4 text-center">Kado Digital</h2>
-            <p className="text-center text-gray-500 mb-8 text-sm">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara cashless.</p>
+        <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="pt-10 pb-24 px-6 max-w-lg mx-auto"
+        >
+            <motion.h2 
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                className="font-script text-5xl text-rose-600 mb-4 text-center text-glow"
+            >
+                Kado Digital
+            </motion.h2>
+            <motion.p 
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                className="text-center text-rose-950 font-bold mb-8 text-sm text-glow"
+            >
+                Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara cashless.
+            </motion.p>
 
             <div className="space-y-6">
                 {data?.gifts?.map((gift, i) => (
-                    <div key={i} className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+                        key={i} className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden"
+                    >
                         <div className="absolute top-0 right-0 p-4 opacity-20"><CreditCard size={64} /></div>
                         <div className="flex justify-between items-start mb-8">
                             <span className="font-bold tracking-widest">{gift.type === 'address' ? 'ALAMAT' : 'DEBIT CARD'}</span>
@@ -470,12 +667,12 @@ const GiftPage = ({ data }: { data: WeddingData }) => {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
 
             {(!data?.gifts || data.gifts.length === 0) && <p className="text-center text-gray-400 italic">Tidak ada informasi rekening.</p>}
-        </div>
+        </motion.div>
     );
 };
 
@@ -515,18 +712,34 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
     };
 
     return (
-        <div className="pt-10 pb-24 px-6 page-enter max-w-lg mx-auto text-center">
-            <h2 className="font-script text-5xl text-rose-600 mb-8">R.S.V.P</h2>
-            <div className="glass-panel p-8 rounded-2xl shadow-lg border-t-4 border-rose-500">
-                <p className="text-gray-600 mb-6 text-sm">Mohon konfirmasi kehadiran Anda.</p>
+        <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="pt-10 pb-24 px-6 max-w-lg mx-auto text-center"
+        >
+            <motion.h2 
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                className="font-script text-5xl text-rose-600 mb-8 text-glow"
+            >
+                R.S.V.P
+            </motion.h2>
+            <motion.div 
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+                className="glass-panel relative !overflow-visible p-8 rounded-2xl shadow-lg border-t-4 border-rose-500"
+            >
+                <CreamyVineOrnament variant="B" className="-bottom-8 -right-8" />
+                <div className="relative z-10">
+                    <p className="text-gray-600 mb-6 text-sm">Mohon konfirmasi kehadiran Anda.</p>
                 
                 {rsvpSuccess ? (
-                    <div className="text-center py-8">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                        className="text-center py-8"
+                    >
                         <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Heart className="w-8 h-8 text-rose-600" />
                         </div>
                         <p className="font-serif text-xl text-rose-800">Terima kasih atas konfirmasi Anda.</p>
-                    </div>
+                    </motion.div>
                 ) : (
                     <form onSubmit={handleRSVPSubmit} className="space-y-4 text-left">
                         <div>
@@ -537,7 +750,7 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 value={rsvpGuestName}
                                 onChange={(e) => setRsvpGuestName(e.target.value)}
                                 disabled={!!guest}
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-sm"
+                                className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-base md:text-sm"
                                 placeholder="Masukkan nama"
                             />
                         </div>
@@ -547,7 +760,7 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 <select
                                     value={rsvpStatus}
                                     onChange={(e) => setRsvpStatus(e.target.value as any)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-sm"
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-base md:text-sm"
                                 >
                                     <option value="Hadir">Hadir</option>
                                     <option value="Tidak Hadir">Tidak Hadir</option>
@@ -562,7 +775,7 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                     max={guest ? guest.paxLimit : 10}
                                     value={rsvpPaxCount}
                                     onChange={(e) => setRsvpPaxCount(Number(e.target.value))}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-sm"
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-base md:text-sm"
                                 />
                             </div>
                         </div>
@@ -573,7 +786,7 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 value={rsvpWishes}
                                 onChange={(e) => setRsvpWishes(e.target.value)}
                                 rows={3}
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-sm resize-none"
+                                className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-base md:text-sm resize-none"
                                 placeholder="Tuliskan pesan Anda..."
                             />
                         </div>
@@ -585,13 +798,17 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                         </button>
                     </form>
                 )}
-            </div>
+                </div>
+            </motion.div>
 
             {/* List of RSVPs */}
             {rsvps && rsvps.length > 0 && (
                 <div className="mt-8 text-left space-y-3 max-h-64 overflow-y-auto pr-2">
                     {rsvps.map((rsvp, idx) => (
-                        <div key={idx} className="bg-white/80 p-4 rounded-xl shadow-sm border border-rose-100">
+                        <motion.div 
+                            initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: (idx % 5) * 0.1 }}
+                            key={idx} className="bg-white/80 p-4 rounded-xl shadow-sm border border-rose-100"
+                        >
                             <div className="flex justify-between items-start mb-2">
                                 <span className="font-bold text-gray-800 font-serif">{rsvp.guestName}</span>
                                 <span className={`text-[9px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-bold ${rsvp.status === 'Hadir' ? 'border-green-200 text-green-600 bg-green-50' : rsvp.status === 'Tidak Hadir' ? 'border-red-200 text-red-600 bg-red-50' : 'border-yellow-200 text-yellow-600 bg-yellow-50'}`}>
@@ -599,11 +816,11 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 </span>
                             </div>
                             <p className="text-xs text-gray-600">"{rsvp.wishes}"</p>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 }
 
@@ -656,7 +873,7 @@ const LuxuryPinkLayout: React.FC<LuxuryPinkProps> = ({ data, guest, onAddRSVP, r
     };
 
     return (
-        <div className="min-h-screen relative">
+        <div className="min-h-screen w-full relative overflow-x-hidden">
             <GlobalStyles />
 
             {/* Background Music */}
@@ -677,20 +894,26 @@ const LuxuryPinkLayout: React.FC<LuxuryPinkProps> = ({ data, guest, onAddRSVP, r
                     onOpen={startExperience}
                     groomName={data?.couple?.groom?.nickname || 'Groom'}
                     brideName={data?.couple?.bride?.nickname || 'Bride'}
+                    guestName={guestName}
                 />
             )}
 
             {/* Main Content Area */}
             {isOpened && (
                 <>
-                    <main className="w-full max-w-2xl mx-auto min-h-screen relative z-10 pb-20">
+                    <motion.main 
+                        initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        className="w-full max-w-2xl mx-auto min-h-screen relative z-10 pb-20"
+                    >
                         {activeTab === 'home' && <HomePage data={data} guestName={guestName} />}
                         {activeTab === 'couple' && <CouplePage data={data} />}
                         {activeTab === 'event' && <EventPage data={data} />}
                         {activeTab === 'gallery' && <GalleryPage data={data} />}
                         {activeTab === 'gift' && <GiftPage data={data} />}
                         {activeTab === 'rsvp' && <RSVPPage data={data} guest={guest} onAddRSVP={onAddRSVP} rsvps={rsvps} />}
-                    </main>
+                    </motion.main>
 
                     {/* Floating Controls */}
                     <Navbar activeTab={activeTab} setTab={setActiveTab} data={data} />

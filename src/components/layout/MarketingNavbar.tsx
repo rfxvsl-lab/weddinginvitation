@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
@@ -8,6 +8,7 @@ import Link from "next/link";
 
 const NAV_LINKS = [
   { label: "Fitur", href: "/#features" },
+  { label: "Preview", href: "/preview" },
   { label: "Galeri", href: "/#gallery" },
   { label: "Testimoni", href: "/#testimonials" },
   { label: "Harga", href: "/#pricing" },
@@ -15,11 +16,18 @@ const NAV_LINKS = [
 
 export const MarketingNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 mix-blend-difference text-white px-6 py-6 transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-lg text-white py-4 shadow-xl border-b border-white/10' : 'mix-blend-difference text-white py-6'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Logo isLink className="brightness-0 invert hover:scale-105" />
 
           <nav className="hidden md:flex items-center gap-10">

@@ -344,15 +344,20 @@ export async function createInvitation(
   weddingData: WeddingData
 ): Promise<string> {
   const id = genId('inv');
+  // Generate a fallback unique slug for the new invitation
+  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  const fallbackSlug = `inv-${id.substring(0, 4)}-${randomSuffix}`;
+
   await dbExecute(
-    `INSERT INTO invitations (id, user_id, title, theme_id, wedding_data)
-     VALUES (:id, :userId, :title, :themeId, :data)`,
+    `INSERT INTO invitations (id, user_id, title, theme_id, wedding_data, slug)
+     VALUES (:id, :userId, :title, :themeId, :data, :slug)`,
     {
       id,
       userId,
       title,
       themeId,
       data: JSON.stringify(weddingData),
+      slug: fallbackSlug,
     }
   );
   return id;

@@ -5,7 +5,6 @@ import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
 import { AlertModalProvider } from '../hooks/useAlertModal';
 import '../index.css';
-import GodMode from '../components/GodMode';
 import { Toaster } from "../components/ui/toaster";
 
 const dmSerif = DM_Serif_Display({
@@ -63,7 +62,6 @@ export default function RootLayout({
         >
           <ToastProvider>
             <AlertModalProvider>
-              <GodMode />
               <AuthProvider>
                 {children}
               </AuthProvider>

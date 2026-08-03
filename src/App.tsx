@@ -94,32 +94,6 @@ export default function App() {
     };
   }, []);
   
-  // SLUG-BASED ROUTING FOR GUEST VIEW
-  const [isInvitationView, setIsInvitationView] = useState(false);
-  const [urlGuest, setUrlGuest] = useState(undefined);
-
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path.length > 1 && path !== '/dashboard' && path !== '/admin') {
-      setIsInvitationView(true);
-      wedding.loadPublicInvitation(path.substring(1)).catch(() => setIsInvitationView(false));
-    }
-  }, []);
-
-  if (isInvitationView) {
-    return (
-      <div className="w-full h-screen">
-        <InvitationPreview 
-          data={wedding.weddingData} 
-          themeId={wedding.themeId} 
-          onAddRSVP={wedding.addRSVP}
-          rsvps={wedding.rsvps}
-          guest={urlGuest}
-        />
-      </div>
-    );
-  }
-
   if (!auth.currentUser) {
     return (
       <AuthGate onLoginSuccess={(user) => {
@@ -139,8 +113,41 @@ export default function App() {
     );
   }
 
+  // Menghitung timer secara global (Account-level) berdasarkan seluruh project
+  const getAccountTimer = () => {
+    if (!wedding.allInvitations || wedding.allInvitations.length === 0) {
+      return { activatedAt: wedding.invitation?.activatedAt, expiresAt: wedding.invitation?.expiresAt };
+    }
+    
+    // Cari yang sudah aktif
+    const activeInvs = wedding.allInvitations.filter(inv => inv.activatedAt);
+    
+    if (activeInvs.length === 0) {
+      return { activatedAt: wedding.invitation?.activatedAt, expiresAt: wedding.invitation?.expiresAt };
+    }
+    
+    // Gunakan project yang paling pertama diaktifkan sebagai sumber kebenaran (Source of Truth)
+    // untuk timer Akun. Ini mencegah progress bar dan waktu out-of-sync jika project baru mendapat +90 hari.
+    const earliestActivated = activeInvs.reduce((earliest, inv) => {
+      if (!earliest.activatedAt || !inv.activatedAt) return earliest;
+      return new Date(inv.activatedAt) < new Date(earliest.activatedAt) ? inv : earliest;
+    }, activeInvs[0]);
+    
+    // Jika ada perpanjangan masa aktif (extend), kita bisa cek expiresAt terlama
+    // Tapi kita harus pastikan activatedAt-nya menyesuaikan durasi paket aslinya (agar progress bar proporsional)
+    // Untuk saat ini yang paling aman & akurat adalah menggunakan sepasang tanggal dari project utama:
+    return { activatedAt: earliestActivated.activatedAt, expiresAt: earliestActivated.expiresAt };
+  };
+
+  const accountTimer = getAccountTimer();
+
   return (
-    <div className="flex h-screen w-full bg-zinc-50 overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-[#FAFAFA] relative overflow-hidden font-sans">
+      {/* Premium Glassmorphic Canvas Elements (Improvisasi UI) */}
+      <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[50%] bg-amber-200/60 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[55%] h-[55%] bg-zinc-300/70 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[20%] right-[15%] w-[40%] h-[40%] bg-amber-100/70 rounded-full blur-[90px] pointer-events-none" />
+
 
       {/* Loading OVERLAY — sits on top, does NOT unmount the dashboard underneath */}
       {wedding.isLoading && (
@@ -161,8 +168,8 @@ export default function App() {
           user={auth.currentUser}
           onLogout={auth.logout}
           onPublish={() => setShowPublishModal(true)}
-          activatedAt={wedding.invitation?.activatedAt}
-          expiresAt={wedding.invitation?.expiresAt}
+          activatedAt={accountTimer.activatedAt}
+          expiresAt={accountTimer.expiresAt}
           currentInvitationId={wedding.invitation?.id}
           allInvitations={wedding.allInvitations}
           onSwitchInvitation={wedding.switchInvitation}
@@ -173,18 +180,18 @@ export default function App() {
 
       {/* MIDDLE PANEL - EDITOR/CONTENT */}
       {!isPreviewGuestMode && (
-        <div className="flex-1 flex flex-col bg-white overflow-hidden relative border-r border-zinc-200">
+        <div className="flex-1 flex flex-col bg-white/60 backdrop-blur-3xl overflow-hidden relative border-r border-amber-900/5 shadow-[20px_0_40px_-15px_rgba(0,0,0,0.03)] z-10 rounded-l-[2.5rem] ml-1 my-1">
           
           {/* Header Top Bar */}
-          <header className="h-16 border-b border-zinc-200/60 bg-white/80 backdrop-blur-xl flex items-center pl-16 pr-6 shrink-0 z-20">
+          <header className="h-16 border-b border-amber-900/5 bg-white/40 backdrop-blur-xl flex items-center pl-10 pr-6 shrink-0 z-20">
             {(() => {
               const segments: Record<string, { title: string; sub: string; icon: React.ElementType; color: string; bg: string }> = {
-                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, color: 'text-rose-600', bg: 'bg-rose-100' },
-                design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, color: 'text-violet-600', bg: 'bg-violet-100' },
-                guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, color: 'text-sky-600', bg: 'bg-sky-100' },
-                analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-                profile: { title: 'Profil Anda', sub: 'Akun & pengaturan', icon: UserCircle, color: 'text-amber-600', bg: 'bg-amber-100' },
-                upgrade: { title: 'Upgrade Akun', sub: 'Tingkatkan paket Anda', icon: Crown, color: 'text-rose-600', bg: 'bg-rose-100' },
+                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, color: 'text-zinc-800', bg: 'bg-amber-100/50 border border-amber-200/50' },
+                design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, color: 'text-zinc-800', bg: 'bg-orange-100/50 border border-orange-200/50' },
+                guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, color: 'text-zinc-800', bg: 'bg-yellow-100/50 border border-yellow-200/50' },
+                analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, color: 'text-zinc-800', bg: 'bg-lime-100/50 border border-lime-200/50' },
+                profile: { title: 'Profil Anda', sub: 'Akun & pengaturan', icon: UserCircle, color: 'text-zinc-800', bg: 'bg-amber-100/50 border border-amber-200/50' },
+                upgrade: { title: 'Upgrade Akun', sub: 'Tingkatkan paket Anda', icon: Crown, color: 'text-amber-700', bg: 'bg-amber-200/60 border border-amber-300/60' },
               };
               const seg = segments[activeSegment] || segments.settings;
               const Icon = seg.icon;
@@ -205,7 +212,7 @@ export default function App() {
           {/* Area Konten Panel Tengah */}
           <div className="flex-1 overflow-hidden relative">
             {activeSegment === 'settings' && (
-              <div className="h-full overflow-y-auto bg-rose-50/20 p-6 md:p-8">
+              <div className="h-full overflow-y-auto bg-transparent p-6 md:p-8">
                 <ThemeSelector 
                   currentThemeId={wedding.themeId} 
                   onSelectTheme={(id) => {
@@ -228,8 +235,8 @@ export default function App() {
                   onAddGuest={wedding.addGuest}
                   onRemoveGuest={wedding.removeGuest}
                   onUpdateGuestStatus={wedding.updateGuestStatus}
-                  appUrl="https://ruanghadir.net"
-                  slug={auth.currentUser?.activeSlug || 'demo'}
+                  appUrl={process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://ruanghadir.net')}
+                  slug={wedding.invitation?.slug || auth.currentUser?.activeSlug || 'demo'}
                   coupleNames={wedding.weddingData.couple.bride.nickname + ' & ' + wedding.weddingData.couple.groom.nickname}
                 />
               </div>
@@ -246,7 +253,7 @@ export default function App() {
               </div>
             )}
             {activeSegment === 'profile' && (
-              <ProfilePanel />
+              <ProfilePanel wedding={wedding} />
             )}
             {activeSegment === 'upgrade' && (
               <div className="h-full overflow-y-auto">
@@ -264,14 +271,19 @@ export default function App() {
       )}
 
       {/* RIGHT PANEL - LIVE PREVIEW */}
-      <div className={`${isPreviewGuestMode ? 'w-full flex' : 'hidden md:flex w-[400px] xl:w-[450px] shrink-0'} bg-zinc-100 flex-col relative`}>
+      <div className={`${isPreviewGuestMode ? 'w-full flex' : 'hidden md:flex w-[400px] xl:w-[450px] shrink-0'} bg-transparent flex-col relative my-1 mr-1 rounded-r-[2.5rem] overflow-hidden`}>
         
         {/* Header Preview */}
-        <div className="p-4 bg-white border-b border-zinc-200 flex justify-between items-center z-10 shadow-sm">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-800">
-            {isPreviewGuestMode ? 'Mode Layar Penuh' : 'Live Preview'}
-          </h3>
-          <div className="flex items-center gap-2">
+        <div className="p-4 bg-white/40 backdrop-blur-xl border-b border-amber-900/5 flex justify-between items-start z-10">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-800">
+              {isPreviewGuestMode ? 'Mode Layar Penuh' : 'Live Preview'}
+            </h3>
+            <p className="text-[10px] font-medium text-zinc-500 mt-1 leading-tight max-w-[220px]">
+              *Tampilan preview mungkin sedikit bergeser/kurang presisi. Hasil yang di-publish akan 100% sempurna.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mt-0.5">
             <button
               onClick={refreshPreview}
               className="p-2 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 rounded-lg transition cursor-pointer"
@@ -281,7 +293,7 @@ export default function App() {
             </button>
             <button
               onClick={() => setIsPreviewGuestMode(!isPreviewGuestMode)}
-              className="px-3.5 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 rounded-xl text-xs font-bold uppercase flex items-center gap-1.5 transition cursor-pointer"
+              className="px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 rounded-full text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-lg shadow-zinc-900/20"
             >
               <Eye className="w-4 h-4" />
               Kembali ke Editor
@@ -290,7 +302,7 @@ export default function App() {
         </div>
 
         {/* Iframe Mobile Container — transform scale approach */}
-        <div ref={previewContainerRef} className="flex-1 overflow-hidden p-4 flex items-center justify-center bg-zinc-50/50" style={{ backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+        <div ref={previewContainerRef} className="flex-1 overflow-hidden p-4 flex items-center justify-center bg-transparent" style={{ backgroundImage: 'radial-gradient(rgba(245,158,11,0.15) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
           <div 
             className="w-[375px] h-[812px] shrink-0 rounded-[3rem] border-[14px] border-zinc-900 bg-black shadow-2xl relative overflow-hidden ring-4 ring-zinc-200/50"
             style={{ transform: `scale(${previewScale})`, transformOrigin: 'center center' }}
@@ -315,7 +327,7 @@ export default function App() {
       {!isPreviewGuestMode && (
         <button
           onClick={() => setIsPreviewGuestMode(true)}
-          className="md:hidden fixed bottom-6 right-6 z-[150] bg-rose-600 hover:bg-rose-500 text-white p-4 rounded-full shadow-2xl flex items-center justify-center gap-2 animate-bounce cursor-pointer"
+          className="md:hidden fixed bottom-6 right-6 z-[150] bg-zinc-900 hover:bg-zinc-800 text-amber-400 p-4 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 animate-bounce cursor-pointer"
           title="Pratinjau Undangan"
         >
           <Eye className="w-5 h-5" />
@@ -357,7 +369,7 @@ export default function App() {
                   wedding.setThemeId(previewThemeId);
                   setPreviewThemeId(null);
                 }}
-                className="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2.5 rounded-full font-black uppercase text-[11px] shadow-lg tracking-widest flex items-center gap-2 transition duration-300 flex items-center justify-center cursor-pointer"
+                className="bg-amber-400 hover:bg-amber-500 text-zinc-900 px-6 py-2.5 rounded-full font-black uppercase text-[11px] shadow-lg shadow-amber-500/30 tracking-widest flex items-center gap-2 transition duration-300 flex items-center justify-center cursor-pointer"
               >
                 <Heart className="w-4 h-4" /> Gunakan Tema
               </button>

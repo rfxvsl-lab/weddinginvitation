@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * useAuth Hook â€” Authentication state management with Turso
@@ -359,20 +359,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearError = useCallback(() => setError(null), []);
 
-  // GodMode: hanya berfungsi jika user adalah admin yang terautentikasi
-  const [isGodMode, setIsGodMode] = useState(false);
-  useEffect(() => {
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'mhmmadridho64@gmail.com';
-    const isActualAdmin = currentUser?.email?.toLowerCase() === adminEmail.toLowerCase();
-    // GodMode hanya berlaku jika user memang admin yang login
-    setIsGodMode(isActualAdmin && localStorage.getItem('godMode') === 'true');
-  }, [currentUser]);
-
-  const effectiveUser = currentUser ? (isGodMode ? {
-    ...currentUser,
-    packageId: 'premium',
-    paymentStatus: 'success',
-  } : currentUser) : null;
+  const effectiveUser = currentUser;
 
   return (
     <AuthContext.Provider value={{

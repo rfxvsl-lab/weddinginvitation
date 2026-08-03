@@ -18,13 +18,13 @@ import { useAlertModal } from '../hooks/useAlertModal';
 
 const PACKAGE_META: Record<string, { label: string; color: string; bg: string }> = {
   demo:    { label: 'Demo (Gratis)', color: 'text-zinc-600', bg: 'bg-zinc-100 border-zinc-300' },
-  reguler: { label: 'Reguler',       color: 'text-blue-600', bg: 'bg-blue-50 border-blue-300' },
-  medium:  { label: 'Medium',        color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-300' },
-  premium: { label: 'Premium',       color: 'text-amber-600', bg: 'bg-amber-50 border-amber-300' },
-  luxury:  { label: 'Luxury',        color: 'text-rose-600', bg: 'bg-rose-50 border-rose-300' },
+  reguler: { label: 'Reguler',       color: 'text-zinc-700', bg: 'bg-zinc-100 border-zinc-300' },
+  medium:  { label: 'Medium',        color: 'text-amber-700', bg: 'bg-amber-50 border-amber-300' },
+  premium: { label: 'Premium',       color: 'text-amber-800', bg: 'bg-amber-100 border-amber-400' },
+  luxury:  { label: 'Luxury',        color: 'text-zinc-900', bg: 'bg-amber-300 border-amber-500' },
 };
 
-export default function ProfilePanel() {
+export default function ProfilePanel({ wedding }: { wedding?: any }) {
   const auth = useAuth();
   const user = auth.currentUser;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,11 +83,11 @@ export default function ProfilePanel() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-zinc-50/50 p-6 md:p-8">
+    <div className="h-full overflow-y-auto bg-transparent p-6 md:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
 
         {/* Profile Header Card */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-8 shadow-sm">
+        <div className="bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition duration-200">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             
             {/* Avatar with upload */}
@@ -156,11 +156,11 @@ export default function ProfilePanel() {
           </div>
         </div>
 
-        {/* Slug / Link Undangan (editable) */}
-        <SlugEditor user={user} auth={auth} />
+        {/* Daftar Link Undangan Proyek */}
+        <ProjectSlugsList user={user} wedding={wedding} />
 
         {/* Detail Informasi */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+        <div className="bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition duration-200 space-y-4">
           <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono flex items-center gap-2">
             <IconUser size={14} /> Informasi Akun
           </h3>
@@ -176,7 +176,7 @@ export default function ProfilePanel() {
         </div>
 
         {/* Paket Detail */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+        <div className="bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition duration-200 space-y-4">
           <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono flex items-center gap-2">
             <CrownIcon className="w-3.5 h-3.5" /> Detail Paket
           </h3>
@@ -194,152 +194,55 @@ export default function ProfilePanel() {
   );
 }
 
-function SlugEditor({ user, auth }: { user: SaaSUser; auth: any }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newSlug, setNewSlug] = useState(user.activeSlug || '');
-  const [slugError, setSlugError] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [copiedSlug, setCopiedSlug] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+function ProjectSlugsList({ user, wedding }: { user: SaaSUser; wedding?: any }) {
   const alertModal = useAlertModal();
-
-  const profileSlugUrl = `ruanghadir.net/${user.activeSlug}`;
-
-  const handleSlugChange = (val: string) => {
-    const clean = val.toLowerCase().replace(/[^a-z0-9-]/g, '');
-    setNewSlug(clean);
-    setSlugError('');
-  };
-
-  const handleSaveSlug = async () => {
-    if (!newSlug || newSlug.length < 3) {
-      setSlugError('Slug minimal 3 karakter.');
-      return;
-    }
-    if (newSlug === user.activeSlug) {
-      setIsEditing(false);
-      return;
-    }
-
-    setIsSaving(true);
-    setSlugError('');
-    try {
-      const res = await fetch('/api/update-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, activeSlug: newSlug }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setSlugError(data.error || 'Gagal update slug.');
-        return;
-      }
-
-      // Update local state
-      const savedSlug = data.activeSlug || newSlug;
-      auth.setCurrentUser({ ...user, activeSlug: savedSlug });
-      setIsEditing(false);
-
-      // Show inline success feedback
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-
-      // Also show modal
-      alertModal.success('Slug Diperbarui', `Link undangan Anda sekarang: ruanghadir.net/${savedSlug}`);
-    } catch (err: any) {
-      console.error('[SlugEditor] Save failed:', err);
-      setSlugError(err.message || 'Gagal menyimpan. Periksa koneksi internet Anda.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCopySlug = () => {
-    navigator.clipboard.writeText(`https://${profileSlugUrl}`);
-    setCopiedSlug(true);
-    setTimeout(() => setCopiedSlug(false), 2000);
-  };
+  
+  const invitations = wedding?.allInvitations || [];
+  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
+  
+  if (invitations.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-3">
+    <div className="bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition duration-200 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono flex items-center gap-2">
-          <IconLink size={14} /> Link Undangan Anda
+          <IconLink size={14} /> Daftar Link Undangan Anda
         </h3>
-        {!isEditing && (
-          <button
-            onClick={() => { setIsEditing(true); setNewSlug(user.activeSlug || ''); setSaveSuccess(false); }}
-            className="flex items-center gap-1 text-[10px] font-bold text-violet-600 hover:text-violet-800 uppercase tracking-wider transition cursor-pointer"
-          >
-            <PencilIcon className="w-3 h-3" /> Edit Slug
-          </button>
-        )}
       </div>
-
-      {/* Success banner */}
-      {saveSuccess && !isEditing && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-          <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
-          <p className="text-[11px] text-emerald-700 font-medium">Slug berhasil diperbarui!</p>
-        </div>
-      )}
-
-      {!isEditing ? (
-        <div className="flex items-center gap-3 bg-zinc-50 border border-zinc-200 rounded-xl p-4">
-          <span className="flex-1 text-sm font-mono text-zinc-700 truncate select-all">
-            {profileSlugUrl}
-          </span>
-          <button
-            onClick={handleCopySlug}
-            className="p-2 rounded-lg hover:bg-zinc-200 text-zinc-500 hover:text-zinc-700 transition cursor-pointer shrink-0"
-          >
-            {copiedSlug ? <CheckIcon className="w-4 h-4 text-emerald-500" /> : <CopyIcon className="w-4 h-4" />}
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-xl overflow-hidden">
-            <span className="text-xs text-zinc-400 font-mono pl-4 shrink-0">ruanghadir.net/</span>
-            <input
-              type="text"
-              value={newSlug}
-              onChange={(e) => handleSlugChange(e.target.value)}
-              className="flex-1 py-3 pr-4 text-sm font-mono text-zinc-800 bg-transparent outline-none"
-              placeholder="nama-pasangan"
-              autoFocus
-            />
-          </div>
-
-          {/* Slug length indicator */}
-          <p className={`text-[10px] ${newSlug.length < 3 ? 'text-red-400' : 'text-zinc-400'}`}>
-            {newSlug.length}/50 karakter {newSlug.length < 3 && '(minimal 3)'}
-          </p>
-
-          {slugError && (
-            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-50 border border-red-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-              <p className="text-[11px] text-red-600 font-medium">{slugError}</p>
+      
+      <div className="space-y-3">
+        {invitations.map((inv: any) => {
+          const displaySlug = inv.slug || user.activeSlug || 'demo';
+          const fullUrl = `${appHost}/${displaySlug}`;
+          
+          return (
+            <div key={inv.id} className="bg-white/70 backdrop-blur-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[2.5rem] p-6 lg:p-7 flex flex-col sm:flex-row gap-3 ring-1 ring-zinc-900/5 transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.08)]">
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="text-xs font-bold text-zinc-800 truncate">{inv.title || 'Proyek Undangan'}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-zinc-600 truncate">{fullUrl}</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://${fullUrl}`);
+                    alertModal.success('Berhasil Disalin', `Tautan undangan ${inv.title} berhasil disalin ke clipboard.`);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 text-[10px] font-bold transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <CopyIcon className="w-3.5 h-3.5" /> Salin
+                </button>
+              </div>
             </div>
-          )}
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleSaveSlug}
-              disabled={isSaving || !newSlug || newSlug.length < 3}
-              className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider hover:bg-zinc-800 disabled:opacity-40 transition cursor-pointer"
-            >
-              {isSaving ? 'Menyimpan...' : 'Simpan Slug'}
-            </button>
-            <button
-              onClick={() => { setIsEditing(false); setSlugError(''); }}
-              className="px-5 py-2.5 rounded-xl border border-zinc-200 text-zinc-500 text-xs font-bold uppercase tracking-wider hover:bg-zinc-50 transition cursor-pointer"
-            >
-              Batal
-            </button>
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
+      
+      <p className="text-[10px] text-zinc-400 mt-2">
+        <span className="text-amber-500 font-bold">*</span> Anda dapat mengubah nama tautan (slug) untuk setiap proyek melalui menu navigasi proyek di bar navigasi atas.
+      </p>
     </div>
   );
 }

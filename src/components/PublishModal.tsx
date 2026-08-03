@@ -31,7 +31,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const generateFormattedMessage = (guestId: string, templateId: string) => {
     const guest = guests.find((g: any) => g.id === guestId);
     if (!guest) return '';
-    const url = `https://ruanghadir.net/${user?.activeSlug || 'demo'}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
+    const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
+    const appProtocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
+    const url = `${appProtocol}//${appHost}/${wedding.invitation?.slug || user?.activeSlug || 'demo'}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
     
     if (templateId === 'formal') {
       return `Kepada Yth. Bapak/Ibu/Saudara/i ${guest.name},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami.\n\nDetail acara dan undangan lengkap dapat dilihat melalui tautan berikut:\n${url}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.\n\nTerima kasih.\n\nHormat kami,\n${wedding.weddingData.couple.bride.nickname} & ${wedding.weddingData.couple.groom.nickname}`;
@@ -60,7 +62,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const packageId = activeSaaSUser.packageId || 'demo';
   const publishAllowed = canAccess(packageId, 'canPublish');
   const themeName = DEFAULT_THEMES.find(t => t.id === wedding.themeId)?.name || 'Grand Ballroom';
-  const siteUrl = `ruanghadir.net/${activeSaaSUser.activeSlug || 'demo'}`;
+  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
+  const siteUrl = `${appHost}/${wedding.invitation?.slug || activeSaaSUser.activeSlug || 'demo'}`;
 
   // If publish not allowed (demo), show upgrade prompt
   if (!publishAllowed) {
@@ -113,7 +116,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               Publish & Bagikan Undangan
             </h3>
             <p className="text-sm text-zinc-500 mt-1">
-              Rilis template <span className="font-semibold text-rose-600">{themeName}</span> dan kirim pesan personal ke tamu.
+              Rilis template <span className="font-semibold text-zinc-700">{themeName}</span> dan kirim pesan personal ke tamu.
             </p>
           </div>
         </div>
@@ -137,7 +140,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-zinc-100">
                   <span className="text-zinc-500">Platform Tautan</span>
-                  <span className="font-semibold text-rose-600 text-[11px]">{siteUrl}</span>
+                  <span className="font-semibold text-zinc-700 text-[11px]">{siteUrl}</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5">
                   <span className="text-zinc-500">Paket</span>
@@ -150,20 +153,20 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
             {/* Copy Link */}
             {!publishSuccess && (
-              <div className="bg-gradient-to-br from-rose-50 to-pink-50/50 border border-rose-100 p-5 rounded-2xl space-y-3">
+              <div className="bg-gradient-to-br from-white to-zinc-50/50 border border-zinc-200 p-5 rounded-2xl space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
-                    <AlertCircle className="w-4 h-4 text-rose-600" />
+                  <div className="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-4 h-4 text-zinc-700" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-rose-700">Salin Tautan Terlebih Dahulu</h4>
+                    <h4 className="text-xs font-bold text-zinc-800">Salin Tautan Terlebih Dahulu</h4>
                     <p className="text-[11px] text-zinc-600 leading-relaxed mt-0.5">
                       Salin tautan undangan resmi di bawah ini sebelum bisa menekan tombol Publish.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-2 items-center bg-white p-2.5 rounded-xl border border-rose-100/50 shadow-sm">
+                <div className="flex gap-2 items-center bg-white p-2.5 rounded-xl border border-zinc-200/50 shadow-sm">
                   <div className="flex-1 flex items-center gap-2 px-2">
                     <ExternalLink className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                     <span className="text-[11px] text-zinc-600 break-all select-all">{siteUrl}</span>
@@ -175,8 +178,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                     }}
                     className={`px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 shrink-0 ${
                       linkCopiedInPublishModal
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-md shadow-rose-500/20'
+                        ? 'bg-zinc-50 text-emerald-700 border border-zinc-200'
+                        : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-900 hover:to-black text-white shadow-md shadow-zinc-900/20'
                     }`}
                   >
                     {linkCopiedInPublishModal ? (
@@ -196,7 +199,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
             )}
 
             {publishSuccess && (
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 p-5 rounded-2xl text-center space-y-2 animate-fadeIn">
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-zinc-200 p-5 rounded-2xl text-center space-y-2 animate-fadeIn">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
                   <CheckCircle className="w-6 h-6 text-white" />
                 </div>
@@ -243,7 +246,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                   className={`flex-1 rounded-xl py-3 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
                     isPublishing || (!linkCopiedInPublishModal && !wedding.invitation?.isPublished)
                       ? 'bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg shadow-rose-500/20'
+                      : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-900 hover:to-black text-white shadow-lg shadow-zinc-900/20'
                   }`}
                 >
                   {isPublishing ? (
@@ -282,7 +285,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                   <select
                     value={selectedShareGuestId}
                     onChange={(e) => setSelectedShareGuestId(e.target.value)}
-                    className="w-full bg-white text-zinc-800 border border-zinc-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 cursor-pointer transition-all"
+                    className="w-full bg-white text-zinc-800 border border-zinc-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-zinc-400 focus:ring-2 focus:ring-amber-400/20/20 cursor-pointer transition-all"
                   >
                     {guests.map((g: any) => (
                       <option key={g.id} value={g.id}>
@@ -302,9 +305,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                 <label className="block text-[11px] text-zinc-500 font-semibold">Gaya Bahasa</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
-                    { id: 'formal', label: 'Formal', color: 'rose' },
-                    { id: 'casual', label: 'Kasual', color: 'violet' },
-                    { id: 'short', label: 'Ringkas', color: 'sky' },
+                    { id: 'formal', label: 'Formal', color: 'amber' },
+                    { id: 'casual', label: 'Kasual', color: 'zinc' },
+                    { id: 'short', label: 'Ringkas', color: 'zinc' },
                   ] as const).map((t) => (
                     <button
                       key={t.id}
@@ -312,7 +315,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                       onClick={() => setSelectedShareTemplateId(t.id)}
                       className={`py-2 text-[11px] rounded-xl font-bold transition-all duration-200 border cursor-pointer ${
                         selectedShareTemplateId === t.id
-                          ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-500 shadow-md shadow-rose-500/10'
+                          ? 'bg-gradient-to-r from-zinc-800 to-zinc-900 text-white border-amber-500 shadow-md shadow-zinc-900/10'
                           : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300'
                       }`}
                     >
@@ -330,7 +333,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                   onChange={(e) => setCustomShareMessage(e.target.value)}
                   rows={5}
                   placeholder="Draf pesan teks undangan otomatis..."
-                  className="w-full bg-white text-zinc-800 text-[11px] border border-zinc-200 p-3 rounded-xl focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 leading-relaxed resize-none transition-all"
+                  className="w-full bg-white text-zinc-800 text-[11px] border border-zinc-200 p-3 rounded-xl focus:outline-none focus:border-zinc-400 focus:ring-2 focus:ring-amber-400/20/20 leading-relaxed resize-none transition-all"
                 />
               </div>
             </div>
@@ -350,8 +353,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                 >
                   {shareMessageCopied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-600">Tersalin!</span>
+                      <Check className="w-3.5 h-3.5 text-zinc-700" />
+                      <span className="text-zinc-700">Tersalin!</span>
                     </>
                   ) : (
                     <>

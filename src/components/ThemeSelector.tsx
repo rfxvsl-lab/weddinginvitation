@@ -26,8 +26,8 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex flex-col gap-1.5">
-        <h3 className="text-xl font-black text-zinc-900 flex items-center gap-2.5 tracking-tight">
-          <div className="p-2 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 shadow-sm">
+        <h3 className="text-xl font-bold text-zinc-900 flex items-center gap-2.5 tracking-tight">
+          <div className="p-2 bg-zinc-100 text-zinc-700 rounded-[1rem] border border-zinc-200/50 shadow-sm">
             <Palette className="w-5 h-5" />
           </div>
           Pilihan Tema Undangan
@@ -37,7 +37,7 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {DEFAULT_THEMES.map((theme) => {
           const isSelected = theme.id === currentThemeId;
           const isAvailable = isThemeAvailable(packageId, theme.id);
@@ -45,80 +45,81 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
             <button
               key={theme.id}
               onClick={() => handleThemeClick(theme.id)}
-              className={`group text-left relative overflow-hidden rounded-[24px] border transition-all duration-500 ease-out flex flex-col ${
+              className={`group text-left relative overflow-hidden rounded-[2rem] transition-all duration-500 ease-out flex flex-col ${
                 !isAvailable
-                  ? 'border-zinc-200 bg-zinc-50 opacity-75 cursor-not-allowed'
+                  ? 'opacity-80 cursor-not-allowed border border-white/40'
                   : isSelected
-                  ? 'border-rose-400 bg-white ring-4 ring-rose-50 shadow-[0_8px_30px_rgb(244,63,94,0.15)] scale-[1.02]'
-                  : 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-[0_8px_25px_rgb(0,0,0,0.06)] hover:-translate-y-1'
-              }`}
+                  ? 'scale-[1.02] border-2 border-amber-300 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.3)] ring-4 ring-amber-50'
+                  : 'border border-white/60 hover:border-amber-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1'
+              } bg-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]`}
             >
               {/* Lock badge for unavailable themes */}
-              {!isAvailable && <LockBadge />}
+              {!isAvailable && (
+                <div className="absolute inset-0 z-30 bg-zinc-50/40 backdrop-blur-[2px] flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 border border-zinc-200/50">
+                    <Crown className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-bold text-zinc-800">Upgrade Required</span>
+                  </div>
+                </div>
+              )}
 
               {/* Top Section - Theme Gradient Preview */}
               <div 
-                className={`h-24 w-full relative overflow-hidden flex items-center justify-center ${!isAvailable ? 'grayscale-[40%]' : ''}`}
+                className="h-32 w-full relative overflow-hidden flex items-center justify-center"
                 style={{
                   background: `linear-gradient(135deg, ${theme.primaryHex} 0%, ${theme.bgHex} 100%)`
                 }}
               >
                 {/* Decorative Elements */}
                 <div 
-                  className="absolute inset-0 opacity-40 mix-blend-overlay"
+                  className="absolute inset-0 opacity-30 mix-blend-overlay"
                   style={{
                     backgroundImage: `radial-gradient(circle at 2px 2px, ${theme.textHex} 1px, transparent 0)`,
-                    backgroundSize: '24px 24px'
+                    backgroundSize: '20px 20px'
                   }}
                 />
                 
                 {/* Floating Preview Pill */}
                 <div 
-                  className="relative z-10 px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md border border-white/20 transition-transform duration-500 group-hover:scale-105"
+                  className="relative z-10 px-5 py-2 rounded-2xl shadow-xl backdrop-blur-md border border-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-2"
                   style={{ 
                     backgroundColor: `${theme.bgHex}dd`,
-                    color: theme.textHex,
-                    fontFamily: theme.fontSerif === 'font-serif' ? 'Georgia, serif' : 'system-ui, sans-serif'
+                    color: theme.textHex
                   }}
                 >
-                  <span className="text-xs font-bold tracking-widest uppercase opacity-90">
+                  <span className="text-xs font-bold tracking-[0.2em] uppercase">
                     {theme.name.split(' ')[0]}
                   </span>
                 </div>
 
                 {/* Selected Checkmark overlay */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3 z-20 animate-scaleIn">
-                    <div className="bg-white rounded-full p-0.5 shadow-md">
-                      <Check className="w-6 h-6 text-rose-500" />
+                  <div className="absolute top-4 right-4 z-20 animate-scaleIn">
+                    <div className="bg-amber-500 rounded-full p-1 shadow-lg shadow-amber-500/40">
+                      <Check className="w-5 h-5 text-white" />
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Bottom Section - Theme Details */}
-              <div className="p-4.5 bg-white flex flex-col gap-4 border-t border-zinc-100">
+              {/* Bottom Section - Theme Details (Glass) */}
+              <div className="p-5 flex flex-col gap-5 border-t border-white/50 bg-white/40">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-bold text-zinc-800 text-sm tracking-tight group-hover:text-rose-600 transition-colors">
+                    <h4 className="font-bold text-zinc-900 text-sm tracking-tight group-hover:text-amber-600 transition-colors">
                       {theme.name}
                     </h4>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono font-semibold bg-zinc-100 px-2 py-0.5 rounded-md">
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono font-semibold bg-white/80 px-2 py-0.5 rounded-lg border border-white">
                         {theme.pattern}
                       </span>
-                      {!isAvailable && (
-                         <span className="text-[10px] text-amber-600 flex items-center gap-0.5 uppercase tracking-widest font-mono font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/50">
-                           <Crown className="w-3 h-3" /> Upgrade
-                         </span>
-                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Color Swatches */}
-                <div className="flex items-center gap-2 pt-1">
-                  <div className="flex -space-x-1">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-1.5">
                     {[
                       { hex: theme.primaryHex, name: "Utama" },
                       { hex: theme.secondaryHex, name: "Sekunder" },
@@ -128,15 +129,12 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
                     ].map((color, i) => (
                       <div
                         key={i}
-                        className={`w-6 h-6 rounded-full border-2 border-white shadow-sm ring-1 ring-zinc-200 transition-transform duration-300 group-hover:-translate-y-1 ${!isAvailable ? 'grayscale-[30%]' : ''}`}
-                        style={{ backgroundColor: color.hex, transitionDelay: `${i * 50}ms` }}
+                        className="w-7 h-7 rounded-full border-[2.5px] border-white shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 hover:!scale-110 hover:!z-10 relative"
+                        style={{ backgroundColor: color.hex, transitionDelay: `${i * 40}ms`, zIndex: 5 - i }}
                         title={color.name}
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] font-mono text-zinc-400 font-medium ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    5 Colors
-                  </span>
                 </div>
               </div>
             </button>

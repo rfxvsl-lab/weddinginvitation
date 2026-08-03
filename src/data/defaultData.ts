@@ -214,8 +214,8 @@ export const DEFAULT_WEDDING_DATA: WeddingData = {
       accountHolder: 'Penerima: Rian & Salsa'
     }
   ],
-  musicUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // Romantic-sounding sample
-  musicTitle: 'Beautiful Piano - Canon in D',
+  musicUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/5d/b9/455db91d-12bf-71bf-1dcc-d0eb43a97584/mzaf_11363755277195490003.plus.aac.p.m4a',
+  musicTitle: 'Foto Kita Blur - Sal Priadi',
   countdownDate: '2026-08-08T08:00:00',
   quoteText: 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
   quoteSource: 'QS. Ar-Rum: 21',
