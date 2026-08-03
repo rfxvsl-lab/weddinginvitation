@@ -7,6 +7,7 @@ import { DEFAULT_THEMES, DEFAULT_WEDDING_DATA } from "@/data/defaultData";
 import { RSVP } from "@/types";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { MotionConfig } from "motion/react";
 
 export default function ThemeDemoPage() {
   const params = useParams();
@@ -59,13 +60,24 @@ export default function ThemeDemoPage() {
       )}
 
       {/* Full screen invitation preview */}
-      <InvitationPreview
-        data={DEFAULT_WEDDING_DATA}
-        themeId={themeId}
-        onAddRSVP={handleAddRSVP}
-        rsvps={rsvps}
-        embedded={isThumbnail}
-      />
+      {isThumbnail && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          *, *::before, *::after {
+            animation-play-state: paused !important;
+            animation: none !important;
+            transition: none !important;
+          }
+        `}} />
+      )}
+      <MotionConfig reducedMotion={isThumbnail ? "always" : "user"}>
+        <InvitationPreview
+          data={DEFAULT_WEDDING_DATA}
+          themeId={themeId}
+          onAddRSVP={handleAddRSVP}
+          rsvps={rsvps}
+          embedded={isThumbnail}
+        />
+      </MotionConfig>
     </div>
   );
 }
