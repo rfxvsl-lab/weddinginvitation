@@ -64,6 +64,7 @@ export default function ThemeDemoPage() {
         themeId={themeId}
         onAddRSVP={handleAddRSVP}
         rsvps={rsvps}
+        embedded={isThumbnail}
       />
     </div>
   );

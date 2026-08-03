@@ -1274,11 +1274,11 @@ const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, guest, onAddR
 
     // Auto play music when stage changes to content
     useEffect(() => {
-        if (stage === 'content' && audioRef.current) {
+        if (stage === 'content' && audioRef.current && !embedded) {
             setMusic(true);
             audioRef.current.play().catch(() => console.log("Autoplay blocked"));
         }
-    }, [stage]);
+    }, [stage, embedded]);
 
     const toggleMusic = () => {
         if (!audioRef.current) return;
@@ -1305,7 +1305,7 @@ const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, guest, onAddR
                 <div className="fixed inset-0 bg-black/85 z-0" />
             )}
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} muted={embedded} />
+            <audio ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} />
 
             {/* --- LAYER 0: CINEMATIC BACKGROUND --- */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#141414]">

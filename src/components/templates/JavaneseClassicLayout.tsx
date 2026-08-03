@@ -659,7 +659,7 @@ const JavaneseClassicLayout: React.FC<JavaneseClassicProps> = ({ data, guest, on
     return (
         <div className="relative w-full h-[100dvh] overflow-hidden bg-[#1A0F0A] text-[#F5EBE0]">
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} muted={embedded} />
+            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
 
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none z-0">

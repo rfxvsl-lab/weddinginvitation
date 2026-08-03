@@ -696,7 +696,7 @@ const RoyalArabianLayout: React.FC<RoyalArabianProps> = ({ data, guest, onAddRSV
     return (
         <div className="relative w-full h-[100dvh] overflow-hidden bg-[#020508] text-[#F5E6CA]">
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} muted={embedded} />
+            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
 
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none z-0">
