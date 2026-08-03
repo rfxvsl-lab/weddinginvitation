@@ -66,11 +66,10 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
               {/* Top Section - Theme Gradient Preview */}
               <div className="h-32 w-full relative overflow-hidden bg-[#050505]">
                 {/* Native Iframe Render */}
-                <iframe
-                  src={`/demo/${theme.id}?thumbnail=true`}
-                  className="w-full h-[812px] absolute top-0 left-0 border-none pointer-events-none opacity-90 transition-opacity duration-500 group-hover:opacity-100"
-                  tabIndex={-1}
-                  aria-hidden="true"
+                <img 
+                  src={`/assets/themes/${theme.id}.png`}
+                  alt={theme.name}
+                  className="w-full h-full object-cover absolute top-0 left-0 pointer-events-none opacity-90 transition-opacity duration-500 group-hover:opacity-100"
                   loading="lazy"
                 />
                 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import InvitationPreview from "@/components/InvitationPreview";
 import { DEFAULT_THEMES, DEFAULT_WEDDING_DATA } from "@/data/defaultData";
@@ -17,20 +17,19 @@ export default function ThemeDemoPage() {
   const theme = DEFAULT_THEMES.find((t) => t.id === themeId);
 
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
-  const [snapshot, setSnapshot] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Freeze animation entirely by taking a DOM snapshot and destroying the React tree
+  // Pause all animations (CSS and JS) after initial render for thumbnails to save CPU
   useEffect(() => {
     if (isThumbnail) {
       const timer = setTimeout(() => {
-        if (containerRef.current) {
-          let html = containerRef.current.innerHTML;
-          // Strip out audio/video tags to prevent them from re-initializing or playing
-          html = html.replace(/<audio\b[^>]*>/gi, '').replace(/<video\b[^>]*>.*?<\/video>/gi, '');
-          setSnapshot(html);
-        }
-      }, 4500); // 4.5 seconds for intro animations to settle
+        // Freeze CSS Animations & Transitions
+        const style = document.createElement('style');
+        style.innerHTML = `* { animation-play-state: paused !important; transition: none !important; }`;
+        document.head.appendChild(style);
+        
+        // Freeze JS animations (Framer Motion, Canvas loops, etc.)
+        window.requestAnimationFrame = () => 0;
+      }, 4000); // 4 seconds should be enough for intro animations to finish
 
       return () => clearTimeout(timer);
     }
@@ -57,21 +56,8 @@ export default function ThemeDemoPage() {
     );
   }
 
-  if (snapshot) {
-    return (
-      <div 
-        dangerouslySetInnerHTML={{ __html: snapshot }} 
-        style={{ pointerEvents: 'none' }}
-        suppressHydrationWarning
-        className="snapshot-frozen"
-      >
-        <style dangerouslySetInnerHTML={{ __html: `.snapshot-frozen * { animation-play-state: paused !important; transition: none !important; }` }} />
-      </div>
-    );
-  }
-
   return (
-    <div className="relative min-h-screen" ref={containerRef}>
+    <div className="relative min-h-screen">
       {/* Floating back button */}
       {!isThumbnail && (
         <Link

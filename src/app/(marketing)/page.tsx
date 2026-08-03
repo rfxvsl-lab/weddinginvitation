@@ -404,12 +404,10 @@ export default function LandingPage() {
 
                         {/* Screen (Native Iframe) */}
                         <div className="absolute inset-0 bg-black overflow-hidden pointer-events-none" style={{ borderRadius: '18px' }}>
-                          <iframe 
-                            src={`/demo/${theme.id}?thumbnail=true`}
-                            className="w-[375px] h-[812px] origin-top-left absolute top-0 left-0 border-none pointer-events-none"
-                            style={{ transform: 'scale(0.333)' }}
-                            tabIndex={-1}
-                            aria-hidden="true"
+                          <img 
+                            src={`/assets/themes/${theme.id}.png`}
+                            alt={theme.name}
+                            className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         </div>
