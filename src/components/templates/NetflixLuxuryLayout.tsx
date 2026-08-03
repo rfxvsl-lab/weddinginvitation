@@ -1221,7 +1221,7 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                     className="bg-gradient-to-r from-[#1a1a1a] to-[#141414] p-5 rounded-xl border-l-2 border-l-gray-800 hover:border-l-[#E50914] transition-all duration-300 shadow-md group relative overflow-hidden"
                                 >
                                     <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                                        <Heart size={40} weight="fill" />
+                                        <Heart size={40} />
                                     </div>
                                     <div className="flex justify-between items-start mb-3 relative z-10">
                                         <div className="flex items-center gap-3">

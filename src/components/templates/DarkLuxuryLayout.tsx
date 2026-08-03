@@ -839,20 +839,20 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
           >
             <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.8)] flex items-center gap-6">
               <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-[#888] hover:text-[var(--theme-primary)] hover:-translate-y-1 transition-all">
-                <Heart size={22} weight="duotone" />
+                <Heart size={22} />
               </button>
               <button onClick={() => document.getElementById('events-section')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-[#888] hover:text-[var(--theme-primary)] hover:-translate-y-1 transition-all">
-                <Calendar size={22} weight="duotone" />
+                <Calendar size={22} />
               </button>
               <button onClick={() => document.getElementById('gallery-section')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-[#888] hover:text-[var(--theme-primary)] hover:-translate-y-1 transition-all">
-                <MapPin size={22} weight="duotone" />
+                <MapPin size={22} />
               </button>
               <div className="w-[1px] h-8 bg-white/10 mx-2"></div>
               <button onClick={toggleMusic} className="relative flex items-center justify-center p-2 rounded-full transition-all hover:scale-110" style={{ color: 'var(--theme-primary)' }}>
                 {isPlaying && (
                   <span className="absolute inset-0 rounded-full border border-[var(--theme-primary)] animate-ping opacity-20"></span>
                 )}
-                {isPlaying ? <Music size={24} weight="duotone" /> : <Play size={24} weight="duotone" />}
+                {isPlaying ? <Music size={24} /> : <Play size={24} />}
               </button>
             </div>
           </motion.div>
