@@ -12,11 +12,11 @@ export const AnimatedRealisticRose: React.FC<AnimatedRealisticRoseProps> = ({
 }) => {
   // We use Framer Motion variants to control the blooming state.
   // The 'repeat: Infinity' with 'reverse' creates a continuous open-close loop.
-  const transitionSettings = {
+  const transitionSettings: any = {
     duration: 3,
     ease: "easeInOut",
     repeat: Infinity,
-    repeatType: "mirror" as const,
+    repeatType: "mirror",
   };
 
   // Outer Petals - wide opening
