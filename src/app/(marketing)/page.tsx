@@ -402,35 +402,15 @@ export default function LandingPage() {
                         {/* Notch */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-14 h-4 bg-black rounded-b-xl z-20" />
 
-                        {/* Screen */}
-                        <div
-                          className="absolute inset-0 flex flex-col items-center justify-center p-4"
-                          style={{
-                            background: `linear-gradient(180deg, ${theme.bgHex} 0%, ${theme.bgPatternHex} 100%)`,
-                          }}
-                        >
-                          <div
-                            className="absolute inset-0 opacity-20"
-                            style={{
-                              backgroundImage: `radial-gradient(circle at 2px 2px, ${theme.accentHex} 0.5px, transparent 0)`,
-                              backgroundSize: '16px 16px',
-                            }}
-                          />
-                          <div className="relative z-10 text-center space-y-2">
-                            <p className="text-[8px] uppercase tracking-[0.25em] font-medium" style={{ color: theme.accentHex }}>
-                              Pernikahan
-                            </p>
-                            <p className="text-[14px] font-serif italic leading-tight" style={{ color: theme.textHex }}>
-                              Rian & Salsa
-                            </p>
-                            <div className="w-8 h-[1px] mx-auto" style={{ backgroundColor: theme.accentHex + '60' }} />
-                            <p className="text-[7px] tracking-wider" style={{ color: theme.textHex + 'aa' }}>
-                              08 Agustus 2026
-                            </p>
-                          </div>
-                          <div
-                            className="absolute bottom-0 left-0 right-0 h-1"
-                            style={{ background: `linear-gradient(90deg, transparent, ${theme.primaryHex}, transparent)` }}
+                        {/* Screen (Native Iframe) */}
+                        <div className="absolute inset-0 bg-black overflow-hidden pointer-events-none" style={{ borderRadius: '18px' }}>
+                          <iframe 
+                            src={`/demo/${theme.id}?thumbnail=true`}
+                            className="w-[375px] h-[812px] origin-top-left absolute top-0 left-0 border-none pointer-events-none"
+                            style={{ transform: 'scale(0.333)' }}
+                            tabIndex={-1}
+                            aria-hidden="true"
+                            loading="lazy"
                           />
                         </div>
                       </div>
