@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import InvitationPreview from "@/components/InvitationPreview";
 import { DEFAULT_THEMES, DEFAULT_WEDDING_DATA } from "@/data/defaultData";
 import { RSVP } from "@/types";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { MotionConfig } from "motion/react";
 
 export default function ThemeDemoPage() {
   const params = useParams();
@@ -18,6 +17,23 @@ export default function ThemeDemoPage() {
   const theme = DEFAULT_THEMES.find((t) => t.id === themeId);
 
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
+
+  // Pause all animations (CSS and JS) after initial render for thumbnails to save CPU
+  useEffect(() => {
+    if (isThumbnail) {
+      const timer = setTimeout(() => {
+        // Freeze CSS Animations & Transitions
+        const style = document.createElement('style');
+        style.innerHTML = `* { animation-play-state: paused !important; transition: none !important; }`;
+        document.head.appendChild(style);
+        
+        // Freeze JS animations (Framer Motion, Canvas loops, etc.)
+        window.requestAnimationFrame = () => 0;
+      }, 4000); // 4 seconds should be enough for intro animations to finish
+
+      return () => clearTimeout(timer);
+    }
+  }, [isThumbnail]);
 
   const handleAddRSVP = (rsvp: RSVP) => {
     setRsvps((prev) => [...prev, rsvp]);
@@ -60,24 +76,13 @@ export default function ThemeDemoPage() {
       )}
 
       {/* Full screen invitation preview */}
-      {isThumbnail && (
-        <style dangerouslySetInnerHTML={{ __html: `
-          *, *::before, *::after {
-            animation-play-state: paused !important;
-            animation: none !important;
-            transition: none !important;
-          }
-        `}} />
-      )}
-      <MotionConfig reducedMotion={isThumbnail ? "always" : "user"}>
-        <InvitationPreview
-          data={DEFAULT_WEDDING_DATA}
-          themeId={themeId}
-          onAddRSVP={handleAddRSVP}
-          rsvps={rsvps}
-          embedded={isThumbnail}
-        />
-      </MotionConfig>
+      <InvitationPreview
+        data={DEFAULT_WEDDING_DATA}
+        themeId={themeId}
+        onAddRSVP={handleAddRSVP}
+        rsvps={rsvps}
+        embedded={isThumbnail}
+      />
     </div>
   );
 }
