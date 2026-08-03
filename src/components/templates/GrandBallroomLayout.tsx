@@ -217,7 +217,7 @@ const TopSwagRopes = () => {
 };
 
 const FlowerNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow" }: { cx: number, cy: number, customDelay: number, size?: number, shadowId?: string }) => {
-    const bloomVariants = {
+    const bloomVariants: any = {
         hidden: { scale: 0, rotate: -180, opacity: 0, x: cx, y: cy },
         visible: (custom: number) => ({
             scale: size, 
@@ -240,7 +240,7 @@ const FlowerNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow" 
 };
 
 const RedRoseNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow" }: { cx: number, cy: number, customDelay: number, size?: number, shadowId?: string }) => {
-    const bloomVariants = {
+    const bloomVariants: any = {
         hidden: { scale: 0, rotate: 180, opacity: 0, x: cx, y: cy },
         visible: (custom: number) => ({
             scale: size, 
