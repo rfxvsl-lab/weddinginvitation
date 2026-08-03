@@ -840,7 +840,7 @@ const SpotiLoveLayout: React.FC<SpotiLoveProps> = ({ data, theme, guest, onAddRS
     return (
         <div className="min-h-screen bg-[#121212] text-white">
             <GlobalStyles />
-            <audio ref={audioRef} loop src={DATA.musicUrl} />
+            <audio ref={audioRef} loop src={DATA.musicUrl} muted={embedded} />
             <CanvasBackground customBg={getImageUrl(data?.bgImageUrl || '')} />
 
             {/* OPENING SEQUENCE (Z-INDEX HIGH) */}

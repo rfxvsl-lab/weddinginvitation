@@ -286,7 +286,7 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
         }
       `}</style>
 
-      {data?.musicUrl && <audio ref={audioRef} src={data.musicUrl} loop />}
+      {data?.musicUrl && <audio ref={audioRef} src={data.musicUrl} loop muted={embedded} />}
 
       {/* === LOCK SCREEN (COVER) === */}
       <div className={`fixed inset-0 z-50 bg-[#050505] transition-transform duration-[1.5s] ease-[cubic-bezier(0.87,0,0.13,1)] flex flex-col items-center justify-center p-6 ${isOpen ? '-translate-y-full' : 'translate-y-0'}`}>

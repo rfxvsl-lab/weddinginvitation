@@ -877,7 +877,7 @@ const LuxuryPinkLayout: React.FC<LuxuryPinkProps> = ({ data, guest, onAddRSVP, r
             <GlobalStyles />
 
             {/* Background Music */}
-            <audio ref={audioRef} loop src={data?.musicUrl || ''} />
+            <audio ref={audioRef} loop src={data?.musicUrl || ''} muted={embedded} />
 
             {/* Animated Background */}
             {data?.bgImageUrl ? (

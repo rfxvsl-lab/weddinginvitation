@@ -1109,7 +1109,7 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddR
     return (
         <div className="relative w-full h-screen overflow-hidden bg-[#0f0505] text-[#333]">
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || ASSETS.bgm} />
+            <audio ref={audioRef} loop src={data?.musicUrl || ASSETS.bgm} muted={embedded} />
 
             {/* LAYER 0: BALLROOM BACKGROUND (SILHOUETTES) */}
             <BallroomBackground customBg={getImageUrl(data?.bgImageUrl || '')} />

@@ -1305,7 +1305,7 @@ const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, guest, onAddR
                 <div className="fixed inset-0 bg-black/85 z-0" />
             )}
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} />
+            <audio ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} muted={embedded} />
 
             {/* --- LAYER 0: CINEMATIC BACKGROUND --- */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#141414]">
