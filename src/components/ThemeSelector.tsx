@@ -64,30 +64,25 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
               )}
 
               {/* Top Section - Theme Gradient Preview */}
-              <div 
-                className="h-32 w-full relative overflow-hidden flex items-center justify-center"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.primaryHex} 0%, ${theme.bgHex} 100%)`
-                }}
-              >
-                {/* Decorative Elements */}
-                <div 
-                  className="absolute inset-0 opacity-30 mix-blend-overlay"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 2px 2px, ${theme.textHex} 1px, transparent 0)`,
-                    backgroundSize: '20px 20px'
-                  }}
+              <div className="h-32 w-full relative overflow-hidden bg-[#050505]">
+                {/* Native Iframe Render */}
+                <iframe
+                  src={`/demo/${theme.id}?thumbnail=true`}
+                  className="w-full h-[812px] absolute top-0 left-0 border-none pointer-events-none opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  loading="lazy"
                 />
                 
                 {/* Floating Preview Pill */}
                 <div 
-                  className="relative z-10 px-5 py-2 rounded-2xl shadow-xl backdrop-blur-md border border-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-2"
+                  className="absolute bottom-3 left-3 z-10 px-4 py-1.5 rounded-xl shadow-lg backdrop-blur-md border border-white/20 transition-transform duration-500 group-hover:scale-105"
                   style={{ 
-                    backgroundColor: `${theme.bgHex}dd`,
+                    backgroundColor: `${theme.bgHex}ee`,
                     color: theme.textHex
                   }}
                 >
-                  <span className="text-xs font-bold tracking-[0.2em] uppercase">
+                  <span className="text-[10px] font-bold tracking-[0.2em] uppercase">
                     {theme.name.split(' ')[0]}
                   </span>
                 </div>

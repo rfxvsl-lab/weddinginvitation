@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import InvitationPreview from "@/components/InvitationPreview";
 import { DEFAULT_THEMES, DEFAULT_WEDDING_DATA } from "@/data/defaultData";
 import { RSVP } from "@/types";
@@ -10,7 +10,9 @@ import { ArrowLeft } from "lucide-react";
 
 export default function ThemeDemoPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const themeId = params.themeId as string;
+  const isThumbnail = searchParams.get('thumbnail') === 'true';
 
   const theme = DEFAULT_THEMES.find((t) => t.id === themeId);
 
@@ -40,17 +42,21 @@ export default function ThemeDemoPage() {
   return (
     <div className="relative min-h-screen">
       {/* Floating back button */}
-      <Link
-        href="/preview"
-        className="fixed top-6 left-6 z-[100] bg-white/90 backdrop-blur-md text-black px-4 py-2.5 rounded-full text-xs tracking-widest uppercase font-bold shadow-xl border border-zinc-200 hover:bg-zinc-100 transition-colors flex items-center gap-2"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" /> Kembali
-      </Link>
+      {!isThumbnail && (
+        <Link
+          href="/preview"
+          className="fixed top-6 left-6 z-[100] bg-white/90 backdrop-blur-md text-black px-4 py-2.5 rounded-full text-xs tracking-widest uppercase font-bold shadow-xl border border-zinc-200 hover:bg-zinc-100 transition-colors flex items-center gap-2"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Kembali
+        </Link>
+      )}
 
       {/* Demo badge */}
-      <div className="fixed top-6 right-6 z-[100] bg-amber-500 text-white px-4 py-2 rounded-full text-[10px] tracking-widest uppercase font-bold shadow-xl">
-        Demo — {theme.name}
-      </div>
+      {!isThumbnail && (
+        <div className="fixed top-6 right-6 z-[100] bg-amber-500 text-white px-4 py-2 rounded-full text-[10px] tracking-widest uppercase font-bold shadow-xl">
+          Demo — {theme.name}
+        </div>
+      )}
 
       {/* Full screen invitation preview */}
       <InvitationPreview
