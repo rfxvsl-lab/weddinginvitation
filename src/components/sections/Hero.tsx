@@ -9,7 +9,7 @@ import { IconArrowRight } from '@/components/Icons';
 import { cn } from '@/lib/utils';
 
 /* ─── Animation Variants ─── */
-const container = {
+const container: any = {
   hidden: {},
   show: {
     transition: {
@@ -19,7 +19,7 @@ const container = {
   },
 };
 
-const fadeUp: Variants = {
+const fadeUp: any = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };

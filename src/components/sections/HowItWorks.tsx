@@ -27,7 +27,7 @@ const steps = [
   },
 ];
 
-const containerVariants = {
+const containerVariants: any = {
   hidden: {},
   visible: {
     transition: {
@@ -36,7 +36,7 @@ const containerVariants = {
   },
 };
 
-const stepVariants: Variants = {
+const stepVariants: any = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,

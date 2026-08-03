@@ -18,17 +18,17 @@ import {
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
 
 // --- ANIMATION VARIANTS ---
-const blurFadeIn = {
+const blurFadeIn: any = {
     hidden: { opacity: 0, filter: 'blur(12px)', y: 30 },
     visible: { opacity: 1, filter: 'blur(0px)', y: 0, transition: { duration: 1.2, ease: 'easeOut' } }
 };
 
-const slideUpPop = {
+const slideUpPop: any = {
     hidden: { opacity: 0, y: 60, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 80, damping: 20, mass: 1 } }
 };
 
-const staggerContainer = {
+const staggerContainer: any = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,

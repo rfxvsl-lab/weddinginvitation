@@ -87,7 +87,7 @@ const tiers: PricingTier[] = [
 ];
 
 
-const containerVariants = {
+const containerVariants: any = {
   hidden: {},
   visible: {
     transition: {
@@ -96,7 +96,7 @@ const containerVariants = {
   },
 };
 
-const cardVariants: Variants = {
+const cardVariants: any = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,

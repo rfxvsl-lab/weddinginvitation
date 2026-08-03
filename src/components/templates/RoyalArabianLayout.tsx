@@ -20,17 +20,17 @@ import {
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
 
 // --- ANIMATION VARIANTS ---
-const blurFadeIn = {
+const blurFadeIn: any = {
     hidden: { opacity: 0, filter: 'blur(10px)', y: 20 },
     visible: { opacity: 1, filter: 'blur(0px)', y: 0, transition: { duration: 1, ease: 'easeOut' } }
 };
 
-const slideUpPop = {
+const slideUpPop: any = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 100, damping: 20, mass: 1 } }
 };
 
-const breatheSway = {
+const breatheSway: any = {
     animate: {
         rotate: [-2, 2, -2],
         scale: [1, 1.05, 1],
@@ -46,7 +46,7 @@ const reverseBreatheSway = {
     }
 };
 
-const staggerContainer = {
+const staggerContainer: any = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,

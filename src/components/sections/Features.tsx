@@ -64,7 +64,7 @@ const features = [
   },
 ];
 
-const containerVariants = {
+const containerVariants: any = {
   hidden: {},
   visible: {
     transition: {
@@ -74,7 +74,7 @@ const containerVariants = {
 };
 
 
-const cardVariants: Variants = {
+const cardVariants: any = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
