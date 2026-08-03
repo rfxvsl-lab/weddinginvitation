@@ -399,7 +399,7 @@ const CornerRedRoseCluster = ({ className, position = "top-left" }: { className?
 };
 
 const Leaf = ({ cx, cy, customDelay, angle, scale=1, color="#e8e8e8" }: { cx: number, cy: number, customDelay: number, angle: number, scale?: number, color?: string }) => {
-    const variants = {
+    const variants: any = {
         hidden: { scale: 0, opacity: 0, x: cx, y: cy, rotate: angle - 45 },
         visible: (custom: number) => ({
             scale: scale, opacity: 1, x: cx, y: cy, rotate: angle,
