@@ -754,7 +754,7 @@ const RoyalArabianLayout: React.FC<RoyalArabianProps> = ({ data, guest, onAddRSV
                                 onClick={() => setActiveTab(item.id)}
                                 className={`relative flex flex-col items-center justify-center p-2 transition-colors ${activeTab === item.id ? 'text-[#D4AF37]' : 'text-[#8B6E4E] hover:text-[#D4AF37]'}`}
                             >
-                                <item.icon size={20} weight={activeTab === item.id ? "fill" : "regular"} />
+                                <item.icon size={20} />
                                 {activeTab === item.id && (
                                     <motion.div layoutId="nav-indicator-royal" className="absolute -bottom-1 w-1 h-1 bg-[#D4AF37] rounded-full drop-shadow-[0_0_5px_#D4AF37]" />
                                 )}

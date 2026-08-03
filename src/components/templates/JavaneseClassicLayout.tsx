@@ -36,7 +36,7 @@ const staggerContainer = {
     }
 };
 
-const breatheSway = {
+const breatheSway: any = {
     animate: {
         rotate: [-1, 1, -1],
         scale: [1, 1.03, 1],
@@ -712,7 +712,7 @@ const JavaneseClassicLayout: React.FC<JavaneseClassicProps> = ({ data, guest, on
                                 onClick={() => setActiveTab(item.id)}
                                 className={`relative flex flex-col items-center justify-center p-2 transition-colors ${activeTab === item.id ? 'text-[#D4AF37]' : 'text-[#8A6B22] hover:text-[#D4AF37]'}`}
                             >
-                                <item.icon size={22} weight={activeTab === item.id ? "fill" : "regular"} />
+                                <item.icon size={22} />
                                 {activeTab === item.id && (
                                     <motion.div layoutId="nav-indicator-jawa" className="absolute -bottom-1 w-6 h-0.5 bg-[#D4AF37] rounded-full drop-shadow-[0_0_5px_#D4AF37]" />
                                 )}
