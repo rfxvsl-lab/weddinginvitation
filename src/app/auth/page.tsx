@@ -31,8 +31,9 @@ export default function AuthPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen w-full">
       <AuthGate onLoginSuccess={handleLoginSuccess} />
     </div>
   );
 }
+

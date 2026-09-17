@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap");
 /* ============================================
    ruanghadir.net — Global Design System
    "Blossom Ivory" Color Palette
@@ -893,6 +893,322 @@ html {
 
 
 
+/* ============================================================
+   RuangHadir — "Clean SaaS" Prototype Layer (no-AI-slop)
+   Sistem baru ala referensi Nixflo: canvas abu, kartu putih,
+   aksen biru royal + navy. Scope: .saas-* saja, agar tidak
+   mengganggu token/template undangan yang sudah ada.
+   ============================================================ */
+
+.saas-scope {
+  --saas-bg: #FAF6F0;
+  --saas-surface: #FFFFFF;
+  --saas-ink: #241418;
+  --saas-muted: #7A6A66;
+  --saas-faint: #B4A49D;
+  --saas-line: #EADFD3;
+  --saas-primary: #8E2F45;
+  --saas-primary-hover: #742539;
+  --saas-primary-soft: #F9ECEF;
+  --saas-navy: #241418;
+  --saas-navy-2: #3A2027;
+  --saas-gold: #C6A15B;
+  --saas-gold-soft: #F7EEDD;
+  --saas-success: #3E7C4F;
+  --saas-success-soft: #EAF4EC;
+  --saas-amber: #B07A2A;
+  --saas-amber-soft: #F9EFDC;
+  --saas-radius: 20px;
+  --saas-shadow: 0 1px 2px rgba(36, 20, 24, 0.06), 0 24px 48px -24px rgba(36, 20, 24, 0.25);
+  --saas-shadow-sm: 0 1px 2px rgba(36, 20, 24, 0.05), 0 10px 28px -18px rgba(36, 20, 24, 0.22);
+  /* Alias semantik (wine/gold/ink) untuk komponen SaaS */
+  --saas-wine: var(--saas-primary);
+  --saas-wine-2: #A53A51;
+  --saas-wine-soft: var(--saas-primary-soft);
+  --saas-green: var(--saas-success);
+  --saas-gold-2: #E9D3A8;
+  --saas-ink-2: #5C4A46;
+  --saas-line-strong: #DECDB8;
+
+  background:
+    radial-gradient(900px 480px at 85% -80px, rgba(198, 161, 91, 0.16), transparent 60%),
+    radial-gradient(760px 520px at -120px 220px, rgba(142, 47, 69, 0.10), transparent 60%),
+    var(--saas-bg);
+  color: var(--saas-ink);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.saas-scope h1, .saas-scope h2 {
+  font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  letter-spacing: -0.01em;
+  color: var(--saas-ink);
+  font-weight: 500;
+}
+
+.saas-scope h3 {
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--saas-ink);
+}
+
+.saas-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--saas-primary);
+}
+.saas-eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--saas-gold);
+}
+
+.saas-card {
+  background: var(--saas-surface);
+  border: 1px solid var(--saas-line);
+  border-radius: var(--saas-radius);
+  box-shadow: var(--saas-shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.saas-card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.saas-card-hover:hover { transform: translateY(-4px); box-shadow: var(--saas-shadow); border-color: #DCC9AE; }
+
+.saas-icon-box {
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--saas-primary-soft), var(--saas-gold-soft));
+  color: var(--saas-primary);
+  border: 1px solid var(--saas-line);
+  flex-shrink: 0;
+}
+
+.saas-btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, #A53A51, #8E2F45 55%, #6E2233);
+  color: #FFF7F0;
+  font-weight: 700; font-size: 14px;
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  padding: 14px 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(142, 47, 69, 0.4);
+  box-shadow: 0 12px 28px -12px rgba(142, 47, 69, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.saas-btn-primary:hover { filter: brightness(1.06); box-shadow: 0 16px 34px -12px rgba(142, 47, 69, 0.6); }
+.saas-btn-primary:active { transform: scale(0.98); }
+
+.saas-btn-outline {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(6px);
+  color: var(--saas-ink);
+  font-weight: 700; font-size: 14px;
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  padding: 14px 28px;
+  border-radius: 999px;
+  border: 1px solid var(--saas-line);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.saas-btn-outline:hover { border-color: var(--saas-gold); background: #fff; }
+
+.saas-input {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--saas-line);
+  border-radius: 12px;
+  padding: 12px 14px 12px 42px;
+  font-size: 14px;
+  color: var(--saas-ink);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.saas-input::placeholder { color: var(--saas-faint); }
+.saas-input:focus { border-color: var(--saas-primary); box-shadow: 0 0 0 3px rgba(142, 47, 69, 0.12); }
+
+.saas-progress { height: 8px; border-radius: 999px; background: #EFE4D4; overflow: hidden; }
+.saas-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--saas-gold), var(--saas-primary)); }
+
+.saas-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 999px;
+}
+.saas-badge-live { background: var(--saas-success-soft); color: var(--saas-success); }
+.saas-badge-blue { background: var(--saas-primary-soft); color: var(--saas-primary); }
+.saas-badge-amber { background: var(--saas-amber-soft); color: var(--saas-amber); }
+.saas-badge-navy { background: var(--saas-navy); color: #fff; }
+
+.saas-donut {
+  width: 104px; height: 104px; border-radius: 50%;
+  background: conic-gradient(var(--saas-primary) 0 68%, #EBDDC6 68% 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.saas-donut::after {
+  content: attr(data-label);
+  width: 74px; height: 74px; border-radius: 50%;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: var(--saas-ink);
+}
+
+.saas-bars { display: flex; align-items: flex-end; gap: 8px; height: 96px; }
+.saas-bars > span { flex: 1; border-radius: 6px 6px 3px 3px; background: #EBDDC6; min-height: 12%; }
+.saas-bars > span.hot { background: var(--saas-navy); }
+.saas-bars > span.mid { background: linear-gradient(180deg, var(--saas-gold), var(--saas-primary)); }
+
+.saas-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.saas-table th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--saas-faint); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--saas-line);
+}
+.saas-table td { padding: 12px; border-bottom: 1px solid var(--saas-line); vertical-align: middle; }
+.saas-table tr:last-child td { border-bottom: none; }
+
+.saas-navlink { font-size: 13.5px; font-weight: 600; color: var(--saas-muted); transition: color 0.15s; }
+.saas-navlink:hover { color: var(--saas-ink); }
+
+.saas-navy-panel { background: linear-gradient(135deg, var(--saas-navy) 0%, var(--saas-navy-2) 100%); color: #fff; }
+.saas-navy-panel h1, .saas-navy-panel h2, .saas-navy-panel h3 { color: #fff; }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ---- Utilitas Clean-SaaS (ivory · ink · wine · gold) ---- */
+.saas-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 28px);
+}
+
+.saas-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--saas-primary);
+}
+.saas-kicker::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--saas-gold);
+}
+
+.saas-serif-i {
+  font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.saas-statnum {
+  font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+.saas-check {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: var(--saas-primary-soft);
+  color: var(--saas-primary);
+  flex-shrink: 0;
+}
+
+.saas-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.saas-float {
+  position: absolute;
+  background: #fff;
+  border: 1px solid var(--saas-line);
+  border-radius: 18px;
+  box-shadow: 0 24px 48px -20px rgba(36, 20, 24, 0.3);
+}
+
+.saas-glass {
+  background: rgba(250, 246, 240, 0.82);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+}
+
+.saas-divide > div + div { border-top: 1px solid var(--saas-line); }
+
+.saas-dark-panel {
+  background: linear-gradient(165deg, #35201F 0%, #241418 52%, #3A2027 100%);
+  color: #F6EFE7;
+  border-color: rgba(222, 205, 184, 0.22);
+}
+.saas-dark-panel h1, .saas-dark-panel h2, .saas-dark-panel h3 { color: #fff; }
+
+.saas-badge-green { background: var(--saas-success-soft); color: var(--saas-success); }
+.saas-badge-gold { background: var(--saas-gold-soft); color: #8A6428; }
+
+.saas-btn-primary:disabled,
+.saas-btn-outline:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
+@media (max-width: 1023px) {
+  .saas-hide-mobile { display: none !important; }
+}
+
+/* ===== Legal document (saas-doc) ===== */
+.saas-doc h2 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--saas-ink);
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--saas-line);
+}
+.saas-doc > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.saas-doc h3 {
+  margin-top: 20px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--saas-ink);
+}
+.saas-doc p {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--saas-ink-2);
+}
+.saas-doc ul,
+.saas-doc ol { margin: 12px 0 0 0; padding-left: 22px; display: grid; gap: 8px; }
+.saas-doc li { font-size: 14px; line-height: 1.7; color: var(--saas-ink-2); padding-left: 4px; }
+.saas-doc ul li::marker { color: var(--saas-gold); }
+.saas-doc ol li::marker { color: var(--saas-wine); font-weight: 800; }
+.saas-doc strong { color: var(--saas-ink); font-weight: 700; }
+.saas-doc a { color: var(--saas-wine); font-weight: 700; }
+.saas-doc a:hover { text-decoration: underline; }
+
 /* Preview Container Overrides */
 .preview-container {
   container-type: size;
@@ -904,4 +1220,267 @@ html {
 .preview-container .h-screen,
 .preview-container [class*="h-[100dvh]"] {
   height: 100cqh !important;
+}
+
+/* ============================================================
+   SaaS UI/UX v2 — lapisan penyempurnaan
+   Semua aturan di bawah di-scope ke .saas-scope agar template
+   undangan dan halaman lama tidak terpengaruh.
+   ============================================================ */
+
+.saas-scope {
+  --saas-danger: #B03A3A;
+  --saas-danger-soft: #FBECEA;
+  --saas-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --saas-dur: 0.22s;
+  --saas-ring: 0 0 0 3px rgba(142, 47, 69, 0.16);
+  --saas-shadow-lift: 0 18px 40px -22px rgba(36, 20, 24, 0.4);
+}
+
+.saas-scope h1,
+.saas-scope h2,
+.saas-scope h3 { text-wrap: balance; }
+.saas-scope p { text-wrap: pretty; }
+
+/* Judul antarmuka aplikasi: tetap sans, karena serif tidak terbaca
+   di ukuran 13-15px yang dipakai header dashboard. */
+.saas-scope .saas-ui-title {
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Fokus keyboard yang konsisten di atas latar ivory ---- */
+.saas-scope :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--saas-primary);
+  outline-offset: 2px;
+}
+.saas-scope .saas-btn-primary:focus-visible,
+.saas-scope .saas-btn-outline:focus-visible { outline-offset: 3px; }
+.saas-scope .saas-input:focus-visible,
+.saas-scope .saas-choice:focus-visible { outline: none; }
+.saas-scope .saas-choice:focus-visible { box-shadow: var(--saas-ring); }
+
+/* ---- Target sentuh & keadaan tombol ---- */
+.saas-btn-primary,
+.saas-btn-outline { min-height: 44px; transition: transform var(--saas-dur) var(--saas-ease), box-shadow var(--saas-dur) var(--saas-ease), border-color var(--saas-dur) var(--saas-ease), background var(--saas-dur) var(--saas-ease), filter var(--saas-dur) var(--saas-ease); }
+.saas-scope .saas-btn-outline:active { transform: scale(0.98); }
+.saas-scope .saas-btn-primary:active { transform: scale(0.985); }
+
+.saas-btn-sm {
+  min-height: 36px !important;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+}
+.saas-btn-block { width: 100%; }
+
+.saas-btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent;
+  color: var(--saas-ink-2);
+  font-weight: 700; font-size: 13.5px;
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  padding: 10px 16px; min-height: 40px;
+  border-radius: 999px; border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--saas-dur) var(--saas-ease), color var(--saas-dur) var(--saas-ease);
+}
+.saas-btn-ghost:hover { background: rgba(142, 47, 69, 0.06); color: var(--saas-primary); }
+
+.saas-spinner {
+  width: 15px; height: 15px; flex-shrink: 0;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: saasSpin 0.7s linear infinite;
+}
+@keyframes saasSpin { to { transform: rotate(360deg); } }
+
+/* ---- Kolom isian: tinggi, keadaan salah, dan varian tanpa ikon ---- */
+.saas-input {
+  min-height: 46px;
+  line-height: 1.4;
+}
+.saas-input-flush { padding-left: 14px; }
+.saas-input.is-error,
+.saas-input[aria-invalid="true"] {
+  border-color: var(--saas-danger);
+  box-shadow: 0 0 0 3px rgba(176, 58, 58, 0.12);
+}
+.saas-input.is-error:focus,
+.saas-input[aria-invalid="true"]:focus {
+  border-color: var(--saas-danger);
+  box-shadow: 0 0 0 3px rgba(176, 58, 58, 0.18);
+}
+.saas-input:disabled {
+  background: #F6F1EA;
+  color: var(--saas-faint);
+  cursor: not-allowed;
+}
+textarea.saas-input { padding-left: 14px; padding-top: 12px; resize: vertical; }
+
+.saas-field-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--saas-ink-2);
+}
+.saas-field-hint { font-size: 11.5px; font-weight: 500; color: var(--saas-muted); }
+.saas-field-error {
+  display: flex; align-items: flex-start; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--saas-danger);
+}
+
+.saas-trailing-btn {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 9px;
+  color: var(--saas-muted); background: transparent; border: 0; cursor: pointer;
+  transition: background var(--saas-dur) var(--saas-ease), color var(--saas-dur) var(--saas-ease);
+}
+.saas-trailing-btn:hover { background: var(--saas-primary-soft); color: var(--saas-primary); }
+
+.saas-meter { display: flex; gap: 4px; }
+.saas-meter > i {
+  height: 4px; flex: 1; border-radius: 999px;
+  background: #E9DCCA;
+  transition: background var(--saas-dur) var(--saas-ease);
+}
+.saas-meter > i.on-weak { background: #D4594F; }
+.saas-meter > i.on-fair { background: var(--saas-amber); }
+.saas-meter > i.on-strong { background: var(--saas-success); }
+
+/* ---- Kartu pilihan (radio) — bisa dioperasikan keyboard ---- */
+.saas-choice {
+  position: relative;
+  display: flex; flex-direction: column; align-items: stretch;
+  width: 100%; height: 100%;
+  text-align: left; gap: 4px; padding: 18px;
+  border-radius: 18px;
+  border: 1.5px solid var(--saas-line);
+  background: #fff;
+  color: var(--saas-ink);
+  cursor: pointer;
+  transition: border-color var(--saas-dur) var(--saas-ease), box-shadow var(--saas-dur) var(--saas-ease), transform var(--saas-dur) var(--saas-ease);
+}
+.saas-choice:hover { border-color: rgba(142, 47, 69, 0.38); box-shadow: var(--saas-shadow-sm); transform: translateY(-2px); }
+.saas-choice[data-selected="true"] {
+  border-color: var(--saas-primary);
+  box-shadow: var(--saas-ring), var(--saas-shadow-sm);
+}
+.saas-choice[data-selected="true"]::after {
+  content: "✓";
+  position: absolute; top: 14px; right: 14px;
+  width: 20px; height: 20px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--saas-primary); color: #fff;
+  font-size: 11px; font-weight: 800; line-height: 1;
+}
+.saas-choice[data-selected="true"]:hover { transform: none; }
+
+/* ---- Indikator langkah ---- */
+.saas-stepper { display: flex; align-items: center; gap: 10px; }
+.saas-stepper-track {
+  position: relative; flex: 1; height: 3px; border-radius: 999px;
+  background: #EFE3D5; overflow: hidden;
+}
+.saas-stepper-track > span {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--saas-gold), var(--saas-primary));
+  transition: width 0.4s var(--saas-ease);
+}
+.saas-stepper-dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 999px; flex-shrink: 0;
+  font-size: 10.5px; font-weight: 800; font-family: "JetBrains Mono", monospace;
+  background: #F0E7D6; color: var(--saas-faint);
+  transition: background var(--saas-dur) var(--saas-ease), color var(--saas-dur) var(--saas-ease), box-shadow var(--saas-dur) var(--saas-ease);
+}
+.saas-stepper-dot[data-state="active"] {
+  background: var(--saas-primary); color: #fff;
+  box-shadow: 0 0 0 4px rgba(142, 47, 69, 0.14);
+}
+.saas-stepper-dot[data-state="done"] { background: var(--saas-success-soft); color: var(--saas-success); }
+
+/* ---- Kerangka pemuatan ---- */
+.saas-skeleton {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #EFE6DA 25%, #F8F3EC 37%, #EFE6DA 63%);
+  background-size: 400% 100%;
+  animation: saasShimmer 1.4s ease-in-out infinite;
+}
+@keyframes saasShimmer {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
+}
+
+.saas-badge-danger { background: var(--saas-danger-soft); color: var(--saas-danger); }
+
+.saas-scope ::selection { background: var(--saas-primary-soft); color: var(--saas-primary-hover); }
+
+/* ---- Hormati preferensi gerak pengguna ---- */
+@media (prefers-reduced-motion: reduce) {
+  .saas-scope *,
+  .saas-scope *::before,
+  .saas-scope *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Dashboard — jembatan palet
+   ------------------------------------------------------------
+   Panel dashboard (EditorPanel, GuestManager, AnalyticsDashboard,
+   dll.) memakai utility zinc/amber/rose warisan desain lama, total
+   500+ pemakaian. Menulis ulang semuanya berisiko besar, jadi
+   variabel palet Tailwind di-remap di dalam area dashboard saja.
+
+   Utility seperti .text-zinc-800 dikompilasi Tailwind v4 menjadi
+   `color: var(--color-zinc-800)`, sehingga menimpa variabel di sini
+   ikut mengubah seluruh panel tanpa menyentuh JSX-nya.
+
+   Catatan: varian opasitas (.bg-zinc-100/80) dikompilasi menjadi hex
+   statis dan TIDAK ikut ter-remap — nilainya netral sehingga tetap aman.
+
+   Skala zinc -> netral hangat, amber -> gold, rose -> wine.
+   Warna semantik (emerald/sky/violet) sengaja TIDAK diubah karena
+   membedakan status hadir/ragu/tidak hadir.
+   ============================================================ */
+
+.saas-dash {
+  /* zinc: netral dingin -> netral hangat berbasis ink */
+  --color-zinc-50:  #FBF8F4;
+  --color-zinc-100: #F5EFE7;
+  --color-zinc-200: #EADFD3;
+  --color-zinc-300: #DECDB8;
+  --color-zinc-400: #B4A49D;
+  --color-zinc-500: #8C7A74;
+  --color-zinc-600: #7A6A66;
+  --color-zinc-700: #5C4A46;
+  --color-zinc-800: #3A2A28;
+  --color-zinc-900: #241418;
+  --color-zinc-950: #1A0F12;
+
+  /* amber: oranye -> gold */
+  --color-amber-50:  #FBF6EC;
+  --color-amber-100: #F7EEDD;
+  --color-amber-200: #EFDFC0;
+  --color-amber-300: #E9D3A8;
+  --color-amber-400: #D8B87C;
+  --color-amber-500: #C6A15B;
+  --color-amber-600: #A8843F;
+  --color-amber-700: #8A6428;
+  --color-amber-800: #6E4F1E;
+  --color-amber-900: #573E18;
+
+  /* rose: pink -> wine */
+  --color-rose-50:  #FDF5F6;
+  --color-rose-100: #F9ECEF;
+  --color-rose-200: #F0D5DB;
+  --color-rose-300: #DFAFB9;
+  --color-rose-400: #C98493;
+  --color-rose-500: #A53A51;
+  --color-rose-600: #8E2F45;
+  --color-rose-700: #742539;
 }

@@ -26,8 +26,8 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex flex-col gap-1.5">
-        <h3 className="text-xl font-bold text-zinc-900 flex items-center gap-2.5 tracking-tight">
-          <div className="p-2 bg-zinc-100 text-zinc-700 rounded-[1rem] border border-zinc-200/50 shadow-sm">
+        <h3 className="saas-ui-title text-xl font-bold text-zinc-900 flex items-center gap-2.5 tracking-tight">
+          <div className="saas-icon-box !rounded-2xl">
             <Palette className="w-5 h-5" />
           </div>
           Pilihan Tema Undangan
@@ -49,9 +49,9 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
                 !isAvailable
                   ? 'opacity-80 cursor-not-allowed border border-white/40'
                   : isSelected
-                  ? 'scale-[1.02] border-2 border-amber-300 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.3)] ring-4 ring-amber-50'
-                  : 'border border-white/60 hover:border-amber-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1'
-              } bg-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]`}
+                  ? 'scale-[1.02] border-2 border-[var(--saas-primary)] shadow-[0_20px_50px_-12px_rgba(142,47,69,0.28)] ring-4 ring-[var(--saas-primary-soft)]'
+                  : 'border border-white/60 hover:border-[var(--saas-gold)] hover:shadow-[0_20px_40px_-15px_rgba(36,20,24,0.12)] hover:-translate-y-1'
+              } bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(36,20,24,0.06)]`}
             >
               {/* Lock badge for unavailable themes */}
               {!isAvailable && (

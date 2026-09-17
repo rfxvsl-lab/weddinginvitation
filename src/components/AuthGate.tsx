@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
@@ -32,6 +32,8 @@ interface AuthGateProps {
   onAdminOverride?: () => void;
 }
 
+const PACKAGE_IDS = ['demo', 'reguler', 'premium', 'luxury'] as const;
+
 function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const toast = useToast();
   // Navigation states
@@ -58,6 +60,27 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       window.removeEventListener('popstate', handleCheckRoute);
       window.removeEventListener('hashchange', handleCheckRoute);
     };
+  }, []);
+
+  // Honori intent dari landing page: /auth?mode=register&package=premium&email=...
+  // Tanpa ini semua CTA "daftar" mendaratkan calon pengguna di form Masuk.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const intent = (params.get('mode') || '').toLowerCase();
+    const pkg = (params.get('package') || '').toLowerCase();
+    const prefillEmail = params.get('email');
+
+    if (intent === 'register' || intent === 'signup' || intent === 'daftar') {
+      setMode('signup');
+      setStep(1);
+    }
+    if ((PACKAGE_IDS as readonly string[]).includes(pkg)) {
+      setPackageId(pkg as (typeof PACKAGE_IDS)[number]);
+    }
+    if (prefillEmail) {
+      setEmail(prefillEmail);
+      setLoginEmail(prefillEmail);
+    }
   }, []);
 
   const handleExitAdmin = () => {
@@ -405,13 +428,13 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans relative selection:bg-foreground selection:text-background overflow-hidden">
-      {/* Modern Ambient Backgrounds */}
-      <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-muted via-background to-transparent pointer-events-none opacity-40" />
-      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-foreground/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-muted blur-[150px] pointer-events-none" />
-      {/* Ornamental dot pattern (if any) */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none dark:bg-[radial-gradient(#262626_1px,transparent_1px)]" />
+    <div className="min-h-screen bg-[#F6F1EA] text-[#2B2018] flex flex-col font-sans relative selection:bg-[#8E2F45] selection:text-white overflow-hidden">
+      {/* Warm Ambient Backgrounds */}
+      <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[#EFE5D4] via-[#F6F1EA] to-transparent pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-[#B98A44]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#8E2F45]/5 blur-[150px] pointer-events-none" />
+      {/* Ornamental dot pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(#DACCB2_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
 
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16 z-10">
@@ -467,7 +490,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
         {/* ==================== WELCOME GREETING ==================== */}
         {showWelcome && welcomeUser && (
-          <div className="w-full max-w-lg bg-card border border-border p-10 rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-700 text-center space-y-6">
+          <div className="w-full max-w-lg saas-card p-10 animate-in fade-in zoom-in-95 duration-700 text-center space-y-6">
             <div className="relative">
               <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 animate-in zoom-in duration-1000">
                 <CheckCircle className="w-10 h-10 text-white" />
@@ -476,32 +499,32 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
             </div>
 
             <div className="space-y-2">
-              <span className="text-[10px] tracking-[0.3em] font-bold uppercase text-muted-foreground font-mono">SELAMAT DATANG DI RUANGHADIR</span>
-              <h2 className="text-3xl font-serif text-foreground tracking-tight">Halo, {welcomeUser.fullName}! 🎉</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Akun Anda telah aktif dengan paket <span className="font-bold text-foreground">{(welcomeUser.packageId || '').toUpperCase()}</span>.
+              <span className="text-[10px] tracking-[0.3em] font-bold uppercase text-[#6B5B4A] font-mono">SELAMAT DATANG DI RUANGHADIR</span>
+              <h2 className="text-3xl font-serif text-[#2B2018] tracking-tight">Halo, {welcomeUser.fullName}! 🎉</h2>
+              <p className="text-sm text-[#6B5B4A] leading-relaxed">
+                Akun Anda telah aktif dengan paket <span className="font-bold text-[#2B2018]">{(welcomeUser.packageId || '').toUpperCase()}</span>.
                 Selamat memulai perjalanan membuat undangan pernikahan digital yang elegan!
               </p>
             </div>
 
-            <div className="bg-muted/50 border border-border p-5 rounded-2xl space-y-3 text-left">
+            <div className="bg-[#F8F2E6] border border-[#E4D8C3] p-5 rounded-2xl space-y-3 text-left">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Paket Aktif</span>
-                <span className="text-xs font-bold text-foreground bg-foreground/10 px-2.5 py-1 rounded-full">{(welcomeUser.packageId || '').toUpperCase()}</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-[#6B5B4A]">Paket Aktif</span>
+                <span className="text-xs font-bold text-[#2B2018] bg-[#8E2F45]/10 px-2.5 py-1 rounded-full">{(welcomeUser.packageId || '').toUpperCase()}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Link Undangan</span>
-                <span className="text-xs font-mono text-foreground">ruanghadir.net/{welcomeUser.activeSlug}</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-[#6B5B4A]">Link Undangan</span>
+                <span className="text-xs font-mono text-[#2B2018]">ruanghadir.net/{welcomeUser.activeSlug}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Opsi</span>
-                <span className="text-xs text-foreground">{welcomeUser.isCustomByRfx ? 'Terima Beres (RFX)' : 'Buat Sendiri'}</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-[#6B5B4A]">Opsi</span>
+                <span className="text-xs text-[#2B2018]">{welcomeUser.isCustomByRfx ? 'Terima Beres (RFX)' : 'Buat Sendiri'}</span>
               </div>
             </div>
 
             <button
               onClick={() => { setShowWelcome(false); onLoginSuccess(welcomeUser); }}
-              className="w-full py-4 bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              className="w-full py-4 saas-btn-primary font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
               <span>Mulai Buat Undangan</span>
               <ChevronRight className="w-4 h-4" />
@@ -511,33 +534,33 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
         {/* ==================== PAYMENT VIEW (PAKASIR) ==================== */}
         {mode === 'payment' && activeUser && !showWelcome && (
-          <div className="w-full max-w-xl bg-card border border-border p-8 rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-500 space-y-6">
+          <div className="w-full max-w-xl bg-[#FFFDFB] border border-[#E4D8C3] p-8 rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-500 space-y-6">
             <div className="text-center space-y-1.5 relative">
-              <span className="text-[10px] tracking-[0.35em] font-bold uppercase text-muted-foreground font-mono">PEMBAYARAN OTOMATIS</span>
-              <h2 className="text-2xl font-serif text-foreground tracking-tight">Selesaikan Pembayaran</h2>
-              <p className="text-xs text-muted-foreground">
+              <span className="text-[10px] tracking-[0.35em] font-bold uppercase text-[#6B5B4A] font-mono">PEMBAYARAN OTOMATIS</span>
+              <h2 className="text-2xl font-serif saas-serif-i text-[#2B2018]">Selesaikan Pembayaran</h2>
+              <p className="text-xs text-[#6B5B4A]">
                 Pilih metode pembayaran, lalu selesaikan untuk aktivasi instan.
               </p>
               <button 
                 onClick={() => { auth.logout(); setMode('signin'); setPakasirData(null); setSelectedPayMethod(null); }}
-                className="absolute top-0 right-0 p-2 text-muted-foreground hover:text-foreground transition flex items-center gap-1 text-[10px] uppercase font-bold cursor-pointer"
+                className="absolute top-0 right-0 p-2 text-[#6B5B4A] hover:text-[#2B2018] transition flex items-center gap-1 text-[10px] uppercase font-bold cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" /> Keluar
               </button>
             </div>
 
             {/* Billing Info */}
-            <div className="bg-muted/50 border border-border p-5 rounded-2xl flex justify-between items-center">
+            <div className="bg-[#F8F2E6] border border-[#E4D8C3] p-5 rounded-2xl flex justify-between items-center">
               <div className="space-y-1">
-                <span className="text-[9px] font-mono text-muted-foreground font-bold uppercase tracking-widest">Detail Tagihan</span>
-                <h4 className="text-sm font-bold text-foreground">{activeUser.fullName}</h4>
-                <p className="text-xs text-muted-foreground">
-                  Paket: <span className="text-foreground font-bold">{(activeUser.packageId || '').toUpperCase()}</span> ({activeUser.isCustomByRfx ? 'Terima Beres' : 'Buat Sendiri'})
+                <span className="text-[9px] font-mono text-[#6B5B4A] font-bold uppercase tracking-widest">Detail Tagihan</span>
+                <h4 className="text-sm font-bold text-[#2B2018]">{activeUser.fullName}</h4>
+                <p className="text-xs text-[#6B5B4A]">
+                  Paket: <span className="text-[#2B2018] font-bold">{(activeUser.packageId || '').toUpperCase()}</span> ({activeUser.isCustomByRfx ? 'Terima Beres' : 'Buat Sendiri'})
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-muted-foreground font-mono uppercase block">Total</span>
-                <h2 className="text-2xl font-serif font-bold text-foreground">
+                <span className="text-[10px] text-[#6B5B4A] font-mono uppercase block">Total</span>
+                <h2 className="text-2xl font-serif font-bold text-[#2B2018]">
                   Rp {currentBillAmount.toLocaleString('id-ID')}
                 </h2>
               </div>
@@ -546,7 +569,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
             {/* ===== PAYMENT METHOD SELECTOR ===== */}
             {!pakasirData && !isCreatingPayment && (
               <div className="space-y-3 animate-in fade-in duration-300">
-                <label className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase font-mono block">Pilih Metode Pembayaran</label>
+                <label className="text-[10px] font-bold text-[#6B5B4A] tracking-wider uppercase font-mono block">Pilih Metode Pembayaran</label>
                 
                 <div className="grid grid-cols-3 gap-2.5">
                   {[
@@ -562,8 +585,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                       onClick={() => { setSelectedPayMethod(m.id); handleCreatePayment(m.id); }}
                       className={`group/bento p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col items-center text-center gap-1.5 hover:shadow-xl hover:border-zinc-300 ${
                         selectedPayMethod === m.id
-                          ? 'bg-foreground/5 border-foreground/30 shadow-sm'
-                          : 'bg-white border-border'
+                          ? 'bg-foreground/5 border-[#8E2F45]/30 shadow-sm'
+                          : 'bg-white border-[#E4D8C3]'
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
@@ -579,13 +602,13 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                         {m.iconType === 'credit' && <CreditCardIcon className="w-4.5 h-4.5" />}
                         {m.iconType === 'wallet' && <WalletIcon className="w-4.5 h-4.5" />}
                       </div>
-                      <span className="text-[11px] font-bold text-foreground leading-tight">{m.label}</span>
-                      <span className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">{m.sub}</span>
+                      <span className="text-[11px] font-bold text-[#2B2018] leading-tight">{m.label}</span>
+                      <span className="text-[8px] font-mono text-[#6B5B4A] uppercase tracking-wider">{m.sub}</span>
                     </button>
                   ))}
                 </div>
 
-                <p className="text-[9px] text-muted-foreground text-center italic">
+                <p className="text-[9px] text-[#6B5B4A] text-center italic">
                   Pilih metode di atas untuk melanjutkan. Pembayaran diproses secara otomatis.
                 </p>
               </div>
@@ -593,11 +616,11 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
             {/* Loading State */}
             {isCreatingPayment && (
-              <div className="bg-muted/30 p-8 rounded-2xl border border-border flex flex-col items-center justify-center text-center space-y-3 animate-pulse">
-                <RefreshCw className="w-6 h-6 text-muted-foreground animate-spin" />
+              <div className="bg-muted/30 p-8 rounded-2xl border border-[#E4D8C3] flex flex-col items-center justify-center text-center space-y-3 animate-pulse">
+                <RefreshCw className="w-6 h-6 text-[#6B5B4A] animate-spin" />
                 <div>
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Menyiapkan Pembayaran...</h4>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Menghubungi gateway pembayaran Pakasir.</p>
+                  <h4 className="text-xs font-bold text-[#2B2018] uppercase tracking-wider">Menyiapkan Pembayaran...</h4>
+                  <p className="text-[10px] text-[#6B5B4A] mt-0.5">Menghubungi gateway pembayaran Pakasir.</p>
                 </div>
               </div>
             )}
@@ -621,7 +644,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                 {/* QRIS Mode */}
                 {pakasirData.method === 'qris' && pakasirData.qrCode ? (
                   <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="bg-white p-5 rounded-2xl shadow-lg border border-border inline-block">
+                    <div className="bg-white p-5 rounded-2xl shadow-lg border border-[#E4D8C3] inline-block">
                       <img 
                         src={pakasirData.qrCode} 
                         alt="QRIS Payment" 
@@ -629,38 +652,38 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                       />
                     </div>
                     <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-foreground uppercase tracking-wider">Scan QRIS dengan Aplikasi Apa Saja</h5>
-                      <p className="text-[10px] text-muted-foreground">
+                      <h5 className="text-xs font-bold text-[#2B2018] uppercase tracking-wider">Scan QRIS dengan Aplikasi Apa Saja</h5>
+                      <p className="text-[10px] text-[#6B5B4A]">
                         GoPay, OVO, DANA, ShopeePay, LinkAja, atau m-Banking.
                       </p>
                     </div>
                   </div>
                 ) : pakasirData.vaNumber ? (
                   /* Virtual Account Mode */
-                  <div className="bg-muted/30 border border-border p-5 rounded-2xl space-y-3">
+                  <div className="bg-muted/30 border border-[#E4D8C3] p-5 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest font-mono">
+                      <span className="text-[9px] font-bold text-[#6B5B4A] uppercase tracking-widest font-mono">
                         {(pakasirData.method || '').replace(/_/g, ' ').toUpperCase()}
                       </span>
-                      <span className="text-[9px] bg-foreground/10 text-foreground px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Virtual Account</span>
+                      <span className="text-[9px] bg-[#8E2F45]/10 text-[#2B2018] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Virtual Account</span>
                     </div>
                     
-                    <div className="bg-background border border-border p-4 rounded-xl flex items-center justify-between gap-3">
+                    <div className="bg-white border border-[#E4D8C3] p-4 rounded-xl flex items-center justify-between gap-3">
                       <div>
-                        <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest block">Nomor Virtual Account</span>
-                        <span className="text-lg font-mono font-bold text-foreground tracking-wider select-all">
+                        <span className="text-[9px] text-[#6B5B4A] font-bold uppercase tracking-widest block">Nomor Virtual Account</span>
+                        <span className="text-lg font-mono font-bold text-[#2B2018] tracking-wider select-all">
                           {pakasirData.vaNumber}
                         </span>
                       </div>
                       <button
                         onClick={() => triggerCopy(pakasirData.vaNumber || '', 'va')}
-                        className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 border border-border text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+                        className="p-2.5 rounded-xl bg-muted hover:bg-[#F8F2E6]/80 border border-[#E4D8C3] text-[#6B5B4A] hover:text-[#2B2018] transition cursor-pointer shrink-0"
                       >
                         {copiedText === 'va' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
 
-                    <div className="text-[10px] text-muted-foreground leading-relaxed space-y-1">
+                    <div className="text-[10px] text-[#6B5B4A] leading-relaxed space-y-1">
                       <p>1. Buka aplikasi m-Banking atau ATM.</p>
                       <p>2. Pilih menu <strong>Transfer → Virtual Account</strong>.</p>
                       <p>3. Masukkan nomor VA di atas, lalu konfirmasi.</p>
@@ -668,11 +691,11 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                   </div>
                 ) : (
                   /* Fallback — no QR, no VA */
-                  <div className="flex flex-col items-center text-center space-y-3 bg-muted/30 p-6 rounded-2xl border border-border">
-                    <ShieldCheck className="w-8 h-8 text-foreground/50" />
+                  <div className="flex flex-col items-center text-center space-y-3 bg-muted/30 p-6 rounded-2xl border border-[#E4D8C3]">
+                    <ShieldCheck className="w-8 h-8 text-[#2B2018]/50" />
                     <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-foreground uppercase tracking-wider">Lakukan Pembayaran</h5>
-                      <p className="text-[10px] text-muted-foreground">
+                      <h5 className="text-xs font-bold text-[#2B2018] uppercase tracking-wider">Lakukan Pembayaran</h5>
+                      <p className="text-[10px] text-[#6B5B4A]">
                         Klik tombol di bawah untuk membuka halaman pembayaran.
                       </p>
                     </div>
@@ -685,7 +708,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                     href={pakasirData.paymentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full py-3.5 saas-btn-primary font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <ShieldCheck className="w-4 h-4" />
                     <span>Bayar via Halaman Pembayaran</span>
@@ -694,15 +717,15 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                 )}
 
                 {/* Order Info */}
-                <div className="bg-muted/30 border border-border p-4 rounded-2xl grid grid-cols-2 gap-3 text-[10px]">
+                <div className="bg-muted/30 border border-[#E4D8C3] p-4 rounded-2xl grid grid-cols-2 gap-3 text-[10px]">
                   <div>
-                    <span className="text-muted-foreground font-bold uppercase tracking-widest block">Order ID</span>
-                    <span className="font-mono text-foreground">{pakasirData.orderId}</span>
+                    <span className="text-[#6B5B4A] font-bold uppercase tracking-widest block">Order ID</span>
+                    <span className="font-mono text-[#2B2018]">{pakasirData.orderId}</span>
                   </div>
                   {pakasirData.expiredAt && (
                     <div className="text-right">
-                      <span className="text-muted-foreground font-bold uppercase tracking-widest block">Batas Waktu</span>
-                      <span className="font-mono text-foreground">{pakasirData.expiredAt}</span>
+                      <span className="text-[#6B5B4A] font-bold uppercase tracking-widest block">Batas Waktu</span>
+                      <span className="font-mono text-[#2B2018]">{pakasirData.expiredAt}</span>
                     </div>
                   )}
                 </div>
@@ -710,7 +733,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                 {/* Change Method */}
                 <button
                   onClick={() => { setPakasirData(null); setSelectedPayMethod(null); }}
-                  className="w-full py-2.5 bg-transparent text-muted-foreground hover:text-foreground border border-border hover:border-foreground/30 font-bold uppercase tracking-widest text-[10px] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2.5 bg-transparent text-[#6B5B4A] hover:text-[#2B2018] border border-[#E4D8C3] hover:border-[#8E2F45]/40 font-bold uppercase tracking-widest text-[10px] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   Ganti Metode Pembayaran
                 </button>
@@ -745,7 +768,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                 )}
 
                 {/* Polling Indicator */}
-                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
+                <div className="flex items-center justify-center gap-2 text-[10px] text-[#6B5B4A]">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Mendeteksi pembayaran secara otomatis...</span>
                 </div>

@@ -48,7 +48,7 @@ export default function ThemeDemoPage() {
       </Link>
 
       {/* Demo badge */}
-      <div className="fixed top-6 right-6 z-[100] bg-amber-500 text-white px-4 py-2 rounded-full text-[10px] tracking-widest uppercase font-bold shadow-xl">
+      <div className="fixed bottom-6 left-6 z-[100] hidden lg:block bg-zinc-950 text-white px-4 py-2 rounded-full text-[10px] tracking-widest uppercase font-bold border border-white/20">
         Demo — {theme.name}
       </div>
 

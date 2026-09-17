@@ -1,177 +1,91 @@
-"use client";
-
 import React from "react";
-import { motion } from "framer-motion";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { DEFAULT_THEMES } from "@/data/defaultData";
+import { SaasPageShell } from "@/components/saas/SaasLegal";
 
-// Background decorations per theme to give visual variety
-const THEME_DECORATIONS: Record<string, { bgImage?: string; overlayColor: string }> = {
-  'rfx-dark': {
-    overlayColor: 'rgba(5,5,5,0.15)',
-  },
-  'cremy-rose': {
-    overlayColor: 'rgba(255,228,230,0.3)',
-  },
-  'grand-ballroom': {
-    overlayColor: 'rgba(254,243,199,0.3)',
-  },
-  'netflix-luxury': {
-    overlayColor: 'rgba(10,10,10,0.2)',
-  },
-  'royal-arabian': {
-    overlayColor: 'rgba(12,18,34,0.2)',
-  },
-  'spotilove': {
-    overlayColor: 'rgba(18,18,18,0.15)',
-  },
-  'javanese-classic': {
-    overlayColor: 'rgba(253,246,236,0.3)',
-  },
+export const metadata: Metadata = {
+  title: "Katalog Tema — RuangHadir.net",
+  description: "Jelajahi koleksi tema undangan pernikahan digital premium: minimalis, adat nusantara, hingga luxury cinematic.",
 };
 
 export default function PreviewPage() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="py-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground block mb-4">
-              Koleksi Tema
-            </span>
-            <h1 className="text-4xl md:text-6xl font-serif mb-8">
-              Pilihan Desain
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Pilih dan gunakan tema undangan pernikahan yang menarik serta unik.
-              Setiap desain dirancang dengan estetika premium untuk momen spesial Anda.
-            </p>
-          </motion.div>
-        </div>
+    <SaasPageShell>
+      <section className="saas-shell pb-14 pt-16 text-center sm:pt-20">
+        <p className="saas-kicker">Koleksi tema</p>
+        <h1 className="mx-auto mt-5 max-w-[16ch] text-[40px] leading-[1.05] sm:text-[56px]">
+          Pilihan <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>desain</span> premium.
+        </h1>
+        <p className="mx-auto mt-6 max-w-[58ch] text-[16px] leading-[1.75]" style={{ color: "var(--saas-ink-2)" }}>
+          Pilih dan gunakan tema undangan pernikahan yang menarik serta unik. Setiap desain dirancang dengan estetika
+          premium untuk momen spesial Anda.
+        </p>
       </section>
 
-      {/* Themes Grid */}
-      <section className="pb-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {DEFAULT_THEMES.map((theme, i) => {
-              const deco = THEME_DECORATIONS[theme.id] || { overlayColor: 'rgba(0,0,0,0.1)' };
-              return (
-                <motion.div
-                  key={theme.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.6 }}
-                  className="group relative"
-                >
-                  {/* Card */}
+      <section className="saas-shell pb-16">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {DEFAULT_THEMES.map((theme) => (
+            <div key={theme.id} className="saas-card saas-card-hover group p-6">
+              <div className="flex items-start gap-5">
+                <Link href={`/demo/${theme.id}`} className="group/phone relative shrink-0" aria-label={`Preview tema ${theme.name}`}>
                   <div
-                    className="relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2"
-                    style={{
-                      background: `linear-gradient(160deg, ${theme.bgHex}22 0%, ${theme.primaryHex}11 100%)`,
-                    }}
+                    className="w-[132px] rounded-[24px] p-1.5 transition-transform duration-500 group-hover/phone:-rotate-2 group-hover/phone:scale-[1.04]"
+                    style={{ background: "var(--saas-ink)", boxShadow: "0 24px 40px -18px rgba(36,20,24,.45)" }}
                   >
-                    {/* Card Inner with theme background tint */}
-                    <div className="relative p-8 pb-6 flex items-center gap-6">
-                      {/* Phone Mockup */}
-                      <div className="shrink-0 relative">
-                        {/* Phone Frame */}
-                        <div
-                          className="relative w-[140px] h-[280px] rounded-[24px] border-[3px] shadow-2xl overflow-hidden transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2"
-                          style={{
-                            borderColor: theme.primaryHex + '40',
-                            backgroundColor: theme.bgHex,
-                          }}
-                        >
-                          {/* Phone Notch */}
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-5 bg-black rounded-b-xl z-20" />
-
-                          {/* Phone Screen Content (Native Iframe) */}
-                          <div className="absolute inset-0 bg-black overflow-hidden pointer-events-none" style={{ borderRadius: '20px' }}>
-                            <img 
-                              src={`/assets/themes/${theme.id}.png`}
-                              alt={theme.name}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Phone shadow */}
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[100px] h-6 bg-black/10 rounded-full blur-xl" />
-                      </div>
-
-                      {/* Theme Info */}
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className="text-[10px] uppercase tracking-[0.2em] font-bold block mb-1"
-                          style={{ color: theme.primaryHex }}
-                        >
-                          Tema Undangan
-                        </span>
-                        <h3 className="text-lg font-serif mb-3 text-foreground leading-tight">
-                          {theme.name}
-                        </h3>
-
-                        {/* Color Palette */}
-                        <div className="flex -space-x-1 mb-4">
-                          {[theme.primaryHex, theme.secondaryHex, theme.bgHex, theme.accentHex, theme.textHex].map(
-                            (hex, ci) => (
-                              <div
-                                key={ci}
-                                className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
-                                style={{ backgroundColor: hex, zIndex: 5 - ci }}
-                              />
-                            )
-                          )}
-                        </div>
-
-                        {/* Pattern Badge */}
-                        <span className="inline-block text-[10px] uppercase tracking-widest font-medium px-3 py-1 rounded-full border border-border text-muted-foreground bg-secondary/50">
-                          {theme.pattern}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Hover overlay with "Lihat Demo" */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 flex items-end justify-center opacity-0 group-hover:opacity-100 rounded-2xl">
-                      <Link
-                        href={`/demo/${theme.id}`}
-                        className="mb-8 bg-white text-black px-6 py-3 text-xs tracking-widest uppercase font-bold rounded-full flex items-center gap-2 shadow-xl hover:bg-primary hover:text-primary-foreground transition-colors transform translate-y-4 group-hover:translate-y-0 duration-500"
-                      >
-                        Lihat Demo <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                    <div className="relative aspect-[9/19] overflow-hidden rounded-[19px]" style={{ background: theme.bgHex }}>
+                      <img
+                        src={`/assets/themes/${theme.id}.png`}
+                        alt={`Mockup tema ${theme.name}`}
+                        loading="lazy"
+                        className="saas-photo opacity-90 transition-opacity duration-500 group-hover/phone:opacity-100"
+                      />
                     </div>
                   </div>
+                  <span
+                    className="absolute inset-x-2 bottom-3 flex translate-y-2 items-center justify-center gap-1.5 rounded-full py-2 text-[10.5px] font-extrabold text-white opacity-0 transition-all duration-300 group-hover/phone:translate-y-0 group-hover/phone:opacity-100"
+                    style={{ background: theme.accentHex }}
+                  >
+                    Lihat Demo <ArrowUpRight size={11} />
+                  </span>
+                </Link>
 
-                  {/* Theme Name Below Card */}
-                  <p className="mt-4 text-sm font-medium text-foreground">{theme.name}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* CTA Button */}
-          <div className="text-center mt-20">
-            <Link
-              href="/auth"
-              className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-10 py-4 text-sm tracking-widest uppercase hover:bg-primary/90 transition-colors"
-            >
-              Mulai Buat Undangan <ArrowRight className="w-4 h-4" />
-            </Link>
-            <p className="text-sm text-muted-foreground mt-4">
-              Gratis untuk paket Demo — tanpa perlu kartu kredit.
-            </p>
-          </div>
+                <div className="min-w-0 flex-1 pt-1">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: theme.primaryHex }}>
+                    Tema undangan
+                  </p>
+                  <h3 className="mt-1.5 text-[18px] font-extrabold leading-tight">{theme.name}</h3>
+                  <div className="mt-3.5 flex -space-x-1.5">
+                    {[theme.primaryHex, theme.secondaryHex, theme.bgHex, theme.accentHex, theme.textHex].map((hex, ci) => (
+                      <span
+                        key={ci}
+                        className="h-5 w-5 rounded-full border-2 border-white"
+                        style={{ background: hex, zIndex: 5 - ci }}
+                      />
+                    ))}
+                  </div>
+                  <span className="saas-badge saas-badge-gold mt-4 inline-block !px-2.5 !py-1">{theme.pattern}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
-    </>
+
+      <section className="saas-shell pb-24">
+        <div className="saas-dark-panel flex flex-col items-center gap-6 rounded-[28px] p-10 text-center sm:p-14">
+          <h2 className="max-w-[22ch] text-[30px] text-white sm:text-[38px]">
+            Sudah menemukan <span className="saas-serif-i" style={{ color: "var(--saas-gold-2)" }}>the one</span>?
+          </h2>
+          <p className="max-w-[46ch] text-[14.5px] leading-relaxed text-[#EAD9CE]">
+            Mulai kustomisasi tema pilihanmu sekarang — gratis untuk paket Demo, tanpa kartu kredit.
+          </p>
+          <Link href="/auth?mode=register" className="saas-btn-primary" style={{ background: "#FFF6F1", color: "var(--saas-wine)" }}>
+            Mulai Buat Undangan <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+    </SaasPageShell>
   );
 }

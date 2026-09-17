@@ -51,10 +51,10 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
   ];
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-background border-r border-border text-foreground font-sans">
+    <div className="saas-scope flex flex-col h-full text-foreground font-sans" style={{ background: "#fff" }}>
       {/* Logo — pinned top */}
-      <div className="flex items-center px-6 py-8 border-b border-border shrink-0">
-        <Logo isLink={false} className="w-40" />
+      <div className="flex items-center px-5 py-5 border-b shrink-0" style={{ borderColor: "var(--saas-line)" }}>
+        <Logo variant="lockup" isLink={false} height="h-9" />
       </div>
 
       {/* Scrollable middle section */}
@@ -84,14 +84,11 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
                   setActiveSegment(item.id);
                   setSidebarOpen(false);
                 }}
-                className={`group/bento w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[13px] font-semibold border transition-all duration-200 ${
-                  isActive
-                    ? 'bg-amber-100/50 text-amber-800 border-amber-200/50 shadow-md shadow-amber-900/5'
-                    : 'text-zinc-500 border-transparent hover:bg-white hover:border-zinc-200 hover:shadow-lg hover:text-zinc-700'
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-200 ${isActive ? '' : ''}`}
+                style={isActive ? { background: "var(--saas-wine-soft)", color: "var(--saas-wine)" } : { color: "var(--saas-muted)" }}
               >
                 <item.icon size={16} />
-                <span className="transition-transform duration-200 group-hover/bento:translate-x-1">{item.label}</span>
+                <span>{item.label}</span>
               </button>
             );
           })}
@@ -105,10 +102,10 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
           onUpgrade={() => { setActiveSegment('profile'); setSidebarOpen(false); }}
         />
 
-        <div className="p-6 pt-2">
+        <div className="p-5 pt-2">
           <button
             onClick={onPublish}
-            className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-amber-400 rounded-full text-xs font-black uppercase tracking-widest flex justify-center items-center gap-2 shadow-lg shadow-zinc-900/20 transition-all duration-300"
+            className="saas-btn-primary w-full !py-3"
           >
             Publish Undangan
           </button>
@@ -116,7 +113,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
       </div>
 
       {/* User section — pinned bottom */}
-      <div className="p-6 border-t border-border shrink-0">
+      <div className="p-5 border-t shrink-0" style={{ borderColor: "var(--saas-line)" }}>
         <button
           onClick={() => { setActiveSegment('profile'); setSidebarOpen(false); }}
           className="flex items-center gap-3 mb-6 w-full text-left hover:bg-muted/50 p-2 -m-2 rounded-xl transition cursor-pointer"
@@ -136,7 +133,7 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
         </button>
         <button
           onClick={onLogout}
-          className="w-full py-2.5 text-xs font-bold uppercase tracking-widest border border-border text-foreground hover:bg-zinc-900 hover:text-amber-400 rounded-full transition-all duration-300"
+          className="saas-btn-outline w-full !py-2.5 !text-[12px]"
         >
           Keluar Akun
         </button>
@@ -150,7 +147,8 @@ export default function DashboardSidebar({ activeSegment, setActiveSegment, user
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetTrigger asChild>
           <button
-            className="fixed top-3 left-4 z-[200] p-3 rounded-full bg-white/80 backdrop-blur-xl border border-amber-900/10 shadow-[0_8px_20px_rgba(0,0,0,0.06)] text-zinc-800 hover:bg-amber-50 transition-colors flex items-center justify-center cursor-pointer"
+            className="fixed top-3 left-4 z-[200] p-3 rounded-full border shadow-sm flex items-center justify-center cursor-pointer"
+            style={{ background: "#fff", borderColor: "var(--saas-line)", color: "var(--saas-ink)" }}
             aria-label="Buka menu navigasi"
           >
             <IconMenu size={20} />

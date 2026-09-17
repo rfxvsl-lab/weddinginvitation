@@ -72,6 +72,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "three": "^0.185.1",
+    "undangankita-rfxvisual": "file:",
     "vaul": "^1.1.2"
   },
   "devDependencies": {

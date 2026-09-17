@@ -730,7 +730,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                   {/* Ledger Header */}
                   <div className="text-center border-b-2 border-slate-800 pb-3">
                     <span className="text-[9px] font-mono font-bold tracking-widest text-[#4f46e5]/80 uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
-                    <h2 className="text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {coupleNames}</h2>
+                    <h2 className="saas-ui-title text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {coupleNames}</h2>
                     <div className="flex justify-between items-center text-[9px] text-[var(--color-outline)] font-mono mt-2">
                       <span>Platform Portal: ruanghadir.net</span>
                       <span>Dicetak: {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
@@ -964,7 +964,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
         <div className="title-box text-center border-b-2 border-black pb-4 mb-6">
           <div className="text-[10px] font-bold tracking-widest uppercase text-gray-600">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</div>
-          <h1 className="text-xl font-black uppercase mt-1">PERNIKAHAN {coupleNames}</h1>
+          <h1 className="saas-ui-title text-xl font-black uppercase mt-1">PERNIKAHAN {coupleNames}</h1>
           <div className="flex justify-between items-center text-[10px] mt-3 text-gray-700 font-mono">
             <span>Metode Ekspor: ruanghadir.net Digital Planner (ruanghadir.net)</span>
             <span>Tanggal Cetak: {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>

@@ -8,16 +8,19 @@ coverage/
 
 # Environment
 .env
-.env.local
-.env.production
-.env*.local
+.env.*
 !.env.example
 
 .vercel
 tsconfig.tsbuildinfo
 
+
+# Backup / editor junk
+*.bak
+*.tmp
+.favorites.csl
+desktop.ini
 # Scratch/debug files
 scratch_*.html
 patch_*.cjs
 replace_*.cjs
-test*.ts

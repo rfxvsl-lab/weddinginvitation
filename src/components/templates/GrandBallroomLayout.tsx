@@ -37,10 +37,10 @@ const GlobalStyles = () => (
     <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
 
-    /* Fonts */
-    .font-grand { font-family: 'Cinzel', serif; }
-    .font-luxury { font-family: 'Playfair Display', serif; }
-    .font-body { font-family: 'Lato', sans-serif; }
+    .grand-ballroom { font-family: 'Lato', sans-serif; line-height: 1.65; }
+    .grand-ballroom .font-grand { font-family: 'Cinzel', serif; }
+    .grand-ballroom .font-luxury { font-family: 'Playfair Display', serif; }
+    .grand-ballroom .font-body { font-family: 'Lato', sans-serif; }
 
     /* --- ANIMATIONS --- */
     
@@ -104,23 +104,12 @@ const GlobalStyles = () => (
     .animate-walk { animation: walk-slow linear infinite; }
     
     /* UTILS */
-    .text-gold-luxury {
-      background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: gold-shimmer 5s linear infinite;
-    }
+    .grand-ballroom .text-gold-luxury { color: var(--primary); }
 
-    .glass-ballroom {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 215, 0, 0.4);
-      box-shadow: 
-        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
-        0 20px 50px rgba(0,0,0,0.3),
-        0 0 100px rgba(191, 149, 63, 0.2);
+    .grand-ballroom .glass-ballroom {
+      background: var(--bg);
+      border: 1px solid var(--secondary);
+      box-shadow: inset 0 0 0 5px var(--bg-pattern);
     }
 
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -151,39 +140,21 @@ const formatDate = (dateStr: string) => {
  */
 
 const CurtainSVG = ({ side, className }: { side: 'left' | 'right', className?: string }) => {
-    // SVG paths simulate heavy velvet folds
+    // Flat slate panels retain the original curtain reveal.
     const isLeft = side === 'left';
     return (
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className={`absolute inset-0 w-full h-full ${className} ${isLeft ? 'origin-left' : 'origin-right'}`}>
-            <defs>
-                <linearGradient id={`velvet-${side}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={isLeft ? "#4a0404" : "#720e1e"} /> {/* Darker on edges */}
-                    <stop offset="20%" stopColor="#720e1e" />
-                    <stop offset="40%" stopColor="#8b1a2b" /> {/* Highlight fold */}
-                    <stop offset="60%" stopColor="#5e0b16" />
-                    <stop offset="80%" stopColor="#8b1a2b" />
-                    <stop offset="100%" stopColor={isLeft ? "#720e1e" : "#4a0404"} />
-                </linearGradient>
-            </defs>
-            <path d="M0 0 H100 V90 Q50 100 0 90 Z" fill={`url(#velvet-${side})`} />
-            {/* Texture Overlay */}
-            <rect x="0" y="0" width="100" height="100" fill="url(#noise)" opacity="0.1" />
+            <path d="M0 0 H100 V90 Q50 100 0 90 Z" fill="var(--primary)" />
+            <path d="M20 0 V92 M50 0 V95 M80 0 V92" fill="none" stroke="var(--secondary)" strokeWidth="0.4" />
         </svg>
     );
 };
 
 const TopSwagRopes = () => {
     return (
-        <div className="absolute top-0 left-0 w-full z-40 pointer-events-none h-[120px] overflow-visible">
+        <div className="absolute top-0 left-0 w-full z-40 pointer-events-none h-8 overflow-visible opacity-50">
             <svg viewBox="0 0 1000 200" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
-                    <linearGradient id="rope-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#AA771C" />
-                        <stop offset="25%" stopColor="#FFF2CD" />
-                        <stop offset="50%" stopColor="#5E4006" />
-                        <stop offset="75%" stopColor="#FFDF73" />
-                        <stop offset="100%" stopColor="#AA771C" />
-                    </linearGradient>
                     <filter id="rope-shadow">
                         <feDropShadow dx="0" dy="15" stdDeviation="15" floodColor="#000" floodOpacity="1" />
                     </filter>
@@ -195,7 +166,7 @@ const TopSwagRopes = () => {
                     animate={{ d: "M -50 -10 Q 250 180, 500 60 Q 750 180, 1050 -10" }}
                     transition={{ duration: 2.5, delay: 1.2, type: "spring", stiffness: 40, damping: 6 }}
                     fill="none"
-                    stroke="url(#rope-grad)"
+                    stroke="var(--secondary)"
                     strokeWidth="4"
                     opacity="0.6"
                     filter="url(#rope-shadow)"
@@ -207,7 +178,7 @@ const TopSwagRopes = () => {
                     animate={{ d: "M -50 -5 Q 250 140, 500 30 Q 750 140, 1050 -5" }}
                     transition={{ duration: 2, delay: 1.3, type: "spring", stiffness: 50, damping: 7 }}
                     fill="none"
-                    stroke="url(#rope-grad)"
+                    stroke="var(--secondary)"
                     strokeWidth="8"
                     filter="url(#rope-shadow)"
                 />
@@ -233,7 +204,7 @@ const FlowerNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow" 
         <motion.g custom={customDelay} initial="hidden" animate="visible" variants={bloomVariants}>
             <path d="M 0 0 C -8 -14, 8 -14, 0 0 C 14 -8, 14 8, 0 0 C 8 14, -8 14, 0 0 C -14 8, -14 -8, 0 0" fill="#ffffff" filter={`url(#${shadowId})`} />
             <path d="M 0 0 C -6 -10, 6 -10, 0 0 C 10 -6, 10 6, 0 0 C 6 10, -6 10, 0 0 C -10 6, -10 -6, 0 0" fill="#fdfdfd" transform="rotate(45)" />
-            <circle cx="0" cy="0" r="2.5" fill="#D4AF37" />
+            <circle cx="0" cy="0" r="2.5" fill="var(--secondary)" />
             <circle cx="0" cy="0" r="1" fill="#fff" opacity="0.8" />
         </motion.g>
     );
@@ -254,10 +225,10 @@ const RedRoseNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow"
 
     return (
         <motion.g custom={customDelay} initial="hidden" animate="visible" variants={bloomVariants}>
-            <path d="M 0 0 C -10 -15, 10 -15, 0 0 C 15 -10, 15 10, 0 0 C 10 15, -10 15, 0 0 C -15 10, -15 -10, 0 0" fill="#600" filter={`url(#${shadowId})`} />
-            <path d="M 0 0 C -8 -12, 8 -12, 0 0 C 12 -8, 12 8, 0 0 C 8 12, -8 12, 0 0 C -12 8, -12 -8, 0 0" fill="#8B0000" transform="rotate(45)" />
-            <path d="M 0 0 C -5 -8, 5 -8, 0 0 C 8 -5, 8 5, 0 0 C 5 8, -5 8, 0 0 C -8 5, -8 -5, 0 0" fill="#a0142b" transform="rotate(20)" />
-            <circle cx="0" cy="0" r="1.5" fill="#D4AF37" />
+            <path d="M 0 0 C -10 -15, 10 -15, 0 0 C 15 -10, 15 10, 0 0 C 10 15, -10 15, 0 0 C -15 10, -15 -10, 0 0" fill="var(--primary)" filter={`url(#${shadowId})`} />
+            <path d="M 0 0 C -8 -12, 8 -12, 0 0 C 12 -8, 12 8, 0 0 C 8 12, -8 12, 0 0 C -12 8, -12 -8, 0 0" fill="var(--primary)" transform="rotate(45)" />
+            <path d="M 0 0 C -5 -8, 5 -8, 0 0 C 8 -5, 8 5, 0 0 C 5 8, -5 8, 0 0 C -8 5, -8 -5, 0 0" fill="var(--secondary)" transform="rotate(20)" />
+            <circle cx="0" cy="0" r="1.5" fill="var(--secondary)" />
         </motion.g>
     );
 };
@@ -265,18 +236,13 @@ const RedRoseNode = ({ cx, cy, customDelay, size = 1, shadowId = "flower-shadow"
 const RealisticPeelCorner = () => {
     return (
         <motion.div 
-            className="absolute bottom-0 right-0 w-16 h-16 md:w-20 md:h-20 z-20 pointer-events-none"
+            className="absolute bottom-0 right-0 w-8 h-8 z-20 pointer-events-none"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.5, type: 'spring', stiffness: 40, damping: 8 }}
             style={{ transformOrigin: 'bottom right' }}
         >
-            {/* The mask that hides the card's actual corner */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#fdfdfd] from-[50%] to-[50%]"></div>
-            {/* The curled flap */}
-            <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tl from-[#fff] via-[#e6e6e6] to-transparent rounded-tl-[100%] shadow-[-5px_-5px_15px_rgba(0,0,0,0.3)] border-t border-l border-white/50"></div>
-            {/* Inner highlight for 3D effect */}
-            <div className="absolute bottom-0 right-0 w-[95%] h-[95%] bg-gradient-to-tl from-transparent via-white/50 to-transparent rounded-tl-[100%]"></div>
+            <div className="absolute inset-0 bg-[var(--bg-pattern)] border-t border-l border-[var(--secondary)]" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}></div>
         </motion.div>
     );
 };
@@ -290,8 +256,8 @@ const QuillSVG = ({ className }: { className?: string }) => (
         <filter id="quill-shadow"><feDropShadow dx="2" dy="2" stdDeviation="2" floodOpacity="0.3"/></filter>
         <g filter="url(#quill-shadow)">
             <path d="M78.5,12.5 C78.5,12.5 86.5,23.5 83.5,41.5 C80.5,59.5 59.5,82.5 19.5,95.5 C19.5,95.5 35.5,74.5 49.5,56.5 C63.5,38.5 73.5,24.5 78.5,12.5 Z" fill="#222" />
-            <path d="M19.5,95.5 L28.5,86.5 L12.5,78.5 Z" fill="#D4AF37" />
-            <path d="M12.5,78.5 L5.5,98.5 L19.5,95.5 Z" fill="#8B6508" />
+            <path d="M19.5,95.5 L28.5,86.5 L12.5,78.5 Z" fill="var(--secondary)" />
+            <path d="M12.5,78.5 L5.5,98.5 L19.5,95.5 Z" fill="var(--primary)" />
             <path d="M 80 20 L 73 25 M 75 35 L 68 40 M 68 50 L 58 55 M 63 20 L 68 25 M 53 35 L 58 40" stroke="#fdfdfd" strokeWidth="0.8" opacity="0.5"/>
             {/* Ink drops */}
             <circle cx="10" cy="88" r="1.5" fill="#222" />
@@ -366,7 +332,7 @@ const WrappingVine = ({ className }: { className?: string }) => (
         <defs><filter id="v-shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.4" /></filter></defs>
         <motion.rect x="5" y="5" width="calc(100% - 10px)" height="calc(100% - 10px)" rx="10" fill="none" stroke="#e0e0e0" strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2.5, ease: "easeOut" }} filter="url(#v-shadow)" />
         <motion.rect x="15" y="15" width="calc(100% - 30px)" height="calc(100% - 30px)" rx="5" fill="none" stroke="#fff" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, delay: 0.5, ease: "easeOut" }} filter="url(#v-shadow)" strokeDasharray="15 15" />
-        <motion.rect x="0" y="10" width="100%" height="calc(100% - 20px)" rx="15" fill="none" stroke="#D4AF37" strokeWidth="1" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3.5, delay: 1, ease: "easeOut" }} filter="url(#v-shadow)" strokeDasharray="5 25" />
+        <motion.rect x="0" y="10" width="100%" height="calc(100% - 20px)" rx="15" fill="none" stroke="var(--secondary)" strokeWidth="1" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3.5, delay: 1, ease: "easeOut" }} filter="url(#v-shadow)" strokeDasharray="5 25" />
     </svg>
 );
 
@@ -380,16 +346,16 @@ const CornerRedRoseCluster = ({ className, position = "top-left" }: { className?
             </defs>
             {position === "top-left" && (
                 <>
-                    <Leaf cx={15} cy={30} angle={-15} scale={1.5} customDelay={0.5} color="#8b7b51" />
-                    <Leaf cx={30} cy={15} angle={45} scale={1.3} customDelay={0.6} color="#a69466" />
+                    <Leaf cx={15} cy={30} angle={-15} scale={1.5} customDelay={0.5} color="var(--secondary)" />
+                    <Leaf cx={30} cy={15} angle={45} scale={1.3} customDelay={0.6} color="var(--secondary)" />
                     <RedRoseNode cx={15} cy={15} size={1.8} customDelay={0.7} shadowId="rose-shadow" />
                     <RedRoseNode cx={35} cy={20} size={1} customDelay={0.9} shadowId="rose-shadow" />
                 </>
             )}
             {position === "bottom-right" && (
                 <>
-                    <Leaf cx={35} cy={20} angle={165} scale={1.5} customDelay={0.8} color="#8b7b51" />
-                    <Leaf cx={20} cy={35} angle={225} scale={1.3} customDelay={0.9} color="#a69466" />
+                    <Leaf cx={35} cy={20} angle={165} scale={1.5} customDelay={0.8} color="var(--secondary)" />
+                    <Leaf cx={20} cy={35} angle={225} scale={1.3} customDelay={0.9} color="var(--secondary)" />
                     <RedRoseNode cx={35} cy={35} size={1.8} customDelay={1.0} shadowId="rose-shadow" />
                     <RedRoseNode cx={15} cy={30} size={1} customDelay={1.2} shadowId="rose-shadow" />
                 </>
@@ -500,19 +466,12 @@ const SquareFloralVines = ({ className }: { className?: string }) => {
 const GoldenCrown3D = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 100 100" className={className}>
         <defs>
-            <linearGradient id="gold-3d" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FFF2CD" />
-                <stop offset="25%" stopColor="#D4AF37" />
-                <stop offset="50%" stopColor="#FFDF73" />
-                <stop offset="75%" stopColor="#AA771C" />
-                <stop offset="100%" stopColor="#5E4006" />
-            </linearGradient>
             <filter id="shadow-3d">
                 <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.6"/>
             </filter>
         </defs>
-        <path d="M10 80 L90 80 L95 90 L5 90 Z" fill="url(#gold-3d)" filter="url(#shadow-3d)"/>
-        <path d="M15 80 L10 40 L30 60 L50 20 L70 60 L90 40 L85 80 Z" fill="url(#gold-3d)" filter="url(#shadow-3d)"/>
+        <path d="M10 80 L90 80 L95 90 L5 90 Z" fill="var(--secondary)" />
+        <path d="M15 80 L10 40 L30 60 L50 20 L70 60 L90 40 L85 80 Z" fill="var(--bg)" />
         <circle cx="10" cy="35" r="5" fill="#FFF" opacity="0.8"/>
         <circle cx="50" cy="15" r="7" fill="#FFF" opacity="0.9"/>
         <circle cx="90" cy="35" r="5" fill="#FFF" opacity="0.8"/>
@@ -521,18 +480,18 @@ const GoldenCrown3D = ({ className }: { className?: string }) => (
 
 const TasselRope = ({ side, className }: { side: 'left' | 'right', className?: string }) => (
     <svg viewBox="0 0 100 20" className={`w-32 h-6 ${className}`} preserveAspectRatio="none">
-        <path d="M0 10 Q50 15 100 10" fill="none" stroke="url(#gold-3d)" strokeWidth="2" strokeLinecap="round" />
-        <circle cx={side === 'left' ? 95 : 5} cy="10" r="4" fill="#D4AF37" filter="url(#shadow-3d)" />
+        <path d="M0 10 Q50 15 100 10" fill="none" stroke="var(--secondary)" strokeWidth="2" strokeLinecap="round" />
+        <circle cx={side === 'left' ? 95 : 5} cy="10" r="4" fill="var(--secondary)" filter="url(#shadow-3d)" />
     </svg>
 );
 
 const ElegantDivider = ({ className }: { className?: string }) => (
     <div className={`flex items-center justify-center gap-4 ${className}`}>
-        <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-[#D4AF37]"></div>
-        <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#D4AF37]" fill="currentColor">
+        <div className="w-16 h-[1px] bg-[var(--secondary)]"></div>
+        <svg viewBox="0 0 24 24" className="w-6 h-6 text-[var(--primary)]" fill="currentColor">
             <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" />
         </svg>
-        <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-[#D4AF37]"></div>
+        <div className="w-16 h-[1px] bg-[var(--secondary)]"></div>
     </div>
 );
 
@@ -557,12 +516,12 @@ const SilhouetteGuest = ({ delay, duration, scale, top }: { delay: number, durat
  */
 const BallroomBackground = ({ customBg }: { customBg?: string }) => {
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0f0505]">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[var(--bg-pattern)]">
             {/* 1. Base Image (Blurred Ballroom) */}
-            <div className="absolute inset-0 bg-cover bg-center opacity-40 blur-sm transform scale-105" style={{ backgroundImage: `url(${customBg || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1600&q=80'})` }}></div>
+            <div className="absolute inset-0 bg-cover bg-center opacity-10 blur-sm transform scale-105" style={{ backgroundImage: `url(${customBg || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1600&q=80'})` }}></div>
 
             {/* 2. Walking Guests Animation (Silhouettes) */}
-            <div className="absolute inset-0 z-10 overflow-hidden">
+            <div className="absolute inset-0 z-10 overflow-hidden opacity-10">
                 <SilhouetteGuest delay={0} duration={20} scale={200} top={50} />
                 <SilhouetteGuest delay={5} duration={25} scale={180} top={45} />
                 <SilhouetteGuest delay={10} duration={22} scale={220} top={55} />
@@ -572,9 +531,6 @@ const BallroomBackground = ({ customBg }: { customBg?: string }) => {
             {/* 3. Lighting Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-80 z-20"></div>
 
-            {/* 4. Spotlights */}
-            <div className="absolute top-0 left-1/4 w-[200px] h-[800px] bg-gradient-to-b from-white/10 to-transparent transform -rotate-12 blur-3xl z-20"></div>
-            <div className="absolute top-0 right-1/4 w-[200px] h-[800px] bg-gradient-to-b from-white/10 to-transparent transform rotate-12 blur-3xl z-20"></div>
         </div>
     );
 };
@@ -603,13 +559,13 @@ const CurtainStage = ({ onOpen }: CurtainProps) => {
         <div className={`fixed inset-0 z-[100] flex items-center justify-center transition-all duration-1000 ${isOpening ? 'pointer-events-none' : ''}`}>
 
             {/* Left Curtain */}
-            <div className={`absolute top-0 left-0 w-1/2 h-full bg-[#4a0404] origin-left z-20 ${isOpening ? 'animate-curtain-l' : ''}`}>
+            <div className={`absolute top-0 left-0 w-1/2 h-full bg-[var(--primary)] origin-left z-20 ${isOpening ? 'animate-curtain-l' : ''}`}>
                 <CurtainSVG side="left" />
                 <TasselRope side="left" className={`absolute top-1/2 right-0 transform -translate-y-1/2 origin-right ${isSnapping ? 'animate-rope-l' : ''}`} />
             </div>
 
             {/* Right Curtain */}
-            <div className={`absolute top-0 right-0 w-1/2 h-full bg-[#4a0404] origin-right z-20 ${isOpening ? 'animate-curtain-r' : ''}`}>
+            <div className={`absolute top-0 right-0 w-1/2 h-full bg-[var(--primary)] origin-right z-20 ${isOpening ? 'animate-curtain-r' : ''}`}>
                 <CurtainSVG side="right" />
                 <TasselRope side="right" className={`absolute top-1/2 left-0 transform -translate-y-1/2 origin-left ${isSnapping ? 'animate-rope-r' : ''}`} />
             </div>
@@ -617,11 +573,10 @@ const CurtainStage = ({ onOpen }: CurtainProps) => {
             {/* Center Crown Button */}
             <div className={`relative z-30 transition-all duration-1000 ${isSnapping ? 'animate-button-fall' : 'scale-100 opacity-100'}`}>
                 <div className="relative group cursor-pointer" onClick={handleOpen}>
-                    <div className="absolute inset-0 bg-[#FFD700] rounded-full blur-[40px] opacity-20 group-hover:opacity-50 transition-opacity animate-pulse"></div>
                     
                     <div className="relative flex flex-col items-center justify-center transform group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_10px_20px_rgba(0,0,0,0.9)]">
-                        <GoldenCrown3D className="w-24 h-24 mb-1 drop-shadow-[0_0_20px_#FFD700]" />
-                        <span className="font-grand text-[#D4AF37] text-xs tracking-[0.6em] drop-shadow-[0_2px_4px_rgba(0,0,0,1)] bg-black/60 px-4 py-1 rounded border border-[#D4AF37]/50 backdrop-blur-sm shadow-[0_0_15px_#FFD700]">OPEN</span>
+                        <GoldenCrown3D className="w-20 h-20 mb-3" />
+                        <span className="font-grand text-[var(--primary)] text-xs tracking-[0.3em] bg-[var(--bg)] px-6 py-3 rounded-sm border border-[var(--secondary)]">OPEN</span>
                     </div>
                 </div>
             </div>
@@ -642,10 +597,10 @@ const NavBar = ({ activeTab, setTab, data }: { activeTab: string, setTab: (t: st
     ].filter(item => item.visible);
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-6">
-            <div className="bg-gradient-to-r from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] px-6 py-4 rounded-full flex justify-between shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-[#D4AF37]/30 relative">
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="bg-[var(--bg)] px-2 py-2 rounded-sm flex justify-between shadow-sm border border-[var(--secondary)] relative">
                 {/* Gold Shine Top */}
-                <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700] to-transparent"></div>
+                <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-[var(--secondary)]"></div>
 
                 {items.map((item) => {
                     const active = activeTab === item.id;
@@ -653,10 +608,10 @@ const NavBar = ({ activeTab, setTab, data }: { activeTab: string, setTab: (t: st
                         <button
                             key={item.id}
                             onClick={() => setTab(item.id)}
-                            className={`relative flex items-center justify-center transition-all duration-300 ${active ? '-translate-y-4' : 'hover:-translate-y-1'}`}
+                            className={`relative flex items-center justify-center transition-all duration-300 ${active ? 'scale-105' : 'hover:-translate-y-1'}`}
                         >
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${active ? 'bg-gradient-to-br from-[#D4AF37] to-[#8B6508] shadow-[0_0_15px_#D4AF37]' : 'text-gray-400'}`}>
-                                <item.icon size={active ? 20 : 18} className={active ? 'text-black' : ''} />
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${active ? 'bg-[var(--primary)]' : 'text-[var(--text)]'}`}>
+                                <item.icon size={active ? 20 : 18} className={active ? 'text-white' : ''} />
                             </div>
                         </button>
                     )
@@ -678,23 +633,23 @@ const HomePage = ({ onEnter, data, guestName }: { onEnter: () => void, data: Wed
         <div className="h-full w-full overflow-y-auto hide-scrollbar flex flex-col items-center justify-start text-center p-6 pt-12 pb-32 relative">
             {/* Elegant Corner Frames */}
             <div className="absolute inset-4 pointer-events-none min-h-[600px]">
-                <div className="absolute top-0 left-0 w-12 h-12 border-t-[1px] border-l-[1px] border-[#D4AF37]"></div>
-                <div className="absolute top-0 right-0 w-12 h-12 border-t-[1px] border-r-[1px] border-[#D4AF37]"></div>
-                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[1px] border-l-[1px] border-[#D4AF37]"></div>
-                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[1px] border-r-[1px] border-[#D4AF37]"></div>
-                <div className="absolute inset-2 border border-[#D4AF37]/20"></div>
+                <div className="absolute top-0 left-0 w-12 h-12 border-t-[1px] border-l-[1px] border-[var(--secondary)]"></div>
+                <div className="absolute top-0 right-0 w-12 h-12 border-t-[1px] border-r-[1px] border-[var(--secondary)]"></div>
+                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[1px] border-l-[1px] border-[var(--secondary)]"></div>
+                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[1px] border-r-[1px] border-[var(--secondary)]"></div>
+                <div className="absolute inset-2 border border-[var(--secondary)]"></div>
             </div>
 
-            <h3 className="font-grand text-xs tracking-[0.4em] text-[#8B6508] mb-4 uppercase relative z-10 shrink-0">The Wedding Celebration</h3>
+            <h3 className="font-body text-xs tracking-[0.2em] text-[var(--primary)] mb-4 uppercase relative z-10 shrink-0">The Wedding Celebration</h3>
 
             <div className="relative mb-8 shrink-0">
-                <h1 className="font-luxury text-5xl md:text-8xl text-gold-luxury drop-shadow-sm leading-none">
+                <h1 className="font-luxury text-5xl min-[400px]:text-6xl text-gold-luxury drop-shadow-sm leading-none">
                     {groomName}
                 </h1>
-                <h2 className="font-grand text-2xl md:text-5xl text-[#D4AF37] my-[-5px] italic drop-shadow-md">
+                <h2 className="font-luxury text-3xl text-[var(--primary)] my-2 italic drop-shadow-md">
                     &
                 </h2>
-                <h1 className="font-luxury text-5xl md:text-8xl text-gold-luxury drop-shadow-sm leading-none">
+                <h1 className="font-luxury text-5xl min-[400px]:text-6xl text-gold-luxury drop-shadow-sm leading-none">
                     {brideName}
                 </h1>
             </div>
@@ -704,22 +659,22 @@ const HomePage = ({ onEnter, data, guestName }: { onEnter: () => void, data: Wed
                 initial={{ opacity: 0, scale: 0.8 }} 
                 animate={{ opacity: 1, scale: 1 }} 
                 transition={{ delay: 0.5, duration: 1 }}
-                className="relative w-64 h-[320px] md:w-80 md:h-[400px] shrink-0 mx-auto mb-12 mt-4"
+                className="relative w-52 h-[280px] min-[400px]:w-60 min-[400px]:h-[320px] shrink-0 mx-auto mb-12 mt-4"
             >
                 {/* Thick Gold Frame Border */}
-                <div className="absolute inset-[-12px] bg-gradient-to-br from-[#FFDF73] via-[#D4AF37] to-[#8B6508] shadow-[0_15px_30px_rgba(0,0,0,0.9)] -z-10 rounded-sm"></div>
+                <div className="absolute inset-[-12px] bg-[var(--secondary)] shadow-sm -z-10 rounded-sm"></div>
                 
                 {/* Winding Vines/Flowers Ornament */}
-                <SquareFloralVines className="absolute inset-[-25px] w-[calc(100%+50px)] h-[calc(100%+50px)] pointer-events-none z-20" />
-                <div className="absolute inset-[-16px] bg-gradient-to-br from-[#FFDF73] via-[#D4AF37] to-[#8B6508] shadow-[0_20px_40px_rgba(0,0,0,0.8)] border border-[#5E4006] flex items-center justify-center p-3 z-0">
+                <SquareFloralVines className="absolute inset-[-12px] w-[calc(100%+24px)] h-[calc(100%+24px)] pointer-events-none z-20 opacity-40" />
+                <div className="absolute inset-[-16px] bg-[var(--secondary)] shadow-sm border border-[var(--primary)] flex items-center justify-center p-3 z-0">
                     {/* Inner dark matting */}
-                    <div className="w-full h-full bg-[#1a1a1a] border-4 border-[#3a2a0a] shadow-inner flex items-center justify-center p-2 relative">
+                    <div className="w-full h-full bg-[var(--bg)] border-4 border-[var(--bg)] shadow-inner flex items-center justify-center p-2 relative">
                         {/* The actual photo */}
-                        <div className="w-full h-full relative overflow-hidden border-2 border-[#D4AF37]/50 shadow-inner">
+                        <div className="w-full h-full relative overflow-hidden border-2 border-[var(--secondary)] shadow-inner">
                             <img
                                 src={getImageUrl(data?.bgImageUrl || data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80")}
                                 alt="Couple"
-                                className="w-full h-full object-cover sepia-[0.2]"
+                                className="w-full h-full object-cover "
                             />
                             <div className="absolute inset-0 shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] pointer-events-none"></div>
                         </div>
@@ -728,21 +683,21 @@ const HomePage = ({ onEnter, data, guestName }: { onEnter: () => void, data: Wed
             </motion.div>
 
             {dateStr && (
-                <div className="flex items-center gap-4 mb-8 font-grand text-gray-500 shrink-0">
-                    <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-[#D4AF37]"></div>
-                    <span className="tracking-[0.3em] text-sm md:text-base font-bold text-[#D4AF37]">{dateStr}</span>
-                    <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-[#D4AF37]"></div>
+                <div className="flex items-center gap-4 mb-8 font-grand text-[var(--text)] shrink-0">
+                    <div className="w-12 h-[1px] bg-[var(--secondary)]"></div>
+                    <span className="tracking-[0.3em] text-sm md:text-base font-bold text-[var(--primary)]">{dateStr}</span>
+                    <div className="w-12 h-[1px] bg-[var(--secondary)]"></div>
                 </div>
             )}
             
             {guestName && (
-                <div className="mb-8 px-6 py-4 rounded border border-[#D4AF37]/30 bg-black/40 backdrop-blur shrink-0 max-w-sm w-full mx-auto">
-                    <p className="font-grand text-[10px] tracking-widest text-[#8B6508] uppercase mb-1">Dear Guest,</p>
-                    <p className="font-luxury text-xl text-white">{guestName}</p>
+                <div className="mb-8 px-6 py-4 rounded border border-[var(--secondary)] bg-[var(--bg-pattern)] shrink-0 max-w-sm w-full mx-auto">
+                    <p className="font-body text-xs tracking-widest text-[var(--primary)] uppercase mb-1">Dear Guest,</p>
+                    <p className="font-luxury text-xl text-[var(--text)] break-words">{guestName}</p>
                 </div>
             )}
 
-            <button onClick={onEnter} className="shrink-0 mb-12 px-10 py-3 bg-[#1a1a1a] text-[#D4AF37] font-grand text-xs tracking-[0.2em] border border-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-all uppercase shadow-lg">
+            <button onClick={onEnter} className="shrink-0 mb-12 min-h-12 px-8 py-3 bg-[var(--primary)] text-white font-grand text-xs tracking-[0.15em] border border-[var(--primary)] hover:bg-[var(--text)] transition-colors uppercase">
                 Enter Ballroom
             </button>
         </div>
@@ -752,7 +707,7 @@ const HomePage = ({ onEnter, data, guestName }: { onEnter: () => void, data: Wed
 const CouplePage = ({ data }: { data: WeddingData }) => {
     return (
         <div className="h-full w-full overflow-y-auto hide-scrollbar p-6 pt-12 text-center relative pb-32">
-            <h2 className="font-luxury text-4xl text-[#D4AF37] drop-shadow-sm mb-6">The Couple</h2>
+            <h2 className="font-luxury text-4xl text-[var(--primary)] drop-shadow-sm mb-6">The Couple</h2>
             <ElegantDivider className="mb-10 opacity-80" />
 
             <div className="flex flex-col items-center justify-center gap-12 w-full max-w-2xl mx-auto">
@@ -761,32 +716,32 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     {/* Cameo Oval Frame */}
                     <div className="relative w-48 h-64 md:w-56 md:h-72 mb-6">
                         {/* Gold Oval Border */}
-                        <div className="absolute inset-[-6px] bg-gradient-to-br from-[#FFDF73] via-[#D4AF37] to-[#8B6508] rounded-full shadow-[0_15px_30px_rgba(0,0,0,0.9)] flex items-center justify-center p-[4px]">
+                        <div className="absolute inset-[-6px] bg-[var(--secondary)] rounded-full shadow-sm flex items-center justify-center p-[4px]">
                             {/* Inner Dark Border */}
-                            <div className="w-full h-full rounded-full border-4 border-[#3a2a0a] bg-[#1a1a1a] p-1 flex items-center justify-center relative">
+                            <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
-                                <div className="w-full h-full relative overflow-hidden rounded-full border border-[#D4AF37]/50">
-                                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover sepia-[0.2]" />
+                                <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
+                                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>
                         </div>
                         {/* White Floral Wreath */}
-                        <WhiteFloralWreath className="absolute inset-0 w-full h-full scale-[1.15] pointer-events-none z-10 drop-shadow-2xl" />
+                        <WhiteFloralWreath className="absolute inset-0 w-full h-full scale-105 pointer-events-none z-10 opacity-50" />
                     </div>
                     {/* Text Area */}
                     <div className="text-center z-10">
-                        <h3 className="font-luxury text-4xl text-[#D4AF37] mb-2">{data?.couple?.groom?.fullName}</h3>
-                        <p className="font-grand text-[10px] uppercase tracking-[0.4em] text-gray-400 mb-3">The Groom</p>
-                        <p className="font-body text-xs text-gray-500 italic">Putra dari<br/>Bpk. {data?.couple?.groom?.fatherName} & Ibu {data?.couple?.groom?.motherName}</p>
+                        <h3 className="font-luxury text-3xl leading-tight text-[var(--primary)] mb-3">{data?.couple?.groom?.fullName}</h3>
+                        <p className="font-body text-xs uppercase tracking-[0.4em] text-[var(--text)] mb-3">The Groom</p>
+                        <p className="font-body text-sm leading-relaxed text-[var(--text)] italic">Putra dari<br/>Bpk. {data?.couple?.groom?.fatherName} & Ibu {data?.couple?.groom?.motherName}</p>
                     </div>
                 </div>
 
                 {/* Separator */}
                 <div className="flex items-center gap-6 my-2">
-                    <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-[#D4AF37]"></div>
-                    <span className="font-grand text-4xl text-[#D4AF37] italic drop-shadow-md">&</span>
-                    <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-[#D4AF37]"></div>
+                    <div className="w-16 h-[1px] bg-[var(--secondary)]"></div>
+                    <span className="font-grand text-4xl text-[var(--primary)] italic drop-shadow-md">&</span>
+                    <div className="w-16 h-[1px] bg-[var(--secondary)]"></div>
                 </div>
 
                 {/* Bride */}
@@ -794,24 +749,24 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     {/* Cameo Oval Frame */}
                     <div className="relative w-48 h-64 md:w-56 md:h-72 mb-6">
                         {/* Gold Oval Border */}
-                        <div className="absolute inset-[-6px] bg-gradient-to-br from-[#FFDF73] via-[#D4AF37] to-[#8B6508] rounded-full shadow-[0_15px_30px_rgba(0,0,0,0.9)] flex items-center justify-center p-[4px]">
+                        <div className="absolute inset-[-6px] bg-[var(--secondary)] rounded-full shadow-sm flex items-center justify-center p-[4px]">
                             {/* Inner Dark Border */}
-                            <div className="w-full h-full rounded-full border-4 border-[#3a2a0a] bg-[#1a1a1a] p-1 flex items-center justify-center relative">
+                            <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
-                                <div className="w-full h-full relative overflow-hidden rounded-full border border-[#D4AF37]/50">
-                                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover sepia-[0.2]" />
+                                <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
+                                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>
                         </div>
                         {/* White Floral Wreath */}
-                        <WhiteFloralWreath className="absolute inset-0 w-full h-full scale-[1.15] pointer-events-none z-10 drop-shadow-2xl" />
+                        <WhiteFloralWreath className="absolute inset-0 w-full h-full scale-105 pointer-events-none z-10 opacity-50" />
                     </div>
                     {/* Text Area */}
                     <div className="text-center z-10">
-                        <h3 className="font-luxury text-4xl text-[#D4AF37] mb-2">{data?.couple?.bride?.fullName}</h3>
-                        <p className="font-grand text-[10px] uppercase tracking-[0.4em] text-gray-400 mb-3">The Bride</p>
-                        <p className="font-body text-xs text-gray-500 italic">Putri dari<br/>Bpk. {data?.couple?.bride?.fatherName} & Ibu {data?.couple?.bride?.motherName}</p>
+                        <h3 className="font-luxury text-3xl leading-tight text-[var(--primary)] mb-3">{data?.couple?.bride?.fullName}</h3>
+                        <p className="font-body text-xs uppercase tracking-[0.4em] text-[var(--text)] mb-3">The Bride</p>
+                        <p className="font-body text-sm leading-relaxed text-[var(--text)] italic">Putri dari<br/>Bpk. {data?.couple?.bride?.fatherName} & Ibu {data?.couple?.bride?.motherName}</p>
                     </div>
                 </div>
             </div>
@@ -821,33 +776,32 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
 
 const EventPage = ({ data }: { data: WeddingData }) => {
     return (
-        <div className="h-full flex flex-col items-center pt-24 pb-32 px-6 overflow-y-auto hide-scrollbar bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a]">
-            <h2 className="font-luxury text-4xl text-[#D4AF37] drop-shadow-sm mb-12">Order of Events</h2>
-            <div className="w-full max-w-2xl bg-gradient-to-b from-[#fffaf0] to-white border border-[#D4AF37]/40 p-8 shadow-lg relative">
+        <div className="h-full flex flex-col items-center pt-12 pb-28 px-4 overflow-y-auto hide-scrollbar bg-[var(--bg-pattern)]">
+            <h2 className="font-luxury text-4xl text-[var(--primary)] drop-shadow-sm mb-12">Order of Events</h2>
+            <div className="w-full max-w-2xl bg-[var(--bg)] border border-[var(--secondary)] p-5 shadow-[inset_0_0_0_5px_var(--bg-pattern)] relative">
                 {/* Event Flowers */}
-                <CornerRedRoseCluster position="top-left" className="absolute top-[-15px] left-[-15px] w-24 h-24 pointer-events-none z-20" />
-                <CornerRedRoseCluster position="bottom-right" className="absolute bottom-[-15px] right-[-15px] w-24 h-24 pointer-events-none z-20" />
+                <CornerRedRoseCluster position="top-left" className="absolute -top-3 -left-3 w-12 h-12 pointer-events-none z-20" />
                 
                 {/* Ticket/Invitation Style */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border border-[#D4AF37]/30 rounded-full -translate-y-1/2 flex items-center justify-center shadow-inner">
-                    <div className="w-2 h-2 bg-[#D4AF37] rounded-full"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[var(--bg)] border border-[var(--secondary)] rounded-full -translate-y-1/2 flex items-center justify-center shadow-inner">
+                    <div className="w-2 h-2 bg-[var(--primary)] rounded-full"></div>
                 </div>
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border border-[#D4AF37]/30 rounded-full translate-y-1/2 flex items-center justify-center shadow-inner">
-                    <div className="w-2 h-2 bg-[#D4AF37] rounded-full"></div>
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[var(--bg)] border border-[var(--secondary)] rounded-full translate-y-1/2 flex items-center justify-center shadow-inner">
+                    <div className="w-2 h-2 bg-[var(--primary)] rounded-full"></div>
                 </div>
 
                 <div className="space-y-10 py-4 px-2">
                     {data?.events?.akad?.enabled !== false && (
                         <div className="relative z-10">
-                            <div className="flex items-center justify-center gap-3 text-[#8B6508] mb-4">
+                            <div className="flex items-center justify-center gap-3 text-[var(--primary)] mb-4">
                                 <Crown size={20} /> <span className="font-grand text-xs tracking-[0.3em] font-bold">CEREMONY</span>
                             </div>
-                            <h3 className="font-luxury text-3xl mb-2 text-[#1a1a1a] font-bold">{data?.events?.akad?.name || 'Akad Nikah'}</h3>
-                            <p className="font-grand tracking-widest text-[#5E4006] mb-4">{formatDate(data?.events?.akad?.date || '')} | {data?.events?.akad?.timeStart}</p>
+                            <h3 className="font-luxury text-3xl mb-2 text-[var(--text)] font-bold">{data?.events?.akad?.name || 'Akad Nikah'}</h3>
+                            <p className="font-body text-sm leading-relaxed text-[var(--text)] mb-4">{formatDate(data?.events?.akad?.date || '')} | {data?.events?.akad?.timeStart}</p>
                             
-                            <div className="bg-white/80 p-4 border border-[#D4AF37]/10 rounded-sm">
-                                <p className="font-body text-sm text-[#1a1a1a] font-bold mb-1">{data?.events?.akad?.venueName}</p>
-                                <p className="font-body text-xs text-gray-500 leading-relaxed">{data?.events?.akad?.address}</p>
+                            <div className="bg-[var(--bg-pattern)] p-4 border border-[var(--secondary)] rounded-sm">
+                                <p className="font-body text-sm text-[var(--text)] font-bold mb-1">{data?.events?.akad?.venueName}</p>
+                                <p className="font-body text-xs text-[var(--text)] leading-relaxed">{data?.events?.akad?.address}</p>
                             </div>
                         </div>
                     )}
@@ -858,15 +812,15 @@ const EventPage = ({ data }: { data: WeddingData }) => {
 
                     {data?.events?.resepsi?.enabled !== false && (
                         <div className="relative z-10">
-                            <div className="flex items-center justify-center gap-3 text-[#8B6508] mb-4">
+                            <div className="flex items-center justify-center gap-3 text-[var(--primary)] mb-4">
                                 <Gem size={20} /> <span className="font-grand text-xs tracking-[0.3em] font-bold">RECEPTION</span>
                             </div>
-                            <h3 className="font-luxury text-3xl mb-2 text-[#1a1a1a] font-bold">{data?.events?.resepsi?.name || 'Resepsi'}</h3>
-                            <p className="font-grand tracking-widest text-[#5E4006] mb-4">{formatDate(data?.events?.resepsi?.date || '')} | {data?.events?.resepsi?.timeStart}</p>
+                            <h3 className="font-luxury text-3xl mb-2 text-[var(--text)] font-bold">{data?.events?.resepsi?.name || 'Resepsi'}</h3>
+                            <p className="font-body text-sm leading-relaxed text-[var(--text)] mb-4">{formatDate(data?.events?.resepsi?.date || '')} | {data?.events?.resepsi?.timeStart}</p>
                             
-                            <div className="bg-white/80 p-4 border border-[#D4AF37]/10 rounded-sm">
-                                <p className="font-body text-sm text-[#1a1a1a] font-bold mb-1">{data?.events?.resepsi?.venueName}</p>
-                                <p className="font-body text-xs text-gray-500 leading-relaxed">{data?.events?.resepsi?.address}</p>
+                            <div className="bg-[var(--bg-pattern)] p-4 border border-[var(--secondary)] rounded-sm">
+                                <p className="font-body text-sm text-[var(--text)] font-bold mb-1">{data?.events?.resepsi?.venueName}</p>
+                                <p className="font-body text-xs text-[var(--text)] leading-relaxed">{data?.events?.resepsi?.address}</p>
                             </div>
                         </div>
                     )}
@@ -874,7 +828,7 @@ const EventPage = ({ data }: { data: WeddingData }) => {
             </div>
 
             {(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) && (
-                <a href={(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) as string} target="_blank" rel="noopener noreferrer" className="mt-8 flex items-center gap-2 text-[#8B6508] font-grand text-xs tracking-widest hover:text-black transition-colors">
+                <a href={(data?.events?.resepsi?.googleMapsUrl || data?.events?.akad?.googleMapsUrl) as string} target="_blank" rel="noopener noreferrer" className="mt-8 min-h-12 px-6 py-3 flex items-center justify-center gap-2 bg-[var(--primary)] text-white font-grand text-xs tracking-widest hover:bg-[var(--text)] transition-colors">
                     <MapPin size={14} /> GET DIRECTIONS
                 </a>
             )}
@@ -884,13 +838,12 @@ const EventPage = ({ data }: { data: WeddingData }) => {
 
 const GalleryPage = ({ data }: { data: WeddingData }) => (
     <div className="h-full overflow-y-auto hide-scrollbar p-6 pt-10 pb-24">
-        <h2 className="font-luxury text-4xl text-[#D4AF37] drop-shadow-sm mb-8 text-center">Moments</h2>
+        <h2 className="font-luxury text-4xl text-[var(--primary)] drop-shadow-sm mb-8 text-center">Moments</h2>
         <div className="columns-2 gap-4 w-full max-w-2xl mt-8">
             {data?.gallery?.map((img, idx) => (
-                <div key={idx} className="relative mb-4 break-inside-avoid shadow-xl p-2 bg-[#fffaf0] border border-[#D4AF37]/40 group overflow-visible">
-                    <img src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full object-cover filter sepia-[0.2]" />
-                    {idx % 2 === 0 && <WhiteFlowerCluster position="top-left" className="absolute top-[-25px] left-[-25px] w-20 h-20 z-20 pointer-events-none" />}
-                    {idx % 2 !== 0 && <WhiteFlowerCluster position="bottom-right" className="absolute bottom-[-25px] right-[-25px] w-20 h-20 z-20 pointer-events-none" />}
+                <div key={idx} className="relative mb-4 break-inside-avoid shadow-xl p-2 bg-[var(--bg)] border border-[var(--secondary)] group overflow-visible">
+                    <img src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full object-cover filter " />
+                    {idx === 0 && <WhiteFlowerCluster position="top-left" className="absolute -top-3 -left-3 w-10 h-10 z-20 pointer-events-none" />}
                 </div>
             ))}
         </div>
@@ -900,26 +853,25 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
 const GiftPage = ({ data }: { data: WeddingData }) => {
     const [copiedIdx, setCopiedIdx] = React.useState<number | null>(null);
     return (
-        <div className="h-full w-full overflow-y-auto hide-scrollbar flex flex-col items-center justify-start p-6 pt-16 text-center pb-32">
-            <div className="w-full max-w-sm shrink-0 bg-[#1a1a1a] text-[#D4AF37] p-8 rounded-lg shadow-2xl border border-[#D4AF37] relative overflow-visible mt-8">
+        <div className="h-full w-full overflow-y-auto hide-scrollbar flex flex-col items-center justify-start p-5 pt-12 text-center pb-28">
+            <div className="w-full max-w-sm shrink-0 bg-[var(--bg)] text-[var(--primary)] p-5 rounded-sm shadow-sm border border-[var(--secondary)] relative overflow-visible mt-8">
                 <WrappingVine className="absolute inset-[-10px] w-[calc(100%+20px)] h-[calc(100%+20px)] pointer-events-none z-20" />
-                <CornerRedRoseCluster position="top-left" className="absolute top-[-25px] left-[-25px] w-20 h-20 pointer-events-none z-30" />
+                <CornerRedRoseCluster position="top-left" className="absolute -top-3 -left-3 w-12 h-12 pointer-events-none z-30" />
                 
-                <div className='absolute inset-0 opacity-10 bg-[url("https://www.transparenttextures.com/patterns/black-scales.png")] rounded-lg pointer-events-none'></div>
-                <div className="w-16 h-16 bg-[#D4AF37] text-black rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
+                <div className="w-16 h-16 bg-[var(--primary)] text-white rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
                     <Gift size={24} />
                 </div>
-                <h2 className="font-grand text-2xl mb-8 relative z-10">Wedding Gift</h2>
+                <h2 className="font-luxury text-3xl mb-8 relative z-10">Wedding Gift</h2>
                 <div className="max-h-[50vh] overflow-y-auto hide-scrollbar space-y-4 relative z-10 pb-4">
                     {data?.gifts?.map((gift, i) => (
-                        <div key={i} className="bg-black/30 p-4 rounded border border-[#D4AF37]/30">
+                        <div key={i} className="bg-[var(--bg-pattern)] p-4 rounded border border-[var(--secondary)]">
                             <p className="font-grand text-xs tracking-widest mb-2 uppercase">{gift.name}</p>
-                            <p className="font-mono text-xl md:text-2xl tracking-wider text-white">{gift.accountNumber}</p>
-                            <p className="font-body text-xs text-gray-400 mt-1 uppercase">{gift.accountHolder}</p>
+                            <p className="font-mono text-lg tracking-wide text-[var(--text)] break-all">{gift.accountNumber}</p>
+                            <p className="font-body text-xs text-[var(--text)] mt-1 uppercase">{gift.accountHolder}</p>
                             {gift.type !== 'address' && (
                                 <button
                                     onClick={() => { navigator.clipboard.writeText(gift.accountNumber); setCopiedIdx(i); setTimeout(() => setCopiedIdx(null), 2000); }}
-                                    className={`mt-3 px-4 py-1 border text-[10px] uppercase tracking-widest transition-colors rounded ${copiedIdx === i ? 'border-emerald-500 text-emerald-400 bg-emerald-900/30' : 'border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black'}`}>
+                                    className={`mt-3 min-h-11 px-5 py-3 border text-xs uppercase tracking-widest transition-colors rounded-sm ${copiedIdx === i ? 'border-[var(--primary)] text-white bg-[var(--primary)]' : 'border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'}`}>
                                     {copiedIdx === i ? '\u2713 Tersalin' : 'Copy'}
                                 </button>
                             )}
@@ -927,7 +879,7 @@ const GiftPage = ({ data }: { data: WeddingData }) => {
                     ))}
                 </div>
                 {(!data?.gifts || data.gifts.length === 0) && (
-                    <p className="text-gray-500 text-sm relative z-10 italic">No payment details provided.</p>
+                    <p className="text-[var(--text)] text-sm relative z-10 italic">No payment details provided.</p>
                 )}
             </div>
         </div>
@@ -971,47 +923,47 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
 
     return (
         <div className="h-full flex flex-col items-center justify-start p-6 pt-10 text-center overflow-y-auto hide-scrollbar pb-24">
-            <h2 className="font-luxury text-4xl text-[#D4AF37] drop-shadow-sm mb-6">R.S.V.P</h2>
+            <h2 className="font-luxury text-4xl text-[var(--primary)] drop-shadow-sm mb-6">R.S.V.P</h2>
             <ElegantDivider className="mb-8 opacity-80" />
             
-            <div className="w-full max-w-md bg-white p-8 shadow-xl border border-[#D4AF37]/30 rounded-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D4AF37] via-[#FFF2CD] to-[#D4AF37]"></div>
+            <div className="w-full max-w-md bg-[var(--bg)] p-5 shadow-sm border border-[var(--secondary)] rounded-lg relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-[var(--accent)]"></div>
                 
-                <p className="text-gray-600 mb-8 text-sm font-body italic">We kindly request your response to celebrate with us.</p>
+                <p className="text-[var(--text)] mb-8 text-sm font-body italic">We kindly request your response to celebrate with us.</p>
                 
                 {rsvpSuccess ? (
                     <div className="text-center py-6">
-                        <div className="w-20 h-20 bg-[#FFF9E6] rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-[#D4AF37] shadow-lg">
-                            <Heart className="w-10 h-10 text-[#D4AF37] animate-pulse" />
+                        <div className="w-20 h-20 bg-[var(--bg-pattern)] rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-[var(--secondary)] shadow-lg">
+                            <Heart className="w-10 h-10 text-[var(--primary)] animate-pulse" />
                         </div>
-                        <p className="font-luxury text-2xl text-[#333] mb-2">Thank You!</p>
-                        <p className="font-body text-sm text-gray-500">Your confirmation has been received.</p>
+                        <p className="font-luxury text-2xl text-[var(--text)] mb-2">Thank You!</p>
+                        <p className="font-body text-sm text-[var(--text)]">Your confirmation has been received.</p>
                     </div>
                 ) : (
                     <form onSubmit={handleRSVPSubmit} className="space-y-6 text-left">
-                        <div className="bg-gray-50/50 p-4 border border-[#D4AF37]/10 rounded shadow-inner">
-                            <label className="block text-[10px] font-grand text-[#8B6508] uppercase tracking-[0.2em] mb-2 font-bold">Nama Anda</label>
-                            <input type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest} className="w-full border-b-2 border-gray-200 px-2 py-2 focus:outline-none focus:border-[#D4AF37] text-base font-body bg-transparent transition-colors" placeholder="Masukkan nama lengkap" />
+                        <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
+                            <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Nama Anda</label>
+                            <input type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" placeholder="Masukkan nama lengkap" />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-gray-50/50 p-4 border border-[#D4AF37]/10 rounded shadow-inner">
-                                <label className="block text-[10px] font-grand text-[#8B6508] uppercase tracking-[0.2em] mb-2 font-bold">Kehadiran</label>
-                                <select value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value as any)} className="w-full border-b-2 border-gray-200 px-2 py-2 focus:outline-none focus:border-[#D4AF37] text-base font-body bg-transparent appearance-none transition-colors cursor-pointer">
+                        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
+                            <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
+                                <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Kehadiran</label>
+                                <select value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value as typeof rsvpStatus)} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors cursor-pointer">
                                     <option value="Hadir">Hadir</option>
                                     <option value="Tidak Hadir">Tidak Hadir</option>
                                     <option value="Ragu-ragu">Ragu-ragu</option>
                                 </select>
                             </div>
-                            <div className="bg-gray-50/50 p-4 border border-[#D4AF37]/10 rounded shadow-inner">
-                                <label className="block text-[10px] font-grand text-[#8B6508] uppercase tracking-[0.2em] mb-2 font-bold">Jumlah Pax</label>
-                                <input type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))} className="w-full border-b-2 border-gray-200 px-2 py-2 focus:outline-none focus:border-[#D4AF37] text-base font-body bg-transparent transition-colors" />
+                            <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
+                                <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Jumlah Pax</label>
+                                <input type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" />
                             </div>
                         </div>
-                        <div className="bg-gray-50/50 p-4 border border-[#D4AF37]/10 rounded shadow-inner">
-                            <label className="block text-[10px] font-grand text-[#8B6508] uppercase tracking-[0.2em] mb-2 font-bold">Ucapan & Doa</label>
-                            <textarea required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3} className="w-full border-b-2 border-gray-200 px-2 py-2 focus:outline-none focus:border-[#D4AF37] text-base font-body bg-transparent resize-none transition-colors" placeholder="Tuliskan pesan indah Anda..." />
+                        <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
+                            <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Ucapan & Doa</label>
+                            <textarea required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3} className="w-full border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] resize-none transition-colors" placeholder="Tuliskan pesan indah Anda..." />
                         </div>
-                        <button type="submit" className="w-full mt-6 py-4 bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] text-[#D4AF37] font-grand text-xs tracking-[0.3em] uppercase hover:from-[#D4AF37] hover:to-[#FFDF73] hover:text-black transition-all shadow-xl rounded-sm border border-[#D4AF37]">
+                        <button type="submit" className="w-full mt-6 py-4 bg-[var(--primary)] text-white font-grand text-xs tracking-[0.3em] uppercase hover:bg-[var(--text)] transition-all shadow-xl rounded-sm border border-[var(--secondary)]">
                             Kirim RSVP
                         </button>
                     </form>
@@ -1021,14 +973,14 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                 {rsvps && rsvps.length > 0 && (
                     <div className="mt-8 text-left space-y-3 max-h-48 overflow-y-auto pr-2 hide-scrollbar">
                         {rsvps.map((rsvp, idx) => (
-                            <div key={idx} className="bg-gray-50 p-4 shadow-sm border border-gray-100">
+                            <div key={idx} className="bg-[var(--bg-pattern)] p-4 shadow-sm border border-[var(--secondary)]">
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="font-bold text-[#1a1a1a] font-luxury">{rsvp.guestName}</span>
+                                    <span className="font-bold text-[var(--text)] font-luxury">{rsvp.guestName}</span>
                                     <span className={`text-[9px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-bold ${rsvp.status === 'Hadir' ? 'border-green-200 text-green-700 bg-green-50' : rsvp.status === 'Tidak Hadir' ? 'border-red-200 text-red-700 bg-red-50' : 'border-yellow-200 text-yellow-700 bg-yellow-50'}`}>
                                         {rsvp.status}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-600 font-body italic">"{rsvp.wishes}"</p>
+                                <p className="text-xs text-[var(--text)] font-body italic">"{rsvp.wishes}"</p>
                             </div>
                         ))}
                     </div>
@@ -1039,23 +991,23 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
 };
 
 const QuotePage = ({ data }: { data: WeddingData }) => (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-[#fdfdfd]">
-        <div className="border border-[#D4AF37] p-8 md:p-12 relative max-w-lg shadow-sm">
+    <div className="h-full overflow-y-auto flex flex-col items-center justify-start px-6 pt-16 pb-28 text-center bg-[var(--bg)]">
+        <div className="border border-[var(--secondary)] p-6 relative max-w-lg shadow-sm">
             <RealisticPeelCorner />
             
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#fdfdfd] px-4">
-                <QuoteIcon className="w-8 h-8 text-[#D4AF37]" />
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--bg)] px-4">
+                <QuoteIcon className="w-8 h-8 text-[var(--primary)]" />
             </div>
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[#D4AF37]"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-[#D4AF37]"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-[#D4AF37]"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#D4AF37]"></div>
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[var(--secondary)]"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-[var(--secondary)]"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-[var(--secondary)]"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[var(--secondary)]"></div>
 
-            <Crown size={32} className="mx-auto mb-6 text-[#D4AF37]" />
-            <p className="font-luxury text-2xl leading-relaxed text-gray-800 italic mb-6">
+            <Crown size={32} className="mx-auto mb-6 text-[var(--primary)]" />
+            <p className="font-luxury text-xl leading-relaxed text-[var(--text)] italic mb-6">
                 "{data?.quoteText}"
             </p>
-            <p className="font-grand text-xs tracking-widest text-[#8B6508] uppercase">{data?.quoteSource}</p>
+            <p className="font-grand text-xs tracking-widest text-[var(--primary)] uppercase">{data?.quoteSource}</p>
         </div>
     </div>
 );
@@ -1072,7 +1024,7 @@ interface GrandBallroomProps {
     embedded?: boolean;
 }
 
-const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddRSVP, rsvps, embedded = false }) => {
+const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }) => {
     const [stage, setStage] = useState<'curtain' | 'content'>(embedded ? 'content' : 'curtain'); // curtain -> content
     const [activeTab, setActiveTab] = useState('home');
     const [music, setMusic] = useState(false);
@@ -1107,7 +1059,7 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddR
     };
 
     return (
-        <div className="relative w-full h-screen overflow-hidden bg-[#0f0505] text-[#333]">
+        <div className="grand-ballroom relative w-full h-screen overflow-hidden bg-[var(--bg)] text-[var(--text)]" style={{ '--primary': theme.primaryHex, '--secondary': theme.secondaryHex, '--bg': theme.bgHex, '--bg-pattern': theme.bgPatternHex, '--text': theme.textHex, '--accent': theme.accentHex } as React.CSSProperties}>
             <GlobalStyles />
             <audio ref={audioRef} loop src={data?.musicUrl || ASSETS.bgm} />
 
@@ -1120,21 +1072,21 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddR
             )}
 
             {/* LAYER 2: 3D MAIN STAGE (THE CARD) */}
-            <div className="absolute inset-0 z-40 flex items-center justify-center p-4">
+            <div className="absolute inset-0 z-40 flex items-center justify-center p-2">
                 <AnimatePresence>
                     {stage === 'content' && (
                         <motion.div 
                             initial={{ opacity: 0, x: -50, filter: 'blur(10px)', scale: 0.95 }}
                             animate={{ opacity: 1, x: 0, filter: 'blur(0px)', scale: 1 }}
                             transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-                            className="relative z-10 w-full max-w-lg h-[90vh] md:h-[85vh] bg-[#1a1a1a] shadow-[0_0_100px_rgba(0,0,0,1)] border-[1px] border-[#D4AF37]/20 flex flex-col overflow-hidden"
+                            className="relative z-10 w-full max-w-lg h-full bg-[var(--bg)] shadow-sm border-[1px] border-[var(--secondary)] flex flex-col overflow-hidden"
                         >
                             {/* Universal Top Curtain Ropes */}
                             <TopSwagRopes />
 
                             {/* Inner Content Area */}
-                            <div className="flex-1 overflow-hidden relative bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-24">
-                                <MagicQuill activeTab={activeTab} />
+                            <div className="flex-1 overflow-hidden relative bg-[var(--bg)]">
+                                {activeTab === 'quote' && <MagicQuill activeTab={activeTab} />}
                                 <AnimatePresence mode="wait">
                                     <motion.div
                                         key={activeTab}
@@ -1150,7 +1102,7 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddR
                             </div>
                             
                             {/* Gold Footer Trim */}
-                            <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] z-50"></div>
+                            <div className="absolute bottom-0 left-0 w-full h-2 bg-[var(--primary)] z-50"></div>
                             
                         </motion.div>
                     )}
@@ -1164,7 +1116,7 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, guest, onAddR
 
             <button
                 onClick={toggleMusic}
-                className="fixed top-24 right-4 md:top-24 md:right-8 z-50 w-10 h-10 bg-white/10 backdrop-blur border border-[#D4AF37] rounded-full flex items-center justify-center text-[#FFD700] hover:bg-[#D4AF37] hover:text-black transition-all"
+                className="fixed top-4 right-4 z-50 w-10 h-10 bg-[var(--bg)] border border-[var(--secondary)] rounded-full flex items-center justify-center text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all"
             >
                 {music ? <Music className="animate-spin-slow" size={16} /> : <Play size={16} />}
             </button>

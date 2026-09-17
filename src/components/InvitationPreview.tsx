@@ -34,6 +34,8 @@ import GrandBallroomLayout from './templates/GrandBallroomLayout';
 import RoyalArabianLayout from './templates/RoyalArabianLayout';
 import SpotiLoveLayout from './templates/SpotiLoveLayout';
 import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
+import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
+import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
 
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { convertGoogleDriveUrl } from '../utils/googleDrive';
@@ -65,7 +67,16 @@ const LuxuryCorner = ({ className = 'w-8 h-8' }: { className?: string }) => (
   </svg>
 );
 
-export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, guest, embedded = false }: InvitationPreviewProps) {
+export default function InvitationPreview(props: InvitationPreviewProps) {
+  const theme = DEFAULT_THEMES.find(t => t.id === props.themeId) || DEFAULT_THEMES[0];
+  return (
+    <DesktopInvitationWrapper data={props.data} theme={theme} embedded={props.embedded}>
+      <InvitationPreviewContent {...props} />
+    </DesktopInvitationWrapper>
+  );
+}
+
+function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embedded = false }: InvitationPreviewProps) {
   const currentTheme = DEFAULT_THEMES.find(t => t.id === themeId) || DEFAULT_THEMES[0];
 
   // States
@@ -290,6 +301,19 @@ export default function InvitationPreview({ data, themeId, onAddRSVP, rsvps, gue
   if (currentTheme.layout === 'dark-luxury') {
     return (
       <DarkLuxuryLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
+  if (currentTheme.layout === 'parallax-cinematic') {
+    return (
+      <ParallaxCinematicLayout 
         data={data} 
         theme={currentTheme} 
         guest={guest} 

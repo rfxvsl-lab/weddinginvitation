@@ -16,7 +16,7 @@ export interface ThemeConfig {
   fontSerif: string; // e.g. Playfair Display, Great Vibes
   fontSans: string; // e.g. Inter
   pattern: 'floral' | 'classic' | 'modern' | 'minimalist';
-  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic'; // Penentu struktur HTML yang di-render
+  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic'; // Penentu struktur HTML yang di-render
 }
 
 export interface CoupleMember {

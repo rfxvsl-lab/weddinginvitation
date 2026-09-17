@@ -142,19 +142,20 @@ export default function App() {
   const accountTimer = getAccountTimer();
 
   return (
-    <div className="flex h-screen w-full bg-[#FAFAFA] relative overflow-hidden font-sans">
-      {/* Premium Glassmorphic Canvas Elements (Improvisasi UI) */}
-      <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[50%] bg-amber-200/60 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[55%] h-[55%] bg-zinc-300/70 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-[20%] right-[15%] w-[40%] h-[40%] bg-amber-100/70 rounded-full blur-[90px] pointer-events-none" />
+    <div className="saas-scope saas-dash flex h-screen w-full relative overflow-hidden font-sans">
+      {/* Glow lembut memakai token wine/gold, bukan amber/zinc, agar seragam
+          dengan landing page dan alur pendaftaran. */}
+      <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[100px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.18)' }} />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[55%] h-[55%] rounded-full blur-[120px] pointer-events-none" style={{ background: 'rgba(142,47,69,0.10)' }} />
+      <div className="absolute top-[20%] right-[15%] w-[40%] h-[40%] rounded-full blur-[90px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.12)' }} />
 
 
       {/* Loading OVERLAY — sits on top, does NOT unmount the dashboard underneath */}
       {wedding.isLoading && (
-        <div className="fixed inset-0 z-[9999] bg-[#050505]/90 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
+        <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center pointer-events-auto" style={{ background: 'rgba(250,246,240,0.9)' }}>
           <div className="text-center space-y-4 animate-pulse">
-            <Loader2 className="w-8 h-8 text-rose-500 animate-spin mx-auto" />
-            <p className="text-sm font-bold text-white font-mono uppercase tracking-widest">Memuat Workspace...</p>
+            <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--saas-primary)' }} />
+            <p className="text-sm font-bold font-mono uppercase tracking-widest" style={{ color: 'var(--saas-ink-2)' }}>Memuat Workspace...</p>
           </div>
         </div>
       )}
@@ -180,29 +181,36 @@ export default function App() {
 
       {/* MIDDLE PANEL - EDITOR/CONTENT */}
       {!isPreviewGuestMode && (
-        <div className="flex-1 flex flex-col bg-white/60 backdrop-blur-3xl overflow-hidden relative border-r border-amber-900/5 shadow-[20px_0_40px_-15px_rgba(0,0,0,0.03)] z-10 rounded-l-[2.5rem] ml-1 my-1">
+        <div className="flex-1 flex flex-col backdrop-blur-3xl overflow-hidden relative shadow-[20px_0_40px_-15px_rgba(36,20,24,0.06)] z-10 rounded-l-[2.5rem] ml-1 my-1" style={{ background: 'rgba(255,255,255,0.66)', borderRight: '1px solid var(--saas-line)' }}>
           
           {/* Header Top Bar */}
-          <header className="h-16 border-b border-amber-900/5 bg-white/40 backdrop-blur-xl flex items-center pl-10 pr-6 shrink-0 z-20">
+          <header className="h-16 backdrop-blur-xl flex items-center pl-10 pr-6 shrink-0 z-20" style={{ borderBottom: '1px solid var(--saas-line)', background: 'rgba(255,255,255,0.5)' }}>
             {(() => {
-              const segments: Record<string, { title: string; sub: string; icon: React.ElementType; color: string; bg: string }> = {
-                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, color: 'text-zinc-800', bg: 'bg-amber-100/50 border border-amber-200/50' },
-                design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, color: 'text-zinc-800', bg: 'bg-orange-100/50 border border-orange-200/50' },
-                guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, color: 'text-zinc-800', bg: 'bg-yellow-100/50 border border-yellow-200/50' },
-                analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, color: 'text-zinc-800', bg: 'bg-lime-100/50 border border-lime-200/50' },
-                profile: { title: 'Profil Anda', sub: 'Akun & pengaturan', icon: UserCircle, color: 'text-zinc-800', bg: 'bg-amber-100/50 border border-amber-200/50' },
-                upgrade: { title: 'Upgrade Akun', sub: 'Tingkatkan paket Anda', icon: Crown, color: 'text-amber-700', bg: 'bg-amber-200/60 border border-amber-300/60' },
+              const segments: Record<string, { title: string; sub: string; icon: React.ElementType; tone: 'wine' | 'gold' }> = {
+                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, tone: 'wine' },
+                design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, tone: 'wine' },
+                guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, tone: 'wine' },
+                analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, tone: 'wine' },
+                profile: { title: 'Profil Anda', sub: 'Akun & pengaturan', icon: UserCircle, tone: 'wine' },
+                upgrade: { title: 'Upgrade Akun', sub: 'Tingkatkan paket Anda', icon: Crown, tone: 'gold' },
               };
               const seg = segments[activeSegment] || segments.settings;
               const Icon = seg.icon;
+              const gold = seg.tone === 'gold';
               return (
                 <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-lg ${seg.bg} flex items-center justify-center`}>
-                    <Icon className={`w-4.5 h-4.5 ${seg.color}`} />
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: gold ? 'var(--saas-gold-soft)' : 'var(--saas-primary-soft)',
+                      color: gold ? '#8A6428' : 'var(--saas-primary)',
+                    }}
+                  >
+                    <Icon className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-bold text-zinc-800 tracking-tight">{seg.title}</h2>
-                    <p className="text-[10px] text-zinc-400 font-medium">{seg.sub}</p>
+                    <h2 className="saas-ui-title text-sm font-bold" style={{ color: 'var(--saas-ink)' }}>{seg.title}</h2>
+                    <p className="text-[10px] font-medium" style={{ color: 'var(--saas-muted)' }}>{seg.sub}</p>
                   </div>
                 </div>
               );
@@ -274,26 +282,28 @@ export default function App() {
       <div className={`${isPreviewGuestMode ? 'w-full flex' : 'hidden md:flex w-[400px] xl:w-[450px] shrink-0'} bg-transparent flex-col relative my-1 mr-1 rounded-r-[2.5rem] overflow-hidden`}>
         
         {/* Header Preview */}
-        <div className="p-4 bg-white/40 backdrop-blur-xl border-b border-amber-900/5 flex justify-between items-start z-10">
+        <div className="p-4 backdrop-blur-xl flex justify-between items-start z-10" style={{ borderBottom: '1px solid var(--saas-line)', background: 'rgba(255,255,255,0.5)' }}>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-800">
+            <h3 className="saas-ui-title text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--saas-ink)' }}>
               {isPreviewGuestMode ? 'Mode Layar Penuh' : 'Live Preview'}
             </h3>
-            <p className="text-[10px] font-medium text-zinc-500 mt-1 leading-tight max-w-[220px]">
+            <p className="text-[10px] font-medium mt-1 leading-tight max-w-[220px]" style={{ color: 'var(--saas-muted)' }}>
               *Tampilan preview mungkin sedikit bergeser/kurang presisi. Hasil yang di-publish akan 100% sempurna.
             </p>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
             <button
               onClick={refreshPreview}
-              className="p-2 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 rounded-lg transition cursor-pointer"
+              className="p-2 rounded-lg transition cursor-pointer"
+              style={{ background: 'var(--saas-primary-soft)', color: 'var(--saas-primary)' }}
               title="Refresh Preview"
+              aria-label="Refresh preview"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setIsPreviewGuestMode(!isPreviewGuestMode)}
-              className="px-4 py-2 bg-zinc-900 text-white hover:bg-zinc-800 rounded-full text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-lg shadow-zinc-900/20"
+              className="saas-btn-primary saas-btn-sm"
             >
               <Eye className="w-4 h-4" />
               Kembali ke Editor
@@ -302,9 +312,9 @@ export default function App() {
         </div>
 
         {/* Iframe Mobile Container — transform scale approach */}
-        <div ref={previewContainerRef} className="flex-1 overflow-hidden p-4 flex items-center justify-center bg-transparent" style={{ backgroundImage: 'radial-gradient(rgba(245,158,11,0.15) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+        <div ref={previewContainerRef} className="flex-1 overflow-hidden p-4 flex items-center justify-center bg-transparent" style={{ backgroundImage: 'radial-gradient(rgba(198,161,91,0.22) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
           <div 
-            className="w-[375px] h-[812px] shrink-0 rounded-[3rem] border-[14px] border-zinc-900 bg-black shadow-2xl relative overflow-hidden ring-4 ring-zinc-200/50"
+            className="w-[375px] h-[812px] shrink-0 rounded-[3rem] border-[14px] border-zinc-900 bg-black shadow-2xl relative overflow-hidden ring-4 ring-white/60"
             style={{ transform: `scale(${previewScale})`, transformOrigin: 'center center' }}
           >
             {/* Notch */}
@@ -327,7 +337,7 @@ export default function App() {
       {!isPreviewGuestMode && (
         <button
           onClick={() => setIsPreviewGuestMode(true)}
-          className="md:hidden fixed bottom-6 right-6 z-[150] bg-zinc-900 hover:bg-zinc-800 text-amber-400 p-4 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 animate-bounce cursor-pointer"
+          className="saas-btn-primary md:hidden fixed bottom-6 right-6 z-[150] !rounded-full !px-5 !py-4 shadow-[0_10px_30px_rgba(36,20,24,0.3)] cursor-pointer"
           title="Pratinjau Undangan"
         >
           <Eye className="w-5 h-5" />

@@ -127,7 +127,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
 
             {/* User Info */}
             <div className="flex-1 text-center sm:text-left space-y-2">
-              <h2 className="text-xl font-bold text-zinc-900">{user.fullName}</h2>
+              <h2 className="saas-ui-title text-xl font-bold text-zinc-900">{user.fullName}</h2>
               <p className="text-sm text-zinc-500">{user.email}</p>
               
               {/* Package Badge */}
