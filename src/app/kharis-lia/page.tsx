@@ -35,18 +35,18 @@ const WEDDING_DATA: WeddingData = {
   },
   events: {
     akad: {
-      enabled: true,
-      name: 'Akad & Resepsi',
+      enabled: false,
+      name: 'Resepsi',
       date: '2026-09-19',
       timeStart: '07:00',
       timeEnd: 'Selesai',
       venueName: 'Kediaman Mempelai',
       address: 'Bantur Pringgodani, Kab. Malang',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Bantur+Pringgodani+Kabupaten+Malang',
-      icon: 'rings',
+      icon: 'party',
     },
     resepsi: {
-      enabled: false,
+      enabled: true,
       name: 'Resepsi',
       date: '2026-09-19',
       timeStart: '07:00',
@@ -70,7 +70,7 @@ const WEDDING_DATA: WeddingData = {
       accountHolder: 'Kharis & Lia',
     },
   ],
-  musicUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  musicUrl: '/assets/kharis-lia/music.mp3',
   musicTitle: 'Wedding Playlist',
   countdownDate: '2026-09-19T07:00:00+07:00',
   quoteText:
