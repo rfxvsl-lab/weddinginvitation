@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * API Layer â€” CRUD Operations for Wedding SaaS
+ * API Layer — CRUD Operations for Wedding SaaS
  * All database interactions go through this module.
  */
 

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * useWeddingData Hook â€” Wedding data management with Turso
+ * useWeddingData Hook — Wedding data management with Turso
  * Menggantikan semua localStorage read/write di App.tsx
  */
 
@@ -97,7 +97,7 @@ interface UseWeddingDataReturn {
 
 /**
  * Komputasi traffic harian dari visitor_logs dan rsvps
- * Group by date (YYYY-MM-DD) dari timestamp â€” ditampilkan di AnalyticsDashboard
+ * Group by date (YYYY-MM-DD) dari timestamp — ditampilkan di AnalyticsDashboard
  */
 function computeDailyTraffic(
   visitorLogs: VisitorLog[],

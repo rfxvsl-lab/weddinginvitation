@@ -35,6 +35,7 @@ import RoyalArabianLayout from './templates/RoyalArabianLayout';
 import SpotiLoveLayout from './templates/SpotiLoveLayout';
 import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
 import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
+import StorybookInteractiveLayout from './templates/StorybookInteractiveLayout';
 import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
 
 import { DEFAULT_THEMES } from '../data/defaultData';
@@ -324,6 +325,19 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
     );
   }
 
+  if (currentTheme.layout === 'storybook-interactive') {
+    return (
+      <StorybookInteractiveLayout 
+        data={data} 
+        theme={currentTheme} 
+        guest={guest} 
+        onAddRSVP={onAddRSVP} 
+        rsvps={rsvps}
+        embedded={embedded} 
+      />
+    );
+  }
+
   return (
     <div 
       className={`relative w-full h-full overflow-y-auto overflow-x-hidden ${isRFX ? 'font-sans bg-[#020202] text-zinc-100' : 'font-sans'}`}
@@ -565,7 +579,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
               "{data.quoteText}"
             </p>
             <span className="block text-[11px] font-black tracking-widest text-amber-600 uppercase font-serif">
-              â€” {data.quoteSource}
+              — {data.quoteSource}
             </span>
           </section>
 
@@ -771,7 +785,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                     }`} />
                     
                     <div className="text-[10px] font-bold tracking-widest text-amber-600 uppercase font-mono">
-                      TAHUN â€” {story.year}
+                      TAHUN — {story.year}
                     </div>
                     
                     <h4 className="font-serif font-black text-lg text-amber-800">
@@ -1018,7 +1032,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                             ? (isRFX ? 'bg-rose-950/40 text-rose-450 border-rose-900/30' : 'bg-rose-50 text-rose-800 border-rose-100')
                             : (isRFX ? 'bg-zinc-900 border border-zinc-800 text-zinc-400' : 'bg-amber-50 text-amber-800 border-amber-100')
                         }`}>
-                          {wish.status === 'Hadir' ? `HADIR â€¢ ${wish.paxCount} PAX` : wish.status}
+                          {wish.status === 'Hadir' ? `HADIR • ${wish.paxCount} PAX` : wish.status}
                         </span>
                       </div>
 
@@ -1122,7 +1136,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
             
             <div className="flex justify-center items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase py-3 border-t border-amber-500/5 max-w-[240px] mx-auto text-amber-600">
               <span>Wedding Builder</span>
-              <span>â€¢</span>
+              <span>•</span>
               <span className="font-extrabold pb-0.5">by rfx.visual</span>
             </div>
           </footer>

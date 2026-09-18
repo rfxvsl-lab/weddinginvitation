@@ -1,6 +1,6 @@
 ﻿/**
  * Simple in-memory rate limiter untuk Next.js API routes
- * Tidak memerlukan dependency external â€” cocok untuk Vercel serverless.
+ * Tidak memerlukan dependency external — cocok untuk Vercel serverless.
  * 
  * Catatan: Di serverless environment, memory tidak persisten antar-invocation.
  * Untuk production scale besar, gunakan Redis (Upstash) via @upstash/ratelimit.

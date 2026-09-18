@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Next.js Middleware â€” Route Protection
+ * Next.js Middleware — Route Protection
  * Proteksi halaman /dashboard dan /admin dari akses langsung tanpa session.
  * Session dideteksi dari cookie 'saas_user_session' yang di-set saat login.
  */

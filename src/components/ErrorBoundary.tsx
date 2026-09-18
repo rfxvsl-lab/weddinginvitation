@@ -1,7 +1,7 @@
 ﻿'use client';
 
 /**
- * ErrorBoundary â€” Menangkap crash komponen React agar tidak merusak seluruh halaman.
+ * ErrorBoundary — Menangkap crash komponen React agar tidak merusak seluruh halaman.
  * 
  * Cara pakai:
  * <ErrorBoundary fallback={<p>Terjadi error</p>}>
@@ -18,7 +18,7 @@ import React from 'react';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  /** Nama komponen â€” ditampilkan di pesan error default */
+  /** Nama komponen — ditampilkan di pesan error default */
   name?: string;
   /** Custom fallback UI, jika tidak disediakan akan menampilkan fallback default */
   fallback?: React.ReactNode;
@@ -55,7 +55,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
     if (this.props.fallback) return this.props.fallback;
 
-    // Default fallback UI â€” menggunakan design system yang ada
+    // Default fallback UI — menggunakan design system yang ada
     return (
       <div
         role="alert"
@@ -130,7 +130,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 }
 
 /**
- * withErrorBoundary â€” HOC untuk membungkus komponen dengan ErrorBoundary
+ * withErrorBoundary — HOC untuk membungkus komponen dengan ErrorBoundary
  * 
  * Usage:
  * const SafeEditorPanel = withErrorBoundary(EditorPanel, { name: 'EditorPanel' });

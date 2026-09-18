@@ -15,8 +15,8 @@ export interface ThemeConfig {
   accentHex: string;
   fontSerif: string; // e.g. Playfair Display, Great Vibes
   fontSans: string; // e.g. Inter
-  pattern: 'floral' | 'classic' | 'modern' | 'minimalist';
-  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic'; // Penentu struktur HTML yang di-render
+  pattern: 'floral' | 'classic' | 'modern' | 'minimalist' | 'storybook';
+  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic' | 'storybook-interactive'; // Penentu struktur HTML yang di-render
 }
 
 export interface CoupleMember {

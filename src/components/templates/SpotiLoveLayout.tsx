@@ -396,7 +396,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                         </p>
                         <h1 className="text-4xl md:text-7xl font-extrabold mb-4 tracking-tight leading-[1.05] break-words">{DATA.couple.groom} & {DATA.couple.bride}</h1>
                         <p className="text-[var(--text-sub)] text-sm md:text-base font-medium max-w-xl leading-relaxed">
-                            The Wedding Celebration â€¢ {dateDisplay} â€¢ 2,492,103 Monthly Wishes
+                            The Wedding Celebration • {dateDisplay} • 2,492,103 Monthly Wishes
                         </p>
                     </div>
                 </div>
@@ -419,7 +419,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                         <img src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
                         <div className="flex-1">
                             <p className="text-[var(--text-main)] font-medium">The Proposal</p>
-                            <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} â€¢ {DATA.couple.bride}</p>
+                            <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
                         </div>
                         <p className="text-sm text-[var(--text-sub)] hidden md:block">Jan 2023</p>
                         <span className="ml-4 md:ml-8 text-sm text-[var(--text-sub)]">3:45</span>
@@ -430,7 +430,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                         <img src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
                         <div className="flex-1">
                             <p className="text-[var(--spoti-green)] font-medium">The Wedding Day</p>
-                            <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} â€¢ {DATA.couple.bride}</p>
+                            <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
                         </div>
                         <p className="text-sm text-[var(--text-sub)] hidden md:block">{formatDate(DATA.dateFull)}</p>
                         <div className="ml-4 md:ml-8 flex gap-1 h-3 items-end">
@@ -443,7 +443,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                         <div className="group flex items-center p-2 rounded hover:bg-[#ffffff]/10 transition cursor-pointer mt-4 border border-[var(--spoti-dark)] bg-[var(--spoti-dark)]">
                             <div className="flex-1 p-2">
                                 <p className="text-[var(--text-main)] font-medium italic">"{DATA.quoteText}"</p>
-                                <p className="text-xs text-[var(--text-sub)] mt-2">â€” {DATA.quoteSource}</p>
+                                <p className="text-xs text-[var(--text-sub)] mt-2">— {DATA.quoteSource}</p>
                             </div>
                         </div>
                     )}
@@ -617,7 +617,7 @@ const GalleryPage = ({ images }: { images: string[] }) => (
                             </div>
                         </div>
                         <h3 className="font-bold text-sm truncate">Our Moment #{i + 1}</h3>
-                        <p className="text-xs text-[var(--text-sub)]">Romantic â€¢ Photo</p>
+                        <p className="text-xs text-[var(--text-sub)]">Romantic • Photo</p>
                     </div>
                 ))
             ) : (

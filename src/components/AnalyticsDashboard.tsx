@@ -274,7 +274,7 @@ export default function AnalyticsDashboard({
                         {log.guestName || 'Anonym / Penasaran'}
                       </span>
                       <span className="text-[10px] text-zinc-500">
-                        {log.browser} â€¢ {log.device}
+                        {log.browser} • {log.device}
                       </span>
                     </div>
                   </div>

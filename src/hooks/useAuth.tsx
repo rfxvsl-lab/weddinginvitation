@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * useAuth Hook â€” Authentication state management with Turso
+ * useAuth Hook — Authentication state management with Turso
  * Menggantikan localStorage-based auth di AuthGate.tsx
  */
 

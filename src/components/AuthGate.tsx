@@ -93,7 +93,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     setMode('signin');
   };
   
-  // Auth hook â€” backed by Turso
+  // Auth hook — backed by Turso
   const auth = useAuth();
   const usersList = auth.allUsers;
   const transactions = auth.allTransactions;
@@ -400,7 +400,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const [slugError, setSlugError] = useState('');
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  // Admin Override Actions â€” via Turso
+  // Admin Override Actions — via Turso
   const handleApproveTransaction = async (txId: string) => {
     const tx = transactions.find(t => t.id === txId);
     if (!tx) return;

@@ -125,6 +125,21 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
     fontSans: 'font-sans',
     pattern: 'modern',
     layout: 'parallax-cinematic'
+  },
+  {
+    id: 'storybook-interactive',
+    name: 'Storybook Interaktif',
+    primary: 'orange-400',
+    primaryHex: '#D97B4F',
+    secondaryHex: '#F6D9A8',
+    bgHex: '#FFF6E3',
+    bgPatternHex: '#F7E3C0',
+    textHex: '#4A3B30',
+    accentHex: '#D97B4F',
+    fontSerif: 'font-serif',
+    fontSans: 'font-sans',
+    pattern: 'storybook',
+    layout: 'storybook-interactive'
   }
 ];
 
