@@ -20,7 +20,7 @@ const WEDDING_DATA: WeddingData = {
       fatherName: 'Moch Syahid',
       motherName: 'Nurul Abidah',
       instagram: 'https://instagram.com/khaarissss_',
-      photoUrl: '',
+      photoUrl: '/assets/kharis-lia/groom.jpg',
       about: '',
     },
     bride: {
@@ -28,7 +28,7 @@ const WEDDING_DATA: WeddingData = {
       nickname: 'Lia',
       fatherName: 'Romli',
       motherName: 'Sutini',
-      instagram: 'https://instagram.com/prettyyhayaa',
+      instagram: 'https://instagram.com/pretty_yhayaa',
       photoUrl: '/assets/kharis-lia/bride.jpg',
       about: '',
     },
@@ -76,6 +76,8 @@ const WEDDING_DATA: WeddingData = {
   quoteText:
     'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ',
   quoteSource: 'QS Ar-Rum : 21',
+  ogImageUrl: '/assets/kharis-lia/hero.jpg',
+  bgImageUrl: '/assets/kharis-lia/hero.jpg',
 };
 
 const SPOTILOVE_THEME: ThemeConfig =
