@@ -29,7 +29,7 @@ const WEDDING_DATA: WeddingData = {
       fatherName: 'Romli',
       motherName: 'Sutini',
       instagram: 'https://instagram.com/prettyyhayaa',
-      photoUrl: '',
+      photoUrl: '/assets/kharis-lia/bride.jpg',
       about: '',
     },
   },
