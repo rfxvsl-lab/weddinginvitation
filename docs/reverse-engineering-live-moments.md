@@ -129,3 +129,57 @@ Diubah:
 - Uji browser nyata: buka undangan → unggah foto (masuk DB + muncul di dinding) → tab suara → generate story card 1080×1920 → check-in via kode manual (pax 2, Meja 7) → baris DB terisi.
 - Kamera fisik belum diuji karena headless (fallback manual terbukti); `BarcodeDetector`/`jsQR` perlu uji di HP.
 - Cloudinary preset `rfx_wedding` sudah diverifikasi menerima upload unsigned.
+
+---
+
+# BAGIAN 2 — RE Target Eksternal (acaranya.id / satumomen)
+
+Bukan cuma konsep dari halaman marketing: aplikasi undangannya dibongkar langsung.
+
+## Target & metode
+
+- `https://inv.acaranya.id/preview/novianty` (platform white-label Satu Momen).
+- HTML diambil, seluruh `<script src>` diinventarisasi, `theme-app.js` (1,2 MB, Vue 2 webpack) diunduh.
+- Eksekusi di browser headless: resource timing menampilkan chunk komponen (`RsvpComponent_vue.js`) dan endpoint API.
+- Kontrak API diverifikasi dengan request langsung (GET/POST), termasuk membuat satu tamu uji di database preview mereka.
+
+## Endpoint yang ditemukan
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/api/guest-books/options/{invitation_id}` | Konfigurasi form RSVP: field mana yang tampil/wajib, `is_private`, `show_comments`, `show_download_qr`, `default_country_code` |
+| GET | `/api/guest-books/{invitation_id}/?comment=true` | Daftar buku tamu + ucapan (paginasi) |
+| GET | `/api/guest-books/code/{code}?invitation_id=` | Validasi kode undangan, balikan status (`UNCONFIRMED` / `CONFIRM_ATTENDANCE`) |
+| POST | `/api/guest-books/{invitation_id}` | Buat konfirmasi tamu: `name, group_name, phone, country_code, attendance, guest, comment, custom_feedback` |
+| PUT | `/api/guest-books/{id}` | Update konfirmasi tamu |
+| GET | `/api/countries` | Daftar kode negara |
+
+## Model data yang terbaca dari respons
+
+`GuestBook`: `id, code (6 char), invitation_id, name, group_name, country_code, phone, comment, attendance, guest, seat_image, checkin_at, checkout_at, option (custom feedback JSON), created_at, updated_at`.
+
+Status mesin: `UNCONFIRMED` → `CONFIRM_ATTENDANCE` → tiket/QR → `checkin_at` oleh scanner panitia.
+
+## Konsep yang diambil
+
+1. **Validasi kode sebelum RSVP** — QR/tiket hanya keluar setelah kehadiran dikonfirmasi; mencegah tamu anonim mengisi porsi.
+2. **Status konfirmasi eksplisit** — bukan sekadar form bebas.
+3. **seat_image per tamu** — denah meja pribadi tampil di tiket.
+4. **Pengaturan form per undangan** — field bisa disembunyikan/diwajibkan, RSVP bisa private.
+5. **QR pass harian** — di-generate per tamu, plus tombol unduh.
+6. **Live streaming** — section khusus dengan tombol keluar ke Instagram/YouTube.
+
+## Implementasi di repo ini
+
+- `migrations/006_add_guest_confirmation.sql`: `attendance`, `rsvp_status`, `seat_image_url`.
+- `validateGuestCode`, `confirmGuestAttendance`, `setGuestSeatImage` di `src/lib/api.ts`.
+- `GuestPassSection.tsx`: validasi kode → konfirmasi → QR (di-generate lokal pakai `qrcode`, bukan API pihak ketiga) → unduh tiket → denah meja + section live streaming. Ditempel otomatis setelah **semua 9 layout** lewat `withExtras()`.
+- Layout default juga punya alur yang sama secara inline + tiket terkunci sebelum konfirmasi.
+- QR pass lama yang memakai `api.qrserver.com` diganti QR lokal.
+- Editor: field `liveStreamUrl` / `liveStreamLabel`; form tamu: URL denah/meja.
+
+## Verifikasi
+
+- Kode invalid ditolak; kode `W-BAHLIL` membuka konfirmasi; setelah konfirmasi QR 320px muncul + tombol unduh (`tiket-W-BAHLIL.png`) dan DB terisi `attendance=Hadir, rsvp_status=CONFIRMED`.
+- Tamu dengan `seat_image_url` menampilkan tombol denah meja (`Meja 7`) di tiket.
+- Section live streaming muncul saat `liveStreamUrl` diisi dan render iframe YouTube.

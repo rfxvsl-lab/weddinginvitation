@@ -23,7 +23,9 @@ import {
   PiSparkleDuotone as Sparkles,
   PiArrowRightDuotone as ArrowRight,
   PiArrowSquareOutDuotone as ExternalLink,
-  PiCaretDownDuotone as ChevronDown
+  PiCaretDownDuotone as ChevronDown,
+  PiQrCodeDuotone as QrCode,
+  PiDownloadSimpleDuotone as Download
 } from 'react-icons/pi';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeddingData, RSVP, ThemeConfig, Guest } from '../types';
@@ -37,6 +39,7 @@ import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
 import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
 import StorybookInteractiveLayout from './templates/StorybookInteractiveLayout';
 import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
+import GuestPassSection from './GuestPassSection';
 
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { convertGoogleDriveUrl } from '../utils/googleDrive';
@@ -49,6 +52,7 @@ interface InvitationPreviewProps {
   guest?: Guest; // If a personalized guest opened this URL
   embedded?: boolean; // If in builder sidebar
   serverNow?: string; // Waktu server saat render — hindari countdown meleset karena jam device
+  invitationId?: string; // Untuk validasi kode & simpan konfirmasi RSVP
 }
 
 // Vintage Floral Branch SVG Divider
@@ -78,7 +82,7 @@ export default function InvitationPreview(props: InvitationPreviewProps) {
   );
 }
 
-function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embedded = false, serverNow }: InvitationPreviewProps) {
+function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embedded = false, serverNow, invitationId }: InvitationPreviewProps) {
   const currentTheme = DEFAULT_THEMES.find(t => t.id === themeId) || DEFAULT_THEMES[0];
 
   // States
@@ -93,6 +97,14 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   const [rsvpGuestName, setRsvpGuestName] = useState('');
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
+  // Guest verification & ticket states (alur RE: kode -> konfirmasi -> QR)
+  const [activeGuest, setActiveGuest] = useState<Guest | undefined>(guest);
+  const [rsvpCode, setRsvpCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [validating, setValidating] = useState(false);
+  const [rsvpDone, setRsvpDone] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+
   // Countdown States
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -101,13 +113,57 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
   // Set guest default name
   useEffect(() => {
+    setActiveGuest(guest);
     if (guest) {
       setRsvpGuestName(guest.name);
       setRsvpPaxCount(guest.paxLimit);
+      if (guest.rsvpStatus === 'CONFIRMED' || guest.checkedInAt) setRsvpDone(true);
     } else {
       setRsvpGuestName('');
     }
   }, [guest]);
+
+  const ticketUnlocked = Boolean(
+    activeGuest && (rsvpDone || activeGuest.rsvpStatus === 'CONFIRMED' || activeGuest.checkedInAt)
+  );
+
+  // Generate QR pass lokal (tanpa API eksternal), hanya setelah konfirmasi
+  useEffect(() => {
+    let cancelled = false;
+    if (!ticketUnlocked || !activeGuest?.invitationCode) {
+      setQrDataUrl('');
+      return;
+    }
+    import('qrcode')
+      .then((QR) => QR.toDataURL(activeGuest.invitationCode, { width: 320, margin: 1, color: { dark: '#111111', light: '#ffffff' } }))
+      .then((url) => !cancelled && setQrDataUrl(url))
+      .catch(() => !cancelled && setQrDataUrl(''));
+    return () => {
+      cancelled = true;
+    };
+  }, [ticketUnlocked, activeGuest?.invitationCode]);
+
+  const handleValidateCode = async () => {
+    if (!invitationId || !rsvpCode.trim()) return;
+    setValidating(true);
+    setCodeError('');
+    try {
+      const { validateGuestCode } = await import('../lib/api');
+      const found = await validateGuestCode(invitationId, rsvpCode);
+      if (!found) {
+        setCodeError('Kode undangan tidak valid. Periksa kembali link/QR dari mempelai.');
+        return;
+      }
+      setActiveGuest(found);
+      setRsvpGuestName(found.name);
+      setRsvpPaxCount(Math.min(found.paxLimit || 1, 2));
+      if (found.rsvpStatus === 'CONFIRMED') setRsvpDone(true);
+    } catch {
+      setCodeError('Gagal memvalidasi kode. Coba lagi.');
+    } finally {
+      setValidating(false);
+    }
+  };
 
   // Simple image URL resolver (Cloudinary URLs are direct, Google Drive needs conversion)
   const getImageUrl = (url: string) => {
@@ -194,19 +250,31 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
     });
   };
 
-  const handleRSVPSubmit = (e: React.FormEvent) => {
+  const handleRSVPSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rsvpGuestName.trim() || !rsvpWishes.trim()) return;
 
     onAddRSVP({
       id: `rsvp-${Date.now()}`,
-      guestId: guest?.id,
+      guestId: activeGuest?.id || guest?.id,
       guestName: rsvpGuestName.trim(),
       status: rsvpStatus,
       paxCount: rsvpStatus === 'Hadir' ? Number(rsvpPaxCount) : 0,
       wishes: rsvpWishes.trim(),
       timestamp: new Date().toISOString()
     });
+
+    // Alur RE: konfirmasi kehadiran membuka QR pass + denah meja
+    if (activeGuest?.id) {
+      try {
+        const { confirmGuestAttendance } = await import('../lib/api');
+        await confirmGuestAttendance(activeGuest.id, rsvpStatus, rsvpPaxCount);
+        setActiveGuest({ ...activeGuest, rsvpStatus: 'CONFIRMED', attendance: rsvpStatus });
+        setRsvpDone(true);
+      } catch (err) {
+        console.error('Gagal menyimpan konfirmasi tamu:', err);
+      }
+    }
 
     setRsvpSuccess(true);
     setRsvpWishes('');
@@ -225,8 +293,23 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   const goldTextAccent = isRFX ? 'text-amber-500' : 'text-amber-700';
   const goldenLineBorder = isRFX ? 'border-amber-950/40' : 'border-amber-100';
 
+  // Section tambahan (live streaming + guest pass) ditempel setelah layout apa pun
+  const darkLayout = !['luxury-pink', 'grand-ballroom', 'storybook-interactive'].includes(currentTheme.layout || '');
+  const withExtras = (node: React.ReactNode) => (
+    <>
+      {node}
+      <GuestPassSection
+        invitationId={invitationId}
+        guest={guest}
+        data={data}
+        accentColor={currentTheme.accentHex || currentTheme.primaryHex}
+        dark={darkLayout}
+      />
+    </>
+  );
+
   if (currentTheme.layout === 'javanese-classic') {
-    return (
+    return withExtras(
       <JavaneseClassicLayout 
         data={data} 
         theme={currentTheme} 
@@ -239,7 +322,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'spotilove') {
-    return (
+    return withExtras(
       <SpotiLoveLayout 
         data={data} 
         theme={currentTheme} 
@@ -252,7 +335,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'royal-arabian') {
-    return (
+    return withExtras(
       <RoyalArabianLayout 
         data={data} 
         theme={currentTheme} 
@@ -265,7 +348,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'grand-ballroom') {
-    return (
+    return withExtras(
       <GrandBallroomLayout 
         data={data} 
         theme={currentTheme} 
@@ -278,7 +361,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'netflix-luxury') {
-    return (
+    return withExtras(
       <NetflixLuxuryLayout 
         data={data} 
         theme={currentTheme} 
@@ -291,7 +374,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'luxury-pink') {
-    return (
+    return withExtras(
       <LuxuryPinkLayout 
         data={data} 
         theme={currentTheme} 
@@ -304,7 +387,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'dark-luxury') {
-    return (
+    return withExtras(
       <DarkLuxuryLayout 
         data={data} 
         theme={currentTheme} 
@@ -317,7 +400,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'parallax-cinematic') {
-    return (
+    return withExtras(
       <ParallaxCinematicLayout 
         data={data} 
         theme={currentTheme} 
@@ -330,7 +413,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   }
 
   if (currentTheme.layout === 'storybook-interactive') {
-    return (
+    return withExtras(
       <StorybookInteractiveLayout 
         data={data} 
         theme={currentTheme} 
@@ -893,6 +976,39 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
             </div>
           </section>
 
+          {/* ==================== 7b. LIVE STREAMING (konsep RE acaranya/satumomen) ==================== */}
+          {data.liveStreamUrl && (
+            <section className={`px-4 py-8 md:p-12 text-center space-y-4 border-t ${isRFX ? 'bg-black/50 border-zinc-900' : 'bg-white border-amber-100/40'}`}>
+              <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-600 block font-serif">LIVE STREAMING</span>
+              <h3 className="text-2xl font-serif text-amber-800">Saksikan Kami Secara Virtual</h3>
+              <p className="text-[11px] text-stone-500 max-w-xs mx-auto leading-relaxed">
+                Bagi kerabat yang berhalangan hadir, acara kami akan disiarkan langsung melalui tautan berikut.
+              </p>
+              {/youtu\.?be/.test(data.liveStreamUrl) ? (
+                <div className="max-w-md mx-auto aspect-video overflow-hidden rounded-2xl border border-amber-500/20 shadow-lg">
+                  <iframe
+                    src={data.liveStreamUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/')}
+                    title="Live streaming pernikahan"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : (
+                <a
+                  href={data.liveStreamUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold text-white"
+                  style={{ backgroundColor: currentTheme.primaryHex }}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  {data.liveStreamLabel || 'Join Live Streaming'}
+                </a>
+              )}
+            </section>
+          )}
+
           {/* ==================== 8. RSVP & BUKU TAMU LAYER ==================== */}
           <section className={`px-4 py-8 md:p-12 space-y-8 border-t ${isRFX ? 'bg-black/30 border-zinc-900' : 'bg-amber-500/5 border-amber-100/40'}`}>
             <div className="text-center space-y-1.5">
@@ -914,13 +1030,56 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
               )}
 
               <div className="space-y-3 pb-2 text-left">
+                {/* Validasi kode undangan (khusus tamu tanpa link personal) */}
+                {!activeGuest && (
+                  <div className={`p-3.5 rounded-2xl border space-y-2 ${
+                    isRFX ? 'bg-zinc-900/80 border-zinc-800' : 'bg-amber-50/60 border-amber-100'
+                  }`}>
+                    <label className="block text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                      Validasi Kode Undangan
+                    </label>
+                    <p className="text-[10px] text-zinc-500 leading-relaxed">
+                      Masukkan kode di undangan/QR Anda supaya porsi & tiket check-in terhubung ke nama yang benar.
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        value={rsvpCode}
+                        onChange={(e) => setRsvpCode(e.target.value.toUpperCase())}
+                        placeholder="Contoh: W-ANDIW"
+                        className={`flex-1 text-xs px-3 py-2.5 rounded-xl border font-mono tracking-wider focus:outline-none ${
+                          isRFX ? 'border-zinc-700 bg-zinc-950 text-white' : 'border-amber-200 bg-white text-slate-800'
+                        }`}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleValidateCode())}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleValidateCode}
+                        disabled={validating || !invitationId}
+                        className="px-3.5 rounded-xl text-[10.5px] font-bold text-white disabled:opacity-50"
+                        style={{ backgroundColor: currentTheme.primaryHex }}
+                      >
+                        {validating ? '...' : 'Validasi'}
+                      </button>
+                    </div>
+                    {codeError && <p className="text-[10px] text-rose-500">{codeError}</p>}
+                  </div>
+                )}
+
+                {activeGuest && (
+                  <div className={`flex items-center gap-2 p-2.5 rounded-xl border text-[10px] font-bold ${
+                    isRFX ? 'bg-emerald-950/40 border-emerald-900/40 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                  }`}>
+                    <Check className="w-3.5 h-3.5" /> Kode tervalidasi untuk {activeGuest.name}
+                  </div>
+                )}
+
                 {/* Name */}
                 <div>
                   <label className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">Nama Tamu Pengirim</label>
                   <input
                     type="text"
                     required
-                    disabled={!!guest}
+                    disabled={!!activeGuest}
                     value={rsvpGuestName}
                     onChange={(e) => setRsvpGuestName(e.target.value)}
                     placeholder="Masukkan nama lengkap Anda..."
@@ -928,7 +1087,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                       isRFX ? 'border-zinc-800 bg-zinc-900 text-white font-mono' : 'border-amber-150 bg-[#fffefd] text-slate-800'
                     }`}
                   />
-                  {guest && (
+                  {activeGuest && (
                     <span className="block mt-1 text-[9px] text-zinc-505 italic">* Dikunci khusus link undang personal Anda.</span>
                   )}
                 </div>
@@ -962,13 +1121,13 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                 {rsvpStatus === 'Hadir' && (
                   <div>
                     <label className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">
-                      Jumlah Pax Kedatangan (Maksimal {guest ? guest.paxLimit : '5'} Pax)
+                      Jumlah Pax Kedatangan (Maksimal {activeGuest ? activeGuest.paxLimit : '5'} Pax)
                     </label>
                     <input
                       type="number"
                       required
                       min={1}
-                      max={guest ? guest.paxLimit : 5}
+                      max={activeGuest ? activeGuest.paxLimit : 5}
                       value={rsvpPaxCount}
                       onChange={(e) => setRsvpPaxCount(Number(e.target.value))}
                       className={`w-full text-xs px-3.5 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
@@ -1067,6 +1226,19 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
               {/* CLASSY BOARDING PASS CARD DESIGN */}
               <div className="max-w-md mx-auto relative overflow-hidden my-4">
+                {!ticketUnlocked ? (
+                  <div className={`rounded-3xl border p-7 text-center space-y-3 ${
+                    isRFX ? 'bg-zinc-950/90 border-zinc-800' : 'bg-white border-amber-100 shadow-md'
+                  }`}>
+                    <div className="mx-auto w-12 h-12 rounded-2xl flex items-center justify-center bg-amber-500/10">
+                      <QrCode className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <p className="text-sm font-serif font-bold text-amber-700">Tiket masih terkunci</p>
+                    <p className="text-[11px] leading-relaxed text-stone-500 max-w-[260px] mx-auto">
+                      Validasi kode undangan lalu konfirmasi kehadiran di form RSVP untuk membuka QR pass dan denah meja Anda.
+                    </p>
+                  </div>
+                ) : (
                 <div className={`rounded-3xl border p-6 text-center space-y-5 relative ${
                   isRFX 
                     ? 'bg-zinc-950/90 border-[#27272a] shadow-[0_10px_25px_rgba(0,0,0,0.85)]' 
@@ -1085,7 +1257,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                     <div>
                       <h5 className="text-[8.5px] font-bold tracking-widest text-[#925c0e] uppercase">PASSENGER NAME</h5>
                       <p className="text-sm font-serif font-black text-amber-800">
-                        {guest ? guest.name : 'Tamu Undangan Terhormat'}
+                        {activeGuest ? activeGuest.name : 'Tamu Undangan Terhormat'}
                       </p>
                     </div>
                     <div className="text-right">
@@ -1093,7 +1265,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-[8.5px] font-bold uppercase mt-1 border ${
                         isRFX ? 'bg-amber-950/40 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-800 border-amber-100'
                       }`}>
-                        {guest ? guest.group : 'VVIP INVITEE'}
+                        {activeGuest ? activeGuest.group : 'VVIP INVITEE'}
                       </span>
                     </div>
                   </div>
@@ -1101,27 +1273,51 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                   {/* QR Body wrapper */}
                   <div className="py-2 flex flex-col items-center">
                     <div className={`bg-white p-3 rounded-2xl shadow-md border ${isRFX ? 'border-amber-500/20' : 'border-amber-50'}`}>
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=${isRFX ? 'dc2626' : 'b45309'}&data=${encodeURIComponent(guest ? guest.invitationCode : 'W-SAMPLE99')}`}
-                        alt="Check-in access pass barcode"
-                        className="w-28 h-28 object-contain"
-                        referrerPolicy="no-referrer"
-                      />
+                      {qrDataUrl ? (
+                        <img
+                          src={qrDataUrl}
+                          alt="Check-in access pass barcode"
+                          className="w-28 h-28 object-contain"
+                        />
+                      ) : (
+                        <div className="w-28 h-28 flex items-center justify-center text-[9px] text-zinc-400">QR…</div>
+                      )}
                     </div>
                     <div className="mt-3.5 text-center">
                       <h4 className="text-[8.5px] font-mono tracking-widest text-zinc-500 uppercase">UNIQUE GATEWAYS KEY</h4>
                       <p className="text-lg font-mono tracking-widest font-black text-amber-600 mt-0.5">
-                        {guest ? guest.invitationCode : 'W-SAMPLE99'}
+                        {activeGuest ? activeGuest.invitationCode : 'W-SAMPLE99'}
                       </p>
                     </div>
+                    {qrDataUrl && (
+                      <a
+                        href={qrDataUrl}
+                        download={`tiket-${activeGuest?.invitationCode || 'tamu'}.png`}
+                        className="mt-2 inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-700 underline underline-offset-2"
+                      >
+                        <Download className="w-3 h-3" /> Unduh tiket
+                      </a>
+                    )}
                   </div>
 
                   {/* Ticket foot */}
                   <div className="border-t border-dashed pt-4 border-amber-500/20 text-[9.5px] text-zinc-500 flex justify-between items-center font-mono uppercase tracking-wider">
-                    <span>LIMIT: <strong className="text-amber-800">{guest ? guest.paxLimit : 2} PAX</strong></span>
+                    <span>LIMIT: <strong className="text-amber-800">{activeGuest ? activeGuest.paxLimit : 2} PAX</strong></span>
                     <span className="text-amber-600 font-bold">RFX.VISUAL DIGITAL BOARDING PASS</span>
                   </div>
+
+                  {activeGuest?.seatImageUrl && (
+                    <a
+                      href={activeGuest.seatImageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-bold bg-amber-600 text-white"
+                    >
+                      <MapPin className="w-3 h-3" /> Lihat denah meja{activeGuest.tableNo ? ` (${activeGuest.tableNo})` : ''}
+                    </a>
+                  )}
                 </div>
+                )}
               </div>
             </section>
           )}

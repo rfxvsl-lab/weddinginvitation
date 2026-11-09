@@ -81,6 +81,8 @@ export interface WeddingData {
   bgImageUrl?: string;
   enableDigitalPass?: boolean;
   enableLiveMoments?: boolean;
+  liveStreamUrl?: string;
+  liveStreamLabel?: string;
 }
 
 export interface Guest {
@@ -96,6 +98,10 @@ export interface Guest {
   checkInPax?: number;
   tableNo?: string;
   souvenirGiven?: boolean;
+  /** Status konfirmasi RSVP: UNCONFIRMED → CONFIRMED setelah validasi kode */
+  attendance?: string;
+  rsvpStatus?: 'UNCONFIRMED' | 'CONFIRMED';
+  seatImageUrl?: string;
 }
 
 export interface PhotoMoment {

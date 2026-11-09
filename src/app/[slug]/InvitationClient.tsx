@@ -70,6 +70,7 @@ export default function InvitationClient({
         rsvps={rsvps}
         guest={urlGuest}
         serverNow={serverNow}
+        invitationId={invitationId}
       />
       {slug && weddingData?.enableLiveMoments !== false && (
         <LiveMomentsDock

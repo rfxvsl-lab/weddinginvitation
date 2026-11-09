@@ -996,6 +996,24 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <p className="text-xs text-zinc-500 mt-1">Masukkan tautan foto dan musik romantis untuk melengkapi kemeriahan atmosfer undangan digital.</p>
             </div>
 
+            {/* Live Streaming */}
+            <div className="p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm space-y-2">
+              <span className="font-bold text-zinc-800 text-xs block">Live Streaming</span>
+              <span className="text-[10px] text-zinc-400 block">Tautan YouTube/Instagram Live. Kosongkan bila tidak dipakai.</span>
+              <input
+                value={data.liveStreamUrl || ''}
+                onChange={(e) => onChange({ ...data, liveStreamUrl: e.target.value })}
+                placeholder="https://youtube.com/watch?v=... atau https://instagram.com/..."
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 bg-white"
+              />
+              <input
+                value={data.liveStreamLabel || ''}
+                onChange={(e) => onChange({ ...data, liveStreamLabel: e.target.value })}
+                placeholder="Label tombol (opsional)"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 bg-white"
+              />
+            </div>
+
             {/* Show/Hide Live Moments (Guest Camera + Voice Wishes) */}
             <div className="flex items-center justify-between p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm">
               <div>

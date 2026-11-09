@@ -654,8 +654,8 @@ export async function addGuest(
   const invitationCode = `W-${initials}${randomNum}`;
 
   await dbExecute(
-    `INSERT INTO guests (id, invitation_id, name, group_name, phone_number, pax_limit, status, invitation_code)
-     VALUES (:id, :invId, :name, :group, :phone, :pax, :status, :code)`,
+    `INSERT INTO guests (id, invitation_id, name, group_name, phone_number, pax_limit, status, invitation_code, seat_image_url)
+     VALUES (:id, :invId, :name, :group, :phone, :pax, :status, :code, :seat)`,
     {
       id,
       invId: invitationId,
@@ -665,6 +665,7 @@ export async function addGuest(
       pax: guestData.paxLimit || 2,
       status: guestData.status || 'Draft',
       code: invitationCode,
+      seat: guestData.seatImageUrl || '',
     }
   );
 
@@ -713,7 +714,41 @@ function rowToGuest(row: any): Guest {
     checkInPax: (row.check_in_pax as number) || 0,
     tableNo: (row.table_no as string) || '',
     souvenirGiven: Number(row.souvenir_given) === 1,
+    attendance: (row.attendance as string) || '',
+    rsvpStatus: (row.rsvp_status as 'UNCONFIRMED' | 'CONFIRMED') || 'UNCONFIRMED',
+    seatImageUrl: (row.seat_image_url as string) || '',
   };
+}
+
+/** Validasi kode undangan personal (alur RE: kode -> status UNCONFIRMED -> konfirmasi) */
+export async function validateGuestCode(invitationId: string, code: string): Promise<Guest | null> {
+  const result = await dbExecute(
+    `SELECT * FROM guests WHERE invitation_id = :invId AND UPPER(invitation_code) = UPPER(:code) LIMIT 1`,
+    { invId: invitationId, code: code.trim() }
+  );
+  if (result.rows.length === 0) return null;
+  return rowToGuest(result.rows[0]);
+}
+
+/** Konfirmasi kehadiran tamu → membuka QR pass */
+export async function confirmGuestAttendance(
+  guestId: string,
+  attendance: string,
+  pax: number
+): Promise<void> {
+  await dbExecute(
+    `UPDATE guests
+     SET attendance = :attendance,
+         rsvp_status = 'CONFIRMED',
+         check_in_pax = CASE WHEN :attendance = 'Hadir' THEN :pax ELSE 0 END,
+         status = 'Opened'
+     WHERE id = :id`,
+    { id: guestId, attendance, pax: Math.max(1, Number(pax) || 1) }
+  );
+}
+
+export async function setGuestSeatImage(guestId: string, url: string): Promise<void> {
+  await dbExecute('UPDATE guests SET seat_image_url = :url WHERE id = :id', { id: guestId, url });
 }
 
 /**

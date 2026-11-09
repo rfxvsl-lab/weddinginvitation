@@ -82,6 +82,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
   const [newGroup, setNewGroup] = useState('Sahabat');
   const [newPhone, setNewPhone] = useState('');
   const [newPaxLimit, setNewPaxLimit] = useState(2);
+  const [newSeatImage, setNewSeatImage] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
   // CSV & PDF Export/Print Modal State
@@ -112,13 +113,15 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
       group: newGroup,
       phoneNumber: newPhone.trim() || '081234567890',
       paxLimit: Number(newPaxLimit),
-      status: 'Draft'
+      status: 'Draft',
+      seatImageUrl: newSeatImage.trim(),
     });
 
     // Reset Form
     setNewName('');
     setNewPhone('');
     setNewPaxLimit(2);
+    setNewSeatImage('');
     setShowAddForm(false);
   };
 
@@ -316,6 +319,17 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               value={newPhone}
               onChange={(e) => setNewPhone(e.target.value)}
               placeholder="e.g. 081234567890"
+              className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-outline-variant)] bg-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">URL Gambar Denah / Meja (opsional)</label>
+            <input
+              type="url"
+              value={newSeatImage}
+              onChange={(e) => setNewSeatImage(e.target.value)}
+              placeholder="https://... (tampil di tiket tamu)"
               className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-outline-variant)] bg-white"
             />
           </div>
