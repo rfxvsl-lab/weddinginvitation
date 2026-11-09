@@ -46,13 +46,11 @@ export function SaasCta() {
         <div className="saas-dark-panel grid gap-10 overflow-hidden rounded-[28px] p-8 sm:p-12 lg:grid-cols-[1.1fr_1fr] lg:p-14">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.26em]" style={{ color: "var(--saas-gold-2)" }}>Mulai sekarang</p>
-            <h2 className="mt-4 text-[32px] leading-[1.08] text-white sm:text-[42px]">
-              Hari spesialmu layak{" "}
-              <span className="saas-serif-i" style={{ color: "var(--saas-gold-2)" }}>diundang</span>{" "}
-              dengan indah.
+            <h2 className="mt-4 text-[32px] leading-[1.15] text-white sm:text-[40px] font-serif">
+              Waktunya wujudkan undangan pernikahan impian kalian.
             </h2>
             <p className="mt-4 max-w-[48ch] text-[14.5px] leading-relaxed text-[#EAD9CE]">
-              Setup 10 menit, langsung sebar via WhatsApp. Coba tema Demo gratis — tanpa kartu kredit.
+              Proses cepat, mudah disesuaikan, dan langsung siap disebarkan ke keluarga serta sahabat tercinta.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -68,24 +66,24 @@ export function SaasCta() {
             </div>
           </div>
           <div className="rounded-2xl bg-white p-6" style={{ color: "var(--saas-ink)" }}>
-            <p className="text-[13px] font-extrabold">Cek ketersediaan link undanganmu</p>
+            <p className="text-[13px] font-extrabold">Klaim tautan undangan pernikahan kalian</p>
             <div className="mt-3 flex gap-2">
               <span className="flex flex-1 items-center gap-2 rounded-full border px-3.5 text-[13px] font-semibold" style={{ borderColor: "var(--saas-line-strong)" }}>
                 <Search size={15} style={{ color: "var(--saas-muted)" }} />
-                <span style={{ color: "var(--saas-muted)" }}>ruanghadir.net/</span><span>rina-budi</span>
+                <span style={{ color: "var(--saas-muted)" }}>ruanghadir.net/</span><span>kharis-lia</span>
               </span>
               <Link href="/auth?mode=register" className="saas-btn-primary !px-5 !py-2.5">Klaim</Link>
             </div>
             <div className="mt-5 space-y-2.5 text-[12.5px] font-semibold" style={{ color: "var(--saas-ink-2)" }}>
               <p className="flex items-center gap-2">
-                <ShieldCheck size={14} style={{ color: "var(--saas-gold)" }} /> Gratis dicoba dulu — tanpa kartu kredit
+                <ShieldCheck size={14} style={{ color: "var(--saas-gold)" }} /> Langsung aktif siap sebar via WhatsApp
               </p>
-              {VERIFIED && (
-                <>
-                  <p className="flex items-center gap-2"><Clock size={14} style={{ color: "var(--saas-gold)" }} /> Rata-rata selesai {CTA_FACTS.setupDuration}</p>
-                  <p className="flex items-center gap-2"><Users size={14} style={{ color: "var(--saas-gold)" }} /> {CTA_FACTS.newCouplesThisMonth.toLocaleString("id-ID")} pasangan daftar bulan ini</p>
-                </>
-              )}
+              <p className="flex items-center gap-2">
+                <Clock size={14} style={{ color: "var(--saas-gold)" }} /> Coba gratis tanpa komitmen awal
+              </p>
+              <p className="flex items-center gap-2">
+                <Users size={14} style={{ color: "var(--saas-gold)" }} /> Pilihan elegan untuk momen sakral sekali seumur hidup
+              </p>
             </div>
           </div>
         </div>

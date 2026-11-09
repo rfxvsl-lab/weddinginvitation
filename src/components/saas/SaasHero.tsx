@@ -107,25 +107,25 @@ export function SaasHero() {
               {/* Background Photo with Gradient */}
               <div className="absolute inset-0 z-0">
                 <img
-                  src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=75"
+                  src="/assets/kharis-lia/hero.jpg"
                   alt="Wedding Preview"
-                  className="w-full h-full object-cover opacity-60"
+                  className="w-full h-full object-cover opacity-75"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0e] via-[#0a0a0e]/40 to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0e] via-[#0a0a0e]/40 to-black/70" />
               </div>
 
               {/* Cover Top */}
               <div className="relative z-10 pt-4">
                 <p className="text-[8px] font-mono tracking-[0.3em] uppercase text-amber-300/80">THE WEDDING OF</p>
-                <h3 className="mt-1 font-serif text-2xl text-amber-100 font-bold">Rian &amp; Salsa</h3>
+                <h3 className="mt-1 font-serif text-2xl text-amber-100 font-bold">Kharis &amp; Lia</h3>
                 <p className="text-[10px] text-zinc-300/80 mt-1">Sabtu, 08 Agustus 2026</p>
               </div>
 
               {/* Guest Card Inside Phone */}
-              <div className="relative z-10 my-auto rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md p-4 text-center space-y-2">
+              <div className="relative z-10 my-auto rounded-2xl border border-white/20 bg-black/40 backdrop-blur-md p-4 text-center space-y-2 shadow-2xl">
                 <p className="text-[9px] uppercase tracking-widest text-amber-200">Kepada Yth.</p>
                 <p className="text-sm font-bold text-white">Andi Wijaya &amp; Partner</p>
-                <div className="inline-flex items-center justify-center gap-1.5 rounded-full bg-amber-600 px-4 py-1.5 text-[10px] font-bold text-white shadow-md">
+                <div className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 px-5 py-1.5 text-[10px] font-bold text-white shadow-md">
                   Buka Undangan
                 </div>
               </div>
