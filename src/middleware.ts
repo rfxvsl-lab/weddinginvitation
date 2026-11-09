@@ -16,9 +16,16 @@ const ADMIN_ONLY_ROUTES = ['/admin'];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const response = NextResponse.next();
+  // Tambahkan Security Headers global
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=*, microphone=*, geolocation=()');
+
   // Cek apakah route ini terproteksi
   const isProtected = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-  if (!isProtected) return NextResponse.next();
+  if (!isProtected) return response;
 
   // Ambil session cookie
   const sessionCookie = request.cookies.get('saas_user_session');
@@ -56,7 +63,12 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/admin/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
