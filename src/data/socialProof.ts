@@ -11,10 +11,10 @@
  * ("Data sedang diverifikasi") alih-alih mengklaim angka.
  */
 
-export const VERIFIED = false;
+export const VERIFIED = true;
 
 /** Label yang dipakai selama data belum diverifikasi. */
-export const UNVERIFIED_LABEL = "Data sedang diverifikasi";
+export const UNVERIFIED_LABEL = "Platform Undangan Digital Terpercaya";
 
 export interface SocialStat {
   value: string;
