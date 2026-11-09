@@ -892,6 +892,7 @@ interface RSVPPageProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
@@ -1022,6 +1023,7 @@ interface GrandBallroomProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }) => {

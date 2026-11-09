@@ -16,6 +16,7 @@ interface StorybookInteractiveLayoutProps {
   onAddRSVP: (rsvp: RSVP) => void;
   rsvps: RSVP[];
   embedded?: boolean;
+  invitationId?: string;
 }
 
 const ASSET = (n: string) => `/assets/storybook/${n}`;

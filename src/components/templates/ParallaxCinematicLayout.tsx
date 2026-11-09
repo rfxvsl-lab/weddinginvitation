@@ -29,6 +29,7 @@ interface ParallaxCinematicLayoutProps {
   onAddRSVP: (rsvp: RSVP) => void;
   rsvps: RSVP[];
   embedded?: boolean;
+  invitationId?: string;
 }
 
 interface CameraWaypoint {

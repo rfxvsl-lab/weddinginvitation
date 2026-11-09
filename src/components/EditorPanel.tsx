@@ -1485,7 +1485,39 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             <div className="space-y-4 p-5 border border-zinc-300 rounded-2xl bg-white shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-300 via-purple-500 to-purple-300" />
               <div>
-                <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Kata Mutiara / Quote Undangan</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-zinc-600 tracking-wide">Kata Mutiara / Quote Undangan</label>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/ai/invitation-copy', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            type: 'quote',
+                            tone: 'islami',
+                            groomName: data?.couple?.groom?.nickname || 'Mempelai Pria',
+                            brideName: data?.couple?.bride?.nickname || 'Mempelai Wanita',
+                          }),
+                        });
+                        const resData = await res.json();
+                        if (resData.success && (resData.quote || resData.text)) {
+                          onChange({
+                            ...data,
+                            quoteText: resData.quote || resData.text,
+                            quoteSource: resData.source || data?.quoteSource || 'QS. Ar-Rum: 21',
+                          });
+                        }
+                      } catch (err) {
+                        console.error('Gagal generate quote AI:', err);
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-2 py-0.5 rounded-md transition"
+                  >
+                    <Sparkles className="w-3 h-3" /> Buat Pakai AI
+                  </button>
+                </div>
                 <textarea
                   value={data?.quoteText}
                   onChange={(e) => onChange({ ...data, quoteText: e.target.value })}

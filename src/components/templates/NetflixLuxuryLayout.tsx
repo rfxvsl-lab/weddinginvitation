@@ -1040,6 +1040,7 @@ interface RSVPPageProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
@@ -1253,6 +1254,7 @@ interface NetflixLuxuryProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }) => {

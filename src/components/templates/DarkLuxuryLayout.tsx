@@ -24,6 +24,7 @@ interface DarkLuxuryLayoutProps {
   onAddRSVP: (rsvp: RSVP) => void;
   rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }: DarkLuxuryLayoutProps) => {

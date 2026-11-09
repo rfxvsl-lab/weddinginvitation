@@ -39,6 +39,13 @@ export default function InvitationClient({
     try {
       const saved = await addRSVP(invitationId, newRSVP);
       setRsvps(prev => [saved, ...prev]);
+
+      // Alur RE: Jika tamu teridentifikasi atau ada guestId, auto-konfirmasi kehadiran & status RSVP di DB
+      const targetGuestId = newRSVP.guestId || urlGuest?.id;
+      if (targetGuestId) {
+        const { confirmGuestAttendance } = await import('../../lib/api');
+        await confirmGuestAttendance(targetGuestId, newRSVP.status, newRSVP.paxCount);
+      }
     } catch (err) {
       console.error('Failed to save RSVP:', err);
     }

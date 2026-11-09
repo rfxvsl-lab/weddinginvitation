@@ -502,6 +502,7 @@ interface RSVPPageProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
@@ -652,6 +653,7 @@ interface RoyalArabianProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const RoyalArabianLayout: React.FC<RoyalArabianProps> = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }) => {

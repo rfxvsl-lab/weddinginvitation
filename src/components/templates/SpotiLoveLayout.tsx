@@ -633,6 +633,7 @@ interface RSVPPageProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
@@ -772,6 +773,7 @@ interface SpotiLoveProps {
     onAddRSVP: (rsvp: RSVP) => void;
     rsvps: RSVP[];
     embedded?: boolean;
+  invitationId?: string;
 }
 
 const SpotiLoveLayout: React.FC<SpotiLoveProps> = ({ data, theme, guest, onAddRSVP, rsvps, embedded = false }) => {

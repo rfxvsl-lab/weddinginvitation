@@ -316,7 +316,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -329,7 +330,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -342,7 +344,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -355,7 +358,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -368,7 +372,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -381,7 +386,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -394,7 +400,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -407,7 +414,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
@@ -420,7 +428,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         guest={guest} 
         onAddRSVP={onAddRSVP} 
         rsvps={rsvps}
-        embedded={embedded} 
+        embedded={embedded}
+        invitationId={invitationId} 
       />
     );
   }
