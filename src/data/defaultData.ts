@@ -145,6 +145,7 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
 
 export const DEFAULT_WEDDING_DATA: WeddingData = {
   showLoveStories: true,
+  enableLiveMoments: true,
   couple: {
     groom: {
       fullName: 'Rian Aditama, S.Kom',

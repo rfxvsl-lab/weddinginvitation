@@ -14,6 +14,8 @@ import type {
   Guest,
   RSVP,
   VisitorLog,
+  PhotoMoment,
+  VoiceWish,
 } from '../types';
 
 // ============================================
@@ -707,7 +709,151 @@ function rowToGuest(row: any): Guest {
     paxLimit: (row.pax_limit as number) || 2,
     status: row.status as Guest['status'],
     invitationCode: row.invitation_code as string,
+    checkedInAt: (row.checked_in_at as string) || null,
+    checkInPax: (row.check_in_pax as number) || 0,
+    tableNo: (row.table_no as string) || '',
+    souvenirGiven: Number(row.souvenir_given) === 1,
   };
+}
+
+/**
+ * Check-in tamu di lokasi acara (dipakai scanner QR meja resepsionis).
+ * Idempotent: check-in kedua hanya memperbarui pax/meja tanpa mengubah timestamp awal.
+ */
+export async function checkInGuest(
+  guestId: string,
+  pax: number,
+  tableNo?: string
+): Promise<void> {
+  await dbExecute(
+    `UPDATE guests
+     SET status = 'Opened',
+         checked_in_at = COALESCE(checked_in_at, :ts),
+         check_in_pax = :pax,
+         table_no = COALESCE(:tableNo, table_no)
+     WHERE id = :id`,
+    {
+      id: guestId,
+      pax: Math.max(1, Number(pax) || 1),
+      tableNo: tableNo ?? null,
+      ts: new Date().toISOString(),
+    }
+  );
+}
+
+export async function updateGuestLogistics(
+  guestId: string,
+  data: { tableNo?: string; souvenirGiven?: boolean }
+): Promise<void> {
+  await dbExecute(
+    `UPDATE guests
+     SET table_no = COALESCE(:tableNo, table_no),
+         souvenir_given = COALESCE(:souvenir, souvenir_given)
+     WHERE id = :id`,
+    {
+      id: guestId,
+      tableNo: data.tableNo ?? null,
+      souvenir: data.souvenirGiven === undefined ? null : data.souvenirGiven ? 1 : 0,
+    }
+  );
+}
+
+// ============================================
+// LIVE MOMENTS — Photo Wall & Voice Wishes
+// ============================================
+
+export async function getPhotoMoments(invitationId: string): Promise<PhotoMoment[]> {
+  const result = await dbExecute(
+    'SELECT * FROM photo_wall WHERE invitation_id = :invId AND is_approved = 1 ORDER BY rowid DESC LIMIT 200',
+    { invId: invitationId }
+  );
+  return result.rows.map((row: any) => ({
+    id: row.id as string,
+    invitationId: row.invitation_id as string,
+    guestName: (row.guest_name as string) || 'Tamu',
+    imageUrl: row.image_url as string,
+    caption: (row.caption as string) || '',
+    createdAt: (row.created_at as string) || new Date().toISOString(),
+  }));
+}
+
+export async function addPhotoMoment(
+  invitationId: string,
+  moment: { guestName: string; imageUrl: string; caption?: string }
+): Promise<PhotoMoment> {
+  const id = genId('photo');
+  const createdAt = new Date().toISOString();
+  await dbExecute(
+    `INSERT INTO photo_wall (id, invitation_id, guest_name, image_url, caption, created_at)
+     VALUES (:id, :invId, :guestName, :imageUrl, :caption, :createdAt)`,
+    {
+      id,
+      invId: invitationId,
+      guestName: moment.guestName || 'Tamu',
+      imageUrl: moment.imageUrl,
+      caption: moment.caption || '',
+      createdAt,
+    }
+  );
+  return {
+    id,
+    invitationId,
+    guestName: moment.guestName || 'Tamu',
+    imageUrl: moment.imageUrl,
+    caption: moment.caption || '',
+    createdAt,
+  };
+}
+
+export async function deletePhotoMoment(photoId: string): Promise<void> {
+  await dbExecute('DELETE FROM photo_wall WHERE id = :id', { id: photoId });
+}
+
+export async function getVoiceWishes(invitationId: string): Promise<VoiceWish[]> {
+  const result = await dbExecute(
+    'SELECT * FROM voice_notes WHERE invitation_id = :invId ORDER BY rowid DESC LIMIT 100',
+    { invId: invitationId }
+  );
+  return result.rows.map((row: any) => ({
+    id: row.id as string,
+    invitationId: row.invitation_id as string,
+    guestName: (row.guest_name as string) || 'Tamu',
+    audioUrl: row.audio_url as string,
+    durationSec: (row.duration_sec as number) || 0,
+    createdAt: (row.created_at as string) || new Date().toISOString(),
+  }));
+}
+
+export async function addVoiceWish(
+  invitationId: string,
+  wish: { guestName: string; audioUrl: string; durationSec: number }
+): Promise<VoiceWish> {
+  const id = genId('voice');
+  const createdAt = new Date().toISOString();
+  await dbExecute(
+    `INSERT INTO voice_notes (id, invitation_id, guest_name, audio_url, duration_sec, created_at)
+     VALUES (:id, :invId, :guestName, :audioUrl, :duration, :createdAt)`,
+    {
+      id,
+      invId: invitationId,
+      guestName: wish.guestName || 'Tamu',
+      audioUrl: wish.audioUrl,
+      duration: Math.round(wish.durationSec || 0),
+      createdAt,
+    }
+  );
+  return {
+    id,
+    invitationId,
+    guestName: wish.guestName || 'Tamu',
+    audioUrl: wish.audioUrl,
+    durationSec: Math.round(wish.durationSec || 0),
+    createdAt,
+  };
+}
+
+export async function deleteVoiceWish(voiceId: string): Promise<void> {
+  await dbExecute('DELETE FROM voice_notes WHERE id = :id', { id: voiceId });
 }
 
 // ============================================

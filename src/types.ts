@@ -80,6 +80,7 @@ export interface WeddingData {
   ogImageUrl?: string;
   bgImageUrl?: string;
   enableDigitalPass?: boolean;
+  enableLiveMoments?: boolean;
 }
 
 export interface Guest {
@@ -90,6 +91,29 @@ export interface Guest {
   paxLimit: number;
   status: 'Draft' | 'Sent' | 'Opened';
   invitationCode: string;
+  /** Check-in on-site (diisi panitia lewat scanner QR) */
+  checkedInAt?: string | null;
+  checkInPax?: number;
+  tableNo?: string;
+  souvenirGiven?: boolean;
+}
+
+export interface PhotoMoment {
+  id: string;
+  invitationId: string;
+  guestName: string;
+  imageUrl: string;
+  caption?: string;
+  createdAt: string;
+}
+
+export interface VoiceWish {
+  id: string;
+  invitationId: string;
+  guestName: string;
+  audioUrl: string;
+  durationSec: number;
+  createdAt: string;
 }
 
 export interface RSVP {

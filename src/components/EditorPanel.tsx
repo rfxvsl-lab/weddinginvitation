@@ -996,7 +996,22 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <p className="text-xs text-zinc-500 mt-1">Masukkan tautan foto dan musik romantis untuk melengkapi kemeriahan atmosfer undangan digital.</p>
             </div>
 
-            {/* OG IMAGE & BG IMAGE CONFIGURATION */}
+            {/* Show/Hide Live Moments (Guest Camera + Voice Wishes) */}
+            <div className="flex items-center justify-between p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm">
+              <div>
+                <span className="font-bold text-zinc-800 text-xs block">Live Moments (Kamera Tamu & Ucapan Suara)</span>
+                <span className="text-[10px] text-zinc-400">Tamu bisa mengirim foto ke dinding momen dan merekam ucapan suara</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={data.enableLiveMoments !== false}
+                  onChange={(e) => onChange({ ...data, enableLiveMoments: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
+              </label>
+            </div>
             <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-300/30 via-emerald-500 to-emerald-300/30" />
               <h5 className="font-bold text-emerald-700 text-xs flex items-center gap-1.5">

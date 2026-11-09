@@ -182,6 +182,9 @@ export default async function Page({ params, searchParams }: PageProps) {
             initialRsvps={rsvpsData}
             urlGuest={urlGuest}
             watermarkType={watermarkType}
+            slug={slug}
+            appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://ruanghadir.net'}
+            serverNow={new Date().toISOString()}
           />
         </div>
       </div>

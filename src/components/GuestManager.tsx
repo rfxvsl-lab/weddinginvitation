@@ -29,6 +29,8 @@ import { Guest } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { getLimits, canAccess, isLimitReached, formatLimit, PACKAGE_NAMES, type PackageId } from '../lib/packageLimits';
 import { useAlertModal } from '../hooks/useAlertModal';
+import { checkInGuest } from '../lib/api';
+import QrCheckInScanner from './QrCheckInScanner';
 
 interface GuestManagerProps {
   guests: Guest[];
@@ -56,6 +58,24 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
   const [selectedQRBoxGuest, setSelectedQRBoxGuest] = useState<Guest | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [checkInSuccess, setCheckInSuccess] = useState(false);
+
+  // Scanner kamera + hasil check-in lokal (sinkron dari server saat reload)
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [liveCheckins, setLiveCheckins] = useState<Record<string, { pax: number; tableNo: string; at: string }>>({});
+
+  const handleScannerCheckIn = async (guest: Guest, pax: number, tableNo: string) => {
+    await checkInGuest(guest.id, pax, tableNo || undefined);
+    setLiveCheckins((prev) => ({
+      ...prev,
+      [guest.id]: { pax, tableNo, at: new Date().toISOString() },
+    }));
+  };
+
+  const checkinOf = (guest: Guest) =>
+    liveCheckins[guest.id] ||
+    (guest.checkedInAt
+      ? { pax: guest.checkInPax || 1, tableNo: guest.tableNo || '', at: guest.checkedInAt }
+      : null);
 
   // Form state
   const [newName, setNewName] = useState('');
@@ -218,24 +238,45 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </p>
         </div>
 
-        <button
-          type="button"
-          disabled={isGuestLimitReached}
-          onClick={() => {
-            if (isGuestLimitReached) {
-              alertModal.upgrade('Batas Tamu Tercapai', `Batas maksimal tamu (${formatLimit(limits.maxGuests)}) untuk paket ${tierName} telah tercapai. Silakan Upgrade Paket.`);
-              return;
-            }
-            setShowAddForm(!showAddForm);
-          }}
-          className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${isGuestLimitReached
-              ? 'bg-surface-container-low text-[var(--color-outline)] cursor-not-allowed'
-              : 'bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer'
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!canAccess(packageId, 'canQR')) {
+                alertModal.upgrade('Fitur Premium', `Scanner QR check-in tidak tersedia di paket ${tierName}. Upgrade ke Premium untuk memakai terminal check-in kamera.`);
+                return;
+              }
+              setScannerOpen(true);
+            }}
+            className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
+              canAccess(packageId, 'canQR')
+                ? 'bg-zinc-900 hover:bg-zinc-800 text-white cursor-pointer'
+                : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
             }`}
-        >
-          <UserPlus className="w-4 h-4" />
-          {showAddForm ? 'Tutup Formulir' : `Tambah Tamu Baru (${guests.length}/${formatLimit(limits.maxGuests)})`}
-        </button>
+          >
+            <QrCode className="w-4 h-4" />
+            Scan Check-in
+          </button>
+
+          <button
+            type="button"
+            disabled={isGuestLimitReached}
+            onClick={() => {
+              if (isGuestLimitReached) {
+                alertModal.upgrade('Batas Tamu Tercapai', `Batas maksimal tamu (${formatLimit(limits.maxGuests)}) untuk paket ${tierName} telah tercapai. Silakan Upgrade Paket.`);
+                return;
+              }
+              setShowAddForm(!showAddForm);
+            }}
+            className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${isGuestLimitReached
+                ? 'bg-surface-container-low text-[var(--color-outline)] cursor-not-allowed'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer'
+              }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            {showAddForm ? 'Tutup Formulir' : `Tambah Tamu Baru (${guests.length}/${formatLimit(limits.maxGuests)})`}
+          </button>
+        </div>
       </div>
 
       {/* FORM TAMBAH GUEST */}
@@ -381,6 +422,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <th className="px-4 py-3">No. Telp</th>
                 <th className="px-4 py-3 text-center">Pax limit</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Check-in</th>
                 <th className="px-5 py-3 text-right">Aksi Undangan</th>
               </tr>
             </thead>
@@ -414,6 +456,24 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         }`}>
                         {guest.status === 'Opened' ? '✓ Dibuka' : guest.status === 'Sent' ? '↗ Terkirim' : '○ Draf'}
                       </span>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      {(() => {
+                        const c = checkinOf(guest);
+                        if (!c) return <span className="text-[10px] text-zinc-400">—</span>;
+                        return (
+                          <span className="inline-flex flex-col gap-0.5 text-[9.5px] font-bold text-emerald-700">
+                            <span className="inline-flex items-center gap-1">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              Hadir {c.pax} pax
+                            </span>
+                            <span className="font-mono text-[8.5px] font-normal text-zinc-400">
+                              {new Date(c.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              {c.tableNo ? ` · ${c.tableNo}` : ''}
+                            </span>
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-5 py-3.5 text-right flex items-center justify-end gap-1.5 h-full">
                       {/* Copy Link */}
@@ -485,7 +545,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-5 py-16 text-center">
+                  <td colSpan={7} className="px-5 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200/50 flex items-center justify-center">
                         <Users className="w-6 h-6 text-zinc-400" />
@@ -1037,6 +1097,14 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
         </div>
       </div>
+      {/* SCANNER KAMERA CHECK-IN */}
+      {scannerOpen && (
+        <QrCheckInScanner
+          guests={guests}
+          onCheckIn={handleScannerCheckIn}
+          onClose={() => setScannerOpen(false)}
+        />
+      )}
     </div>
   );
 }

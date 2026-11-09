@@ -48,6 +48,7 @@ interface InvitationPreviewProps {
   rsvps: RSVP[];
   guest?: Guest; // If a personalized guest opened this URL
   embedded?: boolean; // If in builder sidebar
+  serverNow?: string; // Waktu server saat render — hindari countdown meleset karena jam device
 }
 
 // Vintage Floral Branch SVG Divider
@@ -77,7 +78,7 @@ export default function InvitationPreview(props: InvitationPreviewProps) {
   );
 }
 
-function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embedded = false }: InvitationPreviewProps) {
+function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embedded = false, serverNow }: InvitationPreviewProps) {
   const currentTheme = DEFAULT_THEMES.find(t => t.id === themeId) || DEFAULT_THEMES[0];
 
   // States
@@ -164,8 +165,11 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
   // Countdown target logic
   useEffect(() => {
+    // Sinkronisasi jam device dengan jam server (device tamu sering meleset)
+    const serverOffset = serverNow ? new Date(serverNow).getTime() - Date.now() : 0;
+
     const calculateCountdown = () => {
-      const difference = +new Date(data?.countdownDate) - +new Date();
+      const difference = +new Date(data?.countdownDate) - (Date.now() + serverOffset);
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
