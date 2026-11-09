@@ -183,3 +183,8 @@ Status mesin: `UNCONFIRMED` → `CONFIRM_ATTENDANCE` → tiket/QR → `checkin_a
 - Kode invalid ditolak; kode `W-BAHLIL` membuka konfirmasi; setelah konfirmasi QR 320px muncul + tombol unduh (`tiket-W-BAHLIL.png`) dan DB terisi `attendance=Hadir, rsvp_status=CONFIRMED`.
 - Tamu dengan `seat_image_url` menampilkan tombol denah meja (`Meja 7`) di tiket.
 - Section live streaming muncul saat `liveStreamUrl` diisi dan render iframe YouTube.
+
+## Cleanup lanjutan
+
+- Konfirmasi: tidak ada QR pass bawaan di file layout mana pun, jadi tidak ada duplikasi tiket. Satu-satunya pass adalah `GuestPassSection` (layout non-default) dan versi inline di layout default.
+- Modal tiket di Manajemen Tamu tidak lagi memakai `api.qrserver.com`: QR digenerate lokal, ada tombol unduh, dan tombol check-in sekarang benar-benar menulis `checked_in_at`/`check_in_pax`/`table_no` (bukan simulasi status).

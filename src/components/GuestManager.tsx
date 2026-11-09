@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   PiUsersDuotone as Users,
   PiPlusDuotone as Plus,
@@ -76,6 +76,42 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
     (guest.checkedInAt
       ? { pax: guest.checkInPax || 1, tableNo: guest.tableNo || '', at: guest.checkedInAt }
       : null);
+
+  // QR modal: generate lokal + state check-in nyata
+  const [qrModalUrl, setQrModalUrl] = useState('');
+  const [modalPax, setModalPax] = useState(1);
+  const [modalTable, setModalTable] = useState('');
+
+  useEffect(() => {
+    let dead = false;
+    if (!selectedQRBoxGuest?.invitationCode) {
+      setQrModalUrl('');
+      return;
+    }
+    import('qrcode')
+      .then((QR) => QR.toDataURL(selectedQRBoxGuest.invitationCode, { width: 400, margin: 1 }))
+      .then((url) => !dead && setQrModalUrl(url))
+      .catch(() => !dead && setQrModalUrl(''));
+    return () => {
+      dead = true;
+    };
+  }, [selectedQRBoxGuest?.invitationCode]);
+
+  const handleModalCheckIn = async () => {
+    if (!selectedQRBoxGuest) return;
+    setIsCheckingIn(true);
+    try {
+      await checkInGuest(selectedQRBoxGuest.id, modalPax, modalTable || undefined);
+      setLiveCheckins((prev) => ({
+        ...prev,
+        [selectedQRBoxGuest.id]: { pax: modalPax, tableNo: modalTable, at: new Date().toISOString() },
+      }));
+      setCheckInSuccess(true);
+      onUpdateGuestStatus(selectedQRBoxGuest.id, 'Opened');
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
 
   // Form state
   const [newName, setNewName] = useState('');
@@ -524,6 +560,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                           setSelectedQRBoxGuest(guest);
                           setCheckInSuccess(false);
                           setIsCheckingIn(false);
+                          setModalPax(1);
+                          setModalTable(guest.tableNo || '');
                         }}
                         className={`p-1.5 border rounded-lg transition-all ${!canAccess(packageId, 'canQR')
                             ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
@@ -599,16 +637,15 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               <p className="text-[11px] text-on-surface-variant">Grup: <strong className="text-primary uppercase tracking-wide">{selectedQRBoxGuest.group}</strong> • Limit Porsi: <strong>{selectedQRBoxGuest.paxLimit} Pax</strong></p>
             </div>
 
-            {/* Simulated Live Ticket QR Scan box */}
+            {/* Ticket QR (digenerate lokal) */}
             <div className="relative py-1.5 flex flex-col items-center">
-              <div className={`p-4 rounded-3xl bg-white relative transition-all duration-500 ${checkInSuccess || selectedQRBoxGuest.status === 'Opened' ? 'ring-8 ring-emerald-500/20 scale-102 shadow-[0_0_20px_rgba(16,185,129,0.3)] border-emerald-500' : 'ring-1 ring-zinc-800'
+              <div className={`p-4 rounded-3xl bg-white relative transition-all duration-500 ${checkinOf(selectedQRBoxGuest) ? 'ring-8 ring-emerald-500/20 scale-102 shadow-[0_0_20px_rgba(16,185,129,0.3)] border-emerald-500' : 'ring-1 ring-zinc-800'
                 }`}>
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=dc2626&data=${encodeURIComponent(selectedQRBoxGuest.invitationCode)}`}
-                  alt="Guest Ticket QR"
-                  className="w-36 h-36 object-contain"
-                  referrerPolicy="no-referrer"
-                />
+                {qrModalUrl ? (
+                  <img src={qrModalUrl} alt="Guest Ticket QR" className="w-36 h-36 object-contain" />
+                ) : (
+                  <div className="w-36 h-36 flex items-center justify-center text-[10px] text-zinc-400">QR…</div>
+                )}
               </div>
 
               <div className="mt-4">
@@ -617,34 +654,62 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                   {selectedQRBoxGuest.invitationCode}
                 </code>
               </div>
+
+              {qrModalUrl && (
+                <a
+                  href={qrModalUrl}
+                  download={`tiket-${selectedQRBoxGuest.invitationCode}.png`}
+                  className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary underline underline-offset-2"
+                >
+                  <Download className="w-3 h-3" /> Unduh tiket QR
+                </a>
+              )}
             </div>
 
             {/* Check-In State Banner */}
-            <div className={`p-3.5 rounded-2xl text-xs border transition-all ${selectedQRBoxGuest.status === 'Opened' || checkInSuccess
+            <div className={`p-3.5 rounded-2xl text-xs border transition-all ${checkinOf(selectedQRBoxGuest) || checkInSuccess
                 ? 'bg-surface-container-low border-outline-variant text-on-surface'
                 : 'bg-surface-container-low/40 border-outline-variant/80 text-zinc-450'
               }`}>
               <div className="flex items-center justify-center gap-1.5 font-bold">
-                <span className={`w-2 h-2 rounded-full ${selectedQRBoxGuest.status === 'Opened' || checkInSuccess ? 'bg-surface-container-low5 animate-ping' : 'bg-amber-500'}`} />
-                Status di Lokasi: {selectedQRBoxGuest.status === 'Opened' || checkInSuccess ? 'SUDAH CHECK-IN (HADIR)' : 'Belum Check-In'}
+                <span className={`w-2 h-2 rounded-full ${checkinOf(selectedQRBoxGuest) || checkInSuccess ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
+                Status di Lokasi: {checkinOf(selectedQRBoxGuest) || checkInSuccess ? 'SUDAH CHECK-IN (HADIR)' : 'Belum Check-In'}
               </div>
             </div>
 
-            {/* Live Scan Action Simulator Button */}
+            {/* Input pax & meja untuk check-in */}
+            {!checkinOf(selectedQRBoxGuest) && !checkInSuccess && (
+              <div className="grid grid-cols-2 gap-2 text-left">
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Jumlah hadir</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={selectedQRBoxGuest.paxLimit || 1}
+                    value={modalPax}
+                    onChange={(e) => setModalPax(Math.min(selectedQRBoxGuest.paxLimit || 1, Math.max(1, Number(e.target.value))))}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-outline-variant bg-white text-zinc-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">No. meja</label>
+                  <input
+                    value={modalTable}
+                    onChange={(e) => setModalTable(e.target.value)}
+                    placeholder="Meja 12"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-outline-variant bg-white text-zinc-800"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Live Scan Action */}
             <div className="space-y-1.5">
               <button
                 type="button"
-                disabled={isCheckingIn || selectedQRBoxGuest.status === 'Opened'}
-                onClick={() => {
-                  setIsCheckingIn(true);
-                  // 1.2 second fake network latency check-in scanner delay
-                  setTimeout(() => {
-                    onUpdateGuestStatus(selectedQRBoxGuest.id, 'Opened');
-                    setCheckInSuccess(true);
-                    setIsCheckingIn(false);
-                  }, 1200);
-                }}
-                className={`w-full py-3.5 rounded-2xl text-xs font-bold leading-none cursor-pointer flex items-center justify-center gap-2 border transition-all ${selectedQRBoxGuest.status === 'Opened'
+                disabled={isCheckingIn || Boolean(checkinOf(selectedQRBoxGuest)) || checkInSuccess}
+                onClick={handleModalCheckIn}
+                className={`w-full py-3.5 rounded-2xl text-xs font-bold leading-none cursor-pointer flex items-center justify-center gap-2 border transition-all ${checkinOf(selectedQRBoxGuest) || checkInSuccess
                     ? 'bg-surface-container-low/80 border-outline-variant/80 text-on-surface-variant cursor-not-allowed'
                     : 'bg-primary hover:bg-primary/90 border-primary text-primary-foreground shadow-[0_0_15px_rgba(220,38,38,0.25)] hover:shadow-[0_0_20px_rgba(220,38,38,0.35)]'
                   }`}
@@ -652,14 +717,14 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 {isCheckingIn ? (
                   <span className="flex items-center gap-1.5">
                     <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Menghubungkan ke Scanner...
+                    Menyimpan check-in...
                   </span>
-                ) : selectedQRBoxGuest.status === 'Opened' ? (
+                ) : checkinOf(selectedQRBoxGuest) || checkInSuccess ? (
                   <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" /> Sudah Verifikasi Hadir</span>
                 ) : (
                   <>
                     <Ticket className="w-3.5 h-3.5" />
-                    Simulasikan Scanning Check-in
+                    Check-in Tamu Ini
                   </>
                 )}
               </button>
