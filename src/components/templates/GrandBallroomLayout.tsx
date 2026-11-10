@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
     PiHeartDuotone as Heart,
     PiMapPinDuotone as MapPin,
@@ -714,7 +714,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                             <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
                                 <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
-                                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover " />
+                                    <img alt={`Foto ${data?.couple?.groom?.nickname || "mempelai pria"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>
@@ -747,7 +747,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                             <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
                                 <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
-                                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover " />
+                                    <img alt={`Foto ${data?.couple?.bride?.nickname || "mempelai wanita"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>

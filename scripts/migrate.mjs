@@ -4,7 +4,7 @@
  *   node scripts/migrate.mjs            # jalankan semua migrasi yang belum tercatat
  *   node scripts/migrate.mjs --status   # tampilkan status tanpa mengubah apa pun
  *
- * Membaca TURSO_DATABASE_URL / TURSO_AUTH_TOKEN dari environment (.env ikut
+ * Membaca TURSO_DATABASE_URL / TURSO_AUTH_TOKEN dari environment (.env.local dan .env ikut
  * dimuat). Tanpa TURSO_DATABASE_URL, memakai file lokal ./local.db.
  *
  * Migrasi 001–006 dulu dijalankan manual tanpa pencatatan, jadi pernyataan yang
@@ -15,7 +15,10 @@ import { createClient } from '@libsql/client';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+
+// Sama seperti Next.js: .env.local lebih dulu, lalu .env. Variabel shell tetap menang.
+loadEnv({ path: ['.env.local', '.env'], quiet: true });
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const migrationsDir = path.join(here, '..', 'migrations');

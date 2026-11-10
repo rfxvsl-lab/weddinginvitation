@@ -169,7 +169,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   };
 
   // Simple image URL resolver (Cloudinary URLs are direct, Google Drive needs conversion)
-  const getImageUrl = (url: string) => {
+  const getImageUrl = (url: string | null | undefined) => {
     if (!url) return '';
     return displayImageUrl(url);
   };

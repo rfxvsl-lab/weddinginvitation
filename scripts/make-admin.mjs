@@ -6,7 +6,10 @@
  */
 
 import { createClient } from '@libsql/client';
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+
+// Sama seperti Next.js: .env.local lebih dulu, lalu .env. Variabel shell tetap menang.
+loadEnv({ path: ['.env.local', '.env'], quiet: true });
 
 const email = (process.argv[2] || '').toLowerCase().trim();
 const role = process.argv.includes('--revoke') ? 'user' : 'admin';

@@ -9,7 +9,10 @@
  */
 
 import { createClient } from '@libsql/client';
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+
+// Sama seperti Next.js: .env.local lebih dulu, lalu .env. Variabel shell tetap menang.
+loadEnv({ path: ['.env.local', '.env'], quiet: true });
 import { DEFAULT_WEDDING_DATA, INITIAL_GUESTS } from '../src/data/defaultData.ts';
 import { hashPassword } from '../src/server/password.ts';
 

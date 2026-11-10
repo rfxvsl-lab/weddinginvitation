@@ -19,7 +19,7 @@ import {
     PiHouseDuotone as HomeIcon
 } from 'react-icons/pi';
 import { Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
 import { displayImageUrl } from '../../utils/googleDrive';
 
@@ -541,7 +541,7 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
             <div className="grid md:grid-cols-2 gap-6 mt-8">
                 <div className="flex items-center gap-4 bg-[var(--spoti-dark)] p-4 rounded-lg">
                     <div className="w-16 h-16 shrink-0 rounded-full bg-gray-700 overflow-hidden">
-                        <img loading="lazy" decoding="async" src={getImageUrl(couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80")} className="w-full h-full object-cover" />
+                        <img alt={`Foto ${couple?.groom?.nickname || "mempelai pria"}`} loading="lazy" decoding="async" src={getImageUrl(couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80")} className="w-full h-full object-cover" />
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">{couple?.groom?.fullName}</h3>
@@ -551,7 +551,7 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
                 </div>
                 <div className="flex items-center gap-4 bg-[var(--spoti-dark)] p-4 rounded-lg">
                     <div className="w-16 h-16 shrink-0 rounded-full bg-gray-700 overflow-hidden">
-                        <img loading="lazy" decoding="async" src={getImageUrl(couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80")} className="w-full h-full object-cover" />
+                        <img alt={`Foto ${couple?.bride?.nickname || "mempelai wanita"}`} loading="lazy" decoding="async" src={getImageUrl(couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80")} className="w-full h-full object-cover" />
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">{couple?.bride?.fullName}</h3>
@@ -609,7 +609,7 @@ const GalleryPage = ({ images }: { images: string[] }) => (
                 images.map((img, i) => (
                     <div key={i} className="bg-[var(--spoti-dark)] p-3 md:p-4 rounded-lg hover:bg-[#2B3D31] transition group cursor-pointer min-w-0">
                         <div className="aspect-square bg-[#333] mb-4 rounded shadow-lg overflow-hidden relative">
-                            <img loading="lazy" decoding="async" src={getImageUrl(img) || `https://source.unsplash.com/random/400x400?wedding,love&sig=${i}`} className="w-full h-full object-cover" />
+                            <img alt={`Foto galeri ${i + 1}`} loading="lazy" decoding="async" src={getImageUrl(img) || `https://source.unsplash.com/random/400x400?wedding,love&sig=${i}`} className="w-full h-full object-cover" />
                             <div className="absolute right-2 bottom-2 w-12 h-12 bg-[var(--spoti-green)] rounded-full flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition duration-300">
                                 <Play fill="black" className="ml-1 text-black" />
                             </div>
@@ -850,7 +850,7 @@ const SpotiLoveLayout: React.FC<SpotiLoveProps> = ({ data, theme, guest, onAddRS
                 <Sidebar activeTab={activeTab} setTab={setActiveTab} data={data} />
 
                 {/* Content Area */}
-                <div className="flex-1 min-w-0 md:ml-64 relative z-10 h-full overflow-y-auto bg-[var(--spoti-black)]" tabIndex={0}>
+                <div className="flex-1 min-w-0 md:ml-64 relative z-10 h-full overflow-y-auto bg-[var(--spoti-black)]" tabIndex={0} role="region" aria-label="Isi undangan">
                     {activeTab === 'home' && <HomePage DATA={DATA} />}
                     {activeTab === 'event' && <EventPage data={data} />}
                     {activeTab === 'couple' && <CouplePage couple={data.couple!} cover={DATA.cover} />}

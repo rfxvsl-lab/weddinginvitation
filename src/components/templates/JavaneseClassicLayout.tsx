@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
     PiHeartDuotone as Heart,
     PiMapPinDuotone as MapPin,
@@ -278,7 +278,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             {/* Groom */}
             <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[var(--theme-bg)] ring-2 ring-[var(--theme-primary)] mb-4 shadow-[0_0_15px_rgba(73,48,33,0.4)]">
-                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                    <img alt={`Foto ${data?.couple?.groom?.nickname || "mempelai pria"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
                 </div>
                 <h3 className="font-javanese-title text-3xl text-[color:var(--theme-text)]  mb-2">{data?.couple?.groom?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Kakung Saking</p>
@@ -290,7 +290,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             {/* Bride */}
             <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[var(--theme-bg)] ring-2 ring-[var(--theme-primary)] mb-4 shadow-[0_0_15px_rgba(73,48,33,0.4)]">
-                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                    <img alt={`Foto ${data?.couple?.bride?.nickname || "mempelai wanita"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
                 </div>
                 <h3 className="font-javanese-title text-3xl text-[color:var(--theme-text)]  mb-2">{data?.couple?.bride?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Putri Saking</p>
@@ -405,7 +405,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
                         variants={slideUpPop}
                         className="break-inside-avoid relative p-1 bg-[var(--theme-secondary)] rounded-sm"
                     >
-                        <img loading="lazy" decoding="async" src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.3]" />
+                        <img alt="Foto galeri" loading="lazy" decoding="async" src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.3]" />
                     </motion.div>
                 ))
             ) : (

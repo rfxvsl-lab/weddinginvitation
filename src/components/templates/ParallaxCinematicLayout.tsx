@@ -528,7 +528,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 3: AKAD & RESEPSI (SAVE THE DATE) ── */}
         <section className={`ae-scene-layer absolute top-[300vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 3 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
+          <div className="max-w-xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0} role="region" aria-label="Detail acara akad dan resepsi">
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Save The Date</p>
             <h2 className="text-3xl font-serif ae-title mb-4">Hari Bahagia</h2>
 
@@ -598,7 +598,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 4: GALLERY & STORY ── */}
         <section className={`ae-scene-layer absolute top-[400vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 4 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-2xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
+          <div className="max-w-2xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0} role="region" aria-label="Galeri dan cerita">
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Our Moments</p>
             <h2 className="text-3xl font-serif ae-title mb-6">Galeri Kenangan</h2>
 
@@ -624,7 +624,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 5: AMPLOP & RSVP (INTERACTIVE DESK) ── */}
         <section className={`ae-scene-layer absolute top-[500vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 5 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-lg w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
+          <div className="max-w-lg w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0} role="region" aria-label="Amplop digital dan RSVP">
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Doa &amp; Konfirmasi</p>
             <h2 className="text-3xl font-serif ae-title mb-4">Amplop &amp; RSVP</h2>
 

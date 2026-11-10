@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import {
     PiHeartDuotone as Heart,
     PiCalendarDuotone as Calendar,
@@ -438,7 +438,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
             >
                 <CreamyVineOrnament variant="A" className="-top-10 -left-10" />
                 <div className="w-32 h-32 mx-auto rounded-full border-4 border-[var(--bg-pattern)] overflow-hidden mb-4 shadow-md relative z-10">
-                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover" />
+                    <img alt={`Foto ${data?.couple?.groom?.nickname || "mempelai pria"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-[var(--text)]">{data?.couple?.groom?.fullName}</h3>
                 <p className="text-[var(--primary)] text-sm font-semibold mt-1">Putra dari Bpk. {data?.couple?.groom?.fatherName} & Ibu {data?.couple?.groom?.motherName}</p>
@@ -458,7 +458,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
             >
                 <CreamyVineOrnament variant="B" className="-bottom-10 -right-10" />
                 <div className="w-32 h-32 mx-auto rounded-full border-4 border-[var(--bg-pattern)] overflow-hidden mb-4 shadow-md relative z-10">
-                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover" />
+                    <img alt={`Foto ${data?.couple?.bride?.nickname || "mempelai wanita"}`} loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-[var(--text)]">{data?.couple?.bride?.fullName}</h3>
                 <p className="text-[var(--primary)] text-sm font-semibold mt-1">Putri dari Bpk. {data?.couple?.bride?.fatherName} & Ibu {data?.couple?.bride?.motherName}</p>

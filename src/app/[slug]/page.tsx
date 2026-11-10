@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { getInvitationBySlug, getGuestsByInvitation, getRSVPsByInvitation, getUserById } from '../../server/repo';
 import { getSessionUser } from '../../server/session';
 import { SITE } from '../../lib/site';
@@ -68,12 +69,12 @@ export default async function Page({ params, searchParams }: PageProps) {
           <p className="text-zinc-400 mb-8 text-sm">
             Maaf, halaman undangan yang Anda cari tidak dapat ditemukan. Pastikan URL atau slug yang Anda masukkan sudah benar.
           </p>
-          <a
+          <Link
             href="/"
             className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition text-sm"
           >
             Buat Undangan Sendiri
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -100,12 +101,12 @@ export default async function Page({ params, searchParams }: PageProps) {
             Hubungi pemilik undangan untuk memperpanjang masa aktif, atau buat undangan Anda sendiri.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 w-full">
-            <a
+            <Link
               href="/"
               className="flex-1 px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition text-sm text-center"
             >
               Buat Undangan
-            </a>
+            </Link>
             <a
               href={`https://wa.me/${SITE.adminWhatsApp}?text=${encodeURIComponent('Halo, saya ingin memperpanjang undangan')}`}
               target="_blank"

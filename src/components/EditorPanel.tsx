@@ -9,7 +9,7 @@ import {
   PiHeartDuotone as Heart, 
   PiCalendarDuotone as Calendar, 
   PiBookOpenDuotone as BookOpen, 
-  PiImageDuotone as Image, 
+  PiImageDuotone as ImageIcon, 
   PiMusicNotesDuotone as Music, 
   PiGiftDuotone as Gift, 
   PiQuotesDuotone as Quote, 
@@ -319,7 +319,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
           { id: 'couple' as const, label: 'Mempelai', icon: Heart, color: 'text-amber-500' },
           { id: 'events' as const, label: 'Acara', icon: Calendar, color: 'text-amber-500' },
           { id: 'stories' as const, label: 'Cerita', icon: BookOpen, color: 'text-violet-500' },
-          { id: 'gallery' as const, label: 'Galeri', icon: Image, color: 'text-sky-500' },
+          { id: 'gallery' as const, label: 'Galeri', icon: ImageIcon, color: 'text-sky-500' },
           { id: 'gifts' as const, label: 'Kado', icon: Gift, color: 'text-emerald-500' },
           { id: 'quote' as const, label: 'Kutipan', icon: Quote, color: 'text-fuchsia-500' },
         ] as const).map((tab) => {
@@ -350,7 +350,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             { title: 'Mempelai', icon: <Heart className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('couple'), active: activeTab === 'couple' },
             { title: 'Detail Acara', icon: <Calendar className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('events'), active: activeTab === 'events' },
             { title: 'Cerita Cinta', icon: <BookOpen className="h-full w-full text-violet-500" />, onClick: () => setActiveTab('stories'), active: activeTab === 'stories' },
-            { title: 'Galeri & Musik', icon: <Image className="h-full w-full text-sky-500" />, onClick: () => setActiveTab('gallery'), active: activeTab === 'gallery' },
+            { title: 'Galeri & Musik', icon: <ImageIcon className="h-full w-full text-sky-500" />, onClick: () => setActiveTab('gallery'), active: activeTab === 'gallery' },
             { title: 'Kado Digital', icon: <Gift className="h-full w-full text-emerald-500" />, onClick: () => setActiveTab('gifts'), active: activeTab === 'gifts' },
             { title: 'Kutipan', icon: <Quote className="h-full w-full text-fuchsia-500" />, onClick: () => setActiveTab('quote'), active: activeTab === 'quote' },
           ]}
@@ -967,7 +967,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             {/* Section Header */}
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
-                <Image className="w-5 h-5 text-zinc-700" />
+                <ImageIcon className="w-5 h-5 text-zinc-700" />
               </div>
               <div>
                 <h4 className="font-bold text-zinc-800 text-sm">Galeri & Musik</h4>
@@ -1307,7 +1307,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h5 className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
-                  <Image className="w-4 h-4" /> Daftar Foto Prewedding (Tautan URL)
+                  <ImageIcon className="w-4 h-4" /> Daftar Foto Prewedding (Tautan URL)
                 </h5>
                 <button
                   type="button"

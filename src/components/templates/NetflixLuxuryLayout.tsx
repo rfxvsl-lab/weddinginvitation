@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
     PiHeartDuotone as Heart,
     PiMapPinDuotone as MapPin,
@@ -591,7 +591,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <div className="absolute inset-0 z-0">
-                        <img loading="lazy" decoding="async" 
+                        <img alt={`Foto ${data?.couple?.groom?.nickname || "mempelai pria"}`} loading="lazy" decoding="async" 
                             src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400")} 
                             className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700" 
                             onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400"; }}
@@ -632,7 +632,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                 >
                     <div className="absolute inset-0 z-0">
-                        <img loading="lazy" decoding="async" 
+                        <img alt={`Foto ${data?.couple?.bride?.nickname || "mempelai wanita"}`} loading="lazy" decoding="async" 
                             src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400")} 
                             className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700" 
                             onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400"; }}
@@ -887,7 +887,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => {
                                 viewport={{ once: true, margin: "-50px" }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             >
-                                <img loading="lazy" decoding="async" 
+                                <img alt={`Foto galeri ${i + 1}`} loading="lazy" decoding="async" 
                                     src={getImageUrl(img) || galleryFallbacks[i % galleryFallbacks.length]} 
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                                     onError={(e) => { e.currentTarget.src = galleryFallbacks[i % galleryFallbacks.length]; }}

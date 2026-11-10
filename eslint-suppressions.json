@@ -1,0 +1,343 @@
+{
+  "src/App.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 2
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 2
+    },
+    "react-hooks/immutability": {
+      "count": 1
+    }
+  },
+  "src/app/[slug]/page.tsx": {
+    "react-hooks/purity": {
+      "count": 1
+    }
+  },
+  "src/app/api/ai/invitation-copy/route.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/app/api/calendar/[slug]/route.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/app/api/music-search/route.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/app/auth/page.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/app/dashboard/profile/page.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 1
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/AuthGate.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 1
+    },
+    "react-hooks/immutability": {
+      "count": 5
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 5
+    }
+  },
+  "src/components/DashboardSidebar.tsx": {
+    "react-hooks/static-components": {
+      "count": 1
+    }
+  },
+  "src/components/EditorPanel.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 6
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 45
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/GuestManager.tsx": {
+    "jsx-a11y/label-has-associated-control": {
+      "count": 12
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/GuestPassSection.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "src/components/IframePreview.tsx": {
+    "react-hooks/immutability": {
+      "count": 1
+    }
+  },
+  "src/components/InvitationPreview.tsx": {
+    "jsx-a11y/label-has-associated-control": {
+      "count": 2
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "src/components/LiveMomentsDock.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 3
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 3
+    },
+    "jsx-a11y/no-noninteractive-element-interactions": {
+      "count": 1
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 2
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/ProfilePanel.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 4
+    }
+  },
+  "src/components/ProjectSwitcher.tsx": {
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-autofocus": {
+      "count": 2
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    }
+  },
+  "src/components/PublishModal.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 4
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 3
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "src/components/QrCheckInScanner.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 3
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 2
+    }
+  },
+  "src/components/TierCountdown.tsx": {
+    "react-hooks/purity": {
+      "count": 1
+    }
+  },
+  "src/components/UpgradePanel.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/components/auth/SignInView.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 2
+    }
+  },
+  "src/components/providers/LenisProvider.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/components/templates/DarkLuxuryLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    },
+    "jsx-a11y/mouse-events-have-key-events": {
+      "count": 4
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    },
+    "react-hooks/static-components": {
+      "count": 18
+    }
+  },
+  "src/components/templates/GrandBallroomLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 3
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    }
+  },
+  "src/components/templates/JavaneseClassicLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 5
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 1
+    }
+  },
+  "src/components/templates/LuxuryPinkLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    },
+    "react-hooks/purity": {
+      "count": 3
+    },
+    "react-hooks/static-components": {
+      "count": 4
+    }
+  },
+  "src/components/templates/NetflixLuxuryLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 1
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    },
+    "react-hooks/purity": {
+      "count": 2
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/templates/ParallaxCinematicLayout.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    },
+    "react/jsx-no-comment-textnodes": {
+      "count": 1
+    }
+  },
+  "src/components/templates/RoyalArabianLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 5
+    },
+    "jsx-a11y/label-has-associated-control": {
+      "count": 1
+    }
+  },
+  "src/components/templates/SpotiLoveLayout.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    }
+  },
+  "src/components/templates/StorybookInteractiveLayout.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/ui/floating-dock.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/hooks/useAlertModal.tsx": {
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-autofocus": {
+      "count": 2
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    }
+  },
+  "src/hooks/useToast.tsx": {
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-noninteractive-element-interactions": {
+      "count": 1
+    }
+  },
+  "src/hooks/useWeddingData.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 6
+    }
+  },
+  "src/lib/turso.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  },
+  "src/server/gateway.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 3
+    }
+  },
+  "src/server/google.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  },
+  "src/server/http.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "src/server/repo.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 10
+    }
+  },
+  "tests/unit/payments.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  },
+  "tests/unit/sessionToken.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  }
+}
