@@ -10,7 +10,6 @@ import {
   Mic,
   QrCode,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { RATING } from "@/data/socialProof";
 
@@ -52,8 +51,9 @@ export function SaasHero() {
     <section className="saas-shell relative pt-12 sm:pt-16">
       <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-widest mb-4" style={{ borderColor: "var(--saas-line-strong)", background: "var(--saas-gold-soft)", color: "var(--saas-wine)" }}>
-            <Sparkles size={13} /> Platform Undangan Digital Eksklusif
+          <div className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] mb-4" style={{ borderColor: "var(--saas-line-strong)", background: "var(--saas-gold-soft)", color: "var(--saas-wine)" }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />
+            Platform Undangan Digital Eksklusif
           </div>
 
           <h1 className="text-[42px] leading-[1.08] sm:text-[54px] lg:text-[60px] tracking-tight text-balance">
