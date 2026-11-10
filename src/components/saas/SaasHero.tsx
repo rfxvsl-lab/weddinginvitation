@@ -10,7 +10,6 @@ import {
   Mic,
   QrCode,
   ShieldCheck,
-  CheckCheck,
   Sparkles,
 } from "lucide-react";
 import { RATING } from "@/data/socialProof";
@@ -94,16 +93,16 @@ export function SaasHero() {
         </div>
 
         {/* MOCKUP HP FISIK ELEGANT — BUKAN DASHBOARD TELEMETRI */}
-        <div className="relative mx-auto w-full max-w-[420px] pb-6 sm:pb-8 flex justify-center">
-          <div aria-hidden className="pointer-events-none absolute -inset-6" style={{ background: "radial-gradient(380px 320px at 50% 40%, rgba(185,138,68,.25), transparent 70%)", filter: "blur(20px)" }} />
+        <div className="relative mx-auto w-full max-w-[420px] py-2 flex flex-col items-center">
+          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(360px 300px at 50% 40%, rgba(185,138,68,.22), transparent 70%)", filter: "blur(18px)" }} />
 
           {/* Smartphone Frame */}
-          <div className="relative z-10 w-[290px] sm:w-[320px] rounded-[44px] p-3 shadow-2xl border-4 border-zinc-900 bg-zinc-950 ring-1 ring-zinc-700/50">
+          <div className="relative z-10 w-[272px] sm:w-[296px] rounded-[44px] p-3 shadow-2xl border-4 border-zinc-900 bg-zinc-950 ring-1 ring-zinc-700/50">
             {/* Notch */}
             <div className="absolute top-4 inset-x-0 h-4 bg-zinc-900 rounded-b-xl w-28 mx-auto z-30" />
 
             {/* Screen Content */}
-            <div className="relative aspect-[9/19] rounded-[34px] overflow-hidden bg-[#0d0d12] text-white flex flex-col justify-between p-5 text-center shadow-inner">
+            <div className="relative aspect-[9/19] rounded-[34px] overflow-hidden bg-[#0d0d12] text-white flex flex-col justify-between px-5 pb-5 pt-12 text-center shadow-inner">
               {/* Background Photo with Gradient */}
               <div className="absolute inset-0 z-0">
                 <img
@@ -115,7 +114,7 @@ export function SaasHero() {
               </div>
 
               {/* Cover Top */}
-              <div className="relative z-10 pt-4">
+              <div className="relative z-10">
                 <p className="text-[8px] font-mono tracking-[0.3em] uppercase text-amber-300/80">THE WEDDING OF</p>
                 <h3 className="mt-1 font-serif text-2xl text-amber-100 font-bold">Kharis &amp; Lia</h3>
                 <p className="text-[10px] text-zinc-300/80 mt-1">Sabtu, 08 Agustus 2026</p>
@@ -139,25 +138,25 @@ export function SaasHero() {
             </div>
           </div>
 
-          {/* Floating Feature Bubble: Tiket QR Check-in */}
-          <div className="absolute -bottom-2 -left-4 z-20 rounded-2xl border border-zinc-200 bg-white/95 p-3.5 shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3">
-            <QrMock size={42} />
-            <div className="text-left">
-              <p className="text-[11px] font-extrabold text-zinc-900 leading-tight">Tiket QR &amp; Denah Meja</p>
-              <p className="text-[10px] font-semibold text-emerald-600 flex items-center gap-1 mt-0.5">
-                <CheckCheck size={12} /> Check-in 0,8 detik
-              </p>
+          {/* Feature chips rapi di bawah HP — tidak ada elemen mengambang yang menutupi layar */}
+          <div className="relative z-10 mt-5 grid w-full max-w-[360px] grid-cols-2 gap-2.5">
+            <div className="flex items-center gap-2.5 rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                <Camera size={16} />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="truncate text-[11px] font-extrabold leading-tight text-zinc-900">Dinding Foto Tamu</p>
+                <p className="truncate text-[10px] text-zinc-500">Live dari smartphone</p>
+              </div>
             </div>
-          </div>
-
-          {/* Floating Feature Bubble: Dinding Foto Tamu */}
-          <div className="absolute top-12 -right-4 z-20 rounded-2xl border border-zinc-200 bg-white/95 p-3 shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
-              <Camera size={17} />
-            </div>
-            <div className="text-left pr-1">
-              <p className="text-[11px] font-extrabold text-zinc-900 leading-tight">Dinding Foto Tamu</p>
-              <p className="text-[10px] font-medium text-zinc-500">Live share dari smartphone</p>
+            <div className="flex items-center gap-2.5 rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <QrMock size={17} />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="truncate text-[11px] font-extrabold leading-tight text-zinc-900">Tiket QR &amp; Meja</p>
+                <p className="truncate text-[10px] text-emerald-600">Check-in 0,8 detik</p>
+              </div>
             </div>
           </div>
         </div>
