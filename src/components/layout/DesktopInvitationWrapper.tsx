@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { WeddingData, ThemeConfig } from '../../types';
-import { convertGoogleDriveUrl } from '../../utils/googleDrive';
+import { displayImageUrl } from '../../utils/googleDrive';
 import IframePreview from '../IframePreview';
 
 interface DesktopInvitationWrapperProps {
@@ -17,7 +17,8 @@ export default function DesktopInvitationWrapper({ children, data, theme, embedd
 
   const groom = data.couple.groom.nickname;
   const bride = data.couple.bride.nickname;
-  const photo = convertGoogleDriveUrl(data.bgImageUrl || data.gallery?.[0] || data.couple.groom.photoUrl || data.couple.bride.photoUrl || '');
+  // Panel ini selebar ~2/3 layar desktop, jadi minta resolusi lebih besar dari default.
+  const photo = displayImageUrl(data.bgImageUrl || data.gallery?.[0] || data.couple.groom.photoUrl || data.couple.bride.photoUrl || '', 1600);
 
   return (
     <div className="invitation-desktop-shell" style={{ backgroundColor: theme.bgHex, color: theme.textHex }}>
@@ -41,7 +42,7 @@ export default function DesktopInvitationWrapper({ children, data, theme, embedd
           <p>The wedding of</p>
           <h2>{groom}<span>&amp;</span>{bride}</h2>
         </div>
-        {photo && <img key={photo} src={photo} referrerPolicy="no-referrer" alt={`${groom} & ${bride}`} ref={image => { if (image?.complete && !image.naturalWidth) image.style.display = 'none'; }} onError={event => { event.currentTarget.style.display = 'none'; }} />}
+        {photo && <img loading="lazy" decoding="async" key={photo} src={photo} referrerPolicy="no-referrer" alt={`${groom} & ${bride}`} ref={image => { if (image?.complete && !image.naturalWidth) image.style.display = 'none'; }} onError={event => { event.currentTarget.style.display = 'none'; }} />}
       </aside>
       <main className="invitation-mobile-viewport" aria-label="Undangan pernikahan">
         <IframePreview>{children}</IframePreview>

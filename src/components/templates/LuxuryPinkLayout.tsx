@@ -20,6 +20,7 @@ import {
     PiClockDuotone as Clock
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 const GlobalStyles = () => (
     <style>{`
@@ -123,16 +124,8 @@ const GlobalStyles = () => (
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 
 interface EnvelopeProps {
@@ -391,7 +384,7 @@ const HomePage = ({ data, guestName }: { data: WeddingData, guestName: string })
             >
                 <CreamyVineOrnament variant="C" className="-bottom-8 -left-12" />
                 <div className="w-48 h-64 mx-auto rounded-t-full border-4 border-[var(--secondary)] p-2 overflow-hidden shadow-xl bg-[var(--bg)] relative z-10">
-                    <img src={getImageUrl(data?.bgImageUrl || data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80")} alt="Couple" className="w-full h-full object-cover rounded-t-full hover:scale-110 transition-transform duration-700" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.bgImageUrl || data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80")} alt="Couple" className="w-full h-full object-cover rounded-t-full hover:scale-110 transition-transform duration-700" />
                 </div>
             </motion.div>
 
@@ -445,7 +438,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
             >
                 <CreamyVineOrnament variant="A" className="-top-10 -left-10" />
                 <div className="w-32 h-32 mx-auto rounded-full border-4 border-[var(--bg-pattern)] overflow-hidden mb-4 shadow-md relative z-10">
-                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-[var(--text)]">{data?.couple?.groom?.fullName}</h3>
                 <p className="text-[var(--primary)] text-sm font-semibold mt-1">Putra dari Bpk. {data?.couple?.groom?.fatherName} & Ibu {data?.couple?.groom?.motherName}</p>
@@ -465,7 +458,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
             >
                 <CreamyVineOrnament variant="B" className="-bottom-10 -right-10" />
                 <div className="w-32 h-32 mx-auto rounded-full border-4 border-[var(--bg-pattern)] overflow-hidden mb-4 shadow-md relative z-10">
-                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-[var(--text)]">{data?.couple?.bride?.fullName}</h3>
                 <p className="text-[var(--primary)] text-sm font-semibold mt-1">Putri dari Bpk. {data?.couple?.bride?.fatherName} & Ibu {data?.couple?.bride?.motherName}</p>
@@ -576,7 +569,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
                         initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
                         key={i} className="break-inside-avoid rounded-xl overflow-hidden shadow-md group relative"
                     >
-                        <img
+                        <img loading="lazy" decoding="async"
                             src={getImageUrl(img) || `https://source.unsplash.com/random/600x${i % 2 === 0 ? '800' : '600'}?wedding,love&sig=${i}`}
                             alt="Gallery"
                             className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
@@ -863,7 +856,7 @@ const LuxuryPinkLayout: React.FC<LuxuryPinkProps> = ({ data, theme, guest, onAdd
             <GlobalStyles />
 
             {/* Background Music */}
-            <audio ref={audioRef} loop src={data?.musicUrl || ''} />
+            <audio preload="none" ref={audioRef} loop src={data?.musicUrl || ''} />
 
             {/* Animated Background */}
             {data?.bgImageUrl ? (

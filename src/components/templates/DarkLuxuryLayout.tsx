@@ -16,6 +16,7 @@ import {
 } from 'react-icons/pi';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 interface DarkLuxuryLayoutProps {
   data: WeddingData;
@@ -159,16 +160,8 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
   // Google Drive Image URL Resolver
   const PLACEHOLDER_IMG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmaWxsPSIjNDQ0IiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 
-  const getImageUrl = (url: string) => {
-    if (!url) return PLACEHOLDER_IMG;
-    if (url.includes('drive.google.com/file/d/')) {
-      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        return `https://lh3.googleusercontent.com/d/${match[1]}`;
-      }
-    }
-    return url;
-  };
+  // Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+  const getImageUrl = (url: string) => (url ? displayImageUrl(url) : PLACEHOLDER_IMG);
 
   return (
     <div
@@ -190,13 +183,13 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
       {data?.bgImageUrl && <div className="fixed inset-0 bg-[var(--theme-bg)] opacity-95 pointer-events-none" />}
       
 
-      {data?.musicUrl && <audio ref={audioRef} src={data.musicUrl} loop />}
+      {data?.musicUrl && <audio preload="none" ref={audioRef} src={data.musicUrl} loop />}
 
       {/* === LOCK SCREEN (COVER) === */}
       <div className={`fixed inset-0 z-50 bg-[var(--theme-bg)] transition-transform duration-[1.5s] ease-[cubic-bezier(0.87,0,0.13,1)] flex flex-col items-center justify-center p-6 ${isOpen ? '-translate-y-full' : 'translate-y-0'}`}>
         {/* Background with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover opacity-30 grayscale" alt="Cover" />
+          <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover opacity-30 grayscale" alt="Cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/80 to-transparent"></div>
         </div>
 
@@ -261,7 +254,7 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
             animate={isOpen ? { scale: 1, opacity: 1 } : { scale: 1.2, opacity: 0 }}
             transition={{ duration: 2.5, ease: 'easeOut' }}
           >
-            <img src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover opacity-30" alt="Hero" />
+            <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover opacity-30" alt="Hero" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--theme-bg)]/50 to-[var(--theme-bg)]"></div>
           </motion.div>
 
@@ -355,7 +348,7 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                 {/* Glowing Ring */}
                 <div className="absolute inset-0 rounded-full border-[2px] shadow-lg group-hover:rotate-180 transition-all duration-1000 border-dashed" style={{ borderColor: 'var(--theme-primary)' }}></div>
                 <div className="absolute inset-3 rounded-full overflow-hidden">
-                  <img src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" alt="Groom" />
+                  <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" alt="Groom" />
                 </div>
               </div>
               <h3 className={`${theme.fontSerif} text-3xl md:text-4xl mb-3 text-[var(--theme-text)]`}>{data?.couple?.groom?.fullName}</h3>
@@ -381,7 +374,7 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                 {/* Glowing Ring */}
                 <div className="absolute inset-0 rounded-full border-[2px] shadow-lg group-hover:-rotate-180 transition-all duration-1000 border-dashed" style={{ borderColor: 'var(--theme-primary)' }}></div>
                 <div className="absolute inset-3 rounded-full overflow-hidden">
-                  <img src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" alt="Bride" />
+                  <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" alt="Bride" />
                 </div>
               </div>
               <h3 className={`${theme.fontSerif} text-3xl md:text-4xl mb-3 text-[var(--theme-text)]`}>{data?.couple?.bride?.fullName}</h3>
@@ -538,7 +531,7 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                         key={idx} 
                         className={`relative group overflow-hidden rounded-xl ${gridClass}`}
                       >
-                        <img
+                        <img loading="lazy" decoding="async"
                           src={getImageUrl(img)}
                           className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale group-hover:grayscale-0"
                           alt={`Gallery ${idx + 1}`}

@@ -27,14 +27,29 @@ const caveat = Caveat({
   display: "swap",
 });
 
+/**
+ * Font global yang benar-benar tampil di production.
+ *
+ * Catatan: CSS juga menyebut Inter, Manrope, Lora, Great Vibes, Playfair
+ * Display, dan JetBrains Mono, tetapi font-font itu tidak pernah termuat
+ * (dulu lewat @import di index.css yang dibuang saat bundling), sehingga teks
+ * tersebut tampil dengan font sistem. Menambahkannya di sini akan mengubah
+ * tampilan seluruh situs — itu keputusan desain tersendiri.
+ */
+const GLOBAL_FONTS_URL =
+  'https://fonts.googleapis.com/css2' +
+  '?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500' +
+  '&family=Plus+Jakarta+Sans:wght@400;500;600;700;800' +
+  '&display=swap';
+
 export const metadata: Metadata = {
   title: 'ruanghadir.net — Buat Undangan Pernikahan Digital yang Elegan',
   description: 'Platform pembuatan undangan pernikahan digital premium. Desain elegan, RSVP digital, dan personalisasi tanpa batas.',
   keywords: ['undangan digital', 'undangan pernikahan', 'wedding invitation', 'undangan online', 'RSVP digital', 'RUANGHADIR'],
   authors: [{ name: 'ruanghadir.net' }],
   icons: {
-    icon: '/logo-browser.png',
-    apple: '/logo-browser.png',
+    icon: [{ url: '/icon-512.png', type: 'image/png', sizes: '512x512' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
   openGraph: {
     title: 'ruanghadir.net — Buat Undangan Digital Premium',
@@ -59,10 +74,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#FBF8F4" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
+        <link href={GLOBAL_FONTS_URL} rel="stylesheet" />
       </head>
       <body className={`${dmSerif.variable} ${dmSans.variable} ${caveat.variable} antialiased bg-background text-foreground`}>
         <ThemeProvider

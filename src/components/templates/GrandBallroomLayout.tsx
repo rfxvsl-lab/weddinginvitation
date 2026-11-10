@@ -20,6 +20,7 @@ import {
     PiGiftDuotone as Gift
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 /** * --- KONFIGURASI ASET ---
  */
@@ -117,16 +118,8 @@ const GlobalStyles = () => (
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
@@ -671,7 +664,7 @@ const HomePage = ({ onEnter, data, guestName }: { onEnter: () => void, data: Wed
                     <div className="w-full h-full bg-[var(--bg)] border-4 border-[var(--bg)] shadow-inner flex items-center justify-center p-2 relative">
                         {/* The actual photo */}
                         <div className="w-full h-full relative overflow-hidden border-2 border-[var(--secondary)] shadow-inner">
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src={getImageUrl(data?.bgImageUrl || data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80")}
                                 alt="Couple"
                                 className="w-full h-full object-cover "
@@ -721,7 +714,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                             <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
                                 <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
-                                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover " />
+                                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>
@@ -754,7 +747,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                             <div className="w-full h-full rounded-full border-4 border-[var(--bg)] bg-[var(--bg)] p-1 flex items-center justify-center relative">
                                 {/* The Photo */}
                                 <div className="w-full h-full relative overflow-hidden rounded-full border border-[var(--secondary)]">
-                                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover " />
+                                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80")} className="w-full h-full object-cover " />
                                     <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none rounded-full"></div>
                                 </div>
                             </div>
@@ -842,7 +835,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
         <div className="columns-2 gap-4 w-full max-w-2xl mt-8">
             {data?.gallery?.map((img, idx) => (
                 <div key={idx} className="relative mb-4 break-inside-avoid shadow-xl p-2 bg-[var(--bg)] border border-[var(--secondary)] group overflow-visible">
-                    <img src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full object-cover filter " />
+                    <img loading="lazy" decoding="async" src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full object-cover filter " />
                     {idx === 0 && <WhiteFlowerCluster position="top-left" className="absolute -top-3 -left-3 w-10 h-10 z-20 pointer-events-none" />}
                 </div>
             ))}
@@ -1063,7 +1056,7 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, theme, guest,
     return (
         <div className="grand-ballroom relative w-full h-screen overflow-hidden bg-[var(--bg)] text-[var(--text)]" style={{ '--primary': theme.primaryHex, '--secondary': theme.secondaryHex, '--bg': theme.bgHex, '--bg-pattern': theme.bgPatternHex, '--text': theme.textHex, '--accent': theme.accentHex } as React.CSSProperties}>
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || ASSETS.bgm} />
+            <audio preload="none" ref={audioRef} loop src={data?.musicUrl || ASSETS.bgm} />
 
             {/* LAYER 0: BALLROOM BACKGROUND (SILHOUETTES) */}
             <BallroomBackground customBg={getImageUrl(data?.bgImageUrl || '')} />

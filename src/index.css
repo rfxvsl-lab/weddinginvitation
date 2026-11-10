@@ -1,11 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap");
+/* Font global dimuat lewat <link> di src/app/layout.tsx. @import url() di file ini dibuang saat bundling, jadi jangan dipakai. */
 /* ============================================
    ruanghadir.net — Global Design System
    "Blossom Ivory" Color Palette
    ============================================ */
 
-/* Google Fonts: Cormorant Garamond (elegant heading), Lora (body serif), Inter (UI), Great Vibes (script) */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* Font yang termuat: Cormorant Garamond & Plus Jakarta Sans (lihat GLOBAL_FONTS_URL di layout.tsx). */
 @import "tailwindcss";
 @import "tw-animate-css";
 

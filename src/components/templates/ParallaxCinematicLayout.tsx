@@ -17,6 +17,7 @@ import {
   PiSparkleDuotone as Sparkle,
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 // ════════════════════════════════════════════════════════════════
 // TYPES & CAMERA WAYPOINTS (After Effects 2.5D Multiplane System)
@@ -53,14 +54,8 @@ const WAYPOINTS: CameraWaypoint[] = [
 ];
 
 // Helper: resolve Google Drive or direct image URLs
-const getImageUrl = (url: string) => {
-  if (!url) return '';
-  if (url.includes('drive.google.com/file/d/')) {
-    const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (m?.[1]) return `https://lh3.googleusercontent.com/d/${m[1]}`;
-  }
-  return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
@@ -462,7 +457,7 @@ export default function ParallaxCinematicLayout({
 
             {/* Portrait Photo with Arch Frame */}
             <div className="w-36 h-44 rounded-t-full rounded-b-2xl overflow-hidden border-2 border-[var(--theme-primary)]/40 p-1 mb-6 shadow-2xl bg-[var(--theme-bg)]">
-              <img
+              <img loading="lazy" decoding="async"
                 src={groomPhoto}
                 alt={data?.couple?.groom?.fullName}
                 className="w-full h-full object-cover rounded-t-full rounded-b-xl"
@@ -501,7 +496,7 @@ export default function ParallaxCinematicLayout({
 
             {/* Portrait Photo with Arch Frame */}
             <div className="w-36 h-44 rounded-t-full rounded-b-2xl overflow-hidden border-2 border-[var(--theme-primary)]/40 p-1 mb-6 shadow-2xl bg-[var(--theme-bg)]">
-              <img
+              <img loading="lazy" decoding="async"
                 src={bridePhoto}
                 alt={data?.couple?.bride?.fullName}
                 className="w-full h-full object-cover rounded-t-full rounded-b-xl"
@@ -611,7 +606,7 @@ export default function ParallaxCinematicLayout({
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 w-full mb-6">
               {(data?.gallery?.length ? data.gallery.slice(0, 6) : [groomPhoto, bridePhoto]).map((imgUrl, i) => (
                 <div key={i} className="aspect-square rounded-2xl overflow-hidden border border-white/10 shadow-lg group">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={getImageUrl(imgUrl)}
                     alt={`Moment ${i + 1}`}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"

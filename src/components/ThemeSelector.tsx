@@ -67,7 +67,10 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
               <div className="h-32 w-full relative overflow-hidden bg-[#050505]">
                 {/* Native Iframe Render */}
                 <img 
-                  src={`/assets/themes/${theme.id}.png`}
+                  src={`/assets/themes/${theme.id}.webp`}
+                  width={400}
+                  height={866}
+                  decoding="async"
                   alt={theme.name}
                   className="w-full h-full object-cover absolute top-0 left-0 pointer-events-none opacity-90 transition-opacity duration-500 group-hover:opacity-100"
                   loading="lazy"

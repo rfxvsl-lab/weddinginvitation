@@ -86,7 +86,10 @@ export const MarketingFooter = () => {
           {/* Large logo icon */}
           <div className="flex items-end gap-6">
             <img
-              src="/logo tunggal transparan (tanpa tipografi).png"
+              src="/logo-mark.webp"
+              width={320}
+              height={400}
+              loading="lazy"
               alt="RuangHadir Logo"
               className="w-28 h-28 md:w-40 md:h-40 object-contain brightness-0 invert opacity-80"
             />

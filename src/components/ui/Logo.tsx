@@ -5,9 +5,9 @@ import Link from "next/link";
  * Logo system — RuangHadir.net
  *
  * variant:
- *  - "lockup"     : logo + tipografi horizontal (navbar) → /logo-navbar.png
- *  - "mark"       : logo saja, tanpa tipografi           → /logo-mark.png
- *  - "typography" : logo display besar dengan tipografi  → /logo-browser.png
+ *  - "lockup"     : logo + tipografi horizontal (navbar) → /logo-navbar.webp
+ *  - "mark"       : logo saja, tanpa tipografi           → /logo-mark.webp
+ *  - "typography" : logo display besar dengan tipografi  → /logo-browser.webp
  *
  * invert: versi putih untuk permukaan gelap (brightness-0 invert).
  * isLink: bungkus dengan <Link href="/"> (default true).
@@ -24,9 +24,16 @@ interface LogoProps {
 }
 
 const SRC: Record<LogoVariant, string> = {
-  lockup: "/logo-navbar.png",
-  mark: "/logo-mark.png",
-  typography: "/logo-browser.png",
+  lockup: "/logo-navbar.webp",
+  mark: "/logo-mark.webp",
+  typography: "/logo-browser.webp",
+};
+
+/** Ukuran asli file, supaya browser menyisakan ruang dan tidak terjadi pergeseran layout. */
+const INTRINSIC: Record<LogoVariant, { width: number; height: number }> = {
+  lockup: { width: 640, height: 167 },
+  mark: { width: 320, height: 400 },
+  typography: { width: 512, height: 512 },
 };
 
 const DEFAULT_HEIGHT: Record<LogoVariant, string> = {
@@ -48,6 +55,9 @@ export const Logo = ({
     >
       <img
         src={SRC[variant]}
+        width={INTRINSIC[variant].width}
+        height={INTRINSIC[variant].height}
+        decoding="async"
         alt="RuangHadir.net"
         className={`${height || DEFAULT_HEIGHT[variant]} w-auto object-contain group-hover:opacity-90 transition-opacity duration-200`}
       />

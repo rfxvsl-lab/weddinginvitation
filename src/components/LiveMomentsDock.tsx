@@ -561,7 +561,7 @@ export default function LiveMomentsDock({
                       </button>
                     ) : audioBlob ? (
                       <div className="mt-3 space-y-2">
-                        <audio src={audioPreview} controls className="mx-auto h-9 w-full max-w-[260px]" />
+                        <audio preload="none" src={audioPreview} controls className="mx-auto h-9 w-full max-w-[260px]" />
                         <div className="flex justify-center gap-2">
                           <button onClick={handleSendVoice} disabled={busy} className="rounded-full px-4 py-2 text-[11px] font-bold text-black" style={{ backgroundColor: accentColor }}>
                             {busy ? `Mengirim ${progress}%` : 'Kirim Ucapan'}

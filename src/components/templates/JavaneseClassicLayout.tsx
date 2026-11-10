@@ -16,6 +16,7 @@ import {
     PiCaretDownDuotone as ChevronDown
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 // --- ANIMATION VARIANTS ---
 const blurFadeIn: any = {
@@ -51,7 +52,7 @@ const JavaneseFlower = ({ className, delay = 0 }: { className?: string, delay?: 
         transition={{ delay, type: 'spring', stiffness: 40, damping: 15, duration: 2.5 }}
         className={`absolute pointer-events-none z-0 ${className}`}
     >
-        <motion.img 
+        <motion.img loading="lazy" decoding="async" 
             animate={{ rotate: 360 }}
             transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
             src="/assets/flower.webp" 
@@ -140,16 +141,8 @@ const KawungBatik = ({ className }: { className?: string }) => (
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 // --- PAGES ---
 const GununganEnvelope = ({ onOpen, data, guestName }: { onOpen: () => void, data: WeddingData, guestName: string }) => {
@@ -184,7 +177,7 @@ const GununganEnvelope = ({ onOpen, data, guestName }: { onOpen: () => void, dat
                             <div 
                                 className="w-full h-full bg-contain bg-center bg-no-repeat"
                                 style={{ 
-                                    backgroundImage: `url('/assets/wayang/gunungan.png')`,
+                                    backgroundImage: `url('/assets/wayang/gunungan.webp')`,
                                     filter: 'sepia(0.5) saturate(0.7) drop-shadow(0 4px 6px rgba(73, 48, 33, 0.12))'
                                 }}
                             ></div>
@@ -236,7 +229,7 @@ const HomePage = ({ data }: { data: WeddingData }) => {
 
             <motion.div variants={slideUpPop} className="relative w-56 h-72 md:w-64 md:h-80 mx-auto mb-10 javanese-border p-2">
                 <div className="w-full h-full overflow-hidden rounded-sm">
-                    <img 
+                    <img loading="lazy" decoding="async" 
                         src={getImageUrl(data?.bgImageUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500&q=80")} 
                         className="w-full h-full object-cover filter brightness-75 sepia-[0.4]"
                         alt="Hero"
@@ -248,7 +241,7 @@ const HomePage = ({ data }: { data: WeddingData }) => {
                     <div 
                         className="w-full h-full bg-contain bg-center bg-no-repeat"
                         style={{ 
-                            backgroundImage: `url('/assets/wayang/gunungan.png')`,
+                            backgroundImage: `url('/assets/wayang/gunungan.webp')`,
                             filter: 'sepia(0.5) saturate(0.7) drop-shadow(0 4px 6px rgba(73, 48, 33, 0.12))'
                         }}
                     ></div>
@@ -285,7 +278,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             {/* Groom */}
             <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[var(--theme-bg)] ring-2 ring-[var(--theme-primary)] mb-4 shadow-[0_0_15px_rgba(73,48,33,0.4)]">
-                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
                 </div>
                 <h3 className="font-javanese-title text-3xl text-[color:var(--theme-text)]  mb-2">{data?.couple?.groom?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Kakung Saking</p>
@@ -297,7 +290,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             {/* Bride */}
             <motion.div variants={slideUpPop} className="javanese-panel p-6 javanese-border relative">
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-[var(--theme-bg)] ring-2 ring-[var(--theme-primary)] mb-4 shadow-[0_0_15px_rgba(73,48,33,0.4)]">
-                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.3]" />
                 </div>
                 <h3 className="font-javanese-title text-3xl text-[color:var(--theme-text)]  mb-2">{data?.couple?.bride?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Putri Saking</p>
@@ -412,7 +405,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
                         variants={slideUpPop}
                         className="break-inside-avoid relative p-1 bg-[var(--theme-secondary)] rounded-sm"
                     >
-                        <img src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.3]" />
+                        <img loading="lazy" decoding="async" src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.3]" />
                     </motion.div>
                 ))
             ) : (
@@ -657,7 +650,7 @@ const JavaneseClassicLayout: React.FC<JavaneseClassicProps> = ({ data, theme, gu
     return (
         <div className="javanese-classic relative w-full h-[100dvh] overflow-hidden bg-[var(--theme-bg)] text-[color:var(--theme-text)]" style={{ '--theme-primary': theme.primaryHex, '--theme-secondary': theme.secondaryHex, '--theme-bg': theme.bgHex, '--theme-surface': theme.bgPatternHex, '--theme-text': theme.textHex, '--theme-accent': theme.accentHex, '--theme-on-primary': '#F8F0DF' } as React.CSSProperties}>
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
+            <audio preload="none" ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
 
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none z-0">

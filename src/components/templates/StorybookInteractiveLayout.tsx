@@ -344,7 +344,7 @@ export default function StorybookInteractiveLayout({
 
       {/* ═══ SCENE: COVER ═══ */}
       <section className={`sb-scene absolute inset-0 ${sceneVisible('cover')}`} aria-label="Sampul">
-        <img src={ASSET('bg-sky-day.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        <img loading="lazy" decoding="async" src={ASSET('bg-sky-day.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
         <Cloud className="absolute top-[12%] w-40 opacity-90" style={{ animation: 'sb-drift 26s linear infinite' }} />
         <Cloud className="absolute top-[26%] w-28 opacity-70" style={{ animation: 'sb-drift 38s linear infinite', animationDelay: '-14s' }} />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
@@ -375,7 +375,7 @@ export default function StorybookInteractiveLayout({
 
       {/* ═══ SCENE: INTRO (dua tulip sketsa) ═══ */}
       <section className={`sb-scene absolute inset-0 ${sceneVisible('intro')}`} aria-label="Perkenalan">
-        <img src={ASSET('bg-meadow.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        <img loading="lazy" decoding="async" src={ASSET('bg-meadow.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
         {/* judul di atas kertas */}
         <div className="absolute inset-x-0 top-8 flex justify-center px-6">
           <div className="sb-sketch-card sb-tape px-6 py-3" style={{ transform: 'rotate(-1deg)' }}>
@@ -501,7 +501,7 @@ export default function StorybookInteractiveLayout({
 
       {/* ═══ SCENE: VENUE (ketuk pintu) ═══ */}
       <section className={`sb-scene absolute inset-0 ${sceneVisible('venue')}`} aria-label="Lokasi acara">
-        <img src={ASSET('bg-house.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        <img loading="lazy" decoding="async" src={ASSET('bg-house.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
         <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
           style={{ opacity: doorOpen ? 1 : 0, background: 'radial-gradient(circle at 50% 62%, rgba(255,190,110,.45), transparent 60%)', animation: 'sb-glowpulse 3s ease-in-out infinite' }} />
         {!doorOpen ? (
@@ -566,7 +566,7 @@ export default function StorybookInteractiveLayout({
           {lightbox && (
             <button onClick={() => setLightbox(null)} aria-label="Tutup foto"
               className="absolute inset-0 z-20 bg-black/85 flex items-center justify-center p-6 cursor-zoom-out">
-              <img src={lightbox} alt="Foto diperbesar" className="max-w-full max-h-full shadow-2xl bg-white p-2"
+              <img loading="lazy" decoding="async" src={lightbox} alt="Foto diperbesar" className="max-w-full max-h-full shadow-2xl bg-white p-2"
                 style={{ border: `2.5px solid ${PAPER}` }} draggable={false} />
             </button>
           )}
@@ -576,7 +576,7 @@ export default function StorybookInteractiveLayout({
 
       {/* ═══ SCENE: RSVP (terbangkan lampion) ═══ */}
       <section className={`sb-scene absolute inset-0 ${sceneVisible('rsvp')}`} aria-label="RSVP dan ucapan">
-        <img src={ASSET('bg-night.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        <img loading="lazy" decoding="async" src={ASSET('bg-night.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
         {[...Array(14)].map((_, i) => (
           <span key={i} className="absolute w-1 h-1 rounded-full bg-white"
             style={{
@@ -660,7 +660,7 @@ export default function StorybookInteractiveLayout({
 
       {/* ═══ SCENE: CLOSING ═══ */}
       <section className={`sb-scene absolute inset-0 ${sceneVisible('closing')}`} aria-label="Penutup">
-        <img src={ASSET('bg-village.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        <img loading="lazy" decoding="async" src={ASSET('bg-village.webp')} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
         <div className="absolute inset-x-0 top-[12%] flex flex-col items-center px-8">
           <div className="sb-sketch-card px-8 py-5 text-center" style={{ transform: 'rotate(-1deg)', animation: 'sb-fadeup 800ms ease both' }}>
             <p className="sb-hand text-2xl" style={{ color: '#8A6A4A' }}>hormat kami,</p>

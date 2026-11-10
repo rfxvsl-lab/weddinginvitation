@@ -27,22 +27,25 @@ import {
   PiQrCodeDuotone as QrCode,
   PiDownloadSimpleDuotone as Download
 } from 'react-icons/pi';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeddingData, RSVP, ThemeConfig, Guest } from '../types';
-import DarkLuxuryLayout from './templates/DarkLuxuryLayout';
-import LuxuryPinkLayout from './templates/LuxuryPinkLayout';
-import NetflixLuxuryLayout from './templates/NetflixLuxuryLayout';
-import GrandBallroomLayout from './templates/GrandBallroomLayout';
-import RoyalArabianLayout from './templates/RoyalArabianLayout';
-import SpotiLoveLayout from './templates/SpotiLoveLayout';
-import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
-import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
-import StorybookInteractiveLayout from './templates/StorybookInteractiveLayout';
+// Tiap tema adalah chunk terpisah: tamu hanya mengunduh tema yang dipakai undangannya.
+// SSR tetap aktif, jadi HTML awal sudah berisi tema yang benar.
+const DarkLuxuryLayout = dynamic(() => import('./templates/DarkLuxuryLayout'));
+const LuxuryPinkLayout = dynamic(() => import('./templates/LuxuryPinkLayout'));
+const NetflixLuxuryLayout = dynamic(() => import('./templates/NetflixLuxuryLayout'));
+const GrandBallroomLayout = dynamic(() => import('./templates/GrandBallroomLayout'));
+const RoyalArabianLayout = dynamic(() => import('./templates/RoyalArabianLayout'));
+const SpotiLoveLayout = dynamic(() => import('./templates/SpotiLoveLayout'));
+const JavaneseClassicLayout = dynamic(() => import('./templates/JavaneseClassicLayout'));
+const ParallaxCinematicLayout = dynamic(() => import('./templates/ParallaxCinematicLayout'));
+const StorybookInteractiveLayout = dynamic(() => import('./templates/StorybookInteractiveLayout'));
 import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
 import GuestPassSection from './GuestPassSection';
 
 import { DEFAULT_THEMES } from '../data/defaultData';
-import { convertGoogleDriveUrl } from '../utils/googleDrive';
+import { displayImageUrl } from '../utils/googleDrive';
 
 interface InvitationPreviewProps {
   data: WeddingData;
@@ -168,7 +171,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   // Simple image URL resolver (Cloudinary URLs are direct, Google Drive needs conversion)
   const getImageUrl = (url: string) => {
     if (!url) return '';
-    return convertGoogleDriveUrl(url);
+    return displayImageUrl(url);
   };
 
   // Music URL is now always a direct URL (Cloudinary or external link)
@@ -179,8 +182,12 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
     if (!resolvedMusicUrl) return;
 
     if (!audioRef.current) {
-      audioRef.current = new Audio(resolvedMusicUrl);
-      audioRef.current.loop = true;
+      // preload 'none': file musik baru diunduh saat diputar (setelah tamu membuka undangan).
+      const audio = new Audio();
+      audio.preload = 'none';
+      audio.loop = true;
+      audio.src = resolvedMusicUrl;
+      audioRef.current = audio;
     } else if (audioRef.current.src !== resolvedMusicUrl) {
       audioRef.current.pause();
       audioRef.current.src = resolvedMusicUrl;
@@ -692,7 +699,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
               <div className={`mx-auto w-48 h-64 rounded-t-[100px] rounded-b-lg overflow-hidden shadow-2xl border-4 ring-8 ring-amber-100/25 transition-transform duration-500 hover:scale-[1.025] ${
                 isRFX ? 'border-amber-950/60 bg-zinc-950' : 'border-white bg-white'
               }`}>
-                <img 
+                <img loading="lazy" decoding="async" 
                   src={getImageUrl(data?.couple?.groom.photoUrl)} 
                   alt={data?.couple?.groom.fullName} 
                   className="w-full h-full object-cover"
@@ -738,7 +745,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
               <div className={`mx-auto w-48 h-64 rounded-t-[100px] rounded-b-lg overflow-hidden shadow-2xl border-4 ring-8 ring-amber-100/25 transition-transform duration-500 hover:scale-[1.025] ${
                 isRFX ? 'border-amber-950/60 bg-zinc-950' : 'border-white bg-white'
               }`}>
-                <img 
+                <img loading="lazy" decoding="async" 
                   src={getImageUrl(data?.couple?.bride.photoUrl)} 
                   alt={data?.couple?.bride.fullName} 
                   className="w-full h-full object-cover"
@@ -894,7 +901,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
                     {story.imageUrl && (
                       <div className={`w-full max-h-48 rounded-[24px] overflow-hidden mt-3 shadow-md border ${isRFX ? 'border-zinc-800' : 'border-amber-100/40'}`}>
-                        <img 
+                        <img loading="lazy" decoding="async" 
                           src={getImageUrl(story.imageUrl)} 
                           alt={story.title} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-102"
@@ -921,7 +928,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                 <div key={idx} className={`aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer border ${
                   isRFX ? 'border-zinc-850 hover:border-amber-500/30' : 'border-amber-100/40 hover:border-amber-400'
                 }`}>
-                  <img 
+                  <img loading="lazy" decoding="async" 
                     src={getImageUrl(img) || 'https://lh3.googleusercontent.com/d/1EhkWZdyR3SGNE8bXdrxDFTrNzN9RHx0r'} 
                     alt={`Prewedding ${idx + 1}`} 
                     className="w-full h-full object-cover"
@@ -1283,7 +1290,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
                   <div className="py-2 flex flex-col items-center">
                     <div className={`bg-white p-3 rounded-2xl shadow-md border ${isRFX ? 'border-amber-500/20' : 'border-amber-50'}`}>
                       {qrDataUrl ? (
-                        <img
+                        <img loading="lazy" decoding="async"
                           src={qrDataUrl}
                           alt="Check-in access pass barcode"
                           className="w-28 h-28 object-contain"

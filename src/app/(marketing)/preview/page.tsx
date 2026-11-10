@@ -36,7 +36,10 @@ export default function PreviewPage() {
                   >
                     <div className="relative aspect-[9/19] overflow-hidden rounded-[19px]" style={{ background: theme.bgHex }}>
                       <img
-                        src={`/assets/themes/${theme.id}.png`}
+                        src={`/assets/themes/${theme.id}.webp`}
+                        width={400}
+                        height={866}
+                        decoding="async"
                         alt={`Mockup tema ${theme.name}`}
                         loading="lazy"
                         className="saas-photo opacity-90 transition-opacity duration-500 group-hover/phone:opacity-100"

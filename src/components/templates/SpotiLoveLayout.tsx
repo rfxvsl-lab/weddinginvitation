@@ -21,6 +21,7 @@ import {
 import { Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 /**
  * --- GLOBAL STYLES & ANIMATIONS ---
@@ -78,7 +79,7 @@ const SpotiFlower = ({ className, delay = 0 }: { className?: string, delay?: num
         transition={{ delay, type: 'spring', stiffness: 40, damping: 15, duration: 2.5 }}
         className={`absolute pointer-events-none z-[1] ${className}`}
     >
-        <motion.img 
+        <motion.img loading="lazy" decoding="async" 
             animate={{ rotate: 360 }}
             transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
             src="/assets/spoti-flower.webp" 
@@ -96,7 +97,7 @@ const SpotiLeaves = ({ className, delay = 0 }: { className?: string, delay?: num
         className={`absolute top-0 pointer-events-none z-0 ${className}`}
         style={{ maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' }}
     >
-        <img 
+        <img loading="lazy" decoding="async" 
             src="/assets/spoti-leaves.webp" 
             className="w-full h-full object-cover object-top opacity-10"
             alt="Leaves Ornament"
@@ -105,16 +106,8 @@ const SpotiLeaves = ({ className, delay = 0 }: { className?: string, delay?: num
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
@@ -175,7 +168,7 @@ const OpeningSequence: React.FC<OpeningSequenceProps> = ({ onOpen, onComplete, c
             {step === 'idle' ? (
                 <div className="relative z-10 p-6 flex flex-col items-center animate-fade-in-up w-full h-full justify-center">
                     <div className="w-56 h-56 max-w-full md:w-80 md:h-80 shadow-2xl mb-8 relative group">
-                        <img src={cover} className="w-full h-full object-cover rounded shadow-2xl" alt="Cover" />
+                        <img loading="lazy" decoding="async" src={cover} className="w-full h-full object-cover rounded shadow-2xl" alt="Cover" />
                     </div>
 
                     <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-2 tracking-tight leading-tight break-words text-[var(--text-main)]">{coupleName}</h1>
@@ -288,7 +281,7 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
         <div className="fixed bottom-0 left-0 right-0 min-h-[96px] bg-[var(--spoti-dark)] border-t border-[var(--text-sub)]/20 z-50 flex items-center justify-between gap-2 px-4 pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center gap-3 w-[35%] min-w-0">
                 <div className="relative h-14 w-14 hidden sm:block animate-spin-slow shrink-0" style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}>
-                    <img src={cover} className="w-full h-full rounded-full object-cover shadow-lg border-2 border-[var(--spoti-dark)]" />
+                    <img loading="lazy" decoding="async" src={cover} className="w-full h-full rounded-full object-cover shadow-lg border-2 border-[var(--spoti-dark)]" />
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[var(--spoti-dark)] rounded-full border border-[#333] shadow-inner"></div>
                 </div>
                 <div className="overflow-hidden">
@@ -388,7 +381,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
             <div className="relative min-h-[400px] flex items-end px-5 pt-10 pb-6 md:p-8 bg-[var(--spoti-dark)] z-10">
                 <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end gap-6 w-full min-w-0">
                     <div className="w-40 h-40 md:w-52 md:h-52 shadow-xl bg-[var(--spoti-black)] shrink-0">
-                        <img src={DATA.cover} className="w-full h-full object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -416,7 +409,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                     <div className="group flex items-center p-2 rounded hover:bg-[#ffffff]/10 transition cursor-pointer">
                         <span className="w-8 text-center text-[var(--text-sub)] group-hover:hidden">1</span>
                         <span className="w-8 text-center hidden group-hover:flex justify-center"><Play size={14} fill="white" /></span>
-                        <img src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
                         <div className="flex-1">
                             <p className="text-[var(--text-main)] font-medium">The Proposal</p>
                             <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
@@ -427,7 +420,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                     <div className="group flex items-center p-2 rounded hover:bg-[#ffffff]/10 transition cursor-pointer">
                         <span className="w-8 text-center text-[var(--text-sub)] group-hover:hidden">2</span>
                         <span className="w-8 text-center hidden group-hover:flex justify-center"><Play size={14} fill="white" /></span>
-                        <img src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
                         <div className="flex-1">
                             <p className="text-[var(--spoti-green)] font-medium">The Wedding Day</p>
                             <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
@@ -543,7 +536,7 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
             <div className="grid md:grid-cols-2 gap-6 mt-8">
                 <div className="flex items-center gap-4 bg-[var(--spoti-dark)] p-4 rounded-lg">
                     <div className="w-16 h-16 shrink-0 rounded-full bg-gray-700 overflow-hidden">
-                        <img src={getImageUrl(couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80")} className="w-full h-full object-cover" />
+                        <img loading="lazy" decoding="async" src={getImageUrl(couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80")} className="w-full h-full object-cover" />
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">{couple?.groom?.fullName}</h3>
@@ -553,7 +546,7 @@ const CouplePage = ({ couple, cover }: { couple: WeddingData['couple'], cover: s
                 </div>
                 <div className="flex items-center gap-4 bg-[var(--spoti-dark)] p-4 rounded-lg">
                     <div className="w-16 h-16 shrink-0 rounded-full bg-gray-700 overflow-hidden">
-                        <img src={getImageUrl(couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80")} className="w-full h-full object-cover" />
+                        <img loading="lazy" decoding="async" src={getImageUrl(couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80")} className="w-full h-full object-cover" />
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">{couple?.bride?.fullName}</h3>
@@ -611,7 +604,7 @@ const GalleryPage = ({ images }: { images: string[] }) => (
                 images.map((img, i) => (
                     <div key={i} className="bg-[var(--spoti-dark)] p-3 md:p-4 rounded-lg hover:bg-[#2B3D31] transition group cursor-pointer min-w-0">
                         <div className="aspect-square bg-[#333] mb-4 rounded shadow-lg overflow-hidden relative">
-                            <img src={getImageUrl(img) || `https://source.unsplash.com/random/400x400?wedding,love&sig=${i}`} className="w-full h-full object-cover" />
+                            <img loading="lazy" decoding="async" src={getImageUrl(img) || `https://source.unsplash.com/random/400x400?wedding,love&sig=${i}`} className="w-full h-full object-cover" />
                             <div className="absolute right-2 bottom-2 w-12 h-12 bg-[var(--spoti-green)] rounded-full flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition duration-300">
                                 <Play fill="black" className="ml-1 text-black" />
                             </div>
@@ -833,7 +826,7 @@ const SpotiLoveLayout: React.FC<SpotiLoveProps> = ({ data, theme, guest, onAddRS
             } as React.CSSProperties}
         >
             <GlobalStyles />
-            <audio ref={audioRef} loop src={DATA.musicUrl} />
+            <audio preload="none" ref={audioRef} loop src={DATA.musicUrl} />
             <CanvasBackground customBg={getImageUrl(data?.bgImageUrl || '')} />
 
             {/* OPENING SEQUENCE (Z-INDEX HIGH) */}

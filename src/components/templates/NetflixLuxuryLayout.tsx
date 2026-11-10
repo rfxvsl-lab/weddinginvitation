@@ -17,6 +17,7 @@ import {
     PiBellDuotone as Bell
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, Guest, RSVP } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 // --- ASSETS DEFAULT ---
 const DEFAULT_ASSETS = {
@@ -110,16 +111,8 @@ const GlobalStyles = () => (
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
@@ -343,7 +336,7 @@ const HomePage = ({ onPlay, data }: { onPlay: () => void, data: WeddingData }) =
     return (
         <div className="flex flex-col h-full relative page-enter overflow-x-hidden overflow-y-auto">
             <div className="absolute inset-0 z-0">
-                <img 
+                <img loading="lazy" decoding="async" 
                     src={getImageUrl(data?.bgImageUrl || data?.couple?.bride?.photoUrl || DEFAULT_ASSETS.defaultCover)} 
                     className="w-full h-full object-cover opacity-60" 
                     onError={(e) => { e.currentTarget.src = DEFAULT_ASSETS.defaultCover; }}
@@ -515,7 +508,7 @@ const QuotePage = ({ data }: { data: WeddingData }) => {
 
                 <div className="w-12 h-1 bg-[var(--netflix-primary)] mb-8 shadow-[0_0_10px_red]"></div>
                 
-                <img 
+                <img loading="lazy" decoding="async" 
                     src="https://upload.wikimedia.org/wikipedia/commons/2/23/Bismillah.svg" 
                     className="h-8 md:h-10 mb-8 opacity-50 invert" 
                     alt="Bismillah" 
@@ -595,7 +588,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <div className="absolute inset-0 z-0">
-                        <img 
+                        <img loading="lazy" decoding="async" 
                             src={getImageUrl(data?.couple?.groom?.photoUrl || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400")} 
                             className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700" 
                             onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400"; }}
@@ -636,7 +629,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => {
                     transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                 >
                     <div className="absolute inset-0 z-0">
-                        <img 
+                        <img loading="lazy" decoding="async" 
                             src={getImageUrl(data?.couple?.bride?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400")} 
                             className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700" 
                             onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400"; }}
@@ -703,7 +696,7 @@ const EventPage = ({ data }: { data: WeddingData }) => {
 
                         {/* Thumbnail */}
                         <div className="relative w-full md:w-64 h-40 md:h-36 bg-gray-900 rounded-md overflow-hidden flex-shrink-0 border border-gray-800">
-                            <img 
+                            <img loading="lazy" decoding="async" 
                                 src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=500" 
                                 className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                                 alt="Akad" 
@@ -765,7 +758,7 @@ const EventPage = ({ data }: { data: WeddingData }) => {
 
                         {/* Thumbnail */}
                         <div className="relative w-full md:w-64 h-40 md:h-36 bg-gray-900 rounded-md overflow-hidden flex-shrink-0 border border-gray-800">
-                            <img 
+                            <img loading="lazy" decoding="async" 
                                 src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=500" 
                                 className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                                 alt="Resepsi" 
@@ -891,7 +884,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => {
                                 viewport={{ once: true, margin: "-50px" }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             >
-                                <img 
+                                <img loading="lazy" decoding="async" 
                                     src={getImageUrl(img) || galleryFallbacks[i % galleryFallbacks.length]} 
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                                     onError={(e) => { e.currentTarget.src = galleryFallbacks[i % galleryFallbacks.length]; }}
@@ -1308,7 +1301,7 @@ const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, theme, guest,
                 <div className="fixed inset-0 bg-black/85 z-0" />
             )}
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} />
+            <audio preload="none" ref={audioRef} loop src={data?.musicUrl || DEFAULT_ASSETS.bgm} />
 
             {/* --- LAYER 0: CINEMATIC BACKGROUND --- */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[var(--netflix-bg)]">

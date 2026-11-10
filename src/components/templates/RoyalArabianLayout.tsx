@@ -18,6 +18,7 @@ import {
     PiCaretDownDuotone as ChevronDown
 } from 'react-icons/pi';
 import { WeddingData, ThemeConfig, RSVP, Guest } from '../../types';
+import { displayImageUrl } from '../../utils/googleDrive';
 
 // --- ANIMATION VARIANTS ---
 const blurFadeIn: any = {
@@ -188,16 +189,8 @@ const Lantern = ({ delay }: { delay: number }) => (
 );
 
 // --- HELPERS ---
-const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-    }
-    return url;
-};
+// Resolver bersama: Drive → lh3, lalu minta versi yang diperkecil (lihat utils/googleDrive.ts).
+const getImageUrl = (url: string) => (url ? displayImageUrl(url) : '');
 
 // --- PAGES ---
 const RoyalGateEnvelope = ({ onOpen, data, guestName }: { onOpen: () => void, data: WeddingData, guestName: string }) => {
@@ -285,7 +278,7 @@ const HomePage = ({ data }: { data: WeddingData }) => {
                 <RoyalGoldenFlower className="absolute top-10 -right-16 w-24 h-24 z-0" reverse />
                 
                 <ArabicArch className="w-full h-full relative z-10">
-                    <img 
+                    <img loading="lazy" decoding="async" 
                         src={getImageUrl(data?.bgImageUrl || "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500&q=80")} 
                         className="w-full h-full object-cover filter brightness-75 sepia-[0.3]"
                         alt="Hero"
@@ -321,7 +314,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             <motion.div variants={slideUpPop} className="jade-panel px-6 py-8 rounded-t-[6rem] border-b-2 border-b-[var(--theme-primary)] relative">
                 <RoyalGoldenFlower className="absolute -top-6 -left-6 w-20 h-20" />
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-[var(--theme-primary)] mb-4">
-                    <img src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.2]" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.groom?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.2]" />
                 </div>
                 <h3 className="font-arab-calligraphy text-3xl text-[color:var(--theme-text)] drop-shadow-md mb-1">{data?.couple?.groom?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Putra Dari</p>
@@ -334,7 +327,7 @@ const CouplePage = ({ data }: { data: WeddingData }) => (
             <motion.div variants={slideUpPop} className="jade-panel px-6 py-8 rounded-t-[6rem] border-b-2 border-b-[var(--theme-primary)] relative">
                 <RoyalGoldenFlower className="absolute -top-6 -right-6 w-20 h-20" reverse />
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-[var(--theme-primary)] mb-4">
-                    <img src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.2]" />
+                    <img loading="lazy" decoding="async" src={getImageUrl(data?.couple?.bride?.photoUrl || '')} className="w-full h-full object-cover sepia-[0.2]" />
                 </div>
                 <h3 className="font-arab-calligraphy text-3xl text-[color:var(--theme-text)] drop-shadow-md mb-1">{data?.couple?.bride?.fullName}</h3>
                 <p className="font-modern text-xs uppercase text-[color:var(--theme-primary)] tracking-widest mb-3">Putri Dari</p>
@@ -435,7 +428,7 @@ const GalleryPage = ({ data }: { data: WeddingData }) => (
                         variants={slideUpPop}
                         className="break-inside-avoid relative rounded-lg overflow-hidden border border-[var(--theme-primary)]/40 shadow-lg"
                     >
-                        <img src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.4]" />
+                        <img loading="lazy" decoding="async" src={getImageUrl(img)} className="w-full h-auto object-cover sepia-[0.4]" />
                     </motion.div>
                 ))
             ) : (
@@ -680,7 +673,7 @@ const RoyalArabianLayout: React.FC<RoyalArabianProps> = ({ data, theme, guest, o
     return (
         <div className="royal-arabian relative w-full h-[100dvh] overflow-hidden bg-[var(--theme-bg)] text-[color:var(--theme-text)]" style={{ '--theme-primary': theme.primaryHex, '--theme-secondary': theme.secondaryHex, '--theme-bg': theme.bgHex, '--theme-surface': theme.bgPatternHex, '--theme-text': theme.textHex, '--theme-accent': theme.accentHex, '--theme-on-primary': '#102D29' } as React.CSSProperties}>
             <GlobalStyles />
-            <audio ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
+            <audio preload="none" ref={audioRef} loop src={data?.musicUrl || "https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg"} />
 
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none z-0">
