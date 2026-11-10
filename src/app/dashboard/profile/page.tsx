@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Navigation from '../../../components/Navigation';
 import { useAuth } from '../../../hooks/useAuth';
 import { PiUserDuotone as User, PiCheckCircleDuotone as CheckCircle, PiCameraDuotone as Camera, PiWarningCircleDuotone as AlertCircle } from 'react-icons/pi';
-import { updateUserProfile, checkSlugExists } from '../../../lib/api';
+import { updateUserProfile } from '../../../lib/api';
 import { getLimits } from '../../../lib/packageLimits';
 
 export default function ProfilePage() {
@@ -63,39 +63,17 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     try {
-      let finalSlugChangeCount = currentUser.slugChangeCount || 0;
-      
-      // Jika slug berubah, cek kuota dan ketersediaan
-      if (activeSlug !== currentUser.activeSlug) {
-        if (!canChangeSlug) {
-          throw new Error(`Paket ${currentUser.packageId} tidak mengizinkan pergantian slug.`);
-        }
-        if (changesLeft <= 0 && currentUser.packageId !== 'luxury') {
-          throw new Error('Jatah ganti slug Anda sudah habis.');
-        }
-        
-        const exists = await checkSlugExists(activeSlug, currentUser.id);
-        if (exists) {
-          throw new Error('Slug tersebut sudah digunakan orang lain. Silakan pilih yang lain.');
-        }
-        
-        finalSlugChangeCount += 1;
+      // Kuota ganti slug, keunikan, dan format divalidasi ulang di server.
+      const result = await updateUserProfile(currentUser.id, {
+        fullName: fullName.trim(),
+        activeSlug: activeSlug.trim(),
+        avatarUrl: avatarUrl.trim(),
+      });
+      if (result.ok === false) {
+        setErrorMsg(result.error);
+        return;
       }
-
-      await updateUserProfile(currentUser.id, {
-        fullName: fullName.trim(),
-        activeSlug: activeSlug.trim(),
-        avatarUrl: avatarUrl.trim(),
-        slugChangeCount: finalSlugChangeCount
-      });
-
-      setCurrentUser({
-        ...currentUser,
-        fullName: fullName.trim(),
-        activeSlug: activeSlug.trim(),
-        avatarUrl: avatarUrl.trim(),
-        slugChangeCount: finalSlugChangeCount
-      });
+      setCurrentUser(result.user);
 
       setSuccessMsg('Profil berhasil diperbarui!');
     } catch (err: any) {

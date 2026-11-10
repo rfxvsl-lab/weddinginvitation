@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { AuthError, requireUser } from '@/server/session';
+import { rateLimit } from '@/server/rateLimit';
+import { clampText } from '@/server/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,10 +16,27 @@ interface AICopyRequest {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as AICopyRequest;
-    const { type, tone = 'romantis', groomName = 'Mempelai Pria', brideName = 'Mempelai Wanita', notes = '' } = body;
+    // Fitur editor: hanya untuk user yang login, dan dibatasi supaya kuota AI tidak bisa dihabiskan orang luar.
+    const user = await requireUser();
+    const limited = await rateLimit({ identifier: `ai-copy:${user.id}`, max: 20, windowSecs: 10 * 60 });
+    if (!limited.success) {
+      return NextResponse.json(
+        { success: false, error: `Terlalu banyak permintaan. Coba lagi dalam ${limited.resetIn} detik.` },
+        { status: 429, headers: { 'Retry-After': String(limited.resetIn) } }
+      );
+    }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+    const body = (await req.json()) as AICopyRequest;
+    const TYPES = ['quote', 'about_groom', 'about_bride', 'love_story', 'invitation_closing'];
+    const TONES = ['islami', 'romantis', 'modern', 'puisi', 'elegan'];
+    const type = TYPES.includes(body?.type) ? body.type : 'quote';
+    const tone = TONES.includes(body?.tone as string) ? body.tone : 'romantis';
+    const groomName = clampText(body?.groomName, 60) || 'Mempelai Pria';
+    const brideName = clampText(body?.brideName, 60) || 'Mempelai Wanita';
+    const notes = clampText(body?.notes, 500);
+
+    // Kunci API hanya dari variabel server; varian NEXT_PUBLIC_ akan ikut terkirim ke browser.
+    const apiKey = process.env.GEMINI_API_KEY || '';
 
     // Fallback template jika belum ada API key
     if (!apiKey) {
@@ -65,13 +85,10 @@ export async function POST(req: NextRequest) {
       mock: false,
     });
   } catch (err: any) {
+    if (err instanceof AuthError) {
+      return NextResponse.json({ success: false, error: err.message }, { status: 401 });
+    }
     console.error('AI copywriter error:', err);
-    return NextResponse.json(
-      {
-        success: false,
-        error: err?.message || 'Gagal menghasilkan teks AI',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Gagal menghasilkan teks AI' }, { status: 500 });
   }
 }

@@ -83,9 +83,6 @@ interface UseWeddingDataReturn {
   // Load data for a user
   loadUserData: (user: SaaSUser) => Promise<void>;
 
-  // Load public invitation by slug
-  loadPublicInvitation: (slug: string) => Promise<boolean>;
-
   // Slug operations
   updateInvitationSlug: (invitationId: string, newSlug: string) => Promise<void>;
 
@@ -342,35 +339,6 @@ export function useWeddingData(): UseWeddingDataReturn {
       });
     } catch (err) {
       console.error('Failed to load user data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Load public invitation by slug (for guest view)
-  const loadPublicInvitation = useCallback(async (slug: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const inv = await api.getInvitationBySlug(slug);
-      if (!inv) return false;
-
-      setInvitation(inv);
-      setWeddingDataLocal(inv.weddingData);
-      setThemeIdLocal(inv.themeId);
-
-      // Load guests and RSVPs for public view
-      const [guestsData, rsvpsData] = await Promise.all([
-        api.getGuestsByInvitation(inv.id),
-        api.getRSVPsByInvitation(inv.id),
-      ]);
-
-      setGuestsLocal(guestsData);
-      setRsvpsLocal(rsvpsData);
-
-      return true;
-    } catch (err) {
-      console.error('Failed to load public invitation:', err);
-      return false;
     } finally {
       setIsLoading(false);
     }
@@ -816,7 +784,6 @@ export function useWeddingData(): UseWeddingDataReturn {
     publishInvitation: publishInvitationAction,
     unpublishInvitation: unpublishInvitationAction,
     loadUserData,
-    loadPublicInvitation,
     switchInvitation,
     createNewInvitation,
     updateInvitationSlug: updateInvitationSlugAction,

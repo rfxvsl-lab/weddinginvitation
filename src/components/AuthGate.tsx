@@ -1,7 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth, type GoogleSignupPrefill } from '../hooks/useAuth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 import {
   PiCheckCircleDuotone as CheckCircle,
   PiWarningCircleDuotone as AlertCircle,
@@ -18,13 +17,11 @@ import {
 } from 'react-icons/pi';
 import AnimatedEnvelope from './AnimatedEnvelope';
 import { SaaSUser, TransactionReport } from '../types';
-import * as api from '../lib/api';
 import { useToast } from '../hooks/useToast';
 import { ErrorBoundary } from './ErrorBoundary';
 import SignInView from './auth/SignInView';
 import SignUpView from './auth/SignUpView';
 import { PACKAGE_PRICES as PRICES } from '../lib/packageLimits';
-import AdminPanelView from './auth/AdminPanelView';
 
 
 interface AuthGateProps {
@@ -37,30 +34,7 @@ const PACKAGE_IDS = ['demo', 'reguler', 'premium', 'luxury'] as const;
 function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const toast = useToast();
   // Navigation states
-  const [mode, setMode] = useState<'signin' | 'signup' | 'payment' | 'admin'>('signin');
-  
-  // Check URL pathname or hash to route automatically to Admin Panel
-  useEffect(() => {
-    const handleCheckRoute = () => {
-      const pName = window.location.pathname.toLowerCase();
-      const hashVal = window.location.hash.toLowerCase();
-      const hasAdminQuery = window.location.search.toLowerCase().includes('admin=true');
-      
-      if (pName === '/admin' || pName.endsWith('/admin') || hashVal === '#admin' || hashVal === '#/admin' || hasAdminQuery) {
-        setMode('admin');
-      } else {
-        setMode(prev => prev === 'admin' ? 'signin' : prev);
-      }
-    };
-
-    handleCheckRoute();
-    window.addEventListener('popstate', handleCheckRoute);
-    window.addEventListener('hashchange', handleCheckRoute);
-    return () => {
-      window.removeEventListener('popstate', handleCheckRoute);
-      window.removeEventListener('hashchange', handleCheckRoute);
-    };
-  }, []);
+  const [mode, setMode] = useState<'signin' | 'signup' | 'payment'>('signin');
 
   // Honori intent dari landing page: /auth?mode=register&package=premium&email=...
   // Tanpa ini semua CTA "daftar" mendaratkan calon pengguna di form Masuk.
@@ -83,22 +57,9 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     }
   }, []);
 
-  const handleExitAdmin = () => {
-    if (window.location.pathname.toLowerCase().endsWith('/admin')) {
-      window.history.pushState({}, '', '/');
-    }
-    if (window.location.hash) {
-      window.location.hash = '';
-    }
-    setMode('signin');
-  };
-  
   // Auth hook — backed by Turso
   const auth = useAuth();
-  const usersList = auth.allUsers;
-  const transactions = auth.allTransactions;
   const activeUser = auth.currentUser;
-  const setActiveUser = auth.setCurrentUser;
 
   // Sign up Form step wizard states
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -114,7 +75,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const [sosmed, setSosmed] = useState('');
   const [packageId, setPackageId] = useState<'demo' | 'reguler' | 'premium' | 'luxury'>('reguler');
   const [isCustomByRfx, setIsCustomByRfx] = useState(false);
-  const [googleUser, setGoogleUser] = useState<{ unverifiedEmail: string, name: string, avatarUrl?: string } | null>(null);
+  const [googleUser, setGoogleUser] = useState<GoogleSignupPrefill | null>(null);
   
   // Login Inputs
   const [loginEmail, setLoginEmail] = useState('');
@@ -131,16 +92,9 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeUser, setWelcomeUser] = useState<SaaSUser | null>(null);
 
-  // Load admin data when entering admin mode
-  useEffect(() => {
-    if (mode === 'admin') {
-      auth.fetchAdminData();
-    }
-  }, [mode]);
-
   // Payment gateway — route user based on payment status
   useEffect(() => {
-    if (activeUser && mode !== 'admin') {
+    if (activeUser) {
       if (activeUser.paymentStatus === 'pending' && activeUser.packageId !== 'demo') {
         setMode('payment');
       } else {
@@ -159,16 +113,18 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     setPaymentPolling(true);
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/check-payment-status?userId=${activeUser.id}`);
+        const res = await fetch(`/api/check-payment-status?orderId=${encodeURIComponent(pakasirData.orderId)}`);
+        if (!res.ok) return;
         const data = await res.json();
         if (data.status === 'success') {
           clearInterval(interval);
           setPaymentPolling(false);
-          const updatedUser = { ...activeUser, paymentStatus: 'success' as const };
-          auth.setCurrentUser(updatedUser);
-          // Show welcome greeting
-          setWelcomeUser(updatedUser);
-          setShowWelcome(true);
+          // Status diambil ulang dari server, bukan dirakit di browser.
+          const updatedUser = await auth.refreshUser();
+          if (updatedUser) {
+            setWelcomeUser(updatedUser);
+            setShowWelcome(true);
+          }
         }
       } catch (e) {
         // Silently retry
@@ -233,22 +189,12 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     setPaymentError(null);
     setPakasirData(null);
 
-    const price = PRICES[safePackageId][activeUser.isCustomByRfx ? 'rfx' : 'mandiri'];
-
     try {
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: activeUser.id,
-          userName: activeUser.fullName,
-          userSlug: activeUser.activeSlug,
-          userEmail: activeUser.email,
-          packageId: activeUser.packageId,
-          isCustomByRfx: activeUser.isCustomByRfx,
-          amount: price,
-          method: payMethod,
-        }),
+        // Identitas dan nominal ditentukan server dari session.
+        body: JSON.stringify({ method: payMethod }),
       });
 
       if (!response.ok) {
@@ -289,12 +235,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     if (!credentialResponse.credential) return;
     try {
-      const decoded: any = jwtDecode(credentialResponse.credential);
-      const email = decoded.email;
-      const name = decoded.name;
-      const picture = decoded.picture;
-      
-      const result = await auth.loginWithGoogle(email, name, picture);
+      // Token dikirim apa adanya; server yang memverifikasi dan membaca emailnya.
+      const result = await auth.loginWithGoogle(credentialResponse.credential);
       if (result) {
         if ('unverifiedEmail' in result) {
           // New user -> send to signup step 2 directly with email and name filled
@@ -309,7 +251,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         }
       }
     } catch (err) {
-      console.error('Failed to decode Google JWT', err);
+      console.error('Login Google gagal', err);
     }
   };
 
@@ -361,14 +303,12 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       coupleBride: brideName,
       activeSlug: slug,
       email,
-      password: googleUser ? Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2) : password,
+      password: googleUser ? undefined : password,
       noWa,
       sosmed,
       packageId,
       isCustomByRfx: packageId === 'demo' ? false : isCustomByRfx,
-      paymentStatus: packageId === 'demo' ? 'success' : 'pending', // Demo = instant, others = pending
-      authProvider: googleUser ? 'google' : 'local',
-      avatarUrl: googleUser?.avatarUrl
+      googleCredential: googleUser?.credential,
     });
 
     if (!newUser) {
@@ -399,28 +339,6 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   // Active Slug Checking for uniqueness
   const [slugError, setSlugError] = useState('');
   const [copiedText, setCopiedText] = useState<string | null>(null);
-
-  // Admin Override Actions — via Turso
-  const handleApproveTransaction = async (txId: string) => {
-    const tx = transactions.find(t => t.id === txId);
-    if (!tx) return;
-    await auth.approveTransaction(txId, tx.userId);
-  };
-
-  const handleRejectTransaction = async (txId: string) => {
-    const tx = transactions.find(t => t.id === txId);
-    if (!tx) return;
-    await auth.rejectTransaction(txId, tx.userId);
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (confirm("Apakah anda yakin ingin menghapus user ini dan semua data transaksinya?")) {
-      await auth.deleteUser(userId);
-      if (activeUser?.id === userId) {
-        setMode('signin');
-      }
-    }
-  };
 
   const safePackageId = activeUser?.packageId && PRICES[activeUser.packageId] ? activeUser.packageId : 'reguler';
   const currentBillAmount = activeUser 
@@ -542,7 +460,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                 Pilih metode pembayaran, lalu selesaikan untuk aktivasi instan.
               </p>
               <button 
-                onClick={() => { auth.logout(); setMode('signin'); setPakasirData(null); setSelectedPayMethod(null); }}
+                onClick={() => { void auth.logout(); setMode('signin'); setPakasirData(null); setSelectedPayMethod(null); }}
                 className="absolute top-0 right-0 p-2 text-[#6B5B4A] hover:text-[#2B2018] transition flex items-center gap-1 text-[10px] uppercase font-bold cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" /> Keluar
@@ -738,35 +656,6 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
                   Ganti Metode Pembayaran
                 </button>
 
-                {/* Sandbox Simulate — only on localhost */}
-                {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
-                  <button
-                    onClick={async () => {
-                      try {
-                        const res = await fetch('/api/simulate-payment', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            orderId: pakasirData.orderId,
-                            amount: currentBillAmount,
-                            userId: activeUser.id,
-                          }),
-                        });
-                        const data = await res.json();
-                        if (data.success) {
-                          toast.success('Simulasi berhasil!', 'Pembayaran sandbox dikonfirmasi. Mengarahkan ke dashboard...');
-                        }
-                      } catch (e) {
-                        console.error('Simulation failed:', e);
-                      }
-                    }}
-                    className="w-full py-3 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border border-amber-500/30 font-bold uppercase tracking-widest text-[10px] rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>🧪 Simulasi Bayar (Sandbox / Dev Mode)</span>
-                  </button>
-                )}
-
                 {/* Polling Indicator */}
                 <div className="flex items-center justify-center gap-2 text-[10px] text-[#6B5B4A]">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -777,31 +666,13 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
           </div>
         )}
 
-        {/* ==================== PORTAL ADMIN VIEW ==================== */}
-        {mode === 'admin' && (
-          <ErrorBoundary name="AdminPanel">
-            <AdminPanelView
-              usersList={usersList}
-              transactions={transactions}
-              onApprove={handleApproveTransaction}
-              onReject={handleRejectTransaction}
-              onDeleteUser={async (userId) => {
-                await auth.deleteUser(userId);
-                if (activeUser?.id === userId) setMode('signin');
-              }}
-            />
-          </ErrorBoundary>
-        )}
-
-
-
       </div>
     </div>
   );
 }
 
 export default function AuthGate(props: AuthGateProps) {
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '';
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <AuthGateInner {...props} />

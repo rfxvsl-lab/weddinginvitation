@@ -178,6 +178,8 @@ export interface SaaSUser {
   ipAddress?: string;
   avatarUrl?: string;
   authProvider?: 'local' | 'google';
+  /** Peran akun. Ditentukan server dari kolom users.role; tidak bisa diubah klien. */
+  role?: 'user' | 'admin';
   /** Password disimpan sebagai hash di server (Turso), tidak pernah di client */
   password?: string;
 }
@@ -194,6 +196,12 @@ export interface TransactionReport {
   status: 'success' | 'failed' | 'pending';
   timestamp: string;
   proofImage: string; // Cloudinary URL (bukan base64 lagi)
+  /** Order ID gateway pembayaran (kolom transactions.order_id) */
+  orderId?: string | null;
+  /** Jenis transaksi: pendaftaran baru, upgrade paket, atau perpanjangan */
+  txType?: 'signup' | 'upgrade' | 'extend';
+  /** Undangan yang dituju untuk upgrade/perpanjangan */
+  invitationId?: string | null;
   aiResult?: {
     isAuthentic: boolean;
     timestampDetected?: string;

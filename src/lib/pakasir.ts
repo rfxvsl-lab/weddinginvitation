@@ -14,15 +14,15 @@ if (!process.env.PAKASIR_PROJECT_SLUG || !process.env.PAKASIR_API_KEY) {
 export const pakasir = new PakasirClient({
   project: process.env.PAKASIR_PROJECT_SLUG || '',
   apiKey: process.env.PAKASIR_API_KEY || '',
+  // Hanya untuk staging/test: arahkan ke gateway tiruan. Kosongkan di production.
+  ...(process.env.PAKASIR_BASE_URL ? { baseUrl: process.env.PAKASIR_BASE_URL } : {}),
 });
-
-console.log(`[Pakasir] Initialized with project slug: "${process.env.PAKASIR_PROJECT_SLUG}"`);
 
 /**
  * Generate a unique order ID for transactions
  */
-export function generateOrderId(userId: string): string {
+export function generateOrderId(_userId?: string): string {
   const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase().padEnd(6, '0');
   return `RU-${timestamp}-${random}`;
 }

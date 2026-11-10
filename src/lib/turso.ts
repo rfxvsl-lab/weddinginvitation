@@ -11,6 +11,12 @@ const authToken = process.env.TURSO_AUTH_TOKEN || process.env.VITE_TURSO_AUTH_TO
 // Initialize client only if config is present (prevents build crash if env variables are empty at build time)
 const client = url ? createClient({ url, authToken }) : null;
 
+// Database file lokal (development/test) bisa dibuka beberapa proses sekaligus;
+// tunggu sebentar saat terkunci alih-alih langsung gagal. Tidak berlaku untuk Turso remote.
+if (client && url.startsWith('file:')) {
+  client.execute('PRAGMA busy_timeout = 5000').catch(() => {});
+}
+
 /**
  * Execute a single SQL statement securely on the server
  */

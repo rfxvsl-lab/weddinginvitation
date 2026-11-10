@@ -8,13 +8,23 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit } from '@/server/rateLimit';
+import { getClientIp } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const term = searchParams.get('term');
 
-  if (!term || term.trim().length < 2) {
+  if (!term || term.trim().length < 2 || term.length > 100) {
     return NextResponse.json({ results: [] });
+  }
+
+  const limited = await rateLimit({ identifier: `music:${getClientIp(request)}`, max: 30, windowSecs: 60 });
+  if (!limited.success) {
+    return NextResponse.json(
+      { results: [], error: 'Terlalu banyak pencarian. Coba lagi sebentar.' },
+      { status: 429, headers: { 'Retry-After': String(limited.resetIn) } }
+    );
   }
 
   try {

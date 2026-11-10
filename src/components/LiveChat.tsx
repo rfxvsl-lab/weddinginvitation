@@ -84,7 +84,7 @@ export default function LiveChat({ currentUser }: LiveChatProps) {
   const alertModal = useAlertModal();
 
   const conversationId = currentUser.id; // Each user has one conversation
-  const isAdmin = currentUser.email === 'mhmmadridho64@gmail.com';
+  const isAdmin = currentUser.role === 'admin';
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -113,10 +113,8 @@ export default function LiveChat({ currentUser }: LiveChatProps) {
 
   // Load admin avatar and client avatar
   useEffect(() => {
-    api.getAdminUser().then(admin => {
-      if (admin?.avatarUrl) {
-        setAdminAvatar(admin.avatarUrl);
-      }
+    api.getAdminAvatarUrl().then(url => {
+      if (url) setAdminAvatar(url);
     }).catch(() => {});
 
     if (!isAdmin) {

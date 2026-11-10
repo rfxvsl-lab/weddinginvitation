@@ -1,120 +1,41 @@
 import { NextResponse } from 'next/server';
-import { pakasir, generateOrderId } from '../../../lib/pakasir';
-import { createTransaction } from '../../../lib/api';
-import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { requireUser } from '../../../server/session';
+import { rateLimit } from '../../../server/rateLimit';
+import { createGatewayOrder } from '../../../server/gateway';
+import { normalizePaymentMethod, planSignupOrder } from '../../../server/payments';
+import { errorResponse, jsonError, readJson } from '../../../server/http';
 
 export const runtime = 'nodejs';
 
 /**
- * Supported payment methods from Pakasir
+ * Buat pembayaran untuk akun yang baru mendaftar.
+ * User dan nominal diambil dari session + tabel harga; body hanya memilih metode.
  */
-const VALID_METHODS = [
-  'qris', 'bni_va', 'bri_va', 'cimb_niaga_va', 'permata_va',
-  'maybank_va', 'sampoerna_va', 'bnc_va', 'atm_bersama_va', 'retail',
-];
-
 export async function POST(req: Request) {
   try {
-    // Rate limiting
-    const clientIp = getClientIp(req);
-    const rateLimit = checkRateLimit({
-      identifier: `create-payment:${clientIp}`,
-      max: 10,
-      windowSecs: 10 * 60,
-    });
+    const user = await requireUser();
 
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: `Terlalu banyak permintaan. Coba lagi dalam ${rateLimit.resetIn} detik.` },
-        { status: 429, headers: { 'Retry-After': String(rateLimit.resetIn) } }
-      );
+    const limited = await rateLimit({ identifier: `create-payment:${user.id}`, max: 10, windowSecs: 10 * 60 });
+    if (!limited.success) {
+      return jsonError(`Terlalu banyak permintaan. Coba lagi dalam ${limited.resetIn} detik.`, 429, {
+        'Retry-After': String(limited.resetIn),
+      });
     }
 
-    const body = await req.json();
-    const { userId, userName, userSlug, userEmail, packageId, isCustomByRfx, amount, method } = body;
+    const body = await readJson(req);
+    const plan = planSignupOrder(user);
+    if (plan.ok === false) return jsonError(plan.error, 400);
 
-    if (!userId || !amount) {
-      return NextResponse.json(
-        { error: 'Parameter userId dan amount diperlukan.' },
-        { status: 400 }
-      );
-    }
-
-    const paymentMethod = method && VALID_METHODS.includes(method) ? method : 'qris';
-    const orderId = generateOrderId(userId);
-
-    let qrCode = '';
-    let paymentUrl = '';
-    let paymentNumber = '';
-    let expiredAt = '';
-    let vaNumber = '';
-
-    if (paymentMethod === 'qris') {
-      // QRIS — generate QR code + payment URL
-      try {
-        const payment = await pakasir.createPaymentWithQRAndURL(orderId, amount, {
-          qrOptions: { size: 300 },
-          urlOptions: { redirect: 'https://ruanghadir.net/auth?payment=success' },
-        });
-
-        qrCode = payment.dataUrl || '';
-        paymentUrl = payment.paymentUrl || '';
-        paymentNumber = payment.paymentNumber || '';
-        expiredAt = payment.expiredAt || '';
-        
-        console.log('[create-payment] ✅ QRIS created:', { orderId, hasQR: !!qrCode });
-      } catch (qrisErr: any) {
-        console.warn('[create-payment] QRIS failed, falling back to URL:', qrisErr.message);
-        paymentUrl = `https://app.pakasir.com/pay/${process.env.PAKASIR_PROJECT_SLUG}/${amount}?order_id=${orderId}&redirect=${encodeURIComponent('https://ruanghadir.net/auth?payment=success')}`;
-      }
-    } else {
-      // Virtual Account / Retail — create transaction with specific method
-      try {
-        const tx = await pakasir.createTransaction(paymentMethod, orderId, amount);
-        vaNumber = tx.payment?.payment_number || '';
-        expiredAt = tx.payment?.expired_at || '';
-        paymentUrl = `https://app.pakasir.com/pay/${process.env.PAKASIR_PROJECT_SLUG}/${amount}?order_id=${orderId}&redirect=${encodeURIComponent('https://ruanghadir.net/auth?payment=success')}`;
-        
-        console.log('[create-payment] ✅ VA/Retail created:', { orderId, method: paymentMethod, vaNumber });
-      } catch (vaErr: any) {
-        console.error('[create-payment] VA creation failed:', vaErr.message);
-        throw vaErr;
-      }
-    }
-
-    // Save pending transaction to Turso DB
-    await createTransaction({
-      userId,
-      userName: userName || '',
-      userSlug: userSlug || '',
-      userEmail: userEmail || '',
-      packageId: packageId || 'reguler',
-      isCustomByRfx: isCustomByRfx || false,
-      nominalExpected: amount,
-      status: 'pending',
-      timestamp: new Date().toLocaleString('id-ID'),
-      proofImage: '',
-      aiResult: {
-        isAuthentic: false,
-        reasons: [`Pakasir Order ID: ${orderId}`, `Method: ${paymentMethod}`],
-      },
+    const order = await createGatewayOrder({
+      user,
+      method: normalizePaymentMethod(body.method),
+      amount: plan.amount,
+      packageId: plan.packageId,
+      txType: plan.txType,
     });
 
-    return NextResponse.json({
-      success: true,
-      orderId,
-      method: paymentMethod,
-      qrCode,
-      paymentUrl,
-      paymentNumber,
-      vaNumber,
-      expiredAt,
-    });
-  } catch (error: any) {
-    console.error('[create-payment] Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Gagal membuat transaksi pembayaran.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, amount: plan.amount, ...order });
+  } catch (error) {
+    return errorResponse('create-payment', error);
   }
 }

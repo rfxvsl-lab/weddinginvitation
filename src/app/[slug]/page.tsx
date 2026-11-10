@@ -1,6 +1,8 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getInvitationBySlug, getGuestsByInvitation, getRSVPsByInvitation, getUserById } from '../../lib/api';
+import { getInvitationBySlug, getGuestsByInvitation, getRSVPsByInvitation, getUserById } from '../../server/repo';
+import { getSessionUser } from '../../server/session';
+import { SITE } from '../../lib/site';
 import InvitationClient from './InvitationClient';
 import type { Guest } from '../../types';
 import { Globe, Timer } from 'lucide-react';
@@ -105,7 +107,7 @@ export default async function Page({ params, searchParams }: PageProps) {
               Buat Undangan
             </a>
             <a
-              href="https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20memperpanjang%20undangan"
+              href={`https://wa.me/${SITE.adminWhatsApp}?text=${encodeURIComponent('Halo, saya ingin memperpanjang undangan')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition text-sm text-center"
@@ -119,11 +121,15 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
 
   // Load guests, RSVPs, and user info on server
-  const [guestsData, rsvpsData, userData] = await Promise.all([
+  const [guestsData, rsvpsData, userData, viewer] = await Promise.all([
     getGuestsByInvitation(inv.id),
     getRSVPsByInvitation(inv.id),
     getUserById(inv.userId),
+    getSessionUser().catch(() => null),
   ]);
+
+  // Pemilik undangan (atau admin) boleh memoderasi momen tamu.
+  const canModerate = Boolean(viewer && (viewer.id === inv.userId || viewer.role === 'admin'));
 
   const watermarkType = getWatermarkType(userData?.packageId || 'demo');
 
@@ -135,14 +141,15 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
 
     if (matched) {
-      urlGuest = matched;
+      // Nomor telepon tamu tidak pernah dikirim ke halaman publik.
+      urlGuest = { ...matched, phoneNumber: '' };
     } else {
       urlGuest = {
         id: `tg-${Date.now()}`,
         name: guestTo,
         group: 'Tamu Berharga',
         paxLimit: 2,
-        phoneNumber: '081234567890',
+        phoneNumber: '',
         status: 'Opened',
         invitationCode: guestCode || 'W-TEMP'
       };
@@ -170,7 +177,8 @@ export default async function Page({ params, searchParams }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // "<" di-escape supaya isi dari pengguna tidak bisa menutup tag script.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <div className="relative w-full min-h-screen bg-[#050505] flex items-center justify-center font-sans overflow-hidden">
         <div className="w-full h-full relative animate-fadeIn">
@@ -178,13 +186,13 @@ export default async function Page({ params, searchParams }: PageProps) {
             invitationId={inv.id}
             weddingData={inv.weddingData}
             themeId={inv.themeId}
-            guests={guestsData}
             initialRsvps={rsvpsData}
             urlGuest={urlGuest}
             watermarkType={watermarkType}
             slug={slug}
             appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://ruanghadir.net'}
             serverNow={new Date().toISOString()}
+            canModerate={canModerate}
           />
         </div>
       </div>

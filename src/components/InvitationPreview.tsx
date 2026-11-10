@@ -268,7 +268,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
     if (activeGuest?.id) {
       try {
         const { confirmGuestAttendance } = await import('../lib/api');
-        await confirmGuestAttendance(activeGuest.id, rsvpStatus, rsvpPaxCount);
+        await confirmGuestAttendance(activeGuest.id, rsvpStatus, rsvpPaxCount, activeGuest.invitationCode);
         setActiveGuest({ ...activeGuest, rsvpStatus: 'CONFIRMED', attendance: rsvpStatus });
         setRsvpDone(true);
       } catch (err) {

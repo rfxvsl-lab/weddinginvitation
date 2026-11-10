@@ -15,12 +15,14 @@ interface RateLimitEntry {
 const store = new Map<string, RateLimitEntry>();
 
 // Bersihkan expired entries setiap 5 menit untuk mencegah memory leak
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of store.entries()) {
     if (entry.resetAt < now) store.delete(key);
   }
 }, 5 * 60 * 1000);
+// Timer ini tidak boleh menahan proses tetap hidup (skrip, test, shutdown).
+cleanupTimer.unref?.();
 
 interface RateLimitOptions {
   /** Jumlah maksimum request yang diizinkan */

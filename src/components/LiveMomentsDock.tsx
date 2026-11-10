@@ -40,6 +40,8 @@ interface LiveMomentsDockProps {
   appUrl: string;
   accentColor?: string;
   onOpenChange?: (open: boolean) => void;
+  /** Hanya pemilik undangan yang boleh menghapus momen; server tetap memeriksa. */
+  canModerate?: boolean;
 }
 
 type Tab = 'moments' | 'voices' | 'share';
@@ -75,6 +77,7 @@ export default function LiveMomentsDock({
   appUrl,
   accentColor = '#b45309',
   onOpenChange,
+  canModerate = false,
 }: LiveMomentsDockProps) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>('moments');
@@ -648,9 +651,11 @@ export default function LiveMomentsDock({
             <button onClick={() => downloadImage(lightbox)} className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[11px] font-bold text-black">
               <Download className="h-3.5 w-3.5" /> Unduh
             </button>
-            <button onClick={() => handleDeleteMoment(lightbox)} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-[11px] font-bold">
-              <Trash className="h-3.5 w-3.5" /> Hapus
-            </button>
+            {canModerate && (
+              <button onClick={() => handleDeleteMoment(lightbox)} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-[11px] font-bold">
+                <Trash className="h-3.5 w-3.5" /> Hapus
+              </button>
+            )}
           </div>
         </div>
       )}

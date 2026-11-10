@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getInvitationBySlug } from '@/lib/api';
+import { getInvitationBySlug } from '@/server/repo';
 
 export const dynamic = 'force-dynamic';
 

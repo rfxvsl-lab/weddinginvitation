@@ -1,57 +1,24 @@
 import { NextResponse } from 'next/server';
-import { dbExecute } from '../../../lib/turso';
-import { checkSlugExists, updateUserProfile } from '../../../lib/api';
+import { updateUserProfile } from '../../../lib/api';
+import { errorResponse, jsonError, readJson } from '../../../server/http';
 
 export const runtime = 'nodejs';
 
+/**
+ * Perbarui avatar atau slug akun yang sedang login.
+ * `userId` di body diabaikan; identitas diambil dari session.
+ */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { userId, avatarUrl, activeSlug } = body;
+    const body = await readJson(req);
+    const updates: { avatarUrl?: string; activeSlug?: string } = {};
+    if (body.avatarUrl !== undefined) updates.avatarUrl = String(body.avatarUrl);
+    if (body.activeSlug !== undefined) updates.activeSlug = String(body.activeSlug);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId diperlukan.' }, { status: 400 });
-    }
-
-    // Handle avatar update
-    if (avatarUrl !== undefined) {
-      await dbExecute(
-        'UPDATE users SET avatar_url = :avatarUrl WHERE id = :userId',
-        { avatarUrl, userId }
-      );
-      console.log(`[update-profile] ✅ Avatar updated for user ${userId}`);
-    }
-
-    // Handle slug update
-    if (activeSlug !== undefined) {
-      // Validate format
-      const cleanSlug = activeSlug.toLowerCase().replace(/[^a-z0-9-]/g, '');
-      if (cleanSlug.length < 3) {
-        return NextResponse.json({ error: 'Slug harus minimal 3 karakter.' }, { status: 400 });
-      }
-      if (cleanSlug.length > 50) {
-        return NextResponse.json({ error: 'Slug maksimal 50 karakter.' }, { status: 400 });
-      }
-
-      // Check uniqueness (exclude current user)
-      const exists = await checkSlugExists(cleanSlug, userId);
-      if (exists) {
-        return NextResponse.json({ error: 'Slug sudah digunakan oleh pengguna lain.' }, { status: 409 });
-      }
-
-      // Update slug in DB
-      await updateUserProfile(userId, { activeSlug: cleanSlug });
-      console.log(`[update-profile] ✅ Slug updated for user ${userId}: ${cleanSlug}`);
-
-      return NextResponse.json({ success: true, activeSlug: cleanSlug });
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('[update-profile] Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Gagal update profil.' },
-      { status: 500 }
-    );
+    const result = await updateUserProfile('', updates);
+    if (result.ok === false) return jsonError(result.error, 400);
+    return NextResponse.json({ success: true, activeSlug: result.user.activeSlug, avatarUrl: result.user.avatarUrl });
+  } catch (error) {
+    return errorResponse('update-profile', error);
   }
 }

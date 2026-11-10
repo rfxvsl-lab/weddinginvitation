@@ -67,16 +67,21 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
       const avatarUrl = data.secure_url;
 
       // Update user avatar in DB
-      await fetch('/api/update-profile', {
+      const saveRes = await fetch('/api/update-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, avatarUrl }),
+        body: JSON.stringify({ avatarUrl }),
       });
+      if (!saveRes.ok) {
+        const errData = await saveRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Gagal menyimpan foto profil.');
+      }
 
       // Update local state
       auth.setCurrentUser({ ...user, avatarUrl });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Avatar upload failed:', err);
+      alertModal.error('Upload Gagal', err?.message || 'Gagal mengunggah foto profil. Silakan coba lagi.');
     } finally {
       setIsUploading(false);
     }

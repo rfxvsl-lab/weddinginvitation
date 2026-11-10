@@ -1,64 +1,59 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { SESSION_COOKIE, verifySessionToken } from './server/sessionToken';
 
 /**
- * Next.js Middleware — Route Protection
- * Proteksi halaman /dashboard dan /admin dari akses langsung tanpa session.
- * Session dideteksi dari cookie 'saas_user_session' yang di-set saat login.
+ * Next.js Middleware — proteksi route dan header keamanan.
+ *
+ * /dashboard dan /admin hanya bisa dibuka dengan cookie session yang tanda
+ * tangannya sah. Middleware hanya penjaga pintu untuk navigasi; setiap akses
+ * data tetap dicek ulang di server action dan route handler.
  */
 
-// Route yang membutuhkan autentikasi
 const PROTECTED_ROUTES = ['/dashboard', '/admin'];
-
-// Route khusus admin saja
 const ADMIN_ONLY_ROUTES = ['/admin'];
+
+function matches(pathname: string, routes: string[]): boolean {
+  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
+
+function withSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Kamera & mikrofon hanya untuk origin sendiri (scanner check-in, ucapan suara).
+  response.headers.set('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=()');
+  return response;
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const response = NextResponse.next();
-  // Tambahkan Security Headers global
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'camera=*, microphone=*, geolocation=()');
+  if (!matches(pathname, PROTECTED_ROUTES)) {
+    return withSecurityHeaders(NextResponse.next());
+  }
 
-  // Cek apakah route ini terproteksi
-  const isProtected = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-  if (!isProtected) return response;
+  // Secret tidak dikonfigurasi = tidak ada session yang bisa dipercaya.
+  const secret = process.env.SESSION_SECRET || '';
+  const session =
+    secret.length >= 32 ? verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value, secret) : null;
 
-  // Ambil session cookie
-  const sessionCookie = request.cookies.get('saas_user_session');
-
-  // Tidak ada session → redirect ke auth page
-  if (!sessionCookie?.value) {
+  if (!session) {
     const redirectUrl = new URL('/auth', request.url);
     redirectUrl.searchParams.set('redirect', pathname);
     redirectUrl.searchParams.set('reason', 'auth_required');
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  // Coba parse session data
-  let sessionData: { email?: string; packageId?: string; isAdmin?: boolean } | null = null;
-  try {
-    const decoded = Buffer.from(sessionCookie.value, 'base64').toString('utf-8');
-    sessionData = JSON.parse(decoded);
-  } catch {
-    // Cookie invalid â†’ hapus dan redirect
-    const response = NextResponse.redirect(new URL('/', request.url));
+    const response = NextResponse.redirect(redirectUrl);
+    response.cookies.delete(SESSION_COOKIE);
+    // Cookie lama tanpa tanda tangan tidak pernah dipercaya lagi.
     response.cookies.delete('saas_user_session');
-    return response;
+    return withSecurityHeaders(response);
   }
 
-  // Validasi route admin
-  const isAdminRoute = ADMIN_ONLY_ROUTES.some(route => pathname.startsWith(route));
-  if (isAdminRoute && !sessionData?.isAdmin) {
-    // Bukan admin â†’ redirect ke dashboard
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (matches(pathname, ADMIN_ONLY_ROUTES) && session.role !== 'admin') {
+    return withSecurityHeaders(NextResponse.redirect(new URL('/dashboard', request.url)));
   }
 
-  // Lanjutkan request
-  return NextResponse.next();
+  return withSecurityHeaders(NextResponse.next());
 }
 
 export const config = {

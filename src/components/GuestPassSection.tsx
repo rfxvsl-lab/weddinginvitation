@@ -88,7 +88,7 @@ export default function GuestPassSection({
     setBusy(true);
     setError('');
     try {
-      await confirmGuestAttendance(activeGuest.id, attendance, pax);
+      await confirmGuestAttendance(activeGuest.id, attendance, pax, activeGuest.invitationCode);
       setActiveGuest({ ...activeGuest, rsvpStatus: 'CONFIRMED', attendance });
       setConfirmed(true);
     } catch {

@@ -1,132 +1,50 @@
 import { NextResponse } from 'next/server';
-import { pakasir, generateOrderId } from '../../../lib/pakasir';
-import { createTransaction, updateUserPackage, extendInvitation, getInvitationsByUserId } from '../../../lib/api';
-import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
-import { PACKAGE_LIMITS } from '../../../lib/packageLimits';
+import { requireUser } from '../../../server/session';
+import { rateLimit } from '../../../server/rateLimit';
+import { createGatewayOrder } from '../../../server/gateway';
+import { normalizePaymentMethod, planUpgradeOrder } from '../../../server/payments';
+import { getInvitationMeta } from '../../../server/repo';
+import { errorResponse, jsonError, readJson } from '../../../server/http';
 
 export const runtime = 'nodejs';
 
 /**
- * Create payment for upgrade or extension.
- * type='upgrade' → upgrade tier + reset masa aktif
- * type='extend'  → perpanjang masa aktif tanpa ganti tier
+ * Buat pembayaran upgrade tier atau perpanjangan masa aktif.
+ * Paket baru baru berlaku setelah webhook Pakasir mengonfirmasi pembayaran.
  */
-
-const VALID_METHODS = [
-  'qris', 'bni_va', 'bri_va', 'cimb_niaga_va', 'permata_va',
-  'maybank_va', 'sampoerna_va', 'bnc_va', 'atm_bersama_va', 'retail',
-];
-
 export async function POST(req: Request) {
   try {
-    // Rate limiting
-    const clientIp = getClientIp(req);
-    const rateLimit = checkRateLimit({
-      identifier: `upgrade-payment:${clientIp}`,
-      max: 10,
-      windowSecs: 10 * 60,
+    const user = await requireUser();
+
+    const limited = await rateLimit({ identifier: `upgrade-payment:${user.id}`, max: 10, windowSecs: 10 * 60 });
+    if (!limited.success) {
+      return jsonError(`Terlalu banyak permintaan. Coba lagi dalam ${limited.resetIn} detik.`, 429, {
+        'Retry-After': String(limited.resetIn),
+      });
+    }
+
+    const body = await readJson(req);
+    const plan = planUpgradeOrder(user, body.type, body.targetPackageId);
+    if (plan.ok === false) return jsonError(plan.error, 400);
+
+    // Undangan tujuan hanya diterima jika milik user ini.
+    let invitationId: string | null = null;
+    if (typeof body.invitationId === 'string' && body.invitationId) {
+      const meta = await getInvitationMeta(body.invitationId);
+      if (meta && meta.userId === user.id) invitationId = meta.id;
+    }
+
+    const order = await createGatewayOrder({
+      user,
+      method: normalizePaymentMethod(body.method),
+      amount: plan.amount,
+      packageId: plan.packageId,
+      txType: plan.txType,
+      invitationId,
     });
 
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: `Terlalu banyak permintaan. Coba lagi dalam ${rateLimit.resetIn} detik.` },
-        { status: 429, headers: { 'Retry-After': String(rateLimit.resetIn) } }
-      );
-    }
-
-    const body = await req.json();
-    const { userId, userName, userEmail, type, currentPackageId, targetPackageId, invitationId, amount, method, isCustomByRfx } = body;
-
-    if (!userId || !amount || !type || !targetPackageId) {
-      return NextResponse.json(
-        { error: 'Parameter userId, amount, type, dan targetPackageId diperlukan.' },
-        { status: 400 }
-      );
-    }
-
-    // Validate type
-    if (type !== 'upgrade' && type !== 'extend') {
-      return NextResponse.json({ error: 'type harus "upgrade" atau "extend".' }, { status: 400 });
-    }
-
-    const paymentMethod = method && VALID_METHODS.includes(method) ? method : 'qris';
-    const orderId = generateOrderId(userId);
-
-    let qrCode = '';
-    let paymentUrl = '';
-    let paymentNumber = '';
-    let expiredAt = '';
-    let vaNumber = '';
-
-    if (paymentMethod === 'qris') {
-      try {
-        const payment = await pakasir.createPaymentWithQRAndURL(orderId, amount, {
-          qrOptions: { size: 300 },
-          urlOptions: { redirect: 'https://ruanghadir.net/auth?payment=success' },
-        });
-
-        qrCode = payment.dataUrl || '';
-        paymentUrl = payment.paymentUrl || '';
-        paymentNumber = payment.paymentNumber || '';
-        expiredAt = payment.expiredAt || '';
-
-        console.log('[upgrade-payment] ✅ QRIS created:', { orderId, type, targetPackageId });
-      } catch (qrisErr: any) {
-        console.warn('[upgrade-payment] QRIS failed, falling back to URL:', qrisErr.message);
-        paymentUrl = `https://app.pakasir.com/pay/${process.env.PAKASIR_PROJECT_SLUG}/${amount}?order_id=${orderId}&redirect=${encodeURIComponent('https://ruanghadir.net/auth?payment=success')}`;
-      }
-    } else {
-      try {
-        const tx = await pakasir.createTransaction(paymentMethod, orderId, amount);
-        vaNumber = tx.payment?.payment_number || '';
-        expiredAt = tx.payment?.expired_at || '';
-        paymentUrl = `https://app.pakasir.com/pay/${process.env.PAKASIR_PROJECT_SLUG}/${amount}?order_id=${orderId}&redirect=${encodeURIComponent('https://ruanghadir.net/auth?payment=success')}`;
-
-        console.log('[upgrade-payment] ✅ VA created:', { orderId, method: paymentMethod, vaNumber });
-      } catch (vaErr: any) {
-        console.error('[upgrade-payment] VA creation failed:', vaErr.message);
-        throw vaErr;
-      }
-    }
-
-    // Save pending transaction to Turso DB
-    await createTransaction({
-      userId,
-      userName: userName || '',
-      userSlug: '',
-      userEmail: userEmail || '',
-      packageId: targetPackageId,
-      isCustomByRfx: isCustomByRfx || false,
-      nominalExpected: amount,
-      status: 'pending',
-      timestamp: new Date().toLocaleString('id-ID'),
-      proofImage: '',
-      aiResult: {
-        isAuthentic: false,
-        reasons: [
-          `Pakasir Order ID: ${orderId}`,
-          `Method: ${paymentMethod}`,
-          `Type: ${type}`,
-          `From: ${currentPackageId} → To: ${targetPackageId}`,
-        ],
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      orderId,
-      method: paymentMethod,
-      qrCode,
-      paymentUrl,
-      paymentNumber,
-      vaNumber,
-      expiredAt,
-    });
-  } catch (error: any) {
-    console.error('[upgrade-payment] Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Gagal membuat transaksi upgrade.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, amount: plan.amount, ...order });
+  } catch (error) {
+    return errorResponse('create-upgrade-payment', error);
   }
 }

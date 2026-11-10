@@ -1,34 +1,30 @@
 import { NextResponse } from 'next/server';
-import { getUserById } from '../../../lib/api';
+import { requireUser } from '../../../server/session';
+import { getTransactionByOrderId } from '../../../server/repo';
+import { errorResponse, jsonError } from '../../../server/http';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /**
- * Check payment status for frontend polling
+ * Status pembayaran untuk polling dari browser. Hanya membaca.
+ *
+ * - ?orderId=...  → status transaksi itu (harus milik user yang login)
+ * - tanpa orderId → status bayar akun yang login
  */
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
+    const user = await requireUser();
+    const orderId = new URL(req.url).searchParams.get('orderId');
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId diperlukan' }, { status: 400 });
+    if (orderId) {
+      const tx = await getTransactionByOrderId(orderId);
+      if (!tx || tx.userId !== user.id) return jsonError('Transaksi tidak ditemukan.', 404);
+      return NextResponse.json({ status: tx.status, packageId: user.packageId, txType: tx.txType });
     }
 
-    const user = await getUserById(userId);
-    if (!user) {
-      return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      status: user.paymentStatus,
-      packageId: user.packageId,
-    });
-  } catch (error: any) {
-    console.error('[check-payment-status] Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ status: user.paymentStatus, packageId: user.packageId });
+  } catch (error) {
+    return errorResponse('check-payment-status', error);
   }
 }

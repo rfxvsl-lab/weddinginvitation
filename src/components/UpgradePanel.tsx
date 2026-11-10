@@ -23,6 +23,7 @@ import {
   PiXCircleDuotone as XCircleIcon,
 } from 'react-icons/pi';
 import { SaaSUser } from '../types';
+import { getCurrentUser } from '../lib/authActions';
 import {
   PACKAGE_PRICES,
   PACKAGE_NAMES,
@@ -94,38 +95,22 @@ export default function UpgradePanel({ user, activatedAt, expiresAt, invitationI
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/check-payment-status?userId=${user.id}`);
+        // Status ORDER ini, bukan status akun: akun yang sudah lunas tidak
+        // boleh langsung dianggap sudah membayar upgrade.
+        const res = await fetch(`/api/check-payment-status?orderId=${encodeURIComponent(pakasirData.orderId)}`);
+        if (!res.ok) return;
         const data = await res.json();
         if (data.status === 'success') {
           clearInterval(interval);
-
-          // Apply upgrade/extend on server side
-          if (paymentTarget) {
-            try {
-              await fetch('/api/apply-upgrade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: user.id,
-                  type: paymentTarget.type,
-                  targetPackageId: paymentTarget.targetPackageId,
-                  invitationId: invitationId || '',
-                }),
-              });
-            } catch {}
-          }
-
           setPaymentMode('paid');
-          if (onSuccess && user) {
-            const updatedUser = {
-              ...user,
-              packageId: paymentTarget?.type === 'upgrade' ? paymentTarget.targetPackageId : user.packageId,
-              paymentStatus: 'success' as const,
-            };
-            onSuccess(updatedUser);
-          }
+          // Upgrade/perpanjangan sudah diterapkan server lewat webhook;
+          // ambil data akun terbaru dari server.
+          const fresh = await getCurrentUser();
+          if (onSuccess && fresh) onSuccess(fresh);
         }
-      } catch {}
+      } catch {
+        /* coba lagi pada interval berikutnya */
+      }
     }, 5000);
 
     return () => clearInterval(interval);
@@ -145,23 +130,16 @@ export default function UpgradePanel({ user, activatedAt, expiresAt, invitationI
     setIsCreating(true);
     setError(null);
 
-    const price = PACKAGE_PRICES[paymentTarget.targetPackageId][isRfx ? 'rfx' : 'mandiri'];
-
     try {
       const res = await fetch('/api/create-upgrade-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Nominal dihitung server dari paket tujuan; tidak dikirim dari browser.
         body: JSON.stringify({
-          userId: user.id,
-          userName: user.fullName,
-          userEmail: user.email,
           type: paymentTarget.type,
-          currentPackageId: currentPkg,
           targetPackageId: paymentTarget.targetPackageId,
           invitationId: invitationId || '',
-          amount: price,
           method: selectedMethod,
-          isCustomByRfx: isRfx,
         }),
       });
 

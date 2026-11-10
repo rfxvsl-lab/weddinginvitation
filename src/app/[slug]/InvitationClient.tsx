@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import InvitationPreview from '../../components/InvitationPreview';
 import WatermarkOverlay from '../../components/WatermarkOverlay';
 import LiveMomentsDock from '../../components/LiveMomentsDock';
-import { addRSVP, addVisitorLog } from '../../lib/api';
+import { addRSVP, addVisitorLog, confirmGuestAttendance } from '../../lib/api';
 import type { WeddingData, Guest, RSVP } from '../../types';
 import type { WatermarkType } from '../../lib/packageLimits';
 
@@ -12,26 +12,32 @@ interface InvitationClientProps {
   invitationId: string;
   weddingData: WeddingData;
   themeId: string;
-  guests: Guest[];
   initialRsvps: RSVP[];
   urlGuest?: Guest;
   watermarkType?: WatermarkType;
   slug?: string;
   appUrl?: string;
   serverNow?: string;
+  /** true jika pengunjung adalah pemilik undangan (boleh menghapus momen tamu) */
+  canModerate?: boolean;
+}
+
+/** Tamu sementara dari parameter ?to= tidak punya baris di database. */
+function isRegisteredGuest(guest: Guest): boolean {
+  return !guest.id.startsWith('tg-') && guest.invitationCode !== 'W-TEMP';
 }
 
 export default function InvitationClient({
   invitationId,
   weddingData,
   themeId,
-  guests,
   initialRsvps,
   urlGuest,
   watermarkType = 'none',
   slug = '',
   appUrl = 'https://ruanghadir.net',
   serverNow,
+  canModerate = false,
 }: InvitationClientProps) {
   const [rsvps, setRsvps] = useState<RSVP[]>(initialRsvps);
 
@@ -41,10 +47,9 @@ export default function InvitationClient({
       setRsvps(prev => [saved, ...prev]);
 
       // Alur RE: Jika tamu teridentifikasi atau ada guestId, auto-konfirmasi kehadiran & status RSVP di DB
-      const targetGuestId = newRSVP.guestId || urlGuest?.id;
-      if (targetGuestId) {
-        const { confirmGuestAttendance } = await import('../../lib/api');
-        await confirmGuestAttendance(targetGuestId, newRSVP.status, newRSVP.paxCount);
+      // Hanya untuk tamu terdaftar (punya kode undangan asli); server mencocokkan kodenya.
+      if (urlGuest && isRegisteredGuest(urlGuest) && (!newRSVP.guestId || newRSVP.guestId === urlGuest.id)) {
+        await confirmGuestAttendance(urlGuest.id, newRSVP.status, newRSVP.paxCount, urlGuest.invitationCode);
       }
     } catch (err) {
       console.error('Failed to save RSVP:', err);
@@ -87,6 +92,7 @@ export default function InvitationClient({
           eventDate={eventDate}
           slug={slug}
           appUrl={appUrl}
+          canModerate={canModerate}
         />
       )}
       <WatermarkOverlay type={watermarkType} />

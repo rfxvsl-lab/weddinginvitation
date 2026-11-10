@@ -94,6 +94,18 @@ export default function App() {
     };
   }, []);
   
+  // Session masih dibaca dari server: jangan tampilkan form login dulu.
+  if (auth.isInitializing) {
+    return (
+      <div className="saas-scope flex h-screen w-full items-center justify-center" role="status" aria-live="polite">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--saas-primary)' }} />
+          <p className="text-sm font-bold font-mono uppercase tracking-widest" style={{ color: 'var(--saas-ink-2)' }}>Memuat sesi…</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!auth.currentUser) {
     return (
       <AuthGate onLoginSuccess={(user) => {
