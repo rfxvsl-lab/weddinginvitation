@@ -37,9 +37,8 @@ export default function SignInView({
         <div className="flex justify-center mb-5">
           <Logo isLink={false} className="w-48" />
         </div>
-        <span className="saas-kicker block">Portal Pelanggan</span>
-        <h2 className="text-3xl font-serif saas-serif-i text-[#2B2018]">Selamat Datang Kembali</h2>
-        <p className="text-sm text-[#6B5B4A]">Silakan masuk ke akun Anda untuk melanjutkan pengelolaan undangan.</p>
+        <h1 className="text-3xl font-serif text-[#2B2018]">Masuk</h1>
+        <p className="text-sm text-[#6B5B4A]">Lanjutkan mengelola undangan kalian.</p>
       </div>
 
       {/* Form */}
@@ -87,13 +86,10 @@ export default function SignInView({
         </button>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[#E4D8C3]"></div>
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-[#FFFDFB] px-2 text-[#A3917B] uppercase tracking-widest font-bold">Atau</span>
-        </div>
+      <div className="flex items-center gap-3 text-xs" role="separator" aria-label="atau">
+        <span className="h-px flex-1 bg-[#E4D8C3]" aria-hidden />
+        <span className="text-[#6B5B4A]" aria-hidden>atau</span>
+        <span className="h-px flex-1 bg-[#E4D8C3]" aria-hidden />
       </div>
 
       <div className="flex justify-center w-full">

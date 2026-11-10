@@ -545,7 +545,7 @@ export default function SignUpView({
               isSelected={packageId === 'premium'} onSelect={() => onPackageChange('premium')}
             />
             <PackageCard
-              id="luxury" label="Luxury" tier="Eksklusif"
+              id="luxury" label="Luxury" tier="Terlengkap"
               desc="Masa aktif terpanjang dan tamu tanpa batas." priceLabel="Buat sendiri"
               isSelected={packageId === 'luxury'} onSelect={() => onPackageChange('luxury')}
             />

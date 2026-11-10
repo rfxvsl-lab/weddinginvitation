@@ -14,13 +14,10 @@ export default function PreviewPage() {
   return (
     <SaasPageShell>
       <section className="saas-shell pb-14 pt-16 text-center sm:pt-20">
-        <p className="saas-kicker">Koleksi tema</p>
-        <h1 className="mx-auto mt-5 max-w-[16ch] text-[40px] leading-[1.05] sm:text-[56px]">
-          Pilihan <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>desain</span> premium.
-        </h1>
+        <h1 className="mx-auto max-w-[18ch] text-[40px] leading-[1.05] sm:text-[56px]">Semua tema undangan</h1>
         <p className="mx-auto mt-6 max-w-[58ch] text-[16px] leading-[1.75]" style={{ color: "var(--saas-ink-2)" }}>
-          Pilih dan gunakan tema undangan pernikahan yang menarik serta unik. Setiap desain dirancang dengan estetika
-          premium untuk momen spesial Anda.
+          Ketuk sebuah tema untuk membukanya seperti yang dilihat tamu, lengkap dengan musik dan animasinya.
+          Paket Demo dan Reguler memakai sebagian tema; Premium dan Luxury bisa memakai semuanya.
         </p>
       </section>
 
@@ -79,13 +76,13 @@ export default function PreviewPage() {
       <section className="saas-shell pb-24">
         <div className="saas-dark-panel flex flex-col items-center gap-6 rounded-[28px] p-10 text-center sm:p-14">
           <h2 className="max-w-[22ch] text-[30px] text-white sm:text-[38px]">
-            Sudah menemukan <span className="saas-serif-i" style={{ color: "var(--saas-gold-2)" }}>the one</span>?
+            Sudah ada yang cocok?
           </h2>
           <p className="max-w-[46ch] text-[14.5px] leading-relaxed text-[#EAD9CE]">
-            Mulai kustomisasi tema pilihanmu sekarang — gratis untuk paket Demo, tanpa kartu kredit.
+            Daftar dengan paket Demo untuk mencobanya dengan nama dan foto kalian sendiri, tanpa pembayaran.
           </p>
           <Link href="/auth?mode=register" className="saas-btn-primary" style={{ background: "#FFF6F1", color: "var(--saas-wine)" }}>
-            Mulai Buat Undangan <ArrowRight size={16} />
+            Coba gratis <ArrowRight size={16} aria-hidden />
           </Link>
         </div>
       </section>

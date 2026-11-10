@@ -88,7 +88,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       <div className="min-h-screen flex items-center justify-center bg-[#050505] p-6 text-center">
         <div className="max-w-md w-full bg-[#0a0a0e] rounded-3xl p-8 border border-zinc-800/50 flex flex-col items-center relative overflow-hidden">
           {/* Decorative gradient accent */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-rose-500 to-purple-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-rose-500" />
 
           <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6">
             <Timer className="w-8 h-8 text-amber-500" />

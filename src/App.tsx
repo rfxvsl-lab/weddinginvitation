@@ -155,11 +155,6 @@ export default function App() {
 
   return (
     <div className="saas-scope saas-dash flex h-screen w-full relative overflow-hidden font-sans">
-      {/* Glow lembut memakai token wine/gold, bukan amber/zinc, agar seragam
-          dengan landing page dan alur pendaftaran. */}
-      <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[100px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.18)' }} />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[55%] h-[55%] rounded-full blur-[120px] pointer-events-none" style={{ background: 'rgba(142,47,69,0.10)' }} />
-      <div className="absolute top-[20%] right-[15%] w-[40%] h-[40%] rounded-full blur-[90px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.12)' }} />
 
 
       {/* Loading OVERLAY — sits on top, does NOT unmount the dashboard underneath */}
@@ -199,7 +194,7 @@ export default function App() {
           <header className="h-16 backdrop-blur-xl flex items-center pl-10 pr-6 shrink-0 z-20" style={{ borderBottom: '1px solid var(--saas-line)', background: 'rgba(255,255,255,0.5)' }}>
             {(() => {
               const segments: Record<string, { title: string; sub: string; icon: React.ElementType; tone: 'wine' | 'gold' }> = {
-                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, tone: 'wine' },
+                settings: { title: 'Pilih Tema', sub: 'Tampilan undangan', icon: Palette, tone: 'wine' },
                 design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, tone: 'wine' },
                 guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, tone: 'wine' },
                 analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, tone: 'wine' },

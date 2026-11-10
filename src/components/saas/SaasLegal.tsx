@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Send } from "lucide-react";
 import { SaasNav } from "@/components/saas/SaasNav";
+import { SITE, whatsappLink } from "@/lib/site";
 import { SaasFooter } from "@/components/saas/SaasClosing";
 
 export function SaasPageShell({ children }: { children: React.ReactNode }) {
@@ -37,12 +38,8 @@ export function SaasLegalShell({
             <span>/</span>
             <span>Legal</span>
           </nav>
-          <p className="saas-kicker mt-6">Dokumen legal</p>
-          <h1 className="mt-4 text-[34px] leading-[1.06] sm:text-[44px]">
-            {title}{" "}
-            <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>
-              {accent}
-            </span>
+          <h1 className="mt-6 text-[34px] leading-[1.06] sm:text-[44px]">
+            {title} {accent}
           </h1>
           <p className="mt-3 text-[11.5px] font-bold uppercase tracking-[0.14em]" style={{ color: "var(--saas-muted)" }}>
             {updated}
@@ -52,11 +49,11 @@ export function SaasLegalShell({
             <div>
               <h3 className="text-[15.5px] font-extrabold">Ada pertanyaan soal dokumen ini?</h3>
               <p className="mt-1 text-[13.5px]" style={{ color: "var(--saas-ink-2)" }}>
-                Tim kami siap menjawab setiap hari pukul 08.00–21.00 WIB.
+                Hubungi kami lewat WhatsApp, {SITE.supportHours}.
               </p>
             </div>
             <a
-              href="https://wa.me/6285731021469?text=Halo%20RuangHadir"
+              href={whatsappLink("Halo RuangHadir")}
               target="_blank"
               rel="noreferrer"
               className="saas-btn-primary shrink-0"

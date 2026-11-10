@@ -25,6 +25,8 @@ interface GuestPassSectionProps {
   dark?: boolean;
   /** Warna latar tema. Dipakai sebagai alas pekat untuk varian gelap. */
   bgColor?: string;
+  /** Naikkan di atas lapisan latar `fixed` milik template (default true). */
+  raised?: boolean;
 }
 
 /**
@@ -50,7 +52,9 @@ export default function GuestPassSection({
   accentColor,
   dark = true,
   bgColor,
+  raised = true,
 }: GuestPassSectionProps) {
+  const layer = raised ? 'relative z-[1]' : '';
   const [activeGuest, setActiveGuest] = useState<Guest | undefined>(guest);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -124,7 +128,7 @@ export default function GuestPassSection({
     <>
       {data.liveStreamUrl && (
         <section
-          className={`relative z-[1] px-4 py-10 text-center space-y-3 border-t ${dark ? 'border-zinc-900' : 'bg-white border-amber-100'}`}
+          className={`${layer} px-4 py-10 text-center space-y-3 border-t ${dark ? 'border-zinc-900' : 'bg-white border-amber-100'}`}
           style={dark ? darkSurface(bgColor, 0.6) : undefined}
         >
           <span className="text-[10px] uppercase font-bold tracking-[0.25em]" style={{ color: accentColor }}>LIVE STREAMING</span>
@@ -149,7 +153,7 @@ export default function GuestPassSection({
 
       {data.enableDigitalPass !== false && (
         <section
-          className={`relative z-[1] px-4 py-10 text-center space-y-4 border-t ${dark ? 'border-zinc-900' : 'bg-amber-50/40 border-amber-100'}`}
+          className={`${layer} px-4 py-10 text-center space-y-4 border-t ${dark ? 'border-zinc-900' : 'bg-amber-50/40 border-amber-100'}`}
           style={dark ? darkSurface(bgColor, 0.4) : undefined}
         >
           <span className="text-[10px] uppercase font-bold tracking-[0.25em]" style={{ color: accentColor }}>DIGITAL ENTRY PASS</span>

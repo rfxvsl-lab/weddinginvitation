@@ -31,6 +31,10 @@ jobs:
         # Pelanggaran lama dicatat di eslint-suppressions.json; hanya pelanggaran baru yang gagal.
         run: npm run lint
 
+      - name: Klaim dan tautan di UI
+        # Gagal bila ada angka/testimoni tanpa sumber atau tautan/aset yang tidak ada.
+        run: npm run slop
+
       - name: Unit test
         run: npm test
 

@@ -52,9 +52,9 @@ export default function UpgradePrompt({
 
   if (variant === 'banner') {
     return (
-      <div className={`relative overflow-hidden p-4 bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 border border-amber-200/60 rounded-2xl ${className}`}>
+      <div className={`relative overflow-hidden p-4 bg-orange-50 border border-amber-200/60 rounded-2xl ${className}`}>
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-amber-400 flex items-center justify-center shrink-0 shadow-sm">
             <Crown className="w-4.5 h-4.5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -71,7 +71,7 @@ export default function UpgradePrompt({
               }
             </p>
             {upgradeName && (
-              <button className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all cursor-pointer">
+              <button className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all cursor-pointer">
                 <ArrowUp className="w-3 h-3" />
                 Upgrade ke {upgradeName}
               </button>
@@ -86,7 +86,7 @@ export default function UpgradePrompt({
   return (
     <div className={`absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl ${className}`}>
       <div className="text-center p-6 max-w-xs">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg">
+        <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center mx-auto mb-3 shadow-lg">
           <Lock className="w-5 h-5 text-white" />
         </div>
         <p className="text-sm font-bold text-zinc-800 mb-1">{featureName}</p>
@@ -95,7 +95,7 @@ export default function UpgradePrompt({
           {upgradeName && ` Upgrade ke ${upgradeName} untuk mengaksesnya.`}
         </p>
         {upgradeName && (
-          <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer">
+          <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer">
             <ArrowUp className="w-3.5 h-3.5" />
             Upgrade ke {upgradeName} — Rp {upgradePrice?.mandiri.toLocaleString('id-ID')}
           </button>

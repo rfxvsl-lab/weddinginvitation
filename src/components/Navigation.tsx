@@ -56,9 +56,9 @@ export default function Navigation({ isDashboard = false }: NavigationProps) {
         <>
           <div className="hidden md:flex items-center gap-8 font-medium text-sm text-[var(--color-on-surface-variant)]">
             <Link href="/" className="hover:text-primary transition-colors">Beranda</Link>
-            <Link href="/fitur" className="hover:text-primary transition-colors">Fitur</Link>
-            <Link href="/tema" className="hover:text-primary transition-colors">Tema</Link>
-            <Link href="/harga" className="hover:text-primary transition-colors">Harga</Link>
+            <Link href="/#fitur" className="hover:text-primary transition-colors">Fitur</Link>
+            <Link href="/preview" className="hover:text-primary transition-colors">Tema</Link>
+            <Link href="/#harga" className="hover:text-primary transition-colors">Harga</Link>
           </div>
 
           <div className="flex items-center gap-4">

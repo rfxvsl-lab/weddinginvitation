@@ -304,7 +304,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
     <div className="overflow-hidden flex flex-col h-full relative">
       {/* Animated gradient mesh background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-pink-50" />
+        <div className="absolute inset-0 bg-white" />
         {/* Floating decorative orbs */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-rose-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute bottom-20 -right-20 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
@@ -393,7 +393,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* GROOM PANEL */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Groom */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-rose-500" />
                 <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
                   <span className="bg-zinc-500 text-white text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
                   <h5 className="font-bold text-zinc-800 text-sm">Mempelai Pria (Groom)</h5>
@@ -511,7 +511,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* BRIDE PANEL */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Bride */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-accent" />
                 <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
                   <span className="bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Wanita</span>
                   <h5 className="font-bold text-zinc-800 text-sm">Mempelai Wanita (Bride)</h5>
@@ -646,7 +646,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* AKAD */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Akad */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-rose-500" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
                   <h5 className="font-bold text-zinc-700 font-bold text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-zinc-500" />
@@ -732,7 +732,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* RESEPSI */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Resepsi */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary/30 via-secondary to-secondary/30" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-secondary" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
                   <h5 className="font-bold text-zinc-700 text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-secondary" />
@@ -1031,7 +1031,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </label>
             </div>
             <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-300/30 via-emerald-500 to-emerald-300/30" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
               <h5 className="font-bold text-emerald-700 text-xs flex items-center gap-1.5">
                 <ImageSquare className="w-4 h-4 text-emerald-500" /> Gambar Sampul & Latar Belakang (OG & BG Image)
               </h5>
@@ -1139,7 +1139,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
             {/* MUSIC SECTION WITH CUSTOM AUDIO FILE UPLOADER */}
             <div className="p-5 border border-zinc-200 rounded-2xl bg-violet-50/15 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-300/30 via-violet-500 to-violet-300/30" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-violet-500" />
               <h5 className="font-bold text-violet-700 text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Musik Pengiring Pernikahan (Audio MP3/WAV)
               </h5>
@@ -1220,7 +1220,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
             {/* ITUNES / APPLE MUSIC SEARCH */}
             <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-300/30 via-rose-400 to-rose-300/30" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-rose-400" />
               <h5 className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Cari Lagu dari Apple Music / iTunes
               </h5>
@@ -1405,7 +1405,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {data?.gifts?.map((gift) => (
                 <div key={gift.id} className="p-4 border border-zinc-200 rounded-2xl bg-white/10 space-y-3 relative group shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                   {/* Aksen garis gradasi atas Kado */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/20 via-accent/50 to-accent/20" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-accent/50" />
                   <button
                     type="button"
                     onClick={() => removeGiftItem(gift.id)}
@@ -1483,7 +1483,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             </div>
 
             <div className="space-y-4 p-5 border border-zinc-300 rounded-2xl bg-white shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-300 via-purple-500 to-purple-300" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-purple-500" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-semibold text-zinc-600 tracking-wide">Kata Mutiara / Quote Undangan</label>

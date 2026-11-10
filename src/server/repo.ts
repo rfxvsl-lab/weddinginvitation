@@ -348,9 +348,10 @@ export async function createInvitation(
   weddingData: WeddingData
 ): Promise<string> {
   const id = genId('inv');
-  // Generate a fallback unique slug for the new invitation
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  const fallbackSlug = `inv-${id.substring(0, 4)}-${randomSuffix}`;
+  // Slug cadangan yang unik: diturunkan dari id (genId sudah memuat waktu + acak).
+  // Versi lama memakai `inv-inv--NNNN` (hanya 9.000 kemungkinan) sehingga undangan
+  // baru bisa gagal dibuat karena bentrok dengan indeks unik invitations.slug.
+  const fallbackSlug = id.toLowerCase();
 
   await dbExecute(
     `INSERT INTO invitations (id, user_id, title, theme_id, wedding_data, slug)

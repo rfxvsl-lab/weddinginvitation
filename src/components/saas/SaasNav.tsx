@@ -3,10 +3,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { TESTIMONIALS } from "@/data/socialProof";
 
 const LINKS: [string, string][] = [
-  ["Fitur", "/#fitur"], ["Template", "/#template"], ["Cara Kerja", "/#cara-kerja"],
-  ["Harga", "/#harga"], ["Testimoni", "/#testimoni"], ["FAQ", "/#faq"],
+  ["Fitur", "/#fitur"], ["Tema", "/#template"], ["Cara kerja", "/#cara-kerja"],
+  ["Harga", "/#harga"],
+  // Tautan testimoni hanya ada bila bagiannya dirender (ada testimoni nyata).
+  ...(TESTIMONIALS.length > 0 ? ([["Testimoni", "/#testimoni"]] as [string, string][]) : []),
+  ["FAQ", "/#faq"],
 ];
 
 export function SaasNav() {

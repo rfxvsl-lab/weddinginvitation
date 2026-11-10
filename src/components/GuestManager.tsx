@@ -420,7 +420,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
       </div>
 
       {/* EXPORT DATA & PRINT CONTROL BAR */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gradient-to-r from-zinc-50 to-zinc-100/50 border border-zinc-200/60 p-4 rounded-xl animate-fadeIn">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-zinc-50 border border-zinc-200/60 p-4 rounded-xl animate-fadeIn">
         <div className="text-xs text-zinc-500">
           Menampilkan <span className="font-bold text-primary font-mono">{filteredGuests.length}</span> dari <span className="font-bold text-zinc-800 font-mono">{guests.length}</span> total tamu undangan.
         </div>
@@ -431,7 +431,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               setExportScope('filtered');
               setIsExportModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Cetak PDF / Absensi</span>
@@ -440,7 +440,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           <button
             type="button"
             onClick={() => handleExportCSV('filtered')}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
             title="Ekspor daftar tamu aktif saat ini sebagai dokumen file .csv"
           >
             <Download className="w-3.5 h-3.5" />
@@ -466,7 +466,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gradient-to-r from-zinc-50 to-zinc-100/50 text-[10px] uppercase font-bold text-zinc-500 border-b border-zinc-200">
+              <tr className="bg-zinc-50 text-[10px] uppercase font-bold text-zinc-500 border-b border-zinc-200">
                 <th className="px-5 py-3">Nama Tamu & Grup</th>
                 <th className="px-4 py-3">Kode Unik</th>
                 <th className="px-4 py-3">No. Telp</th>
@@ -499,9 +499,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                     </td>
                     <td className="px-4 py-3.5">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold ${guest.status === 'Opened'
-                          ? 'bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : guest.status === 'Sent'
-                            ? 'bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
                             : 'bg-zinc-100 text-zinc-500 border border-zinc-200'
                         }`}>
                         {guest.status === 'Opened' ? '✓ Dibuka' : guest.status === 'Sent' ? '↗ Terkirim' : '○ Draf'}
@@ -599,7 +599,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <tr>
                   <td colSpan={7} className="px-5 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200/50 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-2xl bg-zinc-100 flex items-center justify-center">
                         <Users className="w-6 h-6 text-zinc-400" />
                       </div>
                       <div>
@@ -618,9 +618,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
       {/* GLOWING MODAL SHOWING THE SELECTED GUEST TICKET QR & CHECK-IN SYSTEM SIMULATOR */}
       {selectedQRBoxGuest && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fadeIn select-none">
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-[2.5rem] p-6 max-w-sm w-full space-y-5 text-center text-zinc-100 shadow-[0_0_35px_rgba(220,38,38,0.3)] relative overflow-hidden">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-[2.5rem] p-6 max-w-sm w-full space-y-5 text-center text-zinc-100 relative overflow-hidden">
             {/* Header notch accent */}
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-650 via-red-500 to-red-650" />
+            <div className="absolute top-0 inset-x-0 h-1 bg-red-500" />
 
             <div className="flex justify-between items-center border-b border-outline-variant pb-2.5">
               <span className="text-[10px] font-mono tracking-widest text-on-surface-variant uppercase">TIKET QR & CHECK-IN DI LOKASI</span>
@@ -639,7 +639,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
             {/* Ticket QR (digenerate lokal) */}
             <div className="relative py-1.5 flex flex-col items-center">
-              <div className={`p-4 rounded-3xl bg-white relative transition-all duration-500 ${checkinOf(selectedQRBoxGuest) ? 'ring-8 ring-emerald-500/20 scale-102 shadow-[0_0_20px_rgba(16,185,129,0.3)] border-emerald-500' : 'ring-1 ring-zinc-800'
+              <div className={`p-4 rounded-3xl bg-white relative transition-all duration-500 ${checkinOf(selectedQRBoxGuest) ? 'ring-8 ring-emerald-500/20 scale-102 border-emerald-500' : 'ring-1 ring-zinc-800'
                 }`}>
                 {qrModalUrl ? (
                   <img src={qrModalUrl} alt="Guest Ticket QR" className="w-36 h-36 object-contain" />
@@ -711,7 +711,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 onClick={handleModalCheckIn}
                 className={`w-full py-3.5 rounded-2xl text-xs font-bold leading-none cursor-pointer flex items-center justify-center gap-2 border transition-all ${checkinOf(selectedQRBoxGuest) || checkInSuccess
                     ? 'bg-surface-container-low/80 border-outline-variant/80 text-on-surface-variant cursor-not-allowed'
-                    : 'bg-primary hover:bg-primary/90 border-primary text-primary-foreground shadow-[0_0_15px_rgba(220,38,38,0.25)] hover:shadow-[0_0_20px_rgba(220,38,38,0.35)]'
+                    : 'bg-primary hover:bg-primary/90 border-primary text-primary-foreground hover:'
                   }`}
               >
                 {isCheckingIn ? (

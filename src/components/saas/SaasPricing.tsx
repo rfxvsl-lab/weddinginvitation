@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Check, ShieldCheck, RefreshCw, Undo2 } from "lucide-react";
+import { Check } from "lucide-react";
+import { SITE } from "@/lib/site";
 import { PACKAGE_PRICES, PACKAGE_LIMITS, PACKAGE_NAMES, formatActiveDays, formatLimit } from "@/lib/packageLimits";
 
 const ORDER: ("demo" | "reguler" | "premium" | "luxury")[] = ["demo", "reguler", "premium", "luxury"];
@@ -10,13 +11,10 @@ export function SaasPricing() {
   return (
     <section id="harga" className="saas-shell pt-24">
       <div className="max-w-[620px]">
-        <p className="saas-kicker">Harga transparan</p>
-        <h2 className="mt-4 text-[32px] sm:text-[40px]">
-          Bayar sekali, <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>tanpa langganan</span>.
-        </h2>
+        <h2 className="text-[32px] sm:text-[40px]">Bayar sekali, tanpa langganan</h2>
         <p className="mt-4 text-[14.5px] leading-relaxed" style={{ color: "var(--saas-ink-2)" }}>
-          Mulai dari paket Demo yang gratis untuk memastikan platformnya cocok.
-          Naikkan paket kapan pun tanpa kehilangan data.
+          Harga di bawah untuk undangan yang kalian susun sendiri. Paket bisa dinaikkan kapan saja dan data
+          undangan tetap tersimpan.
         </p>
       </div>
 
@@ -38,7 +36,7 @@ export function SaasPricing() {
               style={popular ? { borderColor: "rgba(185,138,68,.45)" } : undefined}
             >
               {popular ? (
-                <span className="saas-badge mb-3 self-start" style={{ background: "var(--saas-gold)", color: "#241505" }}>Paling dipilih</span>
+                <span className="saas-badge mb-3 self-start" style={{ background: "var(--saas-gold)", color: "#241505" }}>Rekomendasi kami</span>
               ) : (
                 <span className="mb-3 block h-6" />
               )}
@@ -67,7 +65,7 @@ export function SaasPricing() {
               </ul>
               {id === "demo" ? (
                 <Link href="/preview" className="saas-btn-outline mt-6 w-full !py-3">
-                  Lihat Contoh Dulu
+                  Lihat contoh tema
                 </Link>
               ) : popular ? (
                 <Link
@@ -87,20 +85,13 @@ export function SaasPricing() {
         })}
       </div>
 
-      <div
-        className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 rounded-2xl border px-6 py-4 text-[12.5px] font-semibold"
-        style={{ borderColor: "var(--saas-line)", color: "var(--saas-ink-2)", background: "rgba(255,255,255,.6)" }}
-      >
-        <span className="flex items-center gap-2">
-          <ShieldCheck size={15} style={{ color: "var(--saas-gold)" }} aria-hidden /> Tanpa biaya tersembunyi
-        </span>
-        <span className="flex items-center gap-2">
-          <RefreshCw size={15} style={{ color: "var(--saas-gold)" }} aria-hidden /> Bisa upgrade kapan saja
-        </span>
-        <span className="flex items-center gap-2">
-          <Undo2 size={15} style={{ color: "var(--saas-gold)" }} aria-hidden /> Kebijakan pengembalian jelas
-        </span>
-      </div>
+      <p className="mt-6 text-[13px]" style={{ color: "var(--saas-ink-2)" }}>
+        Semua paket berbayar bergaransi uang kembali {SITE.refundDays} hari sejak pembayaran dikonfirmasi.{" "}
+        <Link href="/refund-policy" className="font-semibold underline underline-offset-2" style={{ color: "var(--saas-wine)" }}>
+          Baca syaratnya
+        </Link>
+        .
+      </p>
     </section>
   );
 }

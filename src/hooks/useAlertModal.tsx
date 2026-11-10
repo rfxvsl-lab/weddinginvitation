@@ -57,44 +57,44 @@ const AlertModalContext = createContext<AlertModalContextType | undefined>(undef
 const THEME: Record<AlertType, { icon: React.ReactNode; gradient: string; iconBg: string; buttonBg: string; accentColor: string }> = {
   success: {
     icon: <CheckCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-emerald-500 to-teal-500',
-    iconBg: 'bg-gradient-to-br from-emerald-500 to-teal-500',
-    buttonBg: 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600',
+    gradient: 'bg-emerald-500',
+    iconBg: 'bg-emerald-500',
+    buttonBg: 'bg-emerald-500 hover:bg-emerald-600',
     accentColor: 'emerald',
   },
   error: {
     icon: <XCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-red-500 to-rose-500',
-    iconBg: 'bg-gradient-to-br from-red-500 to-rose-500',
-    buttonBg: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600',
+    gradient: 'bg-red-500',
+    iconBg: 'bg-red-500',
+    buttonBg: 'bg-red-500 hover:bg-red-600',
     accentColor: 'red',
   },
   warning: {
     icon: <WarningCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-gradient-to-br from-amber-500 to-orange-500',
-    buttonBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
+    gradient: 'bg-amber-500',
+    iconBg: 'bg-amber-500',
+    buttonBg: 'bg-amber-500 hover:bg-amber-600',
     accentColor: 'amber',
   },
   info: {
     icon: <Info className="w-7 h-7 text-white" />,
-    gradient: 'from-blue-500 to-indigo-500',
-    iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-500',
-    buttonBg: 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
+    gradient: 'bg-blue-500',
+    iconBg: 'bg-blue-500',
+    buttonBg: 'bg-blue-500 hover:bg-blue-600',
     accentColor: 'blue',
   },
   confirm: {
     icon: <WarningCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-red-500 to-rose-500',
-    iconBg: 'bg-gradient-to-br from-red-500 to-rose-500',
-    buttonBg: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600',
+    gradient: 'bg-red-500',
+    iconBg: 'bg-red-500',
+    buttonBg: 'bg-red-500 hover:bg-red-600',
     accentColor: 'red',
   },
   upgrade: {
     icon: <Lock className="w-7 h-7 text-white" />,
-    gradient: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500',
-    buttonBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
+    gradient: 'bg-amber-500',
+    iconBg: 'bg-amber-500',
+    buttonBg: 'bg-amber-500 hover:bg-amber-600',
     accentColor: 'amber',
   },
 };
@@ -139,13 +139,12 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: (han
         style={{ animation: 'alertScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
         {/* Top gradient accent bar */}
-        <div className={`h-1.5 bg-gradient-to-r ${theme.gradient}`} />
+        <div className={`h-1.5 ${theme.gradient}`} />
 
         {/* Content */}
         <div className="px-7 pt-7 pb-6 text-center space-y-4">
           {/* Icon circle */}
-          <div className={`w-16 h-16 rounded-2xl ${theme.iconBg} flex items-center justify-center mx-auto shadow-lg`}
-            style={{ boxShadow: `0 8px 24px rgba(0,0,0,0.15)` }}
+          <div className={`w-16 h-16 rounded-2xl ${theme.iconBg} flex items-center justify-center mx-auto`}
           >
             {theme.icon}
           </div>

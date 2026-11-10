@@ -312,6 +312,9 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         accentColor={currentTheme.accentHex || currentTheme.primaryHex}
         dark={darkLayout}
         bgColor={currentTheme.bgHex}
+        // Parallax adalah satu adegan `fixed` selayar penuh. Bagian ini berada di bawahnya
+        // (seperti sebelumnya); menaikkannya akan menimpa sampul tema.
+        raised={currentTheme.layout !== 'parallax-cinematic'}
       />
     </>
   );

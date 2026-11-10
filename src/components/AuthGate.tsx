@@ -347,12 +347,6 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
   return (
     <div className="min-h-screen bg-[#F6F1EA] text-[#2B2018] flex flex-col font-sans relative selection:bg-[#8E2F45] selection:text-white overflow-hidden">
-      {/* Warm Ambient Backgrounds */}
-      <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[#EFE5D4] via-[#F6F1EA] to-transparent pointer-events-none" />
-      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-[#B98A44]/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#8E2F45]/5 blur-[150px] pointer-events-none" />
-      {/* Ornamental dot pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(#DACCB2_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
 
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16 z-10">
@@ -410,18 +404,16 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         {showWelcome && welcomeUser && (
           <div className="w-full max-w-lg saas-card p-10 animate-in fade-in zoom-in-95 duration-700 text-center space-y-6">
             <div className="relative">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 animate-in zoom-in duration-1000">
-                <CheckCircle className="w-10 h-10 text-white" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-600 flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-white" aria-hidden />
               </div>
-              <div className="absolute inset-0 w-20 h-20 mx-auto rounded-full bg-emerald-400/20 animate-ping" />
             </div>
 
             <div className="space-y-2">
-              <span className="text-[10px] tracking-[0.3em] font-bold uppercase text-[#6B5B4A] font-mono">SELAMAT DATANG DI RUANGHADIR</span>
-              <h2 className="text-3xl font-serif text-[#2B2018] tracking-tight">Halo, {welcomeUser.fullName}! 🎉</h2>
+              <h2 className="text-3xl font-serif text-[#2B2018] tracking-tight">Akun siap, {welcomeUser.fullName}</h2>
               <p className="text-sm text-[#6B5B4A] leading-relaxed">
                 Akun Anda telah aktif dengan paket <span className="font-bold text-[#2B2018]">{(welcomeUser.packageId || '').toUpperCase()}</span>.
-                Selamat memulai perjalanan membuat undangan pernikahan digital yang elegan!
+                Langkah berikutnya: pilih tema, lalu isi data acara di editor.
               </p>
             </div>
 

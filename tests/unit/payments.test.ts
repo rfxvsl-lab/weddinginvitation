@@ -182,6 +182,14 @@ test('transaksi lama tanpa kolom order_id tetap ditemukan, tanpa salah cocok', a
   assert.equal(await repo.getTransactionByOrderId('%'), null);
 });
 
+test('slug cadangan undangan baru tidak bentrok walau dibuat banyak sekaligus', async () => {
+  const { user } = await newUser('luxury', 'success');
+  const ids = await Promise.all(Array.from({ length: 300 }, () => repo.createInvitation(user.id, 'Undangan', 'rfx-dark', {} as any)));
+  assert.equal(new Set(ids).size, 300);
+  const slugs = await db.dbExecute('SELECT COUNT(DISTINCT slug) AS n FROM invitations WHERE user_id = :id', { id: user.id });
+  assert.equal(Number(slugs.rows[0].n), 301);
+});
+
 test('order_id unik', async () => {
   const { user } = await newUser('reguler', 'pending');
   await newTx(user.id, 'RU-UNIQUE-0001', 'signup', 'reguler', 35000);

@@ -33,7 +33,7 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
           Pilihan Tema Undangan
         </h3>
         <p className="text-xs text-zinc-500 font-medium max-w-xl leading-relaxed">
-          Eksplorasi koleksi palet warna eksklusif kami. Setiap tema dirancang dengan harmoni warna yang menciptakan kesan elegan, estetik, dan premium untuk hari bahagia Anda.
+          Pilih tema untuk undangan ini. Isi undangan tidak berubah saat tema diganti, dan hasilnya langsung terlihat di pratinjau.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId
                 !isAvailable
                   ? 'opacity-80 cursor-not-allowed border border-white/40'
                   : isSelected
-                  ? 'scale-[1.02] border-2 border-[var(--saas-primary)] shadow-[0_20px_50px_-12px_rgba(142,47,69,0.28)] ring-4 ring-[var(--saas-primary-soft)]'
+                  ? 'scale-[1.02] border-2 border-[var(--saas-primary)] shadow-sm ring-4 ring-[var(--saas-primary-soft)]'
                   : 'border border-white/60 hover:border-[var(--saas-gold)] hover:shadow-[0_20px_40px_-15px_rgba(36,20,24,0.12)] hover:-translate-y-1'
               } bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(36,20,24,0.06)]`}
             >

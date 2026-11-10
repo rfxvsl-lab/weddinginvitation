@@ -35,9 +35,9 @@ export default function WatermarkOverlay({ type, className = '' }: WatermarkOver
         </div>
         {/* Bottom badge — always visible */}
         <div className="fixed bottom-0 left-0 right-0 z-[9999] pointer-events-none">
-          <div className="bg-gradient-to-r from-zinc-900/90 via-zinc-800/95 to-zinc-900/90 backdrop-blur-sm px-4 py-2 flex items-center justify-center gap-2 pointer-events-auto">
+          <div className="bg-zinc-900/95 px-4 py-2 flex items-center justify-center gap-2 pointer-events-auto">
             <span className="text-[10px] text-zinc-300 font-semibold tracking-wide">
-              🔒 Demo RUANGHADIR.net — <a href="https://ruanghadir.net" className="text-amber-400 underline underline-offset-2 hover:text-amber-300">Upgrade untuk menghapus watermark</a>
+              Demo RuangHadir.net — <a href="https://ruanghadir.net" className="text-amber-400 underline underline-offset-2 hover:text-amber-300">Upgrade untuk menghapus watermark</a>
             </span>
           </div>
         </div>

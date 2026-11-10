@@ -121,7 +121,26 @@ npm run a11y -- http://localhost:3000/ http://localhost:3000/rian-salsa
 
 `perf` mengukur LCP dan ukuran unduhan pada profil HP 4G lambat; `a11y` menjalankan audit WCAG 2.1 AA (axe-core), termasuk isi iframe undangan.
 
+```bash
+npm run slop
+```
+
+`slop` memindai UI untuk klaim tanpa sumber (statistik, rating, testimoni), tautan ke halaman yang tidak ada, dan aset yang hilang; CI gagal bila ada. Kriteria lengkapnya di `.claude/skills/ui-no-slop/`.
+
+Thumbnail tema dibuat dari halaman demo (jalankan saat aplikasi hidup dan foto contoh bisa dimuat):
+
+```bash
+node scripts/theme-thumbnails.mjs http://localhost:3000
+```
+
 CI (`.github/workflows/ci.yml`) menjalankan semuanya di setiap pull request.
+
+## Skill untuk Claude Code
+
+Di `.claude/skills/`:
+
+- `ui-no-slop` — kriteria desain tanpa "AI slop" (klaim jujur, copy spesifik, visual konsisten) dan pemindainya.
+- `ui-verify` — cara membuktikan perubahan UI: screenshot sebelum/sesudah, pixel diff, audit aksesibilitas, ukur performa.
 
 ## Lisensi aset
 
