@@ -936,26 +936,26 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                 ) : (
                     <form onSubmit={handleRSVPSubmit} className="space-y-6 text-left">
                         <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
-                            <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Nama Anda</label>
-                            <input type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" placeholder="Masukkan nama lengkap" />
+                            <label htmlFor="grand-ballroom-field-1" className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Nama Anda</label>
+                            <input id="grand-ballroom-field-1" type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" placeholder="Masukkan nama lengkap" />
                         </div>
                         <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
                             <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
-                                <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Kehadiran</label>
-                                <select value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value as typeof rsvpStatus)} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors cursor-pointer">
+                                <label htmlFor="grand-ballroom-field-2" className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Kehadiran</label>
+                                <select id="grand-ballroom-field-2" value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value as typeof rsvpStatus)} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors cursor-pointer">
                                     <option value="Hadir">Hadir</option>
                                     <option value="Tidak Hadir">Tidak Hadir</option>
                                     <option value="Ragu-ragu">Ragu-ragu</option>
                                 </select>
                             </div>
                             <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
-                                <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Jumlah Pax</label>
-                                <input type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" />
+                                <label htmlFor="grand-ballroom-field-3" className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Jumlah Pax</label>
+                                <input id="grand-ballroom-field-3" type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))} className="w-full min-h-11 border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] transition-colors" />
                             </div>
                         </div>
                         <div className="bg-[var(--bg)] p-3 border border-[var(--secondary)] rounded-sm">
-                            <label className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Ucapan & Doa</label>
-                            <textarea required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3} className="w-full border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] resize-none transition-colors" placeholder="Tuliskan pesan indah Anda..." />
+                            <label htmlFor="grand-ballroom-field-4" className="block text-xs font-body text-[var(--primary)] uppercase tracking-wider mb-2 font-bold">Ucapan & Doa</label>
+                            <textarea id="grand-ballroom-field-4" required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3} className="w-full border-b-2 border-[var(--secondary)] px-2 py-2 focus:outline-none focus:border-[var(--primary)] text-base font-body bg-[var(--bg)] text-[var(--text)] resize-none transition-colors" placeholder="Tuliskan pesan indah Anda..." />
                         </div>
                         <button type="submit" className="w-full mt-6 py-4 bg-[var(--primary)] text-white font-grand text-xs tracking-[0.3em] uppercase hover:bg-[var(--text)] transition-all shadow-xl rounded-sm border border-[var(--secondary)]">
                             Kirim RSVP
@@ -1112,6 +1112,8 @@ const GrandBallroomLayout: React.FC<GrandBallroomProps> = ({ data, theme, guest,
             <button
                 onClick={toggleMusic}
                 className="fixed top-4 right-4 z-50 w-10 h-10 bg-[var(--bg)] border border-[var(--secondary)] rounded-full flex items-center justify-center text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-all"
+                aria-label={music ? 'Jeda musik' : 'Putar musik'}
+                aria-pressed={music}
             >
                 {music ? <Music className="animate-spin-slow" size={16} /> : <Play size={16} />}
             </button>

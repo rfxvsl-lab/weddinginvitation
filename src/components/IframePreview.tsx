@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 
 /** A real mobile viewport for media queries, viewport units and fixed overlays. */
 const IFRAME_SRCDOC =
-  '<!DOCTYPE html><html lang="id"><head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><body></body></html>';
+  '<!DOCTYPE html><html lang="id"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Undangan pernikahan</title></head><body></body></html>';
 
 export default function IframePreview({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);

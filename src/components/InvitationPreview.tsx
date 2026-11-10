@@ -311,6 +311,7 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         data={data}
         accentColor={currentTheme.accentHex || currentTheme.primaryHex}
         dark={darkLayout}
+        bgColor={currentTheme.bgHex}
       />
     </>
   );
@@ -509,7 +510,9 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
               ? 'bg-zinc-950 text-white border-zinc-800 shadow-[0_0_20px_rgba(245,158,11,0.25)]' 
               : 'bg-white text-amber-900 border-amber-100 hover:text-amber-700 shadow-xl'
           }`}
-        >
+                    aria-label={isPlaying ? 'Jeda musik' : 'Putar musik'}
+                    aria-pressed={isPlaying}
+                >
           {isPlaying ? (
             <div className="flex items-center justify-center relative">
               <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400/20 opacity-75 animate-ping" />
@@ -1091,8 +1094,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
                 {/* Name */}
                 <div>
-                  <label className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">Nama Tamu Pengirim</label>
-                  <input
+                  <label htmlFor="invitation-preview-field-1" className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">Nama Tamu Pengirim</label>
+                  <input id="invitation-preview-field-1"
                     type="text"
                     required
                     disabled={!!activeGuest}
@@ -1155,8 +1158,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
 
                 {/* Wishes */}
                 <div>
-                  <label className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">Ucapan & Doa Hangat</label>
-                  <textarea
+                  <label htmlFor="invitation-preview-field-2" className="block text-[11px] font-bold text-amber-600 mb-1 uppercase tracking-wider">Ucapan & Doa Hangat</label>
+                  <textarea id="invitation-preview-field-2"
                     required
                     value={rsvpWishes}
                     onChange={(e) => setRsvpWishes(e.target.value)}

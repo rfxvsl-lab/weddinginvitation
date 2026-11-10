@@ -538,8 +538,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                             className="javanese-panel p-6 javanese-border text-left space-y-4"
                         >
                             <div>
-                                <label className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Asma Jangkep</label>
-                                <input
+                                <label htmlFor="javanese-classic-field-1" className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Asma Jangkep</label>
+                                <input id="javanese-classic-field-1"
                                     type="text" required value={rsvpGuestName} onChange={(e) => setRsvpGuestName(e.target.value)} disabled={!!guest}
                                     className="w-full bg-[var(--theme-bg)] border border-[var(--theme-primary)]/30 rounded-sm px-3 py-3 text-[color:var(--theme-text)] font-modern text-base focus:border-[var(--theme-primary)] focus:outline-none disabled:opacity-80"
                                 />
@@ -561,8 +561,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Cacah Tamu</label>
-                                    <input
+                                    <label htmlFor="javanese-classic-field-2" className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Cacah Tamu</label>
+                                    <input id="javanese-classic-field-2"
                                         type="number" min="1" max={guest ? guest.paxLimit : 10} value={rsvpPaxCount} onChange={(e) => setRsvpPaxCount(Number(e.target.value))}
                                         className="w-full bg-[var(--theme-bg)] border border-[var(--theme-primary)]/30 rounded-sm px-3 py-3 text-[color:var(--theme-text)] font-modern text-base focus:border-[var(--theme-primary)] focus:outline-none"
                                     />
@@ -570,8 +570,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                             </div>
 
                             <div>
-                                <label className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Pandonga & Pangarep</label>
-                                <textarea
+                                <label htmlFor="javanese-classic-field-3" className="block font-modern text-xs text-[color:var(--theme-primary)] uppercase tracking-widest mb-1">Pandonga & Pangarep</label>
+                                <textarea id="javanese-classic-field-3"
                                     required value={rsvpWishes} onChange={(e) => setRsvpWishes(e.target.value)} rows={3}
                                     className="w-full bg-[var(--theme-bg)] border border-[var(--theme-primary)]/30 rounded-sm px-3 py-3 text-[color:var(--theme-text)] font-modern text-base focus:border-[var(--theme-primary)] focus:outline-none resize-none"
                                 />

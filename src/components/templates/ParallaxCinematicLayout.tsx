@@ -528,7 +528,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 3: AKAD & RESEPSI (SAVE THE DATE) ── */}
         <section className={`ae-scene-layer absolute top-[300vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 3 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll">
+          <div className="max-w-xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Save The Date</p>
             <h2 className="text-3xl font-serif ae-title mb-4">Hari Bahagia</h2>
 
@@ -598,7 +598,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 4: GALLERY & STORY ── */}
         <section className={`ae-scene-layer absolute top-[400vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 4 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-2xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll">
+          <div className="max-w-2xl w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Our Moments</p>
             <h2 className="text-3xl font-serif ae-title mb-6">Galeri Kenangan</h2>
 
@@ -624,7 +624,7 @@ export default function ParallaxCinematicLayout({
 
         {/* ── SCENE 5: AMPLOP & RSVP (INTERACTIVE DESK) ── */}
         <section className={`ae-scene-layer absolute top-[500vh] inset-x-0 h-screen flex flex-col items-center justify-center p-6 text-center ${activeShot === 5 ? 'in-focus' : 'out-of-focus'}`}>
-          <div className="max-w-lg w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll">
+          <div className="max-w-lg w-full ae-scene-card rounded-2xl p-5 md:p-8 flex flex-col items-center max-h-[78vh] overflow-y-auto plx-allow-scroll" tabIndex={0}>
             <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 mb-1">Doa &amp; Konfirmasi</p>
             <h2 className="text-3xl font-serif ae-title mb-4">Amplop &amp; RSVP</h2>
 
@@ -653,8 +653,8 @@ export default function ParallaxCinematicLayout({
             {/* RSVP Form */}
             <form onSubmit={handleRSVPSubmit} className="w-full space-y-3 text-left">
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Nama Anda</label>
-                <input
+                <label htmlFor="parallax-cinematic-field-1" className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Nama Anda</label>
+                <input id="parallax-cinematic-field-1"
                   type="text"
                   required
                   value={rsvpName}
@@ -666,8 +666,8 @@ export default function ParallaxCinematicLayout({
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Kehadiran</label>
-                  <select
+                  <label htmlFor="parallax-cinematic-field-2" className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Kehadiran</label>
+                  <select id="parallax-cinematic-field-2"
                     value={rsvpStatus}
                     onChange={(e) => setRsvpStatus(e.target.value as RSVP['status'])}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--theme-bg)] border border-white/10 text-xs focus:outline-none focus:border-[var(--theme-primary)] text-white"
@@ -678,8 +678,8 @@ export default function ParallaxCinematicLayout({
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Jumlah Pax</label>
-                  <input
+                  <label htmlFor="parallax-cinematic-field-3" className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Jumlah Pax</label>
+                  <input id="parallax-cinematic-field-3"
                     type="number"
                     min={1}
                     max={5}
@@ -691,8 +691,8 @@ export default function ParallaxCinematicLayout({
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Ucapan &amp; Doa</label>
-                <textarea
+                <label htmlFor="parallax-cinematic-field-4" className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-1">Ucapan &amp; Doa</label>
+                <textarea id="parallax-cinematic-field-4"
                   rows={2}
                   value={rsvpWishes}
                   onChange={(e) => setRsvpWishes(e.target.value)}
@@ -793,7 +793,8 @@ export default function ParallaxCinematicLayout({
         <button
           onClick={toggleMusic}
           className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full bg-[var(--theme-surface)] border border-[var(--theme-primary)]/40 text-[var(--theme-primary)] flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all backdrop-blur-md"
-          aria-label={isPlaying ? 'Mute Music' : 'Play Music'}
+          aria-label={isPlaying ? 'Jeda musik' : 'Putar musik'}
+          aria-pressed={isPlaying}
         >
           {isPlaying ? <Pause size={18} /> : <Play size={18} />}
         </button>

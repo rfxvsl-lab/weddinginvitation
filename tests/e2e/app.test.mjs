@@ -522,6 +522,37 @@ test('panel admin: ditolak untuk user biasa, terbuka setelah role admin diberika
     await page.reload();
     await page.getByText(other.email).first().waitFor();
 
+    // Hapus user lewat dialog konfirmasi: "Batal" tidak menghapus, "Hapus permanen" menghapus.
+    const victim = person('demo');
+    const victimSession = await newSession();
+    try {
+      await register(victimSession.page, victim);
+      await victimSession.page.waitForURL(`${BASE}/dashboard`);
+    } finally {
+      await victimSession.context.close();
+    }
+    await page.reload();
+    const deleteVictim = page.getByRole('button', { name: `Hapus pengguna ${victim.fullName} (${victim.email})` });
+    await deleteVictim.focus();
+    await page.keyboard.press('Enter');
+    const confirmDialog = page.getByRole('alertdialog', { name: 'Hapus user ini?' });
+    await confirmDialog.waitFor();
+    await confirmDialog.getByRole('button', { name: 'Batal' }).click();
+    await confirmDialog.waitFor({ state: 'detached' });
+    assert.ok(await userRow(victim.email), 'batal: user tidak terhapus');
+
+    await deleteVictim.focus();
+    await page.keyboard.press('Enter');
+    await confirmDialog.waitFor();
+    await page.keyboard.press('Escape');
+    await confirmDialog.waitFor({ state: 'detached' });
+    assert.ok(await userRow(victim.email), 'Esc: user tidak terhapus');
+
+    await deleteVictim.click();
+    await confirmDialog.getByRole('button', { name: 'Hapus permanen' }).click();
+    await waitFor(async () => !(await userRow(victim.email)), 'user terhapus setelah konfirmasi');
+    await page.getByText(victim.email).first().waitFor({ state: 'detached' });
+
     // Kontrol positif: selagi admin, action di halaman ini mengembalikan data user lain.
     const adminActions = actions.filter((act) => new URL(act.url).pathname === '/admin');
     assert.ok(adminActions.length >= 2, 'action admin terekam');

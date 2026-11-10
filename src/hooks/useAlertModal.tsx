@@ -23,7 +23,7 @@ import {
   PiArrowUpDuotone as ArrowUp,
 } from 'react-icons/pi';
 
-type AlertType = 'success' | 'error' | 'warning' | 'info' | 'upgrade';
+type AlertType = 'success' | 'error' | 'warning' | 'info' | 'upgrade' | 'confirm';
 
 interface AlertData {
   type: AlertType;
@@ -31,6 +31,15 @@ interface AlertData {
   message?: string;
   buttonText?: string;
   onAction?: () => void;
+  /** Hanya untuk type 'confirm': dipanggil dengan true (lanjut) atau false (batal). */
+  resolve?: (confirmed: boolean) => void;
+  cancelText?: string;
+}
+
+export interface ConfirmOptions {
+  /** Teks tombol lanjut, mis. "Hapus" */
+  confirmText?: string;
+  cancelText?: string;
 }
 
 interface AlertModalContextType {
@@ -39,6 +48,8 @@ interface AlertModalContextType {
   warning: (title: string, message?: string) => void;
   info: (title: string, message?: string) => void;
   upgrade: (title: string, message?: string) => void;
+  /** Pengganti window.confirm(): resolve true jika pengguna memilih lanjut. */
+  confirm: (title: string, message?: string, options?: ConfirmOptions) => Promise<boolean>;
 }
 
 const AlertModalContext = createContext<AlertModalContextType | undefined>(undefined);
@@ -72,6 +83,13 @@ const THEME: Record<AlertType, { icon: React.ReactNode; gradient: string; iconBg
     buttonBg: 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
     accentColor: 'blue',
   },
+  confirm: {
+    icon: <WarningCircle className="w-7 h-7 text-white" />,
+    gradient: 'from-red-500 to-rose-500',
+    iconBg: 'bg-gradient-to-br from-red-500 to-rose-500',
+    buttonBg: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600',
+    accentColor: 'red',
+  },
   upgrade: {
     icon: <Lock className="w-7 h-7 text-white" />,
     gradient: 'from-amber-500 to-orange-500',
@@ -81,7 +99,7 @@ const THEME: Record<AlertType, { icon: React.ReactNode; gradient: string; iconBg
   },
 };
 
-function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () => void }) {
+function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: (handled?: boolean) => void }) {
   const theme = THEME[alert.type];
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -113,6 +131,10 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
       {/* Modal */}
       <div
         ref={modalRef}
+        role={alert.type === 'confirm' ? 'alertdialog' : 'dialog'}
+        aria-modal="true"
+        aria-labelledby="alert-modal-title"
+        aria-describedby={alert.message ? 'alert-modal-message' : undefined}
         className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
         style={{ animation: 'alertScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
@@ -130,11 +152,11 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
 
           {/* Text */}
           <div className="space-y-1.5">
-            <h3 className="text-lg font-bold text-zinc-900 tracking-tight">
+            <h3 id="alert-modal-title" className="text-lg font-bold text-zinc-900 tracking-tight">
               {alert.title}
             </h3>
             {alert.message && (
-              <p className="text-sm text-zinc-500 leading-relaxed">
+              <p id="alert-modal-message" className="text-sm text-zinc-500 leading-relaxed">
                 {alert.message}
               </p>
             )}
@@ -142,10 +164,28 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
 
           {/* Action button */}
           <div className="flex gap-3 pt-2">
-            {alert.type === 'upgrade' ? (
+            {alert.type === 'confirm' ? (
               <>
                 <button
-                  onClick={onClose}
+                  type="button"
+                  onClick={() => onClose()}
+                  autoFocus
+                  className="flex-1 min-h-11 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  {alert.cancelText || 'Batal'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { alert.resolve?.(true); onClose(true); }}
+                  className={`flex-1 min-h-11 py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer`}
+                >
+                  {alert.buttonText || 'Lanjutkan'}
+                </button>
+              </>
+            ) : alert.type === 'upgrade' ? (
+              <>
+                <button
+                  onClick={() => onClose()}
                   className="flex-1 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 text-xs font-bold rounded-xl transition-all cursor-pointer"
                 >
                   Nanti Saja
@@ -181,9 +221,25 @@ export function AlertModalProvider({ children }: { children: React.ReactNode }) 
     setQueue(prev => [...prev, { type, title, message, buttonText, onAction }]);
   }, []);
 
-  const dismiss = useCallback(() => {
-    setQueue(prev => prev.slice(1));
+  /** Tutup modal teratas. Konfirmasi yang ditutup tanpa memilih "lanjut" dianggap batal. */
+  const dismiss = useCallback((handled?: boolean) => {
+    setQueue(prev => {
+      const [current, ...rest] = prev;
+      if (current?.type === 'confirm' && !handled) current.resolve?.(false);
+      return rest;
+    });
   }, []);
+
+  const confirm = useCallback(
+    (title: string, message?: string, options?: ConfirmOptions) =>
+      new Promise<boolean>((resolve) => {
+        setQueue(prev => [
+          ...prev,
+          { type: 'confirm', title, message, buttonText: options?.confirmText, cancelText: options?.cancelText, resolve },
+        ]);
+      }),
+    []
+  );
 
   const ctx: AlertModalContextType = {
     success: (title, message) => show('success', title, message),
@@ -191,6 +247,7 @@ export function AlertModalProvider({ children }: { children: React.ReactNode }) 
     warning: (title, message) => show('warning', title, message),
     info: (title, message) => show('info', title, message),
     upgrade: (title, message) => show('upgrade', title, message),
+    confirm,
   };
 
   // Register singleton
@@ -237,4 +294,6 @@ export const alertModal = {
   warning: (title: string, msg?: string) => _alertRef?.warning(title, msg),
   info: (title: string, msg?: string) => _alertRef?.info(title, msg),
   upgrade: (title: string, msg?: string) => _alertRef?.upgrade(title, msg),
+  confirm: (title: string, msg?: string, options?: ConfirmOptions) =>
+    _alertRef ? _alertRef.confirm(title, msg, options) : Promise.resolve(false),
 };

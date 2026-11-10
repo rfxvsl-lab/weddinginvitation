@@ -14,6 +14,7 @@ import {
 } from 'react-icons/pi';
 import type { SaaSUser, TransactionReport } from '../../types';
 import { PACKAGE_PRICES as PRICES } from '../../lib/packageLimits';
+import { useAlertModal } from '../../hooks/useAlertModal';
 
 interface AdminPanelViewProps {
   usersList: SaaSUser[];
@@ -95,9 +96,15 @@ function PrintModal({ tx, onClose }: { tx: TransactionReport; onClose: () => voi
 
 export default function AdminPanelView({ usersList, transactions, onApprove, onReject, onDeleteUser }: AdminPanelViewProps) {
   const [printingReport, setPrintingReport] = useState<TransactionReport | null>(null);
+  const dialog = useAlertModal();
 
   const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm('Apakah anda yakin ingin menghapus user ini dan semua data transaksinya?')) return;
+    const ok = await dialog.confirm(
+      'Hapus user ini?',
+      'Akun beserta undangan, tamu, dan riwayat transaksinya akan dihapus permanen.',
+      { confirmText: 'Hapus permanen' }
+    );
+    if (!ok) return;
     await onDeleteUser(userId);
   };
 
@@ -134,10 +141,11 @@ export default function AdminPanelView({ usersList, transactions, onApprove, onR
                 const amount = PRICES[safePackageId][usr.isCustomByRfx ? 'rfx' : 'mandiri'];
                 return (
                   <div key={usr.id} className="bg-[var(--bg-surface)] p-4 rounded-2xl border border-[var(--border-default)] space-y-3 relative group">
-                    <button onClick={() => handleDeleteUser(usr.id)}
-                      className="absolute top-3 right-3 p-1 rounded-lg hover:bg-[var(--color-danger-light)] text-[var(--text-faint)] hover:text-[var(--color-danger)] opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                    <button type="button" onClick={() => handleDeleteUser(usr.id)}
+                      aria-label={`Hapus pengguna ${usr.fullName} (${usr.email})`}
+                      className="absolute top-2 right-2 p-2.5 rounded-lg hover:bg-[var(--color-danger-light)] text-[var(--text-faint)] hover:text-[var(--color-danger)] opacity-60 [@media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition cursor-pointer"
                       title="Hapus Pengguna">
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5" aria-hidden />
                     </button>
                     <div className="space-y-0.5">
                       <h4 className="text-xs font-bold text-[var(--text-primary)] uppercase">{usr.fullName}</h4>

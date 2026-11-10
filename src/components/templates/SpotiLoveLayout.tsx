@@ -100,7 +100,7 @@ const SpotiLeaves = ({ className, delay = 0 }: { className?: string, delay?: num
         <img loading="lazy" decoding="async" 
             src="/assets/spoti-leaves.webp" 
             className="w-full h-full object-cover object-top opacity-10"
-            alt="Leaves Ornament"
+            alt=""
         />
     </motion.div>
 );
@@ -281,7 +281,7 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
         <div className="fixed bottom-0 left-0 right-0 min-h-[96px] bg-[var(--spoti-dark)] border-t border-[var(--text-sub)]/20 z-50 flex items-center justify-between gap-2 px-4 pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center gap-3 w-[35%] min-w-0">
                 <div className="relative h-14 w-14 hidden sm:block animate-spin-slow shrink-0" style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}>
-                    <img loading="lazy" decoding="async" src={cover} className="w-full h-full rounded-full object-cover shadow-lg border-2 border-[var(--spoti-dark)]" />
+                    <img loading="lazy" decoding="async" src={cover} className="w-full h-full rounded-full object-cover shadow-lg border-2 border-[var(--spoti-dark)]" alt="" />
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[var(--spoti-dark)] rounded-full border border-[#333] shadow-inner"></div>
                 </div>
                 <div className="overflow-hidden">
@@ -297,6 +297,8 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
                     <SkipBack size={20} className="text-[var(--text-sub)] hover:text-[var(--text-main)] cursor-pointer" fill="currentColor" />
                     <button
                         onClick={togglePlay}
+                        aria-label={isPlaying ? 'Jeda musik' : 'Putar musik'}
+                        aria-pressed={isPlaying}
                         className="w-11 h-11 bg-[var(--spoti-green)] text-[#121A15] rounded-full flex items-center justify-center hover:scale-105 transition shrink-0"
                     >
                         {isPlaying ? <Pause size={16} fill="black" /> : <Play size={16} fill="black" className="ml-0.5" />}
@@ -329,6 +331,8 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ activeTab, setTab, isPlaying, tog
                             e.stopPropagation();
                             setShowMenu(!showMenu);
                         }}
+                        aria-label="Menu navigasi"
+                        aria-expanded={showMenu}
                         className={`p-3 rounded-full transition cursor-pointer relative z-[70] ${showMenu ? 'text-[#121A15] bg-[var(--spoti-green)]' : 'text-[var(--text-sub)]'}`}
                     >
                         <LayoutList size={24} />
@@ -381,7 +385,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
             <div className="relative min-h-[400px] flex items-end px-5 pt-10 pb-6 md:p-8 bg-[var(--spoti-dark)] z-10">
                 <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end gap-6 w-full min-w-0">
                     <div className="w-40 h-40 md:w-52 md:h-52 shadow-xl bg-[var(--spoti-black)] shrink-0">
-                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-full h-full object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-full h-full object-cover" alt={`Foto ${DATA.couple.fullname}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -396,11 +400,12 @@ const HomePage = ({ DATA }: { DATA: any }) => {
             </div>
 
             <div className="px-6 md:px-8 py-6 flex items-center gap-6">
-                <button className="w-14 h-14 bg-[var(--spoti-green)] rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg text-black">
+                {/* Tombol hiasan bergaya pemutar musik: tidak punya aksi, jadi disembunyikan dari pembaca layar dan urutan Tab. */}
+                <div aria-hidden className="w-14 h-14 bg-[var(--spoti-green)] rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg text-black">
                     <Play size={28} fill="black" className="ml-1" />
-                </button>
-                <button className="text-[var(--spoti-green)]"><Heart size={32} fill="var(--spoti-accent)" /></button>
-                <button className="text-[var(--text-sub)] hover:text-[var(--text-main)]"><MoreHorizontal size={32} /></button>
+                </div>
+                <span aria-hidden className="text-[var(--spoti-green)]"><Heart size={32} fill="var(--spoti-accent)" /></span>
+                <span aria-hidden className="text-[var(--text-sub)] hover:text-[var(--text-main)]"><MoreHorizontal size={32} /></span>
             </div>
 
             <div className="px-6 md:px-8">
@@ -409,7 +414,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                     <div className="group flex items-center p-2 rounded hover:bg-[#ffffff]/10 transition cursor-pointer">
                         <span className="w-8 text-center text-[var(--text-sub)] group-hover:hidden">1</span>
                         <span className="w-8 text-center hidden group-hover:flex justify-center"><Play size={14} fill="white" /></span>
-                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" alt="" />
                         <div className="flex-1">
                             <p className="text-[var(--text-main)] font-medium">The Proposal</p>
                             <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
@@ -420,7 +425,7 @@ const HomePage = ({ DATA }: { DATA: any }) => {
                     <div className="group flex items-center p-2 rounded hover:bg-[#ffffff]/10 transition cursor-pointer">
                         <span className="w-8 text-center text-[var(--text-sub)] group-hover:hidden">2</span>
                         <span className="w-8 text-center hidden group-hover:flex justify-center"><Play size={14} fill="white" /></span>
-                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" />
+                        <img loading="lazy" decoding="async" src={DATA.cover} className="w-10 h-10 mr-4 rounded object-cover" alt="" />
                         <div className="flex-1">
                             <p className="text-[var(--spoti-green)] font-medium">The Wedding Day</p>
                             <p className="text-xs text-[var(--text-sub)]">{DATA.couple.groom} • {DATA.couple.bride}</p>
@@ -677,8 +682,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                 ) : (
                     <form className="space-y-4 text-left" onSubmit={handleRSVPSubmit}>
                         <div>
-                            <label className="block text-xs font-bold mb-2 text-[var(--text-sub)]">FULL NAME</label>
-                            <input
+                            <label htmlFor="spoti-love-field-1" className="block text-xs font-bold mb-2 text-[var(--text-sub)]">FULL NAME</label>
+                            <input id="spoti-love-field-1"
                                 type="text"
                                 required
                                 value={rsvpGuestName}
@@ -690,8 +695,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                         </div>
                         <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-bold mb-2 text-[var(--text-sub)]">ATTENDANCE</label>
-                                <select
+                                <label htmlFor="spoti-love-field-2" className="block text-xs font-bold mb-2 text-[var(--text-sub)]">ATTENDANCE</label>
+                                <select id="spoti-love-field-2"
                                     value={rsvpStatus}
                                     onChange={(e) => setRsvpStatus(e.target.value as any)}
                                     className="w-full bg-[var(--spoti-black)] border border-[#333] rounded p-3 text-[var(--text-main)] focus:border-[var(--spoti-green)] focus:outline-none transition appearance-none"
@@ -702,8 +707,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold mb-2 text-[var(--text-sub)]">TICKETS</label>
-                                <input
+                                <label htmlFor="spoti-love-field-3" className="block text-xs font-bold mb-2 text-[var(--text-sub)]">TICKETS</label>
+                                <input id="spoti-love-field-3"
                                     type="number"
                                     min="1"
                                     max={guest ? guest.paxLimit : 10}
@@ -714,8 +719,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold mb-2 text-[var(--text-sub)]">WISHES</label>
-                            <textarea
+                            <label htmlFor="spoti-love-field-4" className="block text-xs font-bold mb-2 text-[var(--text-sub)]">WISHES</label>
+                            <textarea id="spoti-love-field-4"
                                 required
                                 value={rsvpWishes}
                                 onChange={(e) => setRsvpWishes(e.target.value)}
@@ -845,7 +850,7 @@ const SpotiLoveLayout: React.FC<SpotiLoveProps> = ({ data, theme, guest, onAddRS
                 <Sidebar activeTab={activeTab} setTab={setActiveTab} data={data} />
 
                 {/* Content Area */}
-                <div className="flex-1 min-w-0 md:ml-64 relative z-10 h-full overflow-y-auto bg-[var(--spoti-black)]">
+                <div className="flex-1 min-w-0 md:ml-64 relative z-10 h-full overflow-y-auto bg-[var(--spoti-black)]" tabIndex={0}>
                     {activeTab === 'home' && <HomePage DATA={DATA} />}
                     {activeTab === 'event' && <EventPage data={data} />}
                     {activeTab === 'couple' && <CouplePage couple={data.couple!} cover={DATA.cover} />}

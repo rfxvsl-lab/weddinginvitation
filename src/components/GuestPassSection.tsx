@@ -23,14 +23,33 @@ interface GuestPassSectionProps {
   data: WeddingData;
   accentColor: string;
   dark?: boolean;
+  /** Warna latar tema. Dipakai sebagai alas pekat untuk varian gelap. */
+  bgColor?: string;
 }
 
+/**
+ * Latar varian gelap: warna tema yang pekat + nuansa hitam yang sama seperti
+ * sebelumnya. Dulu hanya `bg-black/40` (transparan), sehingga di tema yang
+ * iframe-nya berlatar putih (mis. Royal Arabian) bagian ini tampil abu-abu
+ * #999 dan teks emasnya nyaris tak terbaca.
+ */
+function darkSurface(bgColor: string | undefined, shade: number): React.CSSProperties {
+  return {
+    backgroundColor: bgColor || '#09090b',
+    backgroundImage: `linear-gradient(rgba(0,0,0,${shade}), rgba(0,0,0,${shade}))`,
+  };
+}
+
+// `relative z-[1]` pada setiap <section>: beberapa template punya lapisan latar `position: fixed`
+// (mis. rfx-dark: `fixed inset-0 opacity-95`). Tanpa posisi, bagian ini dilukis DI BAWAH lapisan
+// itu sehingga tiket QR tampil 95% tertutup. z-[1] tetap di bawah navigasi template (z-50).
 export default function GuestPassSection({
   invitationId,
   guest,
   data,
   accentColor,
   dark = true,
+  bgColor,
 }: GuestPassSectionProps) {
   const [activeGuest, setActiveGuest] = useState<Guest | undefined>(guest);
   const [code, setCode] = useState('');
@@ -104,7 +123,10 @@ export default function GuestPassSection({
   return (
     <>
       {data.liveStreamUrl && (
-        <section className={`px-4 py-10 text-center space-y-3 border-t ${dark ? 'bg-black/60 border-zinc-900' : 'bg-white border-amber-100'}`}>
+        <section
+          className={`relative z-[1] px-4 py-10 text-center space-y-3 border-t ${dark ? 'border-zinc-900' : 'bg-white border-amber-100'}`}
+          style={dark ? darkSurface(bgColor, 0.6) : undefined}
+        >
           <span className="text-[10px] uppercase font-bold tracking-[0.25em]" style={{ color: accentColor }}>LIVE STREAMING</span>
           <h3 className={`text-2xl font-serif ${dark ? 'text-amber-500' : 'text-amber-800'}`}>Saksikan Kami Secara Virtual</h3>
           <p className={`text-[11px] max-w-xs mx-auto ${muted}`}>Acara kami disiarkan langsung untuk kerabat yang berhalangan hadir.</p>
@@ -126,7 +148,10 @@ export default function GuestPassSection({
       )}
 
       {data.enableDigitalPass !== false && (
-        <section className={`px-4 py-10 text-center space-y-4 border-t ${dark ? 'bg-black/40 border-zinc-900' : 'bg-amber-50/40 border-amber-100'}`}>
+        <section
+          className={`relative z-[1] px-4 py-10 text-center space-y-4 border-t ${dark ? 'border-zinc-900' : 'bg-amber-50/40 border-amber-100'}`}
+          style={dark ? darkSurface(bgColor, 0.4) : undefined}
+        >
           <span className="text-[10px] uppercase font-bold tracking-[0.25em]" style={{ color: accentColor }}>DIGITAL ENTRY PASS</span>
           <h3 className={`text-2xl font-serif ${dark ? 'text-amber-500' : 'text-amber-800'}`}>Tiket Akses & Denah Meja</h3>
 

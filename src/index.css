@@ -1415,11 +1415,14 @@ textarea.saas-input { padding-left: 14px; padding-top: 12px; resize: vertical; }
 
 .saas-scope ::selection { background: var(--saas-primary-soft); color: var(--saas-primary-hover); }
 
-/* ---- Hormati preferensi gerak pengguna ---- */
+/* ---- Hormati preferensi gerak pengguna ----
+   Berlaku di seluruh aplikasi, termasuk template undangan (stylesheet ini ikut
+   disalin ke iframe undangan). Animasi langsung melompat ke keadaan akhirnya,
+   jadi elemen yang muncul dengan animasi tetap terlihat. */
 @media (prefers-reduced-motion: reduce) {
-  .saas-scope *,
-  .saas-scope *::before,
-  .saas-scope *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

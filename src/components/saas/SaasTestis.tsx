@@ -30,7 +30,7 @@ export function SaasTestis() {
         {TESTIMONIALS.map((t) => (
           <figure key={t.name} className={`saas-card saas-card-hover flex flex-col p-6 ${t.wide ? "md:col-span-2" : ""}`}>
             <div className="flex items-center justify-between">
-              <span className="flex gap-0.5" aria-label="Rating 5 dari 5">
+              <span className="flex gap-0.5" role="img" aria-label="Rating 5 dari 5">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <Star key={i} size={14} fill="var(--saas-gold)" color="var(--saas-gold)" aria-hidden />
                 ))}

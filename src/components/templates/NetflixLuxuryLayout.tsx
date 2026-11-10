@@ -160,13 +160,13 @@ const NetflixIntroStart = ({ onOpen }: { onOpen: () => void }) => {
 
 const NavBar = ({ activeTab, setTab, data }: { activeTab: string, setTab: (t: string) => void, data: WeddingData }) => {
     const items = [
-        { id: 'home', icon: Home, visible: true },
-        { id: 'quote', icon: Info, visible: !!data?.quoteText },
-        { id: 'couple', icon: User, visible: true },
-        { id: 'event', icon: Calendar, visible: (data?.events?.akad?.enabled !== false || data?.events?.resepsi?.enabled !== false) },
-        { id: 'gallery', icon: ImageIcon, visible: !!(data?.gallery && data.gallery.length > 0) },
-        { id: 'gift', icon: Gift, visible: !!(data?.gifts && data.gifts.length > 0) },
-        { id: 'rsvp', icon: Check, visible: true },
+        { id: 'home', label: 'Beranda', icon: Home, visible: true },
+        { id: 'quote', label: 'Kutipan', icon: Info, visible: !!data?.quoteText },
+        { id: 'couple', label: 'Mempelai', icon: User, visible: true },
+        { id: 'event', label: 'Acara', icon: Calendar, visible: (data?.events?.akad?.enabled !== false || data?.events?.resepsi?.enabled !== false) },
+        { id: 'gallery', label: 'Galeri', icon: ImageIcon, visible: !!(data?.gallery && data.gallery.length > 0) },
+        { id: 'gift', label: 'Amplop digital', icon: Gift, visible: !!(data?.gifts && data.gifts.length > 0) },
+        { id: 'rsvp', label: 'RSVP', icon: Check, visible: true },
     ].filter(item => item.visible);
 
     return (
@@ -178,9 +178,11 @@ const NavBar = ({ activeTab, setTab, data }: { activeTab: string, setTab: (t: st
                         <button
                             key={item.id}
                             onClick={() => setTab(item.id)}
+                            aria-label={item.label}
+                            aria-current={active ? 'page' : undefined}
                             className={`relative min-w-10 min-h-11 flex flex-col justify-center items-center gap-1 transition-colors duration-200 ${active ? 'text-[var(--netflix-text)]' : 'text-[#B3B3B3] hover:text-[var(--netflix-text)]'}`}
                         >
-                            <item.icon size={active ? 20 : 18} />
+                            <item.icon size={active ? 20 : 18} aria-hidden />
                             {active && <div className="w-5 h-0.5 bg-[var(--netflix-primary)] mt-1"></div>}
                         </button>
                     )
@@ -339,6 +341,7 @@ const HomePage = ({ onPlay, data }: { onPlay: () => void, data: WeddingData }) =
                 <img loading="lazy" decoding="async" 
                     src={getImageUrl(data?.bgImageUrl || data?.couple?.bride?.photoUrl || DEFAULT_ASSETS.defaultCover)} 
                     className="w-full h-full object-cover opacity-60" 
+                    alt=""
                     onError={(e) => { e.currentTarget.src = DEFAULT_ASSETS.defaultCover; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--netflix-bg)] via-[var(--netflix-bg)]/40 to-transparent z-[1]"></div>
@@ -1121,8 +1124,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                         >
 
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Full Name</label>
-                                <input
+                                <label htmlFor="netflix-luxury-field-1" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Full Name</label>
+                                <input id="netflix-luxury-field-1"
                                     type="text"
                                     required
                                     value={rsvpGuestName}
@@ -1152,8 +1155,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">No. of Guests</label>
-                                    <input
+                                    <label htmlFor="netflix-luxury-field-2" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">No. of Guests</label>
+                                    <input id="netflix-luxury-field-2"
                                         type="number"
                                         min="1"
                                         max={guest ? guest.paxLimit : 10}
@@ -1165,8 +1168,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                             </div>
                             
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Wishes & Prayers</label>
-                                <textarea
+                                <label htmlFor="netflix-luxury-field-3" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Wishes & Prayers</label>
+                                <textarea id="netflix-luxury-field-3"
                                     required
                                     value={rsvpWishes}
                                     onChange={(e) => setRsvpWishes(e.target.value)}
@@ -1371,6 +1374,8 @@ const NetflixLuxuryLayout: React.FC<NetflixLuxuryProps> = ({ data, theme, guest,
                 <button
                     onClick={toggleMusic}
                     className="fixed top-20 right-5 md:top-10 md:right-10 z-[60] w-11 h-11 bg-[var(--netflix-surface)] border border-white/30 rounded-sm flex items-center justify-center text-[var(--netflix-text)] hover:bg-[var(--netflix-primary)] transition-colors"
+                    aria-label={music ? 'Jeda musik' : 'Putar musik'}
+                    aria-pressed={music}
                 >
                     {music ? <Music className="animate-spin-slow" size={16} /> : <Play size={16} />}
                 </button>

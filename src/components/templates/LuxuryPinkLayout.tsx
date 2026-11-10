@@ -721,8 +721,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                 ) : (
                     <form onSubmit={handleRSVPSubmit} className="space-y-4 text-left">
                         <div>
-                            <label className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Nama Anda</label>
-                            <input
+                            <label htmlFor="luxury-pink-field-1" className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Nama Anda</label>
+                            <input id="luxury-pink-field-1"
                                 type="text"
                                 required
                                 value={rsvpGuestName}
@@ -734,8 +734,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                         </div>
                         <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Kehadiran</label>
-                                <select
+                                <label htmlFor="luxury-pink-field-2" className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Kehadiran</label>
+                                <select id="luxury-pink-field-2"
                                     value={rsvpStatus}
                                     onChange={(e) => setRsvpStatus(e.target.value as any)}
                                     className="w-full border border-[var(--secondary)] rounded-lg px-3 py-3 bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] text-base md:text-sm"
@@ -746,8 +746,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Jumlah</label>
-                                <input
+                                <label htmlFor="luxury-pink-field-3" className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Jumlah</label>
+                                <input id="luxury-pink-field-3"
                                     type="number"
                                     min="1"
                                     max={guest ? guest.paxLimit : 10}
@@ -758,8 +758,8 @@ const RSVPPage = ({ data, guest, onAddRSVP, rsvps }: RSVPPageProps) => {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Ucapan & Doa</label>
-                            <textarea
+                            <label htmlFor="luxury-pink-field-4" className="block text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">Ucapan & Doa</label>
+                            <textarea id="luxury-pink-field-4"
                                 required
                                 value={rsvpWishes}
                                 onChange={(e) => setRsvpWishes(e.target.value)}
@@ -901,7 +901,9 @@ const LuxuryPinkLayout: React.FC<LuxuryPinkProps> = ({ data, theme, guest, onAdd
                         onClick={toggleMusic}
                         className="fixed top-24 right-4 z-50 bg-[var(--primary)] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform animate-[spin_4s_linear_infinite]"
                         style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}
-                    >
+                    aria-label={isPlaying ? 'Jeda musik' : 'Putar musik'}
+                    aria-pressed={isPlaying}
+                >
                         {isPlaying ? <Music size={20} /> : <Pause size={20} />}
                     </button>
                 </>

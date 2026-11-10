@@ -30,6 +30,7 @@ import {
   getVoiceWishes,
 } from '../lib/api';
 import type { PhotoMoment, VoiceWish } from '../types';
+import { useAlertModal } from '../hooks/useAlertModal';
 
 interface LiveMomentsDockProps {
   invitationId: string;
@@ -81,6 +82,7 @@ export default function LiveMomentsDock({
 }: LiveMomentsDockProps) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>('moments');
+  const dialog = useAlertModal();
 
   const [moments, setMoments] = useState<PhotoMoment[]>([]);
   const [voices, setVoices] = useState<VoiceWish[]>([]);
@@ -189,7 +191,7 @@ export default function LiveMomentsDock({
   };
 
   const handleDeleteMoment = async (m: PhotoMoment) => {
-    if (!window.confirm('Hapus momen ini dari dinding?')) return;
+    if (!(await dialog.confirm('Hapus momen ini?', 'Foto akan hilang dari dinding momen tamu.', { confirmText: 'Hapus' }))) return;
     setMoments((prev) => prev.filter((x) => x.id !== m.id));
     try {
       await deletePhotoMoment(m.id);
@@ -298,7 +300,7 @@ export default function LiveMomentsDock({
   };
 
   const handleDeleteVoice = async (v: VoiceWish) => {
-    if (!window.confirm('Hapus ucapan suara ini?')) return;
+    if (!(await dialog.confirm('Hapus ucapan suara ini?', undefined, { confirmText: 'Hapus' }))) return;
     setVoices((prev) => prev.filter((x) => x.id !== v.id));
     try {
       await deleteVoiceWish(v.id);

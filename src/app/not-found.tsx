@@ -24,7 +24,6 @@ export default function NotFound() {
         <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12.5px] font-semibold" style={{ color: "var(--saas-muted)" }}>
           <Link href="/#harga" className="hover:underline">Harga</Link>
           <Link href="/#faq" className="hover:underline">FAQ</Link>
-          <Link href="/contact" className="hover:underline">Kontak</Link>
           <Link href="/auth" className="hover:underline">Masuk</Link>
         </div>
       </main>

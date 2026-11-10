@@ -5,7 +5,7 @@ import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
 import { AlertModalProvider } from '../hooks/useAlertModal';
 import '../index.css';
-import { Toaster } from "../components/ui/toaster";
+import { MotionProvider } from '../components/providers/MotionProvider';
 
 const dmSerif = DM_Serif_Display({
   variable: "--font-serif",
@@ -86,11 +86,10 @@ export default function RootLayout({
           <ToastProvider>
             <AlertModalProvider>
               <AuthProvider>
-                {children}
+                <MotionProvider>{children}</MotionProvider>
               </AuthProvider>
             </AlertModalProvider>
           </ToastProvider>
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>

@@ -579,8 +579,9 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                          onClick={() => { navigator.clipboard.writeText(gift.accountNumber); setCopiedGiftIdx(idx); setTimeout(() => setCopiedGiftIdx(null), 2000); }}
                          className="absolute bottom-6 right-6 hover:text-white transition-colors text-[10px] font-bold"
                          style={{ color: copiedGiftIdx === idx ? '#10b981' : 'var(--theme-primary)' }}
+                         aria-label={copiedGiftIdx === idx ? 'Nomor rekening tersalin' : 'Salin nomor rekening'}
                        >
-                         {copiedGiftIdx === idx ? '✓ Tersalin' : <Copy size={18} />}
+                         {copiedGiftIdx === idx ? '✓ Tersalin' : <Copy size={18} aria-hidden />}
                        </button>
                     )}
                   </div>
@@ -619,8 +620,9 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
               ) : (
                 <div className="space-y-5 relative z-10">
                   <div>
-                    <label className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Nama Lengkap</label>
+                    <label htmlFor="dl-rsvp-name" className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Nama Lengkap</label>
                     <input
+                      id="dl-rsvp-name"
                       type="text"
                       required
                       value={rsvpGuestName}
@@ -632,8 +634,9 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Kehadiran</label>
+                      <label htmlFor="dl-rsvp-status" className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Kehadiran</label>
                       <select
+                      id="dl-rsvp-status"
                         value={rsvpStatus}
                         onChange={(e) => setRsvpStatus(e.target.value as any)}
                         className="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded px-4 py-3 text-sm text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors appearance-none"
@@ -644,8 +647,9 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                       </select>
                     </div>
                     <div>
-                      <label className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Jumlah Tamu</label>
+                      <label htmlFor="dl-rsvp-pax" className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Jumlah Tamu</label>
                       <input
+                      id="dl-rsvp-pax"
                         type="number"
                         min="1"
                         max={guest ? guest.paxLimit : 10}
@@ -656,8 +660,9 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                     </div>
                   </div>
                   <div>
-                    <label className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Ucapan & Doa</label>
+                    <label htmlFor="dl-rsvp-wishes" className={`${theme.fontSans} block text-xs uppercase tracking-widest text-[var(--theme-muted)] mb-2`}>Ucapan & Doa</label>
                     <textarea
+                      id="dl-rsvp-wishes"
                       required
                       value={rsvpWishes}
                       onChange={(e) => setRsvpWishes(e.target.value)}
@@ -727,7 +732,10 @@ const DarkLuxuryLayout = ({ data, theme, guest, onAddRSVP, rsvps, embedded = fal
                 <MapPin size={22} />
               </button>
               <div className="w-[1px] h-8 bg-white/10 mx-2"></div>
-              <button onClick={toggleMusic} className="relative flex items-center justify-center p-2 rounded-full transition-all hover:scale-110" style={{ color: 'var(--theme-primary)' }}>
+              <button onClick={toggleMusic} className="relative flex items-center justify-center p-2 rounded-full transition-all hover:scale-110" style={{ color: 'var(--theme-primary)' }}
+                    aria-label={isPlaying ? 'Jeda musik' : 'Putar musik'}
+                    aria-pressed={isPlaying}
+                >
                 {isPlaying && (
                   <span className="absolute inset-0 rounded-full border border-[var(--theme-primary)] animate-ping opacity-20"></span>
                 )}

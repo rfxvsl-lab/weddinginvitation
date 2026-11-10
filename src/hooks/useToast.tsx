@@ -212,6 +212,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Toast Container */}
       <div
         aria-live="polite"
+        role="region"
         aria-label="Notifikasi"
         style={{
           position: 'fixed',
