@@ -62,6 +62,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Vercel menolak middleware Edge untuk project ini — pakai runtime Node.js
+  runtime: 'nodejs',
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
