@@ -86,14 +86,20 @@ export function SaasVideoStudio() {
   const activeTheme =
     VIDEO_THEMES.find((t) => t.id === themeId) || VIDEO_THEMES[0];
   const sampleCouple = DEMO_SAMPLES[themeId];
-  const currentSceneIdx = Math.min(3, Math.floor(frame / 90));
+  const currentSceneIdx = Math.min(3, Math.floor((frame / VIDEO_TOTAL_FRAMES) * 4));
 
   useEffect(() => {
     if (!isPlaying) return;
-    const id = window.setInterval(() => {
-      setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
-    }, Math.round(1000 / VIDEO_FPS));
-    return () => window.clearInterval(id);
+    let rafId = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dtSec = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      setFrame((prev) => (prev + dtSec * VIDEO_FPS) % VIDEO_TOTAL_FRAMES);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [isPlaying]);
 
   return (
@@ -134,7 +140,7 @@ export function SaasVideoStudio() {
                     Sampel Aktif: {activeTheme.name}
                   </span>
                   <span className="font-mono text-[11.5px] font-semibold text-[#007AFF] tabular">
-                    TC {formatTimecode(frame)} · 30fps
+                    TC {formatTimecode(Math.floor(frame))} · 30fps
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -225,7 +231,7 @@ export function SaasVideoStudio() {
                       </button>
                     </div>
                     <span className="font-mono text-[10.5px] font-semibold tracking-wider text-white/90 tabular">
-                      {formatTimecode(frame)} / 00:12:00
+                      {formatTimecode(Math.floor(frame))} / 00:12:00
                     </span>
                   </div>
                 </div>

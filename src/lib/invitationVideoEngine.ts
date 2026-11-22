@@ -33,14 +33,14 @@ export interface VideoThemeMeta {
 }
 
 export const VIDEO_FPS = 30;
-export const VIDEO_DURATION_SEC = 12;
-export const VIDEO_TOTAL_FRAMES = VIDEO_FPS * VIDEO_DURATION_SEC; // 360 frames
+export const VIDEO_DURATION_SEC = 18;
+export const VIDEO_TOTAL_FRAMES = VIDEO_FPS * VIDEO_DURATION_SEC; // 540 frames
 
 export const VIDEO_SCENES = [
-  { id: 0, label: '01 · Opening Theme', start: 0, end: 90 },
-  { id: 1, label: '02 · Mempelai', start: 90, end: 180 },
-  { id: 2, label: '03 · Jadwal & Venue', start: 180, end: 270 },
-  { id: 3, label: '04 · Save The Date', start: 270, end: 360 },
+  { id: 0, label: '01 · Opening Gate', start: 0, end: 135 },
+  { id: 1, label: '02 · Polaroid Mempelai', start: 135, end: 270 },
+  { id: 2, label: '03 · Kartu Undangan', start: 270, end: 405 },
+  { id: 3, label: '04 · Golden Finale', start: 405, end: 540 },
 ] as const;
 
 export const VIDEO_THEMES: VideoThemeMeta[] = [
@@ -48,8 +48,8 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     id: 'javanese-classic',
     name: 'Javanese Classic',
     shortName: 'Javanese Classic',
-    tagline: 'Sogan #F8F0DF · Gunungan · Flower Orbit · Soga #8A452C',
-    techniques: ['Real Gunungan Asset', 'Corner Trim Paths', 'Track Matte'],
+    tagline: 'Painterly Pendopo · Gunungan · Volumetric Sunbeams · #F8F0DF / #8A452C',
+    techniques: ['2.5D Camera Push-In', 'Volumetric God Rays', 'Polaroid Keepsakes', 'Golden Fireflies'],
     swatch: ['#F8F0DF', '#C59C62', '#8A452C'],
     accent: '#8A452C',
     isDark: false,
@@ -58,8 +58,8 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     id: 'grand-ballroom',
     name: 'Grand Ballroom',
     shortName: 'Grand Ballroom',
-    tagline: 'Ice Marble #F3F6FA · Curtain Reveal · Chandelier · Slate #345579',
-    techniques: ['Curtain Reveal', 'Chandelier Sway', 'Marble Frame'],
+    tagline: 'Neoclassical Palace · Parting Curtains · Chandelier Rays · #F3F6FA / #345579',
+    techniques: ['2.5D Camera Push-In', 'Velvet Curtain Reveal', 'Diegetic Marble Note', 'Crystal Bokeh'],
     swatch: ['#F3F6FA', '#8FA8C2', '#345579'],
     accent: '#345579',
     isDark: false,
@@ -68,8 +68,8 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     id: 'luxury-pink',
     name: 'Luxury Love Pink',
     shortName: 'Luxury Pink',
-    tagline: 'Blush #FCF3F6 · 3D Envelope Open · Arched Frame · Rose #A83D68',
-    techniques: ['3D Envelope Flap', 'Card Rise Physics', 'Arch Trim Path'],
+    tagline: 'Parisian Rose Conservatory · 3D Wax Envelope · Sunset Halo · #FCF3F6 / #A83D68',
+    techniques: ['2.5D Camera Push-In', '3D Wax-Seal Envelope', 'Sun-Flare Match Cut', 'Rose Petals 60fps'],
     swatch: ['#FCF3F6', '#D99AB3', '#A83D68'],
     accent: '#A83D68',
     isDark: false,

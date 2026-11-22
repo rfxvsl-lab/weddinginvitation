@@ -95,18 +95,16 @@ export default function VideoInvitationStudio({
     return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials, heroPhoto, groomPhoto, bridePhoto };
   }, [wedding, slug]);
 
-  // 30fps live timeline loop
+  // Smooth 60fps interpolated timeline loop synced to 30fps video frames
   useEffect(() => {
     if (!isPlaying || isRendering) return;
     let rafId = 0;
     let last = performance.now();
-    const stepMs = 1000 / VIDEO_FPS;
 
     const tick = (now: number) => {
-      if (now - last >= stepMs) {
-        last = now;
-        setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
-      }
+      const dtSec = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      setFrame((prev) => (prev + dtSec * VIDEO_FPS) % VIDEO_TOTAL_FRAMES);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -198,7 +196,7 @@ export default function VideoInvitationStudio({
     setTimeout(() => setCopiedSpec(false), 2200);
   };
 
-  const currentSceneIdx = Math.min(3, Math.floor(frame / 90));
+  const currentSceneIdx = Math.min(3, Math.floor((frame / VIDEO_TOTAL_FRAMES) * 4));
 
   return (
     <div className="space-y-6 pb-8">
@@ -251,7 +249,7 @@ export default function VideoInvitationStudio({
               </p>
             </div>
             <span className="rounded-full bg-[#1D1D1F]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[#1D1D1F] tabular">
-              TC {formatTimecode(frame)} / 00:12:00
+              TC {formatTimecode(Math.floor(frame))} / 00:12:00
             </span>
           </div>
 
