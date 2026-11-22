@@ -1,8 +1,11 @@
+'use client';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useWeddingData } from './hooks/useWeddingData';
 import AuthGate from './components/AuthGate';
 import DashboardSidebar from './components/DashboardSidebar';
+import DashboardOverview from './components/DashboardOverview';
 import EditorPanel from './components/EditorPanel';
 import GuestManager from './components/GuestManager';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -11,354 +14,459 @@ import InvitationPreview from './components/InvitationPreview';
 import IframePreview from './components/IframePreview';
 import PublishModal from './components/PublishModal';
 import ProfilePanel from './components/ProfilePanel';
-import { Eye, Heart, Loader2, RefreshCw, Palette, PenLine, Users, BarChart3, UserCircle, Crown } from 'lucide-react';
 import UpgradePanel from './components/UpgradePanel';
-import { SaaSUser } from './types';
+import {
+  Menu,
+  Eye,
+  Heart,
+  Loader2,
+  RefreshCw,
+  Copy,
+  Check,
+  ExternalLink,
+  PanelRightClose,
+  PanelRightOpen,
+  Maximize2,
+  X,
+} from 'lucide-react';
+
+type DashboardSegment =
+  | 'overview'
+  | 'design'
+  | 'settings'
+  | 'guests'
+  | 'analytics'
+  | 'profile'
+  | 'upgrade';
+
+const SEGMENT_META: Record<DashboardSegment, { title: string; sub: string }> = {
+  overview: { title: 'Ringkasan', sub: 'Status undangan & metrik utama' },
+  design: { title: 'Editor Undangan', sub: 'Konten mempelai, acara, galeri & amplop' },
+  settings: { title: 'Koleksi Tema', sub: 'Pilih tampilan & tata letak undangan' },
+  guests: { title: 'Daftar Tamu', sub: 'Nama personal, link WhatsApp & QR check-in' },
+  analytics: { title: 'Analitik & RSVP', sub: 'Kunjungan & konfirmasi kehadiran tamu' },
+  profile: { title: 'Profil & Pengaturan', sub: 'Informasi akun & tautan undangan' },
+  upgrade: { title: 'Paket & Enterprise', sub: 'Status Full Gratis & akses perusahaan' },
+};
 
 export default function App() {
   const auth = useAuth();
   const wedding = useWeddingData();
 
-  const [activeSegment, setActiveSegment] = useState<'design' | 'guests' | 'analytics' | 'settings' | 'profile' | 'upgrade'>('settings');
-  const [isPreviewGuestMode, setIsPreviewGuestMode] = useState(false);
+  const [activeSegment, setActiveSegment] = useState<DashboardSegment>('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showRightPreview, setShowRightPreview] = useState(true);
+  const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
   const [previewThemeId, setPreviewThemeId] = useState<string | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+  const [copiedSlug, setCopiedSlug] = useState(false);
 
-  // Force refresh preview (re-creates IframePreview + recalculates scale)
-  const refreshPreview = useCallback(() => {
-    setPreviewKey(prev => prev + 1);
-    // Recalculate scale after a tick so layout has settled
-    setTimeout(() => {
-      const container = previewContainerRef.current;
-      if (!container) return;
-      const { width, height } = container.getBoundingClientRect();
-      const phoneW = 375 + 28 + 8;
-      const phoneH = 812 + 28 + 8;
-      const scaleX = width / phoneW;
-      const scaleY = height / phoneH;
-      setPreviewScale(Math.max(Math.min(scaleX, scaleY, 1), 0.3));
-    }, 200);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = useState(0.72);
+
+  const calcPreviewScale = useCallback(() => {
+    const container = previewContainerRef.current;
+    if (!container) return;
+    const { width, height } = container.getBoundingClientRect();
+    const phoneW = 375 + 24;
+    const phoneH = 812 + 24;
+    const scaleX = (width - 24) / phoneW;
+    const scaleY = (height - 24) / phoneH;
+    setPreviewScale(Math.max(Math.min(scaleX, scaleY, 0.92), 0.35));
   }, []);
 
-  // Load user data whenever auth.currentUser becomes available
-  // This handles page refresh / session restore (not just fresh login)
+  const refreshPreview = useCallback(() => {
+    setPreviewKey((prev) => prev + 1);
+    setTimeout(calcPreviewScale, 150);
+  }, [calcPreviewScale]);
+
+  // Auto-load user data whenever auth.currentUser becomes available
   useEffect(() => {
     if (auth.currentUser && !wedding.invitation && !wedding.isLoading) {
-      console.log('[DEBUG] 🔄 Auto-loading user data for restored session:', auth.currentUser.id);
       wedding.loadUserData(auth.currentUser);
     }
   }, [auth.currentUser, wedding.invitation, wedding.isLoading]);
 
-  // Auto-refresh preview + recalculate scale when data finishes loading
+  // Refresh preview when invitation finishes loading
   useEffect(() => {
     if (wedding.invitation && !wedding.isLoading) {
-      // Data is ready — refresh preview and recalculate scale
-      // Multiple delays to catch layout settling at different speeds
-      const t1 = setTimeout(refreshPreview, 100);
-      const t2 = setTimeout(refreshPreview, 500);
-      const t3 = setTimeout(refreshPreview, 1500);
-      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+      const t1 = setTimeout(refreshPreview, 120);
+      const t2 = setTimeout(refreshPreview, 650);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
-  }, [wedding.invitation?.id]); // Only when invitation ID changes (null → loaded)
+  }, [wedding.invitation?.id]);
 
-
-  // Preview auto-scale: mengukur container lalu hitung scale agar mockup 375x812 muat
-  const previewContainerRef = useRef<HTMLDivElement>(null);
-  const [previewScale, setPreviewScale] = useState(0.5); // Safe default — never start at 0
-
+  // Keep phone preview scaled cleanly on resize or toggle
   useEffect(() => {
     const container = previewContainerRef.current;
     if (!container) return;
-
-    const calcScale = () => {
-      const { width, height } = container.getBoundingClientRect();
-      // Ukuran native mockup (termasuk border 14px * 2 = 28px per sisi)
-      const phoneW = 375 + 28 + 8; // + ring
-      const phoneH = 812 + 28 + 8;
-      const scaleX = width / phoneW;
-      const scaleY = height / phoneH;
-      // Minimum 0.3 agar mockup tidak pernah invisible
-      const newScale = Math.max(Math.min(scaleX, scaleY, 1), 0.3);
-      setPreviewScale(newScale);
-    };
-
-    // Delay sedikit untuk memastikan layout sudah settle setelah transisi
-    const initTimer = setTimeout(calcScale, 100);
-    
-    const observer = new ResizeObserver(calcScale);
+    const initTimer = setTimeout(calcPreviewScale, 80);
+    const observer = new ResizeObserver(calcPreviewScale);
     observer.observe(container);
     return () => {
       clearTimeout(initTimer);
       observer.disconnect();
     };
-  }, []);
-  
+  }, [showRightPreview, calcPreviewScale]);
+
   if (!auth.currentUser) {
     return (
-      <AuthGate onLoginSuccess={(user) => {
-        auth.setCurrentUser(user);
-        wedding.loadUserData(user);
-      }} />
+      <AuthGate
+        onLoginSuccess={(user) => {
+          auth.setCurrentUser(user);
+          wedding.loadUserData(user);
+        }}
+      />
     );
   }
 
-  // Block pending-payment users from accessing dashboard
-  if (auth.currentUser.paymentStatus === 'pending' && auth.currentUser.packageId !== 'demo') {
-    return (
-      <AuthGate onLoginSuccess={(user) => {
-        auth.setCurrentUser(user);
-        wedding.loadUserData(user);
-      }} />
-    );
-  }
+  const slug = wedding.invitation?.slug || auth.currentUser.activeSlug || '';
+  const isPublished = Boolean(wedding.invitation?.isPublished);
+  const segMeta = SEGMENT_META[activeSegment];
 
-  // Menghitung timer secara global (Account-level) berdasarkan seluruh project
-  const getAccountTimer = () => {
-    if (!wedding.allInvitations || wedding.allInvitations.length === 0) {
-      return { activatedAt: wedding.invitation?.activatedAt, expiresAt: wedding.invitation?.expiresAt };
-    }
-    
-    // Cari yang sudah aktif
-    const activeInvs = wedding.allInvitations.filter(inv => inv.activatedAt);
-    
-    if (activeInvs.length === 0) {
-      return { activatedAt: wedding.invitation?.activatedAt, expiresAt: wedding.invitation?.expiresAt };
-    }
-    
-    // Gunakan project yang paling pertama diaktifkan sebagai sumber kebenaran (Source of Truth)
-    // untuk timer Akun. Ini mencegah progress bar dan waktu out-of-sync jika project baru mendapat +90 hari.
-    const earliestActivated = activeInvs.reduce((earliest, inv) => {
-      if (!earliest.activatedAt || !inv.activatedAt) return earliest;
-      return new Date(inv.activatedAt) < new Date(earliest.activatedAt) ? inv : earliest;
-    }, activeInvs[0]);
-    
-    // Jika ada perpanjangan masa aktif (extend), kita bisa cek expiresAt terlama
-    // Tapi kita harus pastikan activatedAt-nya menyesuaikan durasi paket aslinya (agar progress bar proporsional)
-    // Untuk saat ini yang paling aman & akurat adalah menggunakan sepasang tanggal dari project utama:
-    return { activatedAt: earliestActivated.activatedAt, expiresAt: earliestActivated.expiresAt };
+  const handleCopyLink = () => {
+    if (!slug) return;
+    navigator.clipboard?.writeText(`https://ruanghadir.net/${slug}`);
+    setCopiedSlug(true);
+    setTimeout(() => setCopiedSlug(false), 1800);
   };
 
-  const accountTimer = getAccountTimer();
-
   return (
-    <div className="saas-scope saas-dash flex h-screen w-full relative overflow-hidden font-sans">
-      {/* Glow lembut memakai token wine/gold, bukan amber/zinc, agar seragam
-          dengan landing page dan alur pendaftaran. */}
-      <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[100px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.18)' }} />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[55%] h-[55%] rounded-full blur-[120px] pointer-events-none" style={{ background: 'rgba(142,47,69,0.10)' }} />
-      <div className="absolute top-[20%] right-[15%] w-[40%] h-[40%] rounded-full blur-[90px] pointer-events-none" style={{ background: 'rgba(198,161,91,0.12)' }} />
-
-
-      {/* Loading OVERLAY — sits on top, does NOT unmount the dashboard underneath */}
+    <div className="saas-scope flex h-screen w-full overflow-hidden bg-[#F8F6F2] text-[#1C1614] font-sans">
+      {/* Loading Overlay */}
       {wedding.isLoading && (
-        <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center pointer-events-auto" style={{ background: 'rgba(250,246,240,0.9)' }}>
-          <div className="text-center space-y-4 animate-pulse">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--saas-primary)' }} />
-            <p className="text-sm font-bold font-mono uppercase tracking-widest" style={{ color: 'var(--saas-ink-2)' }}>Memuat Workspace...</p>
-          </div>
-        </div>
-      )}
-
-      
-      {/* LEFT PANEL - DASHBOARD SIDEBAR */}
-      {!isPreviewGuestMode && (
-        <DashboardSidebar
-          activeSegment={activeSegment}
-          setActiveSegment={(s: string) => setActiveSegment(s as any)}
-          user={auth.currentUser}
-          onLogout={auth.logout}
-          onPublish={() => setShowPublishModal(true)}
-          activatedAt={accountTimer.activatedAt}
-          expiresAt={accountTimer.expiresAt}
-          currentInvitationId={wedding.invitation?.id}
-          allInvitations={wedding.allInvitations}
-          onSwitchInvitation={wedding.switchInvitation}
-          onCreateInvitation={wedding.createNewInvitation}
-          onUpdateSlug={wedding.updateInvitationSlug}
-        />
-      )}
-
-      {/* MIDDLE PANEL - EDITOR/CONTENT */}
-      {!isPreviewGuestMode && (
-        <div className="flex-1 flex flex-col backdrop-blur-3xl overflow-hidden relative shadow-[20px_0_40px_-15px_rgba(36,20,24,0.06)] z-10 rounded-l-[2.5rem] ml-1 my-1" style={{ background: 'rgba(255,255,255,0.66)', borderRight: '1px solid var(--saas-line)' }}>
-          
-          {/* Header Top Bar */}
-          <header className="h-16 backdrop-blur-xl flex items-center pl-10 pr-6 shrink-0 z-20" style={{ borderBottom: '1px solid var(--saas-line)', background: 'rgba(255,255,255,0.5)' }}>
-            {(() => {
-              const segments: Record<string, { title: string; sub: string; icon: React.ElementType; tone: 'wine' | 'gold' }> = {
-                settings: { title: 'Pilih Tema', sub: 'Koleksi palet eksklusif', icon: Palette, tone: 'wine' },
-                design: { title: 'Desain Undangan', sub: 'Editor konten utama', icon: PenLine, tone: 'wine' },
-                guests: { title: 'Daftar Tamu', sub: 'Kelola undangan & QR', icon: Users, tone: 'wine' },
-                analytics: { title: 'Statistik RSVP', sub: 'Monitor kunjungan real-time', icon: BarChart3, tone: 'wine' },
-                profile: { title: 'Profil Anda', sub: 'Akun & pengaturan', icon: UserCircle, tone: 'wine' },
-                upgrade: { title: 'Upgrade Akun', sub: 'Tingkatkan paket Anda', icon: Crown, tone: 'gold' },
-              };
-              const seg = segments[activeSegment] || segments.settings;
-              const Icon = seg.icon;
-              const gold = seg.tone === 'gold';
-              return (
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center"
-                    style={{
-                      background: gold ? 'var(--saas-gold-soft)' : 'var(--saas-primary-soft)',
-                      color: gold ? '#8A6428' : 'var(--saas-primary)',
-                    }}
-                  >
-                    <Icon className="w-4.5 h-4.5" />
-                  </div>
-                  <div>
-                    <h2 className="saas-ui-title text-sm font-bold" style={{ color: 'var(--saas-ink)' }}>{seg.title}</h2>
-                    <p className="text-[10px] font-medium" style={{ color: 'var(--saas-muted)' }}>{seg.sub}</p>
-                  </div>
-                </div>
-              );
-            })()}
-          </header>
-
-          {/* Area Konten Panel Tengah */}
-          <div className="flex-1 overflow-hidden relative">
-            {activeSegment === 'settings' && (
-              <div className="h-full overflow-y-auto bg-transparent p-6 md:p-8">
-                <ThemeSelector 
-                  currentThemeId={wedding.themeId} 
-                  onSelectTheme={(id) => {
-                    setPreviewThemeId(id);
-                    wedding.setThemeId(id);
-                  }}
-                  packageId={auth.currentUser?.packageId || 'demo'}
-                />
-              </div>
-            )}
-            {activeSegment === 'design' && (
-              <div className="h-full overflow-y-auto">
-                <EditorPanel data={wedding.weddingData} onChange={wedding.setWeddingData} packageId={auth.currentUser?.packageId || 'demo'} />
-              </div>
-            )}
-            {activeSegment === 'guests' && (
-              <div className="h-full overflow-y-auto p-6">
-                <GuestManager 
-                  guests={wedding.guests || []}
-                  onAddGuest={wedding.addGuest}
-                  onRemoveGuest={wedding.removeGuest}
-                  onUpdateGuestStatus={wedding.updateGuestStatus}
-                  appUrl={process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://ruanghadir.net')}
-                  slug={wedding.invitation?.slug || auth.currentUser?.activeSlug || 'demo'}
-                  coupleNames={wedding.weddingData.couple.bride.nickname + ' & ' + wedding.weddingData.couple.groom.nickname}
-                />
-              </div>
-            )}
-            {activeSegment === 'analytics' && (
-              <div className="h-full overflow-y-auto p-6">
-                <AnalyticsDashboard 
-                  analytics={wedding.analytics}
-                  rsvps={wedding.rsvps}
-                  onDeleteRSVP={wedding.deleteRSVP}
-                  onSimulateGuestRSVP={async () => {}}
-                  onSimulatePageView={async () => {}}
-                />
-              </div>
-            )}
-            {activeSegment === 'profile' && (
-              <ProfilePanel wedding={wedding} />
-            )}
-            {activeSegment === 'upgrade' && (
-              <div className="h-full overflow-y-auto">
-                <UpgradePanel
-                  user={auth.currentUser}
-                  activatedAt={wedding.invitation?.activatedAt}
-                  expiresAt={wedding.invitation?.expiresAt}
-                  invitationId={wedding.invitation?.id}
-                  onSuccess={(updatedUser) => { auth.setCurrentUser(updatedUser); wedding.loadUserData(updatedUser); }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* RIGHT PANEL - LIVE PREVIEW */}
-      <div className={`${isPreviewGuestMode ? 'w-full flex' : 'hidden md:flex w-[400px] xl:w-[450px] shrink-0'} bg-transparent flex-col relative my-1 mr-1 rounded-r-[2.5rem] overflow-hidden`}>
-        
-        {/* Header Preview */}
-        <div className="p-4 backdrop-blur-xl flex justify-between items-start z-10" style={{ borderBottom: '1px solid var(--saas-line)', background: 'rgba(255,255,255,0.5)' }}>
-          <div>
-            <h3 className="saas-ui-title text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--saas-ink)' }}>
-              {isPreviewGuestMode ? 'Mode Layar Penuh' : 'Live Preview'}
-            </h3>
-            <p className="text-[10px] font-medium mt-1 leading-tight max-w-[220px]" style={{ color: 'var(--saas-muted)' }}>
-              *Tampilan preview mungkin sedikit bergeser/kurang presisi. Hasil yang di-publish akan 100% sempurna.
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#FAF6F0]/90 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-7 w-7 animate-spin text-[#8E2F45]" />
+            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#5C4E45]">
+              Memuat Workspace…
             </p>
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            <button
-              onClick={refreshPreview}
-              className="p-2 rounded-lg transition cursor-pointer"
-              style={{ background: 'var(--saas-primary-soft)', color: 'var(--saas-primary)' }}
-              title="Refresh Preview"
-              aria-label="Refresh preview"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setIsPreviewGuestMode(!isPreviewGuestMode)}
-              className="saas-btn-primary saas-btn-sm"
-            >
-              <Eye className="w-4 h-4" />
-              Kembali ke Editor
-            </button>
-          </div>
         </div>
-
-        {/* Iframe Mobile Container — transform scale approach */}
-        <div ref={previewContainerRef} className="flex-1 overflow-hidden p-4 flex items-center justify-center bg-transparent" style={{ backgroundImage: 'radial-gradient(rgba(198,161,91,0.22) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
-          <div 
-            className="w-[375px] h-[812px] shrink-0 rounded-[3rem] border-[14px] border-zinc-900 bg-black shadow-2xl relative overflow-hidden ring-4 ring-white/60"
-            style={{ transform: `scale(${previewScale})`, transformOrigin: 'center center' }}
-          >
-            {/* Notch */}
-            <div className="absolute top-0 inset-x-0 h-7 bg-zinc-900 rounded-b-3xl w-40 mx-auto z-[9999]"></div>
-            
-            <IframePreview key={`main-preview-${previewKey}`}>
-              <InvitationPreview 
-                data={wedding.weddingData} 
-                themeId={previewThemeId || wedding.themeId} 
-                onAddRSVP={wedding.addRSVP}
-                rsvps={wedding.rsvps}
-                embedded={true}
-              />
-            </IframePreview>
-          </div>
-        </div>
-      </div>
-
-      {/* BUTTON PRATINJAU MELAYANG UNTUK MOBILE */}
-      {!isPreviewGuestMode && (
-        <button
-          onClick={() => setIsPreviewGuestMode(true)}
-          className="saas-btn-primary md:hidden fixed bottom-6 right-6 z-[150] !rounded-full !px-5 !py-4 shadow-[0_10px_30px_rgba(36,20,24,0.3)] cursor-pointer"
-          title="Pratinjau Undangan"
-        >
-          <Eye className="w-5 h-5" />
-          <span className="text-xs font-black uppercase tracking-widest pr-1">Pratinjau</span>
-        </button>
       )}
 
-      {/* THEME SELECTION MODAL (IFRAME MOCKUP HP DENGAN DIMENSI IDEAL & SCROLLABLE MODAL DENGAN MARGIN BAWAH AMAN) */}
+      {/* 1. LEFT SIDEBAR (Persistent on desktop, Drawer on mobile) */}
+      <DashboardSidebar
+        activeSegment={activeSegment}
+        setActiveSegment={(s) => setActiveSegment(s as DashboardSegment)}
+        user={auth.currentUser}
+        onLogout={auth.logout}
+        onPublish={() => setShowPublishModal(true)}
+        isPublished={isPublished}
+        mobileOpen={mobileMenuOpen}
+        onMobileOpenChange={setMobileMenuOpen}
+        currentInvitationId={wedding.invitation?.id}
+        allInvitations={wedding.allInvitations}
+        onSwitchInvitation={wedding.switchInvitation}
+        onCreateInvitation={wedding.createNewInvitation}
+        onUpdateSlug={wedding.updateInvitationSlug}
+      />
+
+      {/* 2. MAIN WORKSPACE COLUMN */}
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
+        {/* Top Workspace Bar */}
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#EAE3D8] bg-white px-4 sm:px-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="inline-flex lg:hidden h-9 w-9 items-center justify-center rounded-xl border border-[#E6DFD3] text-[#1C1614] hover:bg-[#FAF6F0] cursor-pointer"
+              aria-label="Buka navigasi"
+            >
+              <Menu className="h-4.5 w-4.5" />
+            </button>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="truncate text-[15px] font-bold text-[#1C1614]">
+                  {segMeta.title}
+                </h1>
+                <span
+                  className={`hidden sm:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    isPublished
+                      ? 'bg-[#EEF6F0] text-[#2D7A4F]'
+                      : 'bg-[#FBF4E6] text-[#9A6B1E]'
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      isPublished ? 'bg-[#2D7A4F]' : 'bg-[#C6933A]'
+                    }`}
+                  />
+                  {isPublished ? 'Publik' : 'Draft'}
+                </span>
+              </div>
+              <p className="hidden md:block truncate text-[11.5px] text-[#8B7D74]">
+                {segMeta.sub}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {slug && (
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DFD3] bg-[#FAF7F2] px-3 py-1.5 text-[12px] font-semibold text-[#1C1614] transition hover:bg-[#F2ECE2] cursor-pointer"
+                title={`Salin ruanghadir.net/${slug}`}
+              >
+                {copiedSlug ? (
+                  <Check className="h-3.5 w-3.5 text-[#2D7A4F]" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 text-[#6B5D54]" />
+                )}
+                <span className="max-w-[140px] truncate font-mono text-[11.5px]">
+                  /{slug}
+                </span>
+              </button>
+            )}
+
+            {slug && isPublished && (
+              <a
+                href={`/${slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DFD3] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#1C1614] transition hover:bg-[#FAF6F0]"
+              >
+                <ExternalLink className="h-3.5 w-3.5 text-[#8E2F45]" />
+                Buka
+              </a>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setIsFullscreenPreview(true)}
+              className="inline-flex xl:hidden items-center gap-1.5 rounded-lg bg-[#8E2F45] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#732336] cursor-pointer"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              Pratinjau
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowRightPreview((v) => !v)}
+              className="hidden xl:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DFD3] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#5C4E45] transition hover:bg-[#FAF6F0] hover:text-[#1C1614] cursor-pointer"
+              title={showRightPreview ? 'Sembunyikan panel pratinjau' : 'Tampilkan panel pratinjau'}
+            >
+              {showRightPreview ? (
+                <>
+                  <PanelRightClose className="h-4 w-4" />
+                  <span>Sembunyikan Preview</span>
+                </>
+              ) : (
+                <>
+                  <PanelRightOpen className="h-4 w-4" />
+                  <span>Tampilkan Preview</span>
+                </>
+              )}
+            </button>
+          </div>
+        </header>
+
+        {/* Scrollable Workspace Content */}
+        <main className="flex-1 overflow-y-auto min-h-0">
+          {activeSegment === 'overview' && (
+            <DashboardOverview
+              user={auth.currentUser}
+              weddingData={wedding.weddingData}
+              invitation={wedding.invitation}
+              guests={wedding.guests || []}
+              rsvps={wedding.rsvps || []}
+              analytics={wedding.analytics}
+              onNavigate={(seg) => setActiveSegment(seg)}
+              onPublish={() => setShowPublishModal(true)}
+            />
+          )}
+
+          {activeSegment === 'settings' && (
+            <div className="mx-auto max-w-5xl p-5 sm:p-8">
+              <ThemeSelector
+                currentThemeId={wedding.themeId}
+                onSelectTheme={(id) => {
+                  setPreviewThemeId(id);
+                  wedding.setThemeId(id);
+                }}
+                packageId={auth.currentUser?.packageId || 'free'}
+              />
+            </div>
+          )}
+
+          {activeSegment === 'design' && (
+            <div className="h-full">
+              <EditorPanel
+                data={wedding.weddingData}
+                onChange={wedding.setWeddingData}
+                packageId={auth.currentUser?.packageId || 'free'}
+              />
+            </div>
+          )}
+
+          {activeSegment === 'guests' && (
+            <div className="mx-auto max-w-5xl p-5 sm:p-8">
+              <GuestManager
+                guests={wedding.guests || []}
+                onAddGuest={wedding.addGuest}
+                onRemoveGuest={wedding.removeGuest}
+                onUpdateGuestStatus={wedding.updateGuestStatus}
+                appUrl={
+                  process.env.NEXT_PUBLIC_APP_URL ||
+                  (typeof window !== 'undefined' ? window.location.origin : 'https://ruanghadir.net')
+                }
+                slug={slug || 'undangan'}
+                coupleNames={`${wedding.weddingData.couple.bride.nickname} & ${wedding.weddingData.couple.groom.nickname}`}
+              />
+            </div>
+          )}
+
+          {activeSegment === 'analytics' && (
+            <div className="mx-auto max-w-5xl p-5 sm:p-8">
+              <AnalyticsDashboard
+                analytics={wedding.analytics}
+                rsvps={wedding.rsvps}
+                onDeleteRSVP={wedding.deleteRSVP}
+                onSimulateGuestRSVP={async () => {}}
+                onSimulatePageView={async () => {}}
+              />
+            </div>
+          )}
+
+          {activeSegment === 'profile' && <ProfilePanel wedding={wedding} />}
+
+          {activeSegment === 'upgrade' && (
+            <UpgradePanel
+              user={auth.currentUser}
+              activatedAt={wedding.invitation?.activatedAt}
+              expiresAt={wedding.invitation?.expiresAt}
+              invitationId={wedding.invitation?.id}
+              onSuccess={(updatedUser) => {
+                auth.setCurrentUser(updatedUser);
+                wedding.loadUserData(updatedUser);
+              }}
+            />
+          )}
+        </main>
+      </div>
+
+      {/* 3. RIGHT LIVE PREVIEW PANE (Toggleable on xl+ screens) */}
+      {showRightPreview && (
+        <aside className="hidden xl:flex w-[380px] shrink-0 flex-col border-l border-[#EAE3D8] bg-[#F3EFE8]">
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#EAE3D8] bg-white px-4">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#2D7A4F]" />
+              <span className="text-[12px] font-bold uppercase tracking-wider text-[#1C1614]">
+                Live Preview
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={refreshPreview}
+                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#FAF6F0] hover:text-[#1C1614] cursor-pointer"
+                title="Muat ulang pratinjau"
+                aria-label="Muat ulang pratinjau"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsFullscreenPreview(true)}
+                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#FAF6F0] hover:text-[#1C1614] cursor-pointer"
+                title="Perbesar layar penuh"
+                aria-label="Perbesar layar penuh"
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            ref={previewContainerRef}
+            className="flex flex-1 items-center justify-center overflow-hidden p-4"
+          >
+            <div
+              className="relative h-[812px] w-[375px] shrink-0 overflow-hidden rounded-[2.75rem] border-[12px] border-[#1E1A18] bg-black shadow-xl"
+              style={{
+                transform: `scale(${previewScale})`,
+                transformOrigin: 'center center',
+              }}
+            >
+              <div className="absolute inset-x-0 top-0 z-[9999] mx-auto h-6 w-36 rounded-b-2xl bg-[#1E1A18]" />
+              <IframePreview key={`main-preview-${previewKey}`}>
+                <InvitationPreview
+                  data={wedding.weddingData}
+                  themeId={previewThemeId || wedding.themeId}
+                  onAddRSVP={wedding.addRSVP}
+                  rsvps={wedding.rsvps}
+                  embedded={true}
+                />
+              </IframePreview>
+            </div>
+          </div>
+        </aside>
+      )}
+
+      {/* FULLSCREEN PREVIEW MODAL */}
+      {isFullscreenPreview && (
+        <div className="fixed inset-0 z-[9000] flex flex-col bg-[#161311]/95 backdrop-blur-sm">
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-5 text-white">
+            <div className="flex items-center gap-2.5">
+              <Eye className="h-4 w-4 text-[#D9B878]" />
+              <span className="text-[13px] font-bold">Pratinjau Layar Penuh</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={refreshPreview}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-1.5 text-[12px] font-semibold text-white/90 hover:bg-white/10 cursor-pointer"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Refresh
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsFullscreenPreview(false)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-[12px] font-bold text-[#1C1614] hover:bg-white/90 cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+                Tutup
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-1 items-center justify-center overflow-hidden p-4">
+            <div className="relative h-full max-h-[820px] w-full max-w-[400px] overflow-hidden rounded-[2.5rem] border-[10px] border-[#26211E] bg-black shadow-2xl">
+              <IframePreview key={`fs-preview-${previewKey}`}>
+                <InvitationPreview
+                  data={wedding.weddingData}
+                  themeId={previewThemeId || wedding.themeId}
+                  onAddRSVP={wedding.addRSVP}
+                  rsvps={wedding.rsvps}
+                  embedded={true}
+                />
+              </IframePreview>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* THEME SELECTION QUICK PREVIEW MODAL */}
       {previewThemeId && (
-        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex flex-col items-center justify-start sm:justify-center pt-4 pb-10 px-4 animate-fadeIn overflow-y-auto" onClick={() => setPreviewThemeId(null)}>
-          <div className="flex flex-col items-center gap-4 max-w-full my-auto" onClick={(e) => e.stopPropagation()}>
-            
-            {/* Mockup HP dengan dimensi hemat ruang (w-[280px] h-[560px]) agar pas sempurna di laptop beresolusi rendah */}
-            <div className="relative w-[280px] h-[560px] rounded-[2rem] border-[6px] border-zinc-900 bg-black shadow-2xl overflow-hidden ring-4 ring-white/10 shrink-0">
-              {/* Notch */}
-              <div className="absolute top-0 inset-x-0 h-4.5 bg-zinc-900 rounded-b-2xl w-24 mx-auto z-[9999]"></div>
-              
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-sm overflow-y-auto"
+          onClick={() => setPreviewThemeId(null)}
+        >
+          <div
+            className="flex flex-col items-center gap-4 max-w-full my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-[560px] w-[280px] shrink-0 overflow-hidden rounded-[2rem] border-[6px] border-[#1E1A18] bg-black shadow-2xl">
+              <div className="absolute inset-x-0 top-0 z-[9999] mx-auto h-4 w-24 rounded-b-xl bg-[#1E1A18]" />
               <IframePreview key={`modal-preview-${previewKey}`}>
-                <InvitationPreview 
-                  data={wedding.weddingData} 
-                  themeId={previewThemeId} 
+                <InvitationPreview
+                  data={wedding.weddingData}
+                  themeId={previewThemeId}
                   onAddRSVP={wedding.addRSVP}
                   rsvps={wedding.rsvps}
                   embedded={true}
@@ -366,37 +474,37 @@ export default function App() {
               </IframePreview>
             </div>
 
-            {/* Tombol aksi diletakkan di luar mockup HP dengan margin bawah aman agar tidak tertutup widget sudut layar */}
-            <div className="flex gap-4 justify-center w-full px-4 pb-2 shrink-0">
+            <div className="flex w-full justify-center gap-3">
               <button
+                type="button"
                 onClick={() => setPreviewThemeId(null)}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-full font-bold uppercase text-[11px] shadow-lg tracking-widest transition duration-300 flex items-center justify-center cursor-pointer border border-zinc-700/50"
+                className="rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-[12px] font-bold text-white transition hover:bg-white/20 cursor-pointer"
               >
-                Kembali
+                Batal
               </button>
               <button
+                type="button"
                 onClick={() => {
                   wedding.setThemeId(previewThemeId);
                   setPreviewThemeId(null);
                 }}
-                className="bg-amber-400 hover:bg-amber-500 text-zinc-900 px-6 py-2.5 rounded-full font-black uppercase text-[11px] shadow-lg shadow-amber-500/30 tracking-widest flex items-center gap-2 transition duration-300 flex items-center justify-center cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#8E2F45] px-5 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#732336] cursor-pointer"
               >
-                <Heart className="w-4 h-4" /> Gunakan Tema
+                <Heart className="h-3.5 w-3.5" />
+                Gunakan Tema Ini
               </button>
             </div>
-
           </div>
         </div>
       )}
 
       {/* PUBLISH MODAL */}
-      <PublishModal 
-        show={showPublishModal} 
-        onClose={() => setShowPublishModal(false)} 
-        user={auth.currentUser} 
-        wedding={wedding} 
+      <PublishModal
+        show={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        user={auth.currentUser}
+        wedding={wedding}
       />
-
     </div>
   );
 }

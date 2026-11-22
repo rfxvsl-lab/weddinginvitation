@@ -16,7 +16,7 @@ export interface ThemeConfig {
   fontSerif: string; // e.g. Playfair Display, Great Vibes
   fontSans: string; // e.g. Inter
   pattern: 'floral' | 'classic' | 'modern' | 'minimalist' | 'storybook';
-  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic' | 'storybook-interactive'; // Penentu struktur HTML yang di-render
+  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic' | 'storybook-interactive';
 }
 
 export interface CoupleMember {
@@ -57,7 +57,7 @@ export interface LoveStoryItem {
 export interface DigitalGift {
   id: string;
   type: 'bank' | 'e-wallet' | 'address';
-  name: string; // e.g. BCA, Mandiri, OVO, Rumah Mempelai
+  name: string;
   accountNumber: string;
   accountHolder: string;
 }
@@ -88,17 +88,15 @@ export interface WeddingData {
 export interface Guest {
   id: string;
   name: string;
-  group: string; // e.g., Keluarga, Sahabat, Kerja, Tetangga
+  group: string;
   phoneNumber: string;
   paxLimit: number;
   status: 'Draft' | 'Sent' | 'Opened';
   invitationCode: string;
-  /** Check-in on-site (diisi panitia lewat scanner QR) */
   checkedInAt?: string | null;
   checkInPax?: number;
   tableNo?: string;
   souvenirGiven?: boolean;
-  /** Status konfirmasi RSVP: UNCONFIRMED → CONFIRMED setelah validasi kode */
   attendance?: string;
   rsvpStatus?: 'UNCONFIRMED' | 'CONFIRMED';
   seatImageUrl?: string;
@@ -160,6 +158,20 @@ export interface InvitationProject {
   analytics: WeddingAnalytics;
 }
 
+/**
+ * PackageTier:
+ * - 'free'       : Paket Full Gratis (default untuk semua pengguna baru)
+ * - 'enterprise' : Paket Enterprise (akses via email perusahaan + kode khusus dari admin@ruanghadir.net)
+ * - Legacy IDs ('demo' | 'reguler' | 'premium' | 'luxury') dipertahankan untuk backward-compatibility DB.
+ */
+export type UserPackageId =
+  | 'free'
+  | 'enterprise'
+  | 'demo'
+  | 'reguler'
+  | 'premium'
+  | 'luxury';
+
 export interface SaaSUser {
   id: string;
   fullName: string;
@@ -169,17 +181,32 @@ export interface SaaSUser {
   email: string;
   noWa: string;
   sosmed: string;
-  packageId: 'demo' | 'reguler' | 'premium' | 'luxury';
-  isCustomByRfx: boolean; // true = custom full by rfx, false = custom mandiri
+  packageId: UserPackageId;
+  isCustomByRfx: boolean;
   paymentStatus: 'pending' | 'success' | 'failed';
   registeredAt: string;
   warningCount?: number;
   slugChangeCount?: number;
   ipAddress?: string;
   avatarUrl?: string;
-  authProvider?: 'local' | 'google';
+  authProvider?: 'local' | 'google' | 'enterprise';
+  companyName?: string;
+  companyDomain?: string;
   /** Password disimpan sebagai hash di server (Turso), tidak pernah di client */
   password?: string;
+}
+
+export interface EnterpriseAccessRecord {
+  id: string;
+  companyName: string;
+  allowedDomain: string;
+  allowedEmail?: string | null;
+  codeHint: string;
+  maxSeats: number;
+  usedSeats: number;
+  active: boolean;
+  expiresAt?: string | null;
+  createdAt: string;
 }
 
 export interface TransactionReport {
@@ -188,12 +215,12 @@ export interface TransactionReport {
   userName: string;
   userSlug: string;
   userEmail: string;
-  packageId: 'demo' | 'reguler' | 'premium' | 'luxury';
+  packageId: UserPackageId;
   isCustomByRfx: boolean;
   nominalExpected: number;
   status: 'success' | 'failed' | 'pending';
   timestamp: string;
-  proofImage: string; // Cloudinary URL (bukan base64 lagi)
+  proofImage: string;
   aiResult?: {
     isAuthentic: boolean;
     timestampDetected?: string;
@@ -202,4 +229,3 @@ export interface TransactionReport {
     reasons?: string[];
   } | null;
 }
-

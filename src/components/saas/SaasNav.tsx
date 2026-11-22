@@ -1,14 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Building2 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
 const LINKS: [string, string][] = [
   ["Fitur", "/#fitur"],
   ["Tema", "/#template"],
   ["Cara Kerja", "/#cara-kerja"],
-  ["Akses Gratis", "/#harga"],
+  ["Gratis & Enterprise", "/#harga"],
   ["FAQ", "/#faq"],
 ];
 
@@ -51,7 +51,7 @@ export function SaasNav() {
             aria-label="Navigasi utama"
             className="hidden items-center gap-1 rounded-full border px-2 py-1.5 lg:flex"
             style={{
-              background: "rgba(255,255,255,0.68)",
+              background: "rgba(255,255,255,0.72)",
               borderColor: "var(--saas-line)",
               backdropFilter: "blur(10px)",
             }}
@@ -68,10 +68,17 @@ export function SaasNav() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-2.5 md:flex">
+            <Link
+              href="/auth?mode=enterprise"
+              className="saas-btn-ghost !text-[13px] !px-3.5"
+              title="Portal Login Enterprise"
+            >
+              <Building2 size={14} /> Enterprise
+            </Link>
             <Link
               href="/auth"
-              className="saas-btn-ghost !text-[13.5px] !px-4"
+              className="saas-btn-ghost !text-[13.5px] !px-3.5"
             >
               Masuk
             </Link>
@@ -118,20 +125,35 @@ export function SaasNav() {
               </a>
             ))}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2.5 border-t pt-4" style={{ borderColor: "var(--saas-line)" }}>
+          <div
+            className="mt-4 grid grid-cols-2 gap-2.5 border-t pt-4"
+            style={{ borderColor: "var(--saas-line)" }}
+          >
             <Link
               href="/auth"
               onClick={() => setOpen(false)}
-              className="saas-btn-outline !py-2.5 !text-[13.5px]"
+              className="saas-btn-outline !py-2.5 !text-[13px]"
             >
               Masuk
             </Link>
             <Link
               href="/auth?mode=register"
               onClick={() => setOpen(false)}
-              className="saas-btn-primary !py-2.5 !text-[13.5px]"
+              className="saas-btn-primary !py-2.5 !text-[13px]"
             >
               Buat Gratis
+            </Link>
+            <Link
+              href="/auth?mode=enterprise"
+              onClick={() => setOpen(false)}
+              className="col-span-2 flex items-center justify-center gap-1.5 rounded-full border py-2.5 text-[12.5px] font-bold"
+              style={{
+                borderColor: "var(--saas-line-strong)",
+                color: "var(--saas-ink-2)",
+                background: "rgba(255,255,255,0.7)",
+              }}
+            >
+              <Building2 size={14} /> Masuk Portal Enterprise
             </Link>
           </div>
         </div>

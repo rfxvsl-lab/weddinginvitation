@@ -1,0 +1,146 @@
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  verifyEnterpriseAccess,
+  incrementEnterpriseSeat,
+} from '@/lib/enterprise';
+import {
+  getUserByEmail,
+  createUser,
+  checkSlugExists,
+} from '@/lib/api';
+import { dbExecute } from '@/lib/turso';
+
+export const runtime = 'nodejs';
+
+/**
+ * POST /api/auth/enterprise
+ *
+ * Autentikasi khusus klien Enterprise:
+ * - Wajib menggunakan email perusahaan (domain non-publik)
+ * - Wajib menyertakan kode akses khusus yang diterbitkan admin@ruanghadir.net
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const email = String(body?.email || '').trim().toLowerCase();
+    const accessCode = String(body?.accessCode || '').trim();
+    const fullNameInput = String(body?.fullName || '').trim();
+
+    if (!email || !accessCode) {
+      return NextResponse.json(
+        { error: 'Email perusahaan dan kode akses Enterprise wajib diisi.' },
+        { status: 400 }
+      );
+    }
+
+    const verification = await verifyEnterpriseAccess(email, accessCode);
+    if (!verification.ok) {
+      return NextResponse.json(
+        { error: verification.error || 'Akses Enterprise ditolak.' },
+        { status: 403 }
+      );
+    }
+
+    // Cek apakah akun sudah ada di database
+    let user = await getUserByEmail(email);
+
+    if (user) {
+      // Pastikan akun dinaikkan ke tier Enterprise & paymentStatus success
+      if (user.packageId !== 'enterprise' || user.paymentStatus !== 'success') {
+        await dbExecute(
+          `UPDATE users SET package_id = 'enterprise', payment_status = 'success' WHERE id = :id`,
+          { id: user.id }
+        );
+        user = {
+          ...user,
+          packageId: 'enterprise',
+          paymentStatus: 'success',
+        };
+      }
+    } else {
+      // Auto-provision akun Enterprise baru
+      const localPart = email.split('@')[0].replace(/[^a-z0-9]/gi, ' ').trim();
+      const displayName =
+        fullNameInput ||
+        localPart
+          .split(/\s+/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ') ||
+        verification.companyName ||
+        'Enterprise Member';
+
+      const baseSlug = `${(verification.allowedDomain || 'ent').split('.')[0]}-${localPart.replace(/\s+/g, '')}`
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '')
+        .slice(0, 28);
+
+      let slug = baseSlug || `ent-${Math.random().toString(36).slice(2, 7)}`;
+      if (await checkSlugExists(slug)) {
+        slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+      }
+
+      user = await createUser({
+        fullName: displayName,
+        coupleGroom: verification.companyName || 'Enterprise',
+        coupleBride: 'Event',
+        activeSlug: slug,
+        email,
+        password: `ent_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        noWa: '-',
+        sosmed: '',
+        packageId: 'enterprise',
+        isCustomByRfx: true,
+        paymentStatus: 'success',
+        authProvider: 'enterprise',
+        ipAddress: req.headers.get('x-forwarded-for') || '',
+      });
+
+      if (verification.recordId) {
+        await incrementEnterpriseSeat(verification.recordId);
+      }
+    }
+
+    const enrichedUser = {
+      ...user,
+      packageId: 'enterprise' as const,
+      paymentStatus: 'success' as const,
+      companyName: verification.companyName,
+      companyDomain: verification.allowedDomain,
+    };
+
+    const res = NextResponse.json({
+      ok: true,
+      user: enrichedUser,
+      enterprise: {
+        companyName: verification.companyName,
+        allowedDomain: verification.allowedDomain,
+      },
+    });
+
+    // Set cookie session agar konsisten dengan middleware
+    const payload = Buffer.from(
+      JSON.stringify({
+        email: enrichedUser.email,
+        packageId: 'enterprise',
+        isAdmin: false,
+        isEnterprise: true,
+        companyName: verification.companyName,
+      })
+    ).toString('base64');
+
+    res.cookies.set('saas_user_session', payload, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    return res;
+  } catch (err: any) {
+    console.error('[POST /api/auth/enterprise] Error:', err);
+    return NextResponse.json(
+      { error: 'Terjadi gangguan pada server autentikasi Enterprise. Silakan coba lagi.' },
+      { status: 500 }
+    );
+  }
+}

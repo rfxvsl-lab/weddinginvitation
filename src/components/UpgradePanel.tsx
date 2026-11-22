@@ -1,37 +1,29 @@
 'use client';
 
 /**
- * UpgradePanel — Halaman upgrade tier & perpanjang masa aktif.
- * Hanya tampilkan tier yang LEBIH TINGGI dari current tier.
- * Demo tidak bisa perpanjang (harus upgrade dulu).
- * Pembayaran via Pakasir (QRIS / VA).
+ * UpgradePanel — Manajemen Paket & Aktivasi Enterprise RuangHadir.
+ * Model 2-tier:
+ * - Full Gratis (Rp 0): seluruh fitur inti terbuka tanpa batas.
+ * - Enterprise: untuk WO / agensi / korporat, pemesanan via admin@ruanghadir.net
+ *   dan aktivasi lewat email perusahaan + kode akses khusus.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  PiCrownDuotone as CrownIcon,
-  PiRocketDuotone as RocketIcon,
-  PiCheckCircleDuotone as CheckIcon,
-  PiTimerDuotone as TimerIcon,
-  PiQrCodeDuotone as QrCodeIcon,
-  PiBankDuotone as BankIcon,
-  PiArrowsClockwiseDuotone as RefreshIcon,
-  PiShieldCheckDuotone as ShieldIcon,
-  PiStarDuotone as StarIcon,
-  PiSparkle as SparkleIcon,
-  PiWarningCircleDuotone as WarningIcon,
-  PiXCircleDuotone as XCircleIcon,
-} from 'react-icons/pi';
-import { SaaSUser } from '../types';
+  Building2,
+  Check,
+  Mail,
+  Copy,
+  KeyRound,
+  ShieldCheck,
+  ArrowRight,
+  AlertCircle,
+  Sparkles,
+} from 'lucide-react';
+import type { SaaSUser } from '../types';
 import {
-  PACKAGE_PRICES,
-  PACKAGE_NAMES,
-  PACKAGE_LIMITS,
-  getLimits,
-  getUpgradeTier,
-  formatLimit,
-  formatActiveDays,
-  type PackageId,
+  ENTERPRISE_CONTACT_EMAIL,
+  isEnterpriseTier,
 } from '../lib/packageLimits';
 
 interface UpgradePanelProps {
@@ -42,461 +34,307 @@ interface UpgradePanelProps {
   onSuccess?: (updatedUser: SaaSUser) => void;
 }
 
-const TIER_ORDER: PackageId[] = ['demo', 'reguler', 'premium', 'luxury'];
+const PUBLIC_DOMAINS = new Set([
+  'gmail.com',
+  'googlemail.com',
+  'yahoo.com',
+  'yahoo.co.id',
+  'ymail.com',
+  'hotmail.com',
+  'outlook.com',
+  'live.com',
+  'icloud.com',
+  'proton.me',
+  'protonmail.com',
+]);
 
-const TIER_COLORS: Record<PackageId, { bg: string; border: string; text: string; badge: string; accent: string }> = {
-  demo: { bg: 'bg-zinc-50', border: 'border-zinc-200', text: 'text-zinc-600', badge: 'bg-zinc-100 text-zinc-600', accent: 'bg-zinc-500' },
-  reguler: { bg: 'bg-sky-50', border: 'border-sky-200', text: 'text-sky-700', badge: 'bg-sky-100 text-sky-700', accent: 'bg-sky-500' },
-  premium: { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-700', badge: 'bg-violet-100 text-violet-700', accent: 'bg-violet-500' },
-  luxury: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700', accent: 'bg-amber-500' },
-};
+const FREE_FEATURES = [
+  'Semua 9 koleksi tema interaktif & Storybook 3D',
+  'Tamu & tautan personal tanpa batas',
+  'QR Code check-in, amplop digital, & RSVP real-time',
+  'Export CSV/PDF & statistik kunjungan',
+  'Publish instan tanpa watermark',
+];
 
-const TIER_FEATURES: Record<PackageId, string[]> = {
-  demo: ['1 proyek', '3 foto galeri', 'Watermark besar', '2 tema'],
-  reguler: ['1 proyek', '6 foto galeri', '2 love stories', '100 tamu', 'Publish aktif', 'Export CSV'],
-  premium: ['2 proyek', '20 foto galeri', '5 love stories', '500 tamu', 'Semua tema', 'QR Code', 'Upload musik', 'Custom background'],
-  luxury: ['3 proyek', '∞ foto galeri', '∞ love stories', '∞ tamu', 'Semua tema', 'QR Code', 'Upload musik', 'Custom background', 'Export PDF', 'Visitor logs'],
-};
+const ENTERPRISE_FEATURES = [
+  'Semua fitur Full Gratis + kapasitas proyek tak terbatas',
+  'Custom domain white-label milik perusahaan/WO',
+  'Multi-seat akses tim dengan domain email perusahaan',
+  'Kontrol kode akses organisasi & audit seat terpusat',
+  'SLA dukungan prioritas & integrasi kustom',
+];
 
-function formatRupiah(n: number): string {
-  return 'Rp ' + n.toLocaleString('id-ID');
-}
-
-function getDaysLeft(expiresAt: string | null | undefined): number {
-  if (!expiresAt) return 0;
-  const diff = new Date(expiresAt).getTime() - Date.now();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
-
-export default function UpgradePanel({ user, activatedAt, expiresAt, invitationId, onSuccess }: UpgradePanelProps) {
-  const [paymentMode, setPaymentMode] = useState<'idle' | 'selecting' | 'processing' | 'paid'>('idle');
-  const [paymentTarget, setPaymentTarget] = useState<{ type: 'upgrade' | 'extend'; targetPackageId: PackageId } | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<string>('qris');
-  const [pakasirData, setPakasirData] = useState<{
-    orderId: string; qrCode: string; paymentUrl: string;
-    vaNumber?: string; expiredAt?: string;
-  } | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [companyEmail, setCompanyEmail] = useState(
+    user?.email && !PUBLIC_DOMAINS.has((user.email.split('@')[1] || '').toLowerCase())
+      ? user.email
+      : ''
+  );
+  const [accessCode, setAccessCode] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const currentPkg = (user?.packageId || 'demo') as PackageId;
-  const currentIdx = TIER_ORDER.indexOf(currentPkg);
-  const higherTiers = TIER_ORDER.slice(currentIdx + 1);
-  const isMaxTier = higherTiers.length === 0;
-  const canExtend = currentPkg !== 'demo'; // Demo can't extend
-  const daysLeft = getDaysLeft(expiresAt);
-  const currentLimits = getLimits(currentPkg);
-  const isRfx = user?.isCustomByRfx || false;
-
-  // Poll payment status
-  useEffect(() => {
-    if (paymentMode !== 'processing' || !pakasirData || !user) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/check-payment-status?userId=${user.id}`);
-        const data = await res.json();
-        if (data.status === 'success') {
-          clearInterval(interval);
-
-          // Apply upgrade/extend on server side
-          if (paymentTarget) {
-            try {
-              await fetch('/api/apply-upgrade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: user.id,
-                  type: paymentTarget.type,
-                  targetPackageId: paymentTarget.targetPackageId,
-                  invitationId: invitationId || '',
-                }),
-              });
-            } catch {}
-          }
-
-          setPaymentMode('paid');
-          if (onSuccess && user) {
-            const updatedUser = {
-              ...user,
-              packageId: paymentTarget?.type === 'upgrade' ? paymentTarget.targetPackageId : user.packageId,
-              paymentStatus: 'success' as const,
-            };
-            onSuccess(updatedUser);
-          }
-        }
-      } catch {}
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [paymentMode, pakasirData, user]);
-
-  // Start payment flow
-  const handleStartPayment = (type: 'upgrade' | 'extend', targetPkg: PackageId) => {
-    setPaymentTarget({ type, targetPackageId: targetPkg });
-    setPaymentMode('selecting');
-    setError(null);
-    setPakasirData(null);
-  };
-
-  // Create payment via Pakasir
-  const handleCreatePayment = async () => {
-    if (!user || !paymentTarget) return;
-    setIsCreating(true);
-    setError(null);
-
-    const price = PACKAGE_PRICES[paymentTarget.targetPackageId][isRfx ? 'rfx' : 'mandiri'];
-
-    try {
-      const res = await fetch('/api/create-upgrade-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          userName: user.fullName,
-          userEmail: user.email,
-          type: paymentTarget.type,
-          currentPackageId: currentPkg,
-          targetPackageId: paymentTarget.targetPackageId,
-          invitationId: invitationId || '',
-          amount: price,
-          method: selectedMethod,
-          isCustomByRfx: isRfx,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Gagal membuat transaksi.');
-      }
-
-      const result = await res.json();
-      setPakasirData({
-        orderId: result.orderId,
-        qrCode: result.qrCode,
-        paymentUrl: result.paymentUrl,
-        vaNumber: result.vaNumber,
-        expiredAt: result.expiredAt,
-      });
-      setPaymentMode('processing');
-    } catch (err: any) {
-      setError(err.message || 'Gagal membuat pembayaran.');
-    } finally {
-      setIsCreating(false);
-    }
-  };
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   if (!user) return null;
 
-  // ============================================================
-  // PAYMENT MODAL (inline overlay)
-  // ============================================================
-  if (paymentMode !== 'idle') {
-    return (
-      <div className="p-6 md:p-8 max-w-lg mx-auto">
-        {/* Back button */}
-        {paymentMode === 'selecting' && (
-          <button onClick={() => setPaymentMode('idle')} className="text-sm text-zinc-500 hover:text-zinc-800 mb-6 flex items-center gap-1 transition">
-            ← Kembali
-          </button>
-        )}
+  const isEnt = isEnterpriseTier(user.packageId);
 
-        {/* Payment method selection */}
-        {paymentMode === 'selecting' && paymentTarget && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-100 flex items-center justify-center mb-3">
-                {paymentTarget.type === 'upgrade' ? <RocketIcon className="w-7 h-7 text-rose-600" /> : <TimerIcon className="w-7 h-7 text-rose-600" />}
-              </div>
-              <h3 className="text-lg font-bold text-zinc-800">
-                {paymentTarget.type === 'upgrade' ? `Upgrade ke ${PACKAGE_NAMES[paymentTarget.targetPackageId]}` : 'Perpanjang Masa Aktif'}
-              </h3>
-              <p className="text-sm text-zinc-500 mt-1">
-                {paymentTarget.type === 'upgrade'
-                  ? `Tingkatkan dari ${PACKAGE_NAMES[currentPkg]} ke ${PACKAGE_NAMES[paymentTarget.targetPackageId]}`
-                  : `Tambah ${formatActiveDays(currentLimits.activeDays)} masa aktif`}
-              </p>
-            </div>
+  const handleCopyEmail = () => {
+    navigator.clipboard?.writeText(ENTERPRISE_CONTACT_EMAIL);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 1800);
+  };
 
-            {/* Price display */}
-            <div className="rounded-xl border border-zinc-200 p-4 text-center bg-zinc-50">
-              <p className="text-xs text-zinc-500 mb-1">Total Pembayaran</p>
-              <p className="text-3xl font-bold text-zinc-800">
-                {formatRupiah(PACKAGE_PRICES[paymentTarget.targetPackageId][isRfx ? 'rfx' : 'mandiri'])}
-              </p>
-            </div>
+  const handleActivateEnterprise = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMsg(null);
 
-            {/* Payment methods */}
-            <div className="space-y-2">
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Metode Pembayaran</p>
-              {[
-                { id: 'qris', label: 'QRIS', desc: 'Scan QR — semua e-wallet & m-banking', icon: QrCodeIcon },
-                { id: 'bri_va', label: 'BRI Virtual Account', desc: 'Transfer via BRI', icon: BankIcon },
-                { id: 'bni_va', label: 'BNI Virtual Account', desc: 'Transfer via BNI', icon: BankIcon },
-                { id: 'permata_va', label: 'Permata VA', desc: 'Transfer via Permata Bank', icon: BankIcon },
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setSelectedMethod(m.id)}
-                  className={`group/bento w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-left ${
-                    selectedMethod === m.id
-                      ? 'border-rose-300 bg-rose-50 shadow-md'
-                      : 'border-zinc-200 hover:border-zinc-300 hover:shadow-sm'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${selectedMethod === m.id ? 'bg-rose-100' : 'bg-zinc-100'}`}>
-                    <m.icon className={`w-5 h-5 ${selectedMethod === m.id ? 'text-rose-600' : 'text-zinc-400'}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-zinc-800">{m.label}</p>
-                    <p className="text-[10px] text-zinc-400">{m.desc}</p>
-                  </div>
-                  {selectedMethod === m.id && <CheckIcon className="w-5 h-5 text-rose-500 ml-auto" />}
-                </button>
-              ))}
-            </div>
+    const trimmed = companyEmail.trim().toLowerCase();
+    const domain = trimmed.split('@')[1] || '';
 
-            {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-100">
-                <WarningIcon className="w-4 h-4 text-red-500 shrink-0" />
-                <p className="text-xs text-red-600">{error}</p>
-              </div>
-            )}
+    if (!domain || !trimmed.includes('@')) {
+      setError('Masukkan email perusahaan resmi Anda.');
+      return;
+    }
+    if (PUBLIC_DOMAINS.has(domain)) {
+      setError(`Aktivasi Enterprise wajib menggunakan email perusahaan, bukan ${domain}.`);
+      return;
+    }
+    if (accessCode.trim().length < 6) {
+      setError('Masukkan kode akses khusus Enterprise yang valid.');
+      return;
+    }
 
-            <button
-              onClick={handleCreatePayment}
-              disabled={isCreating}
-              className="w-full py-3.5 rounded-xl bg-rose-500 text-white font-bold text-sm uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-all shadow-sm"
-            >
-              {isCreating ? 'Memproses...' : 'Bayar Sekarang'}
-            </button>
-          </div>
-        )}
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/auth/enterprise', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: trimmed,
+          accessCode: accessCode.trim(),
+          fullName: user.fullName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setError(data.error || 'Kode akses atau email perusahaan tidak valid.');
+        return;
+      }
+      setSuccessMsg('Akses Enterprise berhasil diaktifkan pada akun perusahaan Anda.');
+      setAccessCode('');
+      if (onSuccess && data.user) {
+        onSuccess(data.user);
+      }
+    } catch {
+      setError('Gagal menghubungi server aktivasi Enterprise.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-        {/* Payment processing — show QR / VA */}
-        {paymentMode === 'processing' && pakasirData && (
-          <div className="space-y-6 text-center">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-100 flex items-center justify-center">
-              <RefreshIcon className="w-7 h-7 text-amber-600 animate-spin" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-zinc-800">Menunggu Pembayaran</h3>
-              <p className="text-sm text-zinc-500 mt-1">
-                Order ID: <span className="font-mono text-xs">{pakasirData.orderId}</span>
-              </p>
-            </div>
-
-            {/* QR Code */}
-            {pakasirData.qrCode && (
-              <div className="rounded-xl border border-zinc-200 p-6 bg-white">
-                <img src={pakasirData.qrCode} alt="QRIS" className="w-48 h-48 mx-auto" />
-                <p className="text-xs text-zinc-400 mt-3">Scan QR di atas dengan aplikasi e-wallet / m-banking</p>
-              </div>
-            )}
-
-            {/* VA Number */}
-            {pakasirData.vaNumber && (
-              <div className="rounded-xl border border-zinc-200 p-4 bg-white">
-                <p className="text-xs text-zinc-500 mb-1">Nomor Virtual Account</p>
-                <p className="text-2xl font-mono font-bold text-zinc-800 tracking-wider">{pakasirData.vaNumber}</p>
-              </div>
-            )}
-
-            {/* Payment URL fallback */}
-            {pakasirData.paymentUrl && (
-              <a
-                href={pakasirData.paymentUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 text-sm text-zinc-600 hover:border-zinc-300 hover:shadow-sm transition"
-              >
-                Buka Halaman Pembayaran →
-              </a>
-            )}
-
-            <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
-              <RefreshIcon className="w-3 h-3 animate-spin" />
-              <span>Otomatis mendeteksi pembayaran...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Payment success */}
-        {paymentMode === 'paid' && (
-          <div className="text-center py-12 space-y-4">
-            <div className="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center">
-              <CheckIcon className="w-10 h-10 text-emerald-600" />
-            </div>
-            <h3 className="text-xl font-bold text-zinc-800">Pembayaran Berhasil!</h3>
-            <p className="text-sm text-zinc-500">
-              {paymentTarget?.type === 'upgrade'
-                ? `Akun Anda telah di-upgrade ke ${PACKAGE_NAMES[paymentTarget.targetPackageId]}.`
-                : `Masa aktif undangan telah diperpanjang.`}
-            </p>
-            <button
-              onClick={() => { setPaymentMode('idle'); setPaymentTarget(null); setPakasirData(null); }}
-              className="px-6 py-2.5 rounded-xl bg-zinc-900 text-white font-bold text-sm hover:bg-zinc-800 transition"
-            >
-              Kembali ke Dashboard
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ============================================================
-  // MAIN UPGRADE PAGE
-  // ============================================================
   return (
-    <div className="p-6 md:p-8 max-w-2xl mx-auto space-y-8">
-
-      {/* ---- CURRENT PLAN CARD ---- */}
-      <div className={`rounded-2xl border-2 ${TIER_COLORS[currentPkg].border} ${TIER_COLORS[currentPkg].bg} p-6`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl ${TIER_COLORS[currentPkg].accent} flex items-center justify-center`}>
-              <CrownIcon className="w-5 h-5 text-white" />
+    <div className="mx-auto max-w-4xl space-y-6 p-5 sm:p-8">
+      {/* ── Active Plan Banner ── */}
+      <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                isEnt ? 'bg-[#FBF4E6] text-[#8A611C]' : 'bg-[#EEF6F0] text-[#2D7A4F]'
+              }`}
+            >
+              {isEnt ? <Building2 className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
             </div>
             <div>
-              <p className="text-xs text-zinc-500 font-medium">Paket Saat Ini</p>
-              <h3 className={`text-lg font-bold ${TIER_COLORS[currentPkg].text}`}>{PACKAGE_NAMES[currentPkg]}</h3>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8B7D74]">
+                Paket Aktif Saat Ini
+              </span>
+              <h2 className="text-[20px] font-bold text-[#1C1614]">
+                {isEnt ? 'RuangHadir Enterprise' : 'RuangHadir Full Gratis'}
+              </h2>
+              <p className="mt-0.5 text-[13px] text-[#6B5D54]">
+                {isEnt
+                  ? `Terverifikasi untuk organisasi ${user.companyName || user.companyDomain || user.email}.`
+                  : 'Seluruh fitur undangan personal sudah aktif penuh dengan biaya Rp 0.'}
+              </p>
             </div>
           </div>
-          <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${TIER_COLORS[currentPkg].badge}`}>
+          <span
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-bold ${
+              isEnt ? 'bg-[#FBF4E6] text-[#8A611C]' : 'bg-[#EEF6F0] text-[#2D7A4F]'
+            }`}
+          >
+            <Check className="h-3.5 w-3.5" />
             Aktif
           </span>
         </div>
+      </section>
 
-        {/* Days left */}
-        {expiresAt && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-white/60 border border-white">
-            <TimerIcon className={`w-5 h-5 ${daysLeft <= 3 ? 'text-red-500' : daysLeft <= 7 ? 'text-amber-500' : 'text-emerald-500'}`} />
-            <div>
-              <p className="text-sm font-bold text-zinc-800">{daysLeft} hari tersisa</p>
-              <p className="text-[10px] text-zinc-400">Berakhir: {new Date(expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-            </div>
+      {/* ── 2-Tier Comparison ── */}
+      <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {/* Free Card */}
+        <div className="flex flex-col rounded-2xl border border-[#E6DFD3] bg-white p-6">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2D7A4F]">
+              Personal
+            </span>
+            {!isEnt && (
+              <span className="rounded-full bg-[#EEF6F0] px-2.5 py-0.5 text-[10.5px] font-bold text-[#2D7A4F]">
+                Paket Anda
+              </span>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* ---- UPGRADE TIER CARDS ---- */}
-      {!isMaxTier && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <RocketIcon className="w-5 h-5 text-rose-500" />
-            <h3 className="text-sm font-bold text-zinc-800">Upgrade Paket</h3>
-          </div>
-
-          <div className="space-y-4">
-            {higherTiers.map((tierId) => {
-              const limits = PACKAGE_LIMITS[tierId];
-              const price = PACKAGE_PRICES[tierId][isRfx ? 'rfx' : 'mandiri'];
-              const colors = TIER_COLORS[tierId];
-              const features = TIER_FEATURES[tierId];
-
-              return (
-                <div
-                  key={tierId}
-                  className={`group/bento rounded-2xl border ${colors.border} ${colors.bg} p-5 transition-all duration-200 hover:shadow-lg hover:border-opacity-100`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-9 h-9 rounded-lg ${colors.accent} flex items-center justify-center`}>
-                        <StarIcon className="w-4 h-4 text-white" />
-                      </div>
-                      <div>
-                        <h4 className={`text-base font-bold ${colors.text}`}>{PACKAGE_NAMES[tierId]}</h4>
-                        <p className="text-[10px] text-zinc-400">{formatActiveDays(limits.activeDays)} masa aktif</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`text-lg font-bold ${colors.text}`}>{formatRupiah(price)}</p>
-                      <p className="text-[9px] text-zinc-400">{isRfx ? 'Custom by RFX' : 'Mandiri'}</p>
-                    </div>
-                  </div>
-
-                  {/* Feature list */}
-                  <div className="grid grid-cols-2 gap-1.5 mb-4">
-                    {features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <CheckIcon className={`w-3.5 h-3.5 ${colors.text} shrink-0`} />
-                        <span className="text-[11px] text-zinc-600">{f}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => handleStartPayment('upgrade', tierId)}
-                    className={`w-full py-2.5 rounded-xl text-sm font-bold text-white uppercase tracking-wider ${colors.accent} hover:opacity-90 transition shadow-sm`}
-                  >
-                    Upgrade ke {PACKAGE_NAMES[tierId]}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+          <h3 className="mt-2 font-serif text-[24px] text-[#1C1614]">Full Gratis</h3>
+          <p className="mt-1 text-[28px] font-extrabold text-[#1C1614]">
+            Rp 0 <span className="text-[12.5px] font-normal text-[#8B7D74]">/ selamanya</span>
+          </p>
+          <p className="mt-2 text-[13px] text-[#6B5D54]">
+            Untuk pasangan yang ingin membuat dan menerbitkan undangan digital elegan tanpa biaya.
+          </p>
+          <ul className="mt-5 space-y-2.5 flex-1">
+            {FREE_FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-2.5 text-[13px] text-[#4A3E36]">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2D7A4F]" />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
 
-      {/* Max tier message */}
-      {isMaxTier && (
-        <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-6 text-center">
-          <CrownIcon className="w-12 h-12 mx-auto mb-3 text-amber-500" />
-          <h3 className="text-lg font-bold text-amber-800">Anda di Tier Tertinggi!</h3>
-          <p className="text-sm text-amber-600/80 mt-1">Nikmati semua fitur premium tanpa batas.</p>
-        </div>
-      )}
-
-      {/* ---- EXTEND SUBSCRIPTION ---- */}
-      {canExtend && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <TimerIcon className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-sm font-bold text-zinc-800">Perpanjang Masa Aktif</h3>
+        {/* Enterprise Card */}
+        <div className="flex flex-col rounded-2xl border border-[#D8C5A3] bg-[#FCF9F3] p-6">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#8A611C]">
+              WO · Agensi · Korporat
+            </span>
+            {isEnt && (
+              <span className="rounded-full bg-[#FBF4E6] px-2.5 py-0.5 text-[10.5px] font-bold text-[#8A611C]">
+                Aktif
+              </span>
+            )}
           </div>
+          <h3 className="mt-2 font-serif text-[24px] text-[#1C1614]">Enterprise</h3>
+          <p className="mt-1 text-[28px] font-extrabold text-[#1C1614]">
+            Custom{' '}
+            <span className="text-[12.5px] font-normal text-[#8B7D74]">/ kontrak organisasi</span>
+          </p>
+          <p className="mt-2 text-[13px] text-[#6B5D54]">
+            Dirancang untuk Wedding Organizer, agensi event, dan perusahaan dengan akses email kantor resmi.
+          </p>
+          <ul className="mt-5 space-y-2.5 flex-1">
+            {ENTERPRISE_FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-2.5 text-[13px] text-[#4A3E36]">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#8E2F45]" />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5 hover:shadow-lg hover:border-zinc-300 transition-all duration-200">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h4 className="text-sm font-bold text-zinc-800">
-                  Tambah {formatActiveDays(currentLimits.activeDays)}
-                </h4>
-                <p className="text-[11px] text-zinc-400">
-                  Perpanjang masa aktif tanpa ganti paket
-                </p>
-              </div>
-              <p className="text-lg font-bold text-zinc-800">
-                {formatRupiah(PACKAGE_PRICES[currentPkg][isRfx ? 'rfx' : 'mandiri'])}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-100 mb-4">
-              <ShieldIcon className="w-4 h-4 text-emerald-500 shrink-0" />
-              <p className="text-[11px] text-emerald-700">
-                Sisa hari Anda saat ini ({daysLeft} hari) akan ditambah, bukan direset.
-              </p>
-            </div>
-
-            <button
-              onClick={() => handleStartPayment('extend', currentPkg)}
-              className="w-full py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-bold uppercase tracking-wider hover:bg-emerald-600 transition shadow-sm"
+          <div className="mt-6 flex flex-wrap gap-2">
+            <a
+              href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Permintaan%20Paket%20Enterprise%20RuangHadir`}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#1C1614] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#332925]"
             >
-              Perpanjang Sekarang
+              <Mail className="h-4 w-4" />
+              Hubungi {ENTERPRISE_CONTACT_EMAIL}
+            </a>
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#DDD4C6] bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-[#1C1614] transition hover:bg-[#FAF6F0] cursor-pointer"
+              title="Salin email Enterprise"
+            >
+              {copiedEmail ? <Check className="h-4 w-4 text-[#2D7A4F]" /> : <Copy className="h-4 w-4 text-[#6B5D54]" />}
+              {copiedEmail ? 'Tersalin' : 'Salin'}
             </button>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Demo can't extend notice */}
-      {!canExtend && (
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 flex items-center gap-3">
-          <WarningIcon className="w-5 h-5 text-zinc-400 shrink-0" />
-          <div>
-            <p className="text-sm font-bold text-zinc-600">Perpanjang tidak tersedia</p>
-            <p className="text-xs text-zinc-400">Upgrade ke paket Reguler atau lebih tinggi untuk bisa perpanjang masa aktif.</p>
+      {/* ── Inline Enterprise Access Code Activation ── */}
+      {!isEnt && (
+        <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8E2F45]/10 text-[#8E2F45]">
+              <KeyRound className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-[15px] font-bold text-[#1C1614]">
+                Sudah Punya Kode Akses Enterprise?
+              </h3>
+              <p className="mt-0.5 text-[12.5px] text-[#6B5D54]">
+                Masukkan email perusahaan resmi dan kode khusus dari{' '}
+                <a
+                  href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`}
+                  className="font-semibold text-[#8E2F45] hover:underline"
+                >
+                  {ENTERPRISE_CONTACT_EMAIL}
+                </a>{' '}
+                untuk langsung membuka workspace Enterprise.
+              </p>
+            </div>
           </div>
-        </div>
+
+          <form onSubmit={handleActivateEnterprise} className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-12">
+            <div className="sm:col-span-5">
+              <label htmlFor="dash-ent-email" className="mb-1.5 block text-[11.5px] font-bold text-[#5C4E45]">
+                Email Perusahaan
+              </label>
+              <input
+                id="dash-ent-email"
+                type="email"
+                required
+                value={companyEmail}
+                onChange={(e) => setCompanyEmail(e.target.value)}
+                placeholder="nama@perusahaan.co.id"
+                className="w-full rounded-xl border border-[#DDD4C6] bg-[#FAF7F2] px-3.5 py-2.5 text-[13px] text-[#1C1614] outline-none focus:border-[#8E2F45] focus:bg-white"
+              />
+            </div>
+
+            <div className="sm:col-span-4">
+              <label htmlFor="dash-ent-code" className="mb-1.5 block text-[11.5px] font-bold text-[#5C4E45]">
+                Kode Akses Khusus
+              </label>
+              <input
+                id="dash-ent-code"
+                type="text"
+                required
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                placeholder="RH-ENT-XXXXXX"
+                className="w-full rounded-xl border border-[#DDD4C6] bg-[#FAF7F2] px-3.5 py-2.5 font-mono text-[13px] uppercase tracking-wider text-[#1C1614] outline-none focus:border-[#8E2F45] focus:bg-white"
+              />
+            </div>
+
+            <div className="flex items-end sm:col-span-3">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#8E2F45] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#732336] disabled:opacity-50 cursor-pointer"
+              >
+                <span>{submitting ? 'Memverifikasi...' : 'Aktifkan'}</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </form>
+
+          {error && (
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#B03A3A]/25 bg-[#FBECEA] px-3.5 py-2.5 text-[12.5px] text-[#9B2C2C]">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#2D7A4F]/25 bg-[#EEF6F0] px-3.5 py-2.5 text-[12.5px] text-[#2D7A4F]">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+        </section>
       )}
     </div>
   );

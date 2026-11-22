@@ -1,31 +1,33 @@
 "use client";
 import React, { useState } from "react";
-import { Plus, Send, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Plus, Mail, ShieldCheck, KeyRound } from "lucide-react";
+import { ENTERPRISE_CONTACT_EMAIL } from "@/lib/packageLimits";
 
 const FAQS = [
   {
-    q: "Apakah benar membuat undangan di RuangHadir gratis?",
-    a: "Benar. Kalian bisa mendaftar, memilih tema, mengisi data mempelai, galeri, musik, amplop digital, hingga membagikan link undangan secara gratis tanpa kartu kredit.",
+    q: "Apakah benar seluruh fitur undangan di RuangHadir gratis?",
+    a: "Benar. Paket Full Gratis (Rp 0) sudah mencakup seluruh 9 tema, publish langsung, nama tamu personal tanpa batas, RSVP real-time, amplop digital, QR check-in, galeri foto, musik latar, serta export CSV/PDF tanpa watermark.",
+  },
+  {
+    q: "Apa bedanya akun Gratis dengan Enterprise?",
+    a: "Akun Gratis ditujukan untuk pasangan dan acara pribadi (hingga 3 proyek undangan). Paket Enterprise dirancang untuk Wedding Organizer, agensi event, dan korporat dengan proyek tanpa batas, multi-seat tim, custom domain, white-label, dan dukungan prioritas.",
+  },
+  {
+    q: "Bagaimana cara mendaftar dan masuk ke akun Enterprise?",
+    a: `Hubungi ${ENTERPRISE_CONTACT_EMAIL} untuk pengaktifan. Setelah disetujui, tim kami menerbitkan Kode Akses Khusus yang terikat pada domain email perusahaan Anda. Login dilakukan lewat Portal Enterprise menggunakan email perusahaan resmi (bukan Gmail/Yahoo) dan kode khusus tersebut.`,
   },
   {
     q: "Apakah tamu atau mempelai harus menginstal aplikasi?",
-    a: "Tidak perlu. Semua proses pembuatan undangan maupun tampilan yang dibuka tamu berjalan langsung melalui browser HP atau laptop.",
+    a: "Tidak perlu. Pengelolaan dashboard maupun pembukaan undangan oleh tamu berjalan 100% langsung di browser HP dan desktop.",
   },
   {
-    q: "Bagaimana cara membuat link dengan nama tamu yang berbeda-beda?",
-    a: "Di dalam dashboard, kalian cukup memasukkan daftar nama tamu. Sistem akan membuatkan tautan personal beserta teks pengantar WhatsApp siap kirim untuk masing-masing tamu.",
-  },
-  {
-    q: "Apakah tema dan data acara bisa diedit setelah undangan jadi?",
-    a: "Bisa kapan saja. Jika ada perubahan jam acara, foto baru, atau ingin mengganti tema ke gaya lain, kalian tinggal ubah di dashboard dan halaman langsung diperbarui.",
+    q: "Apakah tema dan data acara bisa diedit setelah undangan dipublish?",
+    a: "Bisa kapan saja dari dashboard. Perubahan jadwal, foto, musik, hingga pergantian tema akan langsung aktif pada tautan undangan Anda.",
   },
   {
     q: "Metode amplop digital apa saja yang didukung?",
-    a: "Kalian dapat menambahkan rekening bank (BCA, Mandiri, BRI, BNI, dan lainnya), e-wallet, gambar QRIS, serta alamat pengiriman kado fisik lengkap dengan tombol salin cepat.",
-  },
-  {
-    q: "Bagaimana jika saya ingin memakai domain sendiri atau dibantu input data?",
-    a: "Penggunaan mandiri dengan tautan ruanghadir.net tetap gratis. Jika membutuhkan domain khusus (.com/.id) atau layanan terima beres oleh tim kami, silakan hubungi WhatsApp Support.",
+    a: "Anda bisa menampilkan rekening multi-bank (BCA, Mandiri, BRI, BNI, dll.), e-wallet, QRIS, serta alamat pengiriman kado fisik lengkap dengan tombol salin cepat.",
   },
 ];
 
@@ -103,21 +105,25 @@ export function SaasFaq() {
             <ShieldCheck size={20} />
           </span>
           <h3 className="mt-4 text-[19px] font-extrabold">
-            Masih ada pertanyaan?
+            Butuh Paket Enterprise?
           </h3>
           <p className="mt-2 text-[13.5px] leading-relaxed text-[#EFE0D6]">
-            Tim RuangHadir siap membantu kendala teknis maupun konsultasi tema
-            setiap hari pukul 08.00–21.00 WIB via WhatsApp.
+            Kirimkan kebutuhan organisasi, Wedding Organizer, atau acara
+            korporat Anda langsung ke tim kami via email resmi.
           </p>
           <a
-            href="https://wa.me/6285731021469?text=Halo%20RuangHadir,%20saya%20ingin%20bertanya%20tentang%20undangan%20digital%20gratis"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-[13.5px] font-extrabold transition-transform hover:scale-[1.01]"
+            href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Konsultasi%20RuangHadir%20Enterprise`}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-[13px] font-extrabold transition-transform hover:scale-[1.01]"
             style={{ background: "var(--saas-gold)", color: "#241505" }}
           >
-            <Send size={15} /> Chat WhatsApp Support
+            <Mail size={15} /> {ENTERPRISE_CONTACT_EMAIL}
           </a>
+          <Link
+            href="/auth?mode=enterprise"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/25 py-2.5 text-[12.5px] font-bold text-[#F5EBE3] transition-colors hover:bg-white/10"
+          >
+            <KeyRound size={14} /> Portal Login Enterprise
+          </Link>
         </aside>
       </div>
     </section>

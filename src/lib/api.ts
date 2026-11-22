@@ -9,6 +9,7 @@ import { dbExecute, dbBatch, genId } from './turso';
 import { getLimits } from './packageLimits';
 import type {
   SaaSUser,
+  UserPackageId,
   TransactionReport,
   WeddingData,
   Guest,
@@ -53,7 +54,7 @@ export async function createUser(
       sosmed: userData.sosmed || '',
       packageId: userData.packageId,
       isRfx: userData.isCustomByRfx ? 1 : 0,
-      payStatus: userData.paymentStatus || 'pending',
+      payStatus: userData.paymentStatus || 'success',
       regAt: registeredAt,
       ipAddress: userData.ipAddress || '',
       authProvider: userData.authProvider || 'local',
@@ -71,7 +72,7 @@ export async function createUser(
     sosmed: userData.sosmed || '',
     packageId: userData.packageId,
     isCustomByRfx: userData.isCustomByRfx,
-    paymentStatus: userData.paymentStatus || 'pending',
+    paymentStatus: userData.paymentStatus || 'success',
     registeredAt,
     ipAddress: userData.ipAddress || '',
     authProvider: userData.authProvider || 'local',
@@ -217,14 +218,14 @@ function rowToUser(row: any): SaaSUser {
     email: row.email as string,
     noWa: row.no_wa as string,
     sosmed: (row.sosmed as string) || '',
-    packageId: row.package_id as 'demo' | 'reguler' | 'premium' | 'luxury',
+    packageId: (row.package_id || 'free') as UserPackageId,
     isCustomByRfx: Boolean(row.is_custom_by_rfx),
-    paymentStatus: (row.payment_status || (adminEmail && (row.email as string)?.toLowerCase() === adminEmail ? 'success' : 'pending')) as 'pending' | 'success' | 'failed',
+    paymentStatus: (row.payment_status === 'failed' ? 'failed' : 'success') as 'pending' | 'success' | 'failed',
     registeredAt: row.registered_at as string,
     warningCount: Number(row.warning_count || 0),
     ipAddress: row.ip_address as string,
     avatarUrl: row.avatar_url as string,
-    authProvider: row.auth_provider as 'local' | 'google'
+    authProvider: row.auth_provider as 'local' | 'google' | 'enterprise'
   };
 }
 
