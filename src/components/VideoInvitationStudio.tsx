@@ -20,6 +20,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { isEnterpriseTier } from '@/lib/packageLimits';
+import EnterpriseMotionPlayer from '@/components/EnterpriseMotionPlayer';
 import { WeddingData, SaaSUser } from '@/types';
 import {
   VIDEO_THEMES,
@@ -88,7 +89,10 @@ export default function VideoInvitationStudio({
     const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'Grand Ballroom Hotel Mulia, Jakarta';
     const displaySlug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
     const initials = `${groom.charAt(0).toUpperCase()} & ${bride.charAt(0).toUpperCase()}`;
-    return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials };
+    const heroPhoto = wedding?.bgImageUrl || wedding?.gallery?.[0] || '/assets/kharis-lia/hero.jpg';
+    const groomPhoto = wedding?.couple?.groom?.photoUrl || '/assets/kharis-lia/groom.jpg';
+    const bridePhoto = wedding?.couple?.bride?.photoUrl || '/assets/kharis-lia/bride.jpg';
+    return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials, heroPhoto, groomPhoto, bridePhoto };
   }, [wedding, slug]);
 
   // 30fps live timeline loop
@@ -251,13 +255,31 @@ export default function VideoInvitationStudio({
             </span>
           </div>
 
-          {/* Stage Canvas Frame */}
-          <div className="relative flex items-center justify-center rounded-[24px] bg-[#14161F] p-4 sm:p-6 min-h-[380px] sm:min-h-[460px] overflow-hidden border border-white/15">
+          {/* Live 1:1 Theme Motion Stage + Hidden Export Canvas */}
+          <div className="relative flex items-center justify-center rounded-[24px] bg-[#14161F] p-4 sm:p-6 min-h-[420px] sm:min-h-[490px] overflow-hidden border border-white/15">
+            <div
+              className="relative overflow-hidden rounded-[22px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] border border-white/15"
+              style={{
+                aspectRatio: aspectId === '9:16' ? '9 / 16' : aspectId === '1:1' ? '1 / 1' : '16 / 9',
+                height: aspectId === '16:9' ? 'auto' : '450px',
+                width: aspectId === '16:9' ? '100%' : 'auto',
+                maxWidth: '100%',
+              }}
+            >
+              <EnterpriseMotionPlayer
+                themeId={themeId}
+                couple={coupleData}
+                sceneIdx={currentSceneIdx}
+                progress={frame / VIDEO_TOTAL_FRAMES}
+                isPlaying={isPlaying}
+                showWatermark={!isEnt}
+              />
+            </div>
             <canvas
               ref={canvasRef}
               width={aspect.w}
               height={aspect.h}
-              className="rounded-[20px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)] max-h-[430px] w-auto max-w-full object-contain"
+              className="hidden"
             />
           </div>
 

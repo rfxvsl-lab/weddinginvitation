@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Film,
@@ -14,57 +14,67 @@ import {
   Layers,
   SlidersHorizontal,
 } from "lucide-react";
+import EnterpriseMotionPlayer, {
+  MotionPlayerCouple,
+} from "@/components/EnterpriseMotionPlayer";
 import {
   VIDEO_THEMES,
   VIDEO_SCENES,
   VIDEO_FPS,
   VIDEO_TOTAL_FRAMES,
   VideoThemeId,
-  VideoCoupleProps,
-  renderInvitationVideoFrame,
   formatTimecode,
 } from "@/lib/invitationVideoEngine";
 
-const DEMO_SAMPLES: Record<VideoThemeId, VideoCoupleProps> = {
+const DEMO_SAMPLES: Record<VideoThemeId, MotionPlayerCouple> = {
   "javanese-classic": {
-    groom: "Bagas",
-    bride: "Sekar",
-    groomFull: "R. Bagas Pratama, S.T.",
-    brideFull: "R.A. Sekar Ayu, S.Ars.",
+    groom: "Kharis",
+    bride: "Lia",
+    groomFull: "Kharis Pratama, S.T.",
+    brideFull: "Lia Ayu Lestari, S.Ars.",
     dateRaw: "Minggu, 18 Oktober 2026",
     timeRaw: "09:00 WIB",
     venue: "Pendopo Agung Royal Ambarrukmo, Yogyakarta",
-    slug: "ruanghadir.net/bagas-sekar",
-    initials: "B & S",
+    slug: "ruanghadir.net/kharis-lia",
+    initials: "K & L",
+    heroPhoto: "/assets/kharis-lia/hero.jpg",
+    groomPhoto: "/assets/kharis-lia/groom.jpg",
+    bridePhoto: "/assets/kharis-lia/bride.jpg",
   },
   "grand-ballroom": {
-    groom: "Rian",
-    bride: "Salsa",
-    groomFull: "Rian Mahendra, M.B.A.",
-    brideFull: "Salsa Kirana, S.E.",
+    groom: "Kharis",
+    bride: "Lia",
+    groomFull: "Kharis Pratama, M.B.A.",
+    brideFull: "Lia Ayu Lestari, S.E.",
     dateRaw: "Sabtu, 24 Oktober 2026",
     timeRaw: "19:00 WIB",
     venue: "Grand Ballroom Hotel Mulia, Jakarta",
-    slug: "ruanghadir.net/rian-salsa",
-    initials: "R & S",
+    slug: "ruanghadir.net/kharis-lia",
+    initials: "K & L",
+    heroPhoto: "/assets/kharis-lia/hero.jpg",
+    groomPhoto: "/assets/kharis-lia/groom.jpg",
+    bridePhoto: "/assets/kharis-lia/bride.jpg",
   },
   "luxury-pink": {
-    groom: "Dimas",
-    bride: "Nadia",
-    groomFull: "Dimas Aditya, S.Kom.",
-    brideFull: "Nadia Putri, S.Psi.",
+    groom: "Kharis",
+    bride: "Lia",
+    groomFull: "Kharis Pratama, S.Kom.",
+    brideFull: "Lia Ayu Lestari, S.Psi.",
     dateRaw: "Sabtu, 7 November 2026",
     timeRaw: "11:00 WIB",
     venue: "The Glasshouse Rose Garden, Bandung",
-    slug: "ruanghadir.net/dimas-nadia",
-    initials: "D & N",
+    slug: "ruanghadir.net/kharis-lia",
+    initials: "K & L",
+    heroPhoto: "/assets/kharis-lia/hero.jpg",
+    groomPhoto: "/assets/kharis-lia/groom.jpg",
+    bridePhoto: "/assets/kharis-lia/bride.jpg",
   },
 };
 
 const HIGHLIGHTS = [
-  "Engine motion graphic ala After Effects: Trim Paths, Track Matte kinetic text, volumetric light leak, dan partikel berlapis",
-  "3 contoh preset resmi siap pakai: Javanese Classic, Grand Ballroom, dan Luxury Love Pink",
-  "Sinkronisasi otomatis nama mempelai, jadwal, dan venue dari data undangan — siap ekspor 9:16 Reels/TikTok/WA Status hingga 16:9",
+  "1:1 persis sesuai tema undangan asli — mulai dari aset Gunungan & Flower Javanese, tirai & chandelier Grand Ballroom, hingga amplop 3D & bingkai lengkung Luxury Pink",
+  "Foto mempelai asli, tipografi tema, ikon acara, efek partikel 60fps, dan sapuan light-leak otomatis tersinkronisasi dari data undangan",
+  "Format siap sebar 9:16 (Reels, TikTok, WhatsApp Status), 1:1 Feed, hingga 16:9 layar venue",
   "Ekspor video HD bebas watermark + Remotion Render Spec (JSON) eksklusif untuk akun Enterprise",
 ];
 
@@ -72,47 +82,19 @@ export function SaasVideoStudio() {
   const [themeId, setThemeId] = useState<VideoThemeId>("javanese-classic");
   const [frame, setFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const activeTheme =
     VIDEO_THEMES.find((t) => t.id === themeId) || VIDEO_THEMES[0];
   const sampleCouple = DEMO_SAMPLES[themeId];
   const currentSceneIdx = Math.min(3, Math.floor(frame / 90));
 
-  // 30fps live motion playback
   useEffect(() => {
     if (!isPlaying) return;
-    let rafId = 0;
-    let last = performance.now();
-    const stepMs = 1000 / VIDEO_FPS;
-
-    const tick = (now: number) => {
-      if (now - last >= stepMs) {
-        last = now;
-        setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
-      }
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
+    const id = window.setInterval(() => {
+      setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
+    }, Math.round(1000 / VIDEO_FPS));
+    return () => window.clearInterval(id);
   }, [isPlaying]);
-
-  // Draw live motion frame
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    renderInvitationVideoFrame(
-      ctx,
-      frame,
-      canvas.width,
-      canvas.height,
-      themeId,
-      sampleCouple,
-      false
-    );
-  }, [frame, themeId, sampleCouple]);
 
   return (
     <section id="video-enterprise" className="py-16 md:py-24">
@@ -126,29 +108,30 @@ export function SaasVideoStudio() {
                   <Film size={13} /> Eksklusif Enterprise
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-3 py-1 text-[11px] font-semibold text-[#48484A]">
-                  After Effects Motion Engine · 30fps
+                  1:1 Theme Motion Graphic · 60fps FX
                 </span>
               </div>
 
               <h2 className="text-[30px] sm:text-[42px] font-bold leading-[1.08] tracking-[-0.03em] text-[#1D1D1F]">
-                Make Your Invitation Video — motion graphic kelas studio.
+                Make Your Invitation Video — 1:1 sesuai tema undangan asli.
               </h2>
 
               <p className="text-[15px] sm:text-[16px] leading-[1.7] text-[#48484A] max-w-xl">
-                Coba langsung 3 contoh motion graphic Enterprise di samping (
+                Lihat sampel langsung 3 tema unggulan Enterprise:{" "}
                 <strong>Javanese Classic</strong>,{" "}
                 <strong>Grand Ballroom</strong>, dan{" "}
-                <strong>Luxury Love Pink</strong>). Semua animasi dijalankan
-                secara prosedural lengkap dengan trim-path ornamen, track-matte
-                tipografi, dan light-leak transisi.
+                <strong>Luxury Pink</strong>. Seluruh tata letak, ornamen asli,
+                foto mempelai, ikon, dan animasi pembuka disusun identik dengan
+                undangan webnya lalu ditingkatkan dengan partikel &amp; transisi
+                sinematik.
               </p>
 
-              {/* Technical Layer Badges for Active Theme */}
+              {/* Technical Layer Badges */}
               <div className="rounded-2xl bg-white/60 border border-white/85 p-4 space-y-2.5">
                 <div className="flex items-center justify-between gap-2 text-[12px]">
                   <span className="inline-flex items-center gap-1.5 font-bold text-[#1D1D1F]">
                     <SlidersHorizontal size={13} className="text-[#007AFF]" />
-                    Komposisi Aktif: {activeTheme.name}
+                    Sampel Aktif: {activeTheme.name}
                   </span>
                   <span className="font-mono text-[11.5px] font-semibold text-[#007AFF] tabular">
                     TC {formatTimecode(frame)} · 30fps
@@ -199,23 +182,23 @@ export function SaasVideoStudio() {
               </div>
             </div>
 
-            {/* Right: Live 9:16 After Effects Motion Graphic Player */}
+            {/* Right: Live 9:16 1:1 Theme Motion Graphic Player */}
             <div className="lg:col-span-5 flex flex-col items-center gap-4">
-              {/* iOS Phone Frame */}
-              <div className="relative w-full max-w-[300px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#1D1D1F] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.48)] border border-white/25">
+              <div className="relative w-full max-w-[304px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#1D1D1F] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.48)] border border-white/25">
                 {/* Dynamic Island */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 h-5 w-24 rounded-full bg-black/90" />
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 h-5 w-24 rounded-full bg-black/90" />
 
                 <div className="relative h-full w-full rounded-[33px] overflow-hidden bg-black">
-                  <canvas
-                    ref={canvasRef}
-                    width={540}
-                    height={960}
-                    className="h-full w-full object-cover"
+                  <EnterpriseMotionPlayer
+                    themeId={themeId}
+                    couple={sampleCouple}
+                    sceneIdx={currentSceneIdx}
+                    progress={frame / VIDEO_TOTAL_FRAMES}
+                    isPlaying={isPlaying}
                   />
 
-                  {/* Subtle Floating Transport Overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 px-3 py-1.5 text-white">
+                  {/* Floating Transport Controls */}
+                  <div className="absolute bottom-3 left-3 right-3 z-50 flex items-center justify-between gap-2 rounded-full bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1.5 text-white">
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
@@ -248,7 +231,7 @@ export function SaasVideoStudio() {
                 </div>
               </div>
 
-              {/* 3-Theme Segmented Pill Switcher */}
+              {/* 3-Theme Switcher */}
               <div className="glx-pill p-1.5 inline-flex flex-wrap items-center justify-center gap-1">
                 {VIDEO_THEMES.map((t) => {
                   const active = themeId === t.id;
@@ -278,8 +261,8 @@ export function SaasVideoStudio() {
               </div>
 
               <p className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-[#6E6E73]">
-                <Layers size={13} className="text-[#007AFF]" /> Pilih tema di
-                atas untuk preview live motion graphic 9:16
+                <Layers size={13} className="text-[#007AFF]" /> Ganti tema untuk
+                melihat sampel video 1:1 sesuai desain asli
               </p>
             </div>
           </div>
