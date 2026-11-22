@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { SaasNav } from "@/components/saas/SaasNav";
 import { SaasHero } from "@/components/saas/SaasHero";
 import { SaasFeatures } from "@/components/saas/SaasFeatures";
 import { SaasTemplates } from "@/components/saas/SaasTemplates";
+import { SaasVideoStudio } from "@/components/saas/SaasVideoStudio";
 import { SaasSteps } from "@/components/saas/SaasSteps";
 import { SaasPricing } from "@/components/saas/SaasPricing";
 import { SaasTestis } from "@/components/saas/SaasTestis";
@@ -19,6 +20,7 @@ export default function LandingPage() {
       <SaasStrip />
       <SaasFeatures />
       <SaasTemplates />
+      <SaasVideoStudio />
       <SaasSteps />
       <SaasPricing />
       <SaasTestis />

@@ -71,3 +71,10 @@ RuangHadir beroperasi dengan model bisnis **2-Tier yang transparan**:
 - **Kompatibilitas:** Akun lama dengan `package_id` (`demo`, `reguler`, `premium`, `luxury`) tetap dapat login dan mengakses seluruh fitur Gratis tanpa migrasi destruktif.
 - **Performa & Build:** Harus lulus build produksi Next.js 16 di Vercel dengan Node.js `22.x`.
 - **Responsivitas:** Optimal pada mobile (`360px–430px`), tablet, dan desktop (`1280px+`).
+
+## 6. iOS 26 Liquid Glass UI & Enterprise Video Studio (v2.3.0)
+- **Global Design Language**: All SaaS marketing, authentication, and dashboard surfaces follow an iOS 26 Liquid Glass aesthetic (`.glx*` Tailwind v4 utilities, specular top-rim lighting, `backdrop-filter: blur() saturate()`, `#007AFF` primary system blue, `#1D1D1F` label typography, and `prefers-reduced-transparency` fallback).
+- **Make Your Invitation Video (Enterprise-Only)**:
+  - Auto-populates active wedding invitation data (couple names, event date/time, venue, invitation URL) into a 4-scene, 30fps animated composition.
+  - Supports `9:16` (1080×1920 Reels/TikTok/WhatsApp Status), `1:1` (1080×1080), and `16:9` (1920×1080) outputs.
+  - Free-tier users may preview their composition with an Enterprise Preview badge; watermark-free HD rendering and Remotion JSON Render Spec export are strictly unlocked for verified Enterprise accounts (`admin@ruanghadir.net`).

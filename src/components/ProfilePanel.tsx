@@ -94,14 +94,14 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-5 sm:p-8">
       {/* ── Profile Identity Card ── */}
-      <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6">
+      <section className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6">
         <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
           <div className="relative group shrink-0">
-            <Avatar className="h-20 w-20 border border-[#E6DFD3]">
+            <Avatar className="h-20 w-20 border border-[#E1E7F0]">
               {user.avatarUrl ? (
                 <AvatarImage src={user.avatarUrl} alt={user.fullName} className="object-cover" />
               ) : null}
-              <AvatarFallback className="bg-[#FAF6F0] text-[#1C1614] text-lg font-bold uppercase">
+              <AvatarFallback className="bg-[#F3F6FB] text-[#1D1D1F] text-lg font-bold uppercase">
                 {user.fullName?.substring(0, 2) || 'RH'}
               </AvatarFallback>
             </Avatar>
@@ -129,7 +129,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
           </div>
 
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="font-serif text-[22px] leading-tight text-[#1C1614]">
+            <h2 className="font-serif text-[22px] leading-tight text-[#1D1D1F]">
               {user.fullName}
             </h2>
             <p className="mt-0.5 text-[13px] text-[#6B5D54]">{user.email}</p>
@@ -138,20 +138,20 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold ${
                   isEnt
-                    ? 'bg-[#FBF4E6] text-[#8A611C]'
-                    : 'bg-[#EEF6F0] text-[#2D7A4F]'
+                    ? 'bg-[#EEEDFE] text-[#5856D6]'
+                    : 'bg-[#E8F8EC] text-[#1E7E34]'
                 }`}
               >
                 {isEnt ? <Building2 className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />}
                 Paket {pkgLabel}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-[#E6DFD3] bg-[#FAF7F2] px-2.5 py-1 text-[11px] font-semibold text-[#5C4E45]">
-                <CheckCircle2 className="h-3 w-3 text-[#2D7A4F]" />
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#E1E7F0] bg-[#F3F6FB] px-2.5 py-1 text-[11px] font-semibold text-[#48484A]">
+                <CheckCircle2 className="h-3 w-3 text-[#1E7E34]" />
                 Akun Aktif
               </span>
             </div>
 
-            <p className="mt-3 text-[11.5px] text-[#8B7D74]">
+            <p className="mt-3 text-[11.5px] text-[#6E6E73]">
               Masuk melalui{' '}
               {user.authProvider === 'enterprise'
                 ? 'Portal Enterprise'
@@ -166,13 +166,13 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
 
       {/* ── Invitation Links ── */}
       {invitations.length > 0 && (
-        <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6 space-y-4">
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-[#8B7D74]">
-            <Link2 className="h-3.5 w-3.5 text-[#8E2F45]" />
+        <section className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6 space-y-4">
+          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-[#6E6E73]">
+            <Link2 className="h-3.5 w-3.5 text-[#007AFF]" />
             <span>Tautan Undangan Anda</span>
           </div>
 
-          <div className="divide-y divide-[#F0E9DE] rounded-xl border border-[#ECE4D8] bg-[#FAF7F2]">
+          <div className="divide-y divide-[#F0E9DE] rounded-xl border border-[#ECE4D8] bg-[#F3F6FB]">
             {invitations.map((inv: any) => {
               const displaySlug = inv.slug || user.activeSlug || 'undangan';
               const fullUrl = `${appHost}/${displaySlug}`;
@@ -184,7 +184,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
                   className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-[13.5px] font-bold text-[#1C1614]">
+                    <p className="truncate text-[13.5px] font-bold text-[#1D1D1F]">
                       {inv.title || 'Proyek Undangan'}
                     </p>
                     <p className="truncate font-mono text-[12px] text-[#6B5D54]">
@@ -195,10 +195,10 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
                     <button
                       type="button"
                       onClick={() => handleCopySlug(inv.id, fullUrl)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#DDD4C6] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#1C1614] transition hover:bg-[#F5EFE6] cursor-pointer"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#D2DAE6] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#1D1D1F] transition hover:bg-[#F5EFE6] cursor-pointer"
                     >
                       {isCopied ? (
-                        <Check className="h-3.5 w-3.5 text-[#2D7A4F]" />
+                        <Check className="h-3.5 w-3.5 text-[#1E7E34]" />
                       ) : (
                         <Copy className="h-3.5 w-3.5 text-[#6B5D54]" />
                       )}
@@ -208,7 +208,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
                       href={`/${displaySlug}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-[#DDD4C6] bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#8E2F45] transition hover:bg-[#F5EFE6]"
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#D2DAE6] bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#007AFF] transition hover:bg-[#F5EFE6]"
                       title="Buka undangan"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -222,9 +222,9 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
       )}
 
       {/* ── Account Details ── */}
-      <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6 space-y-4">
-        <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-[#8B7D74]">
-          <User className="h-3.5 w-3.5 text-[#8E2F45]" />
+      <section className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6 space-y-4">
+        <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-[#6E6E73]">
+          <User className="h-3.5 w-3.5 text-[#007AFF]" />
           <span>Informasi Akun</span>
         </div>
 
@@ -251,13 +251,13 @@ function InfoField({
   value: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-[#EFE9DF] bg-[#FAF7F2] p-3.5">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#8B7D74]" />
+    <div className="flex items-start gap-3 rounded-xl border border-[#EFE9DF] bg-[#F3F6FB] p-3.5">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#6E6E73]" />
       <div className="min-w-0">
-        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-[#8B7D74]">
+        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-[#6E6E73]">
           {label}
         </span>
-        <span className="mt-0.5 block truncate text-[13.5px] font-semibold text-[#1C1614] select-text">
+        <span className="mt-0.5 block truncate text-[13.5px] font-semibold text-[#1D1D1F] select-text">
           {value}
         </span>
       </div>

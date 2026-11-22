@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   PenLine,
   Palette,
+  Film,
   Users,
   BarChart3,
   UserCircle,
@@ -32,7 +33,6 @@ interface DashboardSidebarProps {
   isPublished?: boolean;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
-  // Multi-project
   currentInvitationId?: string | null;
   allInvitations?: {
     id: string;
@@ -47,13 +47,22 @@ interface DashboardSidebarProps {
   onUpdateSlug?: (invitationId: string, newSlug: string) => void;
 }
 
-const NAV_GROUPS = [
+const NAV_GROUPS: {
+  label: string;
+  items: {
+    id: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string;
+  }[];
+}[] = [
   {
     label: 'Workspace',
     items: [
       { id: 'overview', label: 'Ringkasan', icon: LayoutDashboard },
       { id: 'design', label: 'Editor Undangan', icon: PenLine },
       { id: 'settings', label: 'Koleksi Tema', icon: Palette },
+      { id: 'video', label: 'Video Studio', icon: Film, badge: 'ENT' },
     ],
   },
   {
@@ -70,7 +79,7 @@ const NAV_GROUPS = [
       { id: 'upgrade', label: 'Paket & Enterprise', icon: Building2 },
     ],
   },
-] as const;
+];
 
 export default function DashboardSidebar({
   activeSegment,
@@ -96,9 +105,9 @@ export default function DashboardSidebar({
   };
 
   const sidebarBody = (
-    <div className="flex h-full flex-col bg-white text-[#1C1614] font-sans">
+    <div className="flex h-full flex-col bg-white/75 backdrop-blur-2xl text-[#1D1D1F] font-sans">
       {/* Brand Header */}
-      <div className="flex h-14 items-center border-b border-[#EAE3D8] px-5 shrink-0">
+      <div className="flex h-14 items-center border-b border-black/[0.06] px-5 shrink-0">
         <Logo variant="lockup" isLink={false} height="h-7" />
       </div>
 
@@ -126,10 +135,10 @@ export default function DashboardSidebar({
         <nav className="space-y-5" aria-label="Navigasi Dashboard">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
-              <p className="mb-1.5 px-3 text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#9A8C82]">
+              <p className="mb-1.5 px-3 text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#8E8E93]">
                 {group.label}
               </p>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const active = activeSegment === item.id;
@@ -138,14 +147,27 @@ export default function DashboardSidebar({
                       key={item.id}
                       type="button"
                       onClick={() => handleSelect(item.id)}
-                      className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold transition-colors cursor-pointer ${
+                      className={`flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-[13px] font-semibold transition-all cursor-pointer ${
                         active
-                          ? 'bg-[#8E2F45]/10 text-[#8E2F45]'
-                          : 'text-[#5C4E45] hover:bg-[#FAF6F0] hover:text-[#1C1614]'
+                          ? 'bg-[#007AFF] text-white shadow-[0_8px_20px_-8px_rgba(0,122,255,0.65)]'
+                          : 'text-[#48484A] hover:bg-white/80 hover:text-[#1D1D1F]'
                       }`}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                      {item.badge && (
+                        <span
+                          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            active
+                              ? 'bg-white/25 text-white'
+                              : 'bg-[#5856D6]/12 text-[#5856D6]'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -162,7 +184,7 @@ export default function DashboardSidebar({
               onPublish?.();
               onMobileOpenChange(false);
             }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#8E2F45] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#732336] cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#1E8FFF] to-[#007AFF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(0,122,255,0.65)] transition hover:brightness-105 active:scale-[0.98] cursor-pointer"
           >
             <Globe className="h-4 w-4" />
             <span>{isPublished ? 'Bagikan Undangan' : 'Publish Undangan'}</span>
@@ -171,14 +193,14 @@ export default function DashboardSidebar({
       </div>
 
       {/* User Footer */}
-      <div className="border-t border-[#EAE3D8] p-3 shrink-0">
-        <div className="flex items-center gap-2.5 rounded-xl p-2 hover:bg-[#FAF6F0] transition">
+      <div className="border-t border-black/[0.06] p-3 shrink-0">
+        <div className="flex items-center gap-2.5 rounded-2xl p-2 hover:bg-white/75 transition">
           <button
             type="button"
             onClick={() => handleSelect('profile')}
             className="flex flex-1 items-center gap-2.5 min-w-0 text-left cursor-pointer"
           >
-            <Avatar className="h-9 w-9 border border-[#E6DFD3] shrink-0">
+            <Avatar className="h-9 w-9 border border-white/80 shadow-sm shrink-0">
               {user?.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
@@ -186,26 +208,26 @@ export default function DashboardSidebar({
                   className="h-full w-full object-cover rounded-full"
                 />
               ) : null}
-              <AvatarFallback className="bg-[#FAF6F0] text-[#1C1614] text-[11px] font-bold uppercase">
+              <AvatarFallback className="bg-[#007AFF]/12 text-[#007AFF] text-[11px] font-bold uppercase">
                 {user?.fullName?.substring(0, 2) || 'RH'}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="truncate text-[13px] font-bold text-[#1C1614]">
+                <p className="truncate text-[13px] font-bold text-[#1D1D1F]">
                   {user?.fullName || 'Pengguna'}
                 </p>
                 <span
                   className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider ${
                     isEnt
-                      ? 'bg-[#FBF4E6] text-[#8A611C]'
-                      : 'bg-[#EEF6F0] text-[#2D7A4F]'
+                      ? 'bg-[#5856D6]/14 text-[#5856D6]'
+                      : 'bg-[#34C759]/14 text-[#1E7E34]'
                   }`}
                 >
                   {pkgLabel}
                 </span>
               </div>
-              <p className="truncate text-[11px] text-[#8B7D74]">{user?.email || ''}</p>
+              <p className="truncate text-[11px] text-[#6E6E73]">{user?.email || ''}</p>
             </div>
           </button>
 
@@ -214,7 +236,7 @@ export default function DashboardSidebar({
             onClick={onLogout}
             title="Keluar Akun"
             aria-label="Keluar Akun"
-            className="rounded-lg p-2 text-[#8B7D74] transition hover:bg-[#FBECEA] hover:text-[#9B2C2C] cursor-pointer shrink-0"
+            className="rounded-xl p-2 text-[#6E6E73] transition hover:bg-[#FF3B30]/12 hover:text-[#D70015] cursor-pointer shrink-0"
           >
             <LogOut className="h-4 w-4" />
           </button>
@@ -225,14 +247,12 @@ export default function DashboardSidebar({
 
   return (
     <>
-      {/* Persistent Desktop Sidebar */}
-      <aside className="hidden lg:flex w-[248px] shrink-0 flex-col border-r border-[#EAE3D8] bg-white h-full">
+      <aside className="hidden lg:flex w-[256px] shrink-0 flex-col border-r border-white/80 bg-white/65 backdrop-blur-2xl h-full">
         {sidebarBody}
       </aside>
 
-      {/* Mobile Drawer */}
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetContent side="left" className="w-[272px] p-0 z-[300]">
+        <SheetContent side="left" className="w-[276px] p-0 z-[300] bg-white/85 backdrop-blur-2xl">
           <SheetTitle className="sr-only">Menu Navigasi Workspace</SheetTitle>
           {sidebarBody}
         </SheetContent>

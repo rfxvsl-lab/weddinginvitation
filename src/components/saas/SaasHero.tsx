@@ -476,7 +476,7 @@ export function SaasHero() {
                         </div>
 
                         <div className="my-auto space-y-3">
-                          <div className="mx-auto inline-flex flex-col items-center rounded-2xl bg-[#FAF6F0] p-3 text-[#1C1614] shadow-md">
+                          <div className="mx-auto inline-flex flex-col items-center rounded-2xl bg-[#F3F6FB] p-3 text-[#1D1D1F] shadow-md">
                             <QrMock size={76} />
                             <span className="mt-1.5 font-mono text-[8.5px] font-bold tracking-[0.16em] text-[#6B5D54]">
                               VIP · CHECK-IN PASS

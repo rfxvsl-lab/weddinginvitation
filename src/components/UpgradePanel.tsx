@@ -138,21 +138,21 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-5 sm:p-8">
       {/* ── Active Plan Banner ── */}
-      <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6">
+      <section className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3.5">
             <div
               className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                isEnt ? 'bg-[#FBF4E6] text-[#8A611C]' : 'bg-[#EEF6F0] text-[#2D7A4F]'
+                isEnt ? 'bg-[#EEEDFE] text-[#5856D6]' : 'bg-[#E8F8EC] text-[#1E7E34]'
               }`}
             >
               {isEnt ? <Building2 className="h-5 w-5" /> : <ShieldCheck className="h-5 w-5" />}
             </div>
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8B7D74]">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6E6E73]">
                 Paket Aktif Saat Ini
               </span>
-              <h2 className="text-[20px] font-bold text-[#1C1614]">
+              <h2 className="text-[20px] font-bold text-[#1D1D1F]">
                 {isEnt ? 'RuangHadir Enterprise' : 'RuangHadir Full Gratis'}
               </h2>
               <p className="mt-0.5 text-[13px] text-[#6B5D54]">
@@ -164,7 +164,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
           </div>
           <span
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-bold ${
-              isEnt ? 'bg-[#FBF4E6] text-[#8A611C]' : 'bg-[#EEF6F0] text-[#2D7A4F]'
+              isEnt ? 'bg-[#EEEDFE] text-[#5856D6]' : 'bg-[#E8F8EC] text-[#1E7E34]'
             }`}
           >
             <Check className="h-3.5 w-3.5" />
@@ -176,20 +176,20 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
       {/* ── 2-Tier Comparison ── */}
       <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* Free Card */}
-        <div className="flex flex-col rounded-2xl border border-[#E6DFD3] bg-white p-6">
+        <div className="flex flex-col rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2D7A4F]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#1E7E34]">
               Personal
             </span>
             {!isEnt && (
-              <span className="rounded-full bg-[#EEF6F0] px-2.5 py-0.5 text-[10.5px] font-bold text-[#2D7A4F]">
+              <span className="rounded-full bg-[#E8F8EC] px-2.5 py-0.5 text-[10.5px] font-bold text-[#1E7E34]">
                 Paket Anda
               </span>
             )}
           </div>
-          <h3 className="mt-2 font-serif text-[24px] text-[#1C1614]">Full Gratis</h3>
-          <p className="mt-1 text-[28px] font-extrabold text-[#1C1614]">
-            Rp 0 <span className="text-[12.5px] font-normal text-[#8B7D74]">/ selamanya</span>
+          <h3 className="mt-2 font-serif text-[24px] text-[#1D1D1F]">Full Gratis</h3>
+          <p className="mt-1 text-[28px] font-extrabold text-[#1D1D1F]">
+            Rp 0 <span className="text-[12.5px] font-normal text-[#6E6E73]">/ selamanya</span>
           </p>
           <p className="mt-2 text-[13px] text-[#6B5D54]">
             Untuk pasangan yang ingin membuat dan menerbitkan undangan digital elegan tanpa biaya.
@@ -197,7 +197,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
           <ul className="mt-5 space-y-2.5 flex-1">
             {FREE_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2.5 text-[13px] text-[#4A3E36]">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2D7A4F]" />
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#1E7E34]" />
                 <span>{f}</span>
               </li>
             ))}
@@ -207,19 +207,19 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
         {/* Enterprise Card */}
         <div className="flex flex-col rounded-2xl border border-[#D8C5A3] bg-[#FCF9F3] p-6">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#8A611C]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#5856D6]">
               WO · Agensi · Korporat
             </span>
             {isEnt && (
-              <span className="rounded-full bg-[#FBF4E6] px-2.5 py-0.5 text-[10.5px] font-bold text-[#8A611C]">
+              <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-[10.5px] font-bold text-[#5856D6]">
                 Aktif
               </span>
             )}
           </div>
-          <h3 className="mt-2 font-serif text-[24px] text-[#1C1614]">Enterprise</h3>
-          <p className="mt-1 text-[28px] font-extrabold text-[#1C1614]">
+          <h3 className="mt-2 font-serif text-[24px] text-[#1D1D1F]">Enterprise</h3>
+          <p className="mt-1 text-[28px] font-extrabold text-[#1D1D1F]">
             Custom{' '}
-            <span className="text-[12.5px] font-normal text-[#8B7D74]">/ kontrak organisasi</span>
+            <span className="text-[12.5px] font-normal text-[#6E6E73]">/ kontrak organisasi</span>
           </p>
           <p className="mt-2 text-[13px] text-[#6B5D54]">
             Dirancang untuk Wedding Organizer, agensi event, dan perusahaan dengan akses email kantor resmi.
@@ -227,7 +227,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
           <ul className="mt-5 space-y-2.5 flex-1">
             {ENTERPRISE_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2.5 text-[13px] text-[#4A3E36]">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#8E2F45]" />
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#007AFF]" />
                 <span>{f}</span>
               </li>
             ))}
@@ -236,7 +236,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
           <div className="mt-6 flex flex-wrap gap-2">
             <a
               href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Permintaan%20Paket%20Enterprise%20RuangHadir`}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#1C1614] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#332925]"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#1D1D1F] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#332925]"
             >
               <Mail className="h-4 w-4" />
               Hubungi {ENTERPRISE_CONTACT_EMAIL}
@@ -244,10 +244,10 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
             <button
               type="button"
               onClick={handleCopyEmail}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#DDD4C6] bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-[#1C1614] transition hover:bg-[#FAF6F0] cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#D2DAE6] bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-[#1D1D1F] transition hover:bg-[#F3F6FB] cursor-pointer"
               title="Salin email Enterprise"
             >
-              {copiedEmail ? <Check className="h-4 w-4 text-[#2D7A4F]" /> : <Copy className="h-4 w-4 text-[#6B5D54]" />}
+              {copiedEmail ? <Check className="h-4 w-4 text-[#1E7E34]" /> : <Copy className="h-4 w-4 text-[#6B5D54]" />}
               {copiedEmail ? 'Tersalin' : 'Salin'}
             </button>
           </div>
@@ -256,20 +256,20 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
 
       {/* ── Inline Enterprise Access Code Activation ── */}
       {!isEnt && (
-        <section className="rounded-2xl border border-[#E6DFD3] bg-white p-6">
+        <section className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-6">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8E2F45]/10 text-[#8E2F45]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#007AFF]/10 text-[#007AFF]">
               <KeyRound className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-[#1C1614]">
+              <h3 className="text-[15px] font-bold text-[#1D1D1F]">
                 Sudah Punya Kode Akses Enterprise?
               </h3>
               <p className="mt-0.5 text-[12.5px] text-[#6B5D54]">
                 Masukkan email perusahaan resmi dan kode khusus dari{' '}
                 <a
                   href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`}
-                  className="font-semibold text-[#8E2F45] hover:underline"
+                  className="font-semibold text-[#007AFF] hover:underline"
                 >
                   {ENTERPRISE_CONTACT_EMAIL}
                 </a>{' '}
@@ -280,7 +280,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
 
           <form onSubmit={handleActivateEnterprise} className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-12">
             <div className="sm:col-span-5">
-              <label htmlFor="dash-ent-email" className="mb-1.5 block text-[11.5px] font-bold text-[#5C4E45]">
+              <label htmlFor="dash-ent-email" className="mb-1.5 block text-[11.5px] font-bold text-[#48484A]">
                 Email Perusahaan
               </label>
               <input
@@ -290,12 +290,12 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
                 value={companyEmail}
                 onChange={(e) => setCompanyEmail(e.target.value)}
                 placeholder="nama@perusahaan.co.id"
-                className="w-full rounded-xl border border-[#DDD4C6] bg-[#FAF7F2] px-3.5 py-2.5 text-[13px] text-[#1C1614] outline-none focus:border-[#8E2F45] focus:bg-white"
+                className="w-full rounded-xl border border-[#D2DAE6] bg-[#F3F6FB] px-3.5 py-2.5 text-[13px] text-[#1D1D1F] outline-none focus:border-[#007AFF] focus:bg-white"
               />
             </div>
 
             <div className="sm:col-span-4">
-              <label htmlFor="dash-ent-code" className="mb-1.5 block text-[11.5px] font-bold text-[#5C4E45]">
+              <label htmlFor="dash-ent-code" className="mb-1.5 block text-[11.5px] font-bold text-[#48484A]">
                 Kode Akses Khusus
               </label>
               <input
@@ -305,7 +305,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
                 placeholder="RH-ENT-XXXXXX"
-                className="w-full rounded-xl border border-[#DDD4C6] bg-[#FAF7F2] px-3.5 py-2.5 font-mono text-[13px] uppercase tracking-wider text-[#1C1614] outline-none focus:border-[#8E2F45] focus:bg-white"
+                className="w-full rounded-xl border border-[#D2DAE6] bg-[#F3F6FB] px-3.5 py-2.5 font-mono text-[13px] uppercase tracking-wider text-[#1D1D1F] outline-none focus:border-[#007AFF] focus:bg-white"
               />
             </div>
 
@@ -313,7 +313,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#8E2F45] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#732336] disabled:opacity-50 cursor-pointer"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#007AFF] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#0062CC] disabled:opacity-50 cursor-pointer"
               >
                 <span>{submitting ? 'Memverifikasi...' : 'Aktifkan'}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -322,14 +322,14 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
           </form>
 
           {error && (
-            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#B03A3A]/25 bg-[#FBECEA] px-3.5 py-2.5 text-[12.5px] text-[#9B2C2C]">
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#B03A3A]/25 bg-[#FFEBEA] px-3.5 py-2.5 text-[12.5px] text-[#D70015]">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#2D7A4F]/25 bg-[#EEF6F0] px-3.5 py-2.5 text-[12.5px] text-[#2D7A4F]">
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-[#1E7E34]/25 bg-[#E8F8EC] px-3.5 py-2.5 text-[12.5px] text-[#1E7E34]">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{successMsg}</span>
             </div>

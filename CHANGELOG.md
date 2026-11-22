@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.0] — iOS 26 Liquid Glass Overhaul & Enterprise Video Studio
+### Added
+- **iOS 26 Liquid Glass Design System** (`src/index.css`): Added Tailwind v4 `@utility glx`, `glx-strong`, `glx-pill`, `glx-inset`, `glx-dark`, and `.glx-wallpaper` atmospheric backdrop inspired by Apple Liquid Glass material optics (`admos98/liquid-glass-suite`), with accessible `prefers-reduced-transparency` fallbacks.
+- **Enterprise "Make Your Invitation Video" Studio** (`src/components/VideoInvitationStudio.tsx`): New Enterprise-gated dashboard module (`Video Studio`) built on a 30fps Remotion-aligned composition model featuring 4 motion presets (`Liquid Glass`, `Midnight Titanium`, `Editorial Pearl`, `Botanical Mist`), 3 aspect ratios (`9:16` Reels/TikTok/WA Status, `1:1` Feed, `16:9` Venue), live timeline scrubber, real browser HD `.webm` video rendering, and Remotion JSON Render Spec export.
+- **Landing Page Video Showcase** (`src/components/saas/SaasVideoStudio.tsx`): Added interactive 9:16 iOS phone motion preview showcasing Enterprise video invitations with direct inquiry CTA to `admin@ruanghadir.net`.
+
+### Changed
+- **Global UI & Palette Overhaul**: Migrated Landing Page, Navigation (`SaasNav.tsx` floating glass capsule), Auth, and all Dashboard modules from warm ivory/wine to cohesive iOS 26 Liquid Glass (`#007AFF` System Blue, `#5856D6` Enterprise Indigo, `#1D1D1F` Apple label ink, frosted translucent surfaces).
+- **Enterprise Pricing & Upgrade Panels**: Highlighted "Make Your Invitation Video" as an exclusive Enterprise capability across `SaasPricing.tsx` and `UpgradePanel.tsx`.
+
 Semua perubahan signifikan pada **RuangHadir** (`www.ruanghadir.net`) dicatat secara berkala pada dokumen ini menggunakan format [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [2.0.0] — 2026-11-22

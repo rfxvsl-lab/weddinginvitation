@@ -83,7 +83,7 @@ export default function ProjectSwitcher({
         className="group/bento w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-white border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-200 text-left"
       >
         <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
-          <FileText className="w-4 h-4 text-[#8E2F45]" />
+          <FileText className="w-4 h-4 text-[#007AFF]" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-bold text-zinc-800 truncate transition-transform duration-200 group-hover/bento:translate-x-0.5">
@@ -125,8 +125,8 @@ export default function ProjectSwitcher({
                           : 'text-zinc-600 border border-transparent hover:bg-zinc-50 hover:border-zinc-200 hover:shadow-md'
                       }`}
                     >
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-[#8E2F45]/10' : 'bg-zinc-100'}`}>
-                        <FileText className={`w-3.5 h-3.5 ${isActive ? 'text-[#8E2F45]' : 'text-zinc-400'}`} />
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-[#007AFF]/10' : 'bg-zinc-100'}`}>
+                        <FileText className={`w-3.5 h-3.5 ${isActive ? 'text-[#007AFF]' : 'text-zinc-400'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-semibold truncate transition-transform duration-200 group-hover/bento:translate-x-0.5">{inv.title}</p>
@@ -139,7 +139,7 @@ export default function ProjectSwitcher({
                           </span>
                         </div>
                       </div>
-                      {isActive && <Check className="w-3.5 h-3.5 text-[#8E2F45] shrink-0" />}
+                      {isActive && <Check className="w-3.5 h-3.5 text-[#007AFF] shrink-0" />}
                     </button>
 
                     {/* Per-project slug editor (Premium/Luxury only) */}
@@ -162,7 +162,7 @@ export default function ProjectSwitcher({
                             <button
                               onClick={(e) => { e.stopPropagation(); handleSlugSave(inv.id); }}
                               disabled={!slugInput.trim()}
-                              className="px-2.5 py-1 bg-[#8E2F45] text-white rounded-lg text-[9px] font-bold disabled:opacity-30 hover:bg-[#732336] transition"
+                              className="px-2.5 py-1 bg-[#007AFF] text-white rounded-lg text-[9px] font-bold disabled:opacity-30 hover:bg-[#0062CC] transition"
                             >
                               OK
                             </button>
@@ -174,7 +174,7 @@ export default function ProjectSwitcher({
                               setEditingSlugId(inv.id);
                               setSlugInput(inv.slug || '');
                             }}
-                            className="flex items-center gap-1 text-[9px] text-zinc-400 hover:text-[#8E2F45] transition"
+                            className="flex items-center gap-1 text-[9px] text-zinc-400 hover:text-[#007AFF] transition"
                           >
                             <Pencil className="w-2.5 h-2.5" />
                             Ubah slug proyek ini
@@ -207,7 +207,7 @@ export default function ProjectSwitcher({
                     <button
                       onClick={handleCreate}
                       disabled={!newTitle.trim()}
-                      className="flex-1 py-1.5 bg-[#8E2F45] text-white rounded-lg text-[10px] font-bold uppercase tracking-wider disabled:opacity-30 hover:bg-[#732336] transition"
+                      className="flex-1 py-1.5 bg-[#007AFF] text-white rounded-lg text-[10px] font-bold uppercase tracking-wider disabled:opacity-30 hover:bg-[#0062CC] transition"
                     >
                       Buat
                     </button>
@@ -222,7 +222,7 @@ export default function ProjectSwitcher({
               ) : (
                 <button
                   onClick={() => setIsCreating(true)}
-                  className="group/bento w-full flex items-center gap-2.5 px-3.5 py-2.5 text-zinc-500 hover:bg-zinc-50 hover:text-[#8E2F45] transition-all duration-200"
+                  className="group/bento w-full flex items-center gap-2.5 px-3.5 py-2.5 text-zinc-500 hover:bg-zinc-50 hover:text-[#007AFF] transition-all duration-200"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span className="text-[11px] font-semibold transition-transform duration-200 group-hover/bento:translate-x-0.5">Buat Proyek Baru</span>

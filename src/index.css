@@ -1549,3 +1549,284 @@ body {
 .dashboard-shell-lock ::-webkit-scrollbar-thumb:hover {
   background: #B9AA98;
 }
+
+
+/* ==========================================================================
+   iOS 26 LIQUID GLASS DESIGN SYSTEM (Tailwind v4 + Apple Material Optics)
+   Inspired by admos98/liquid-glass-suite (glx* utilities, specular rim,
+   backdrop blur + saturation, reduced-transparency accessible fallback).
+   ========================================================================== */
+
+@utility glx {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
+  backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 1px rgba(15, 23, 42, 0.04),
+    inset 1px 0 1px rgba(255, 255, 255, 0.45),
+    0 12px 36px -16px rgba(15, 23, 42, 0.12);
+}
+
+@utility glx-strong {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
+  backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(15, 23, 42, 0.05),
+    0 18px 48px -20px rgba(15, 23, 42, 0.16);
+}
+
+@utility glx-pill {
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 24px -12px rgba(15, 23, 42, 0.12);
+}
+
+@utility glx-inset {
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    inset 0 1px 3px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@utility glx-dark {
+  background: rgba(28, 28, 30, 0.78);
+  color: #F5F5F7;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 24px 60px -20px rgba(0, 0, 0, 0.45);
+}
+
+.glx-wallpaper {
+  background-color: #EEF2F8;
+  background-image:
+    radial-gradient(920px 540px at 8% -6%, rgba(0, 122, 255, 0.16), transparent 62%),
+    radial-gradient(840px 560px at 92% 4%, rgba(88, 86, 214, 0.14), transparent 60%),
+    radial-gradient(760px 560px at 52% 96%, rgba(175, 82, 222, 0.10), transparent 64%),
+    linear-gradient(180deg, #F4F7FC 0%, #EDF1F8 100%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glx,
+  .glx-strong,
+  .glx-pill,
+  .saas-card,
+  .saas-glass {
+    background: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-color: #DCE2EC !important;
+  }
+}
+
+/* Override .saas-scope to iOS 26 Liquid Glass Aesthetic */
+.saas-scope {
+  --saas-bg: #EEF2F8;
+  --saas-surface: rgba(255, 255, 255, 0.68);
+  --saas-ink: #1D1D1F;
+  --saas-ink-2: #48484A;
+  --saas-muted: #6E6E73;
+  --saas-faint: #8E8E93;
+  --saas-line: rgba(255, 255, 255, 0.78);
+  --saas-line-strong: rgba(15, 23, 42, 0.12);
+  --saas-primary: #007AFF;
+  --saas-primary-hover: #0062CC;
+  --saas-primary-soft: rgba(0, 122, 255, 0.11);
+  --saas-wine: #007AFF;
+  --saas-wine-2: #1E8FFF;
+  --saas-wine-soft: rgba(0, 122, 255, 0.11);
+  --saas-navy: #1C1C1E;
+  --saas-navy-2: #2C2C2E;
+  --saas-gold: #5856D6;
+  --saas-gold-2: #AF52DE;
+  --saas-gold-soft: rgba(88, 86, 214, 0.12);
+  --saas-success: #1E7E34;
+  --saas-green: #1E7E34;
+  --saas-success-soft: rgba(52, 199, 89, 0.14);
+  --saas-amber: #B25000;
+  --saas-amber-soft: rgba(255, 149, 0, 0.14);
+  --saas-danger: #D70015;
+  --saas-danger-soft: rgba(255, 59, 48, 0.12);
+  --saas-radius: 26px;
+  --saas-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 20px 50px -22px rgba(15, 23, 42, 0.18);
+  --saas-shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 12px 32px -18px rgba(15, 23, 42, 0.14);
+  --saas-ring: 0 0 0 3px rgba(0, 122, 255, 0.22);
+
+  background-color: #EEF2F8;
+  background-image:
+    radial-gradient(960px 540px at 10% -4%, rgba(0, 122, 255, 0.17), transparent 62%),
+    radial-gradient(880px 560px at 90% 6%, rgba(88, 86, 214, 0.15), transparent 60%),
+    radial-gradient(800px 520px at 50% 52%, rgba(90, 200, 250, 0.12), transparent 65%),
+    linear-gradient(180deg, #F5F8FD 0%, #ECF1F8 100%);
+  color: var(--saas-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+}
+
+.saas-scope h1,
+.saas-scope h2,
+.saas-scope h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.028em;
+  color: var(--saas-ink);
+  font-weight: 700;
+}
+
+.saas-scope .saas-serif-i {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.saas-scope .saas-statnum {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.saas-scope .saas-card {
+  background: rgba(255, 255, 255, 0.66);
+  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
+  backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 26px;
+  box-shadow: var(--saas-shadow-sm);
+}
+
+.saas-scope .saas-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--saas-shadow);
+  border-color: rgba(255, 255, 255, 0.96);
+}
+
+.saas-scope .saas-dark-panel,
+.saas-scope .saas-navy-panel {
+  background: linear-gradient(155deg, rgba(28, 28, 30, 0.88) 0%, rgba(20, 24, 38, 0.92) 100%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #F5F5F7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 28px 64px -22px rgba(15, 23, 42, 0.42);
+}
+
+.saas-scope .saas-btn-primary {
+  background: linear-gradient(180deg, #1E8FFF 0%, #007AFF 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 12px 26px -10px rgba(0, 122, 255, 0.58);
+}
+.saas-scope .saas-btn-primary:hover {
+  background: linear-gradient(180deg, #0F84FF 0%, #0062CC 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    0 16px 32px -10px rgba(0, 122, 255, 0.65);
+}
+
+.saas-scope .saas-btn-outline {
+  background: rgba(255, 255, 255, 0.68);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  color: #1D1D1F;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 6px 18px -10px rgba(15, 23, 42, 0.14);
+}
+.saas-scope .saas-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+.saas-scope .saas-input {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.saas-scope .saas-input:focus {
+  background: #FFFFFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.18);
+}
+
+.saas-scope .saas-glass {
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.saas-scope .saas-kicker,
+.saas-scope .saas-eyebrow {
+  color: #007AFF;
+  letter-spacing: 0.16em;
+}
+.saas-scope .saas-kicker::before,
+.saas-scope .saas-eyebrow::before {
+  background: linear-gradient(90deg, #007AFF, #5856D6);
+}
+
+.saas-scope .saas-icon-box {
+  background: rgba(0, 122, 255, 0.10);
+  color: #007AFF;
+  border: 1px solid rgba(0, 122, 255, 0.16);
+  border-radius: 16px;
+}
+
+/* Dashboard Apple Cool Neutral + System Blue Palette Bridge */
+.saas-dash {
+  --color-zinc-50:  #F5F7FB;
+  --color-zinc-100: #ECEFF6;
+  --color-zinc-200: #DCE2EC;
+  --color-zinc-300: #C6CFDE;
+  --color-zinc-400: #8E96A4;
+  --color-zinc-500: #6E6E73;
+  --color-zinc-600: #48484A;
+  --color-zinc-700: #3A3A3C;
+  --color-zinc-800: #2C2C2E;
+  --color-zinc-900: #1D1D1F;
+  --color-zinc-950: #111113;
+
+  --color-amber-50:  #F2F1FE;
+  --color-amber-100: #E5E4FC;
+  --color-amber-200: #CECCFA;
+  --color-amber-300: #B1AEF7;
+  --color-amber-400: #8B87F0;
+  --color-amber-500: #5856D6;
+  --color-amber-600: #4B49BD;
+  --color-amber-700: #3E3C9E;
+  --color-amber-800: #323080;
+  --color-amber-900: #252463;
+
+  --color-rose-50:  #EDF6FF;
+  --color-rose-100: #D8ECFF;
+  --color-rose-200: #B4DAFF;
+  --color-rose-300: #7EC0FF;
+  --color-rose-400: #3D9EFF;
+  --color-rose-500: #007AFF;
+  --color-rose-600: #0062CC;
+  --color-rose-700: #004DA3;
+}
+
+.dashboard-shell-lock ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.16);
+}
+.dashboard-shell-lock ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.28);
+}

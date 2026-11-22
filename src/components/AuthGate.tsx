@@ -293,7 +293,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   };
 
   return (
-    <div className="saas-scope min-h-screen bg-[#FAF6F0] text-[#1C1614] flex flex-col font-sans relative selection:bg-[#8E2F45] selection:text-white">
+    <div className="saas-scope min-h-screen bg-[#F3F6FB] text-[#1D1D1F] flex flex-col font-sans relative selection:bg-[#007AFF] selection:text-white">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 z-10">
         {/* ==================== SIGN IN VIEW ==================== */}
         {mode === 'signin' && !showWelcome && (
@@ -371,13 +371,13 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         {/* ==================== WELCOME GREETING ==================== */}
         {showWelcome && welcomeUser && (
           <div className="w-full max-w-md saas-card p-8 sm:p-10 text-center space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#EEF6F0] border border-[#2D7A4F]/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-[#2D7A4F]" />
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#E8F8EC] border border-[#1E7E34]/20 flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-[#1E7E34]" />
             </div>
 
             <div className="space-y-2">
               <span className="saas-kicker">Akun Aktif · Full Gratis</span>
-              <h2 className="text-[28px] font-serif text-[#1C1614] leading-tight">
+              <h2 className="text-[28px] font-serif text-[#1D1D1F] leading-tight">
                 Selamat Datang, {welcomeUser.fullName}
               </h2>
               <p className="text-[13.5px] text-[#6B5D54] leading-relaxed">
@@ -385,16 +385,16 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               </p>
             </div>
 
-            <div className="bg-[#FAF6F0] border border-[#E6DFD3] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
+            <div className="bg-[#F3F6FB] border border-[#E1E7F0] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
               <div className="flex justify-between items-center">
                 <span className="text-[#6B5D54]">Paket Aktif</span>
-                <span className="font-bold text-[#2D7A4F] bg-[#EEF6F0] px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#1E7E34] bg-[#E8F8EC] px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
                   Full Gratis · Rp 0
                 </span>
               </div>
               <div className="flex justify-between items-center gap-3">
                 <span className="text-[#6B5D54]">Tautan Undangan</span>
-                <span className="font-mono text-[12px] font-semibold text-[#1C1614] truncate">
+                <span className="font-mono text-[12px] font-semibold text-[#1D1D1F] truncate">
                   ruanghadir.net/{welcomeUser.activeSlug}
                 </span>
               </div>

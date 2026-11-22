@@ -125,7 +125,7 @@ export function SaasCta() {
             </p>
             <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
               <label
-                className="flex flex-1 items-center gap-2 rounded-full border px-4 py-2.5 text-[13px] font-semibold focus-within:border-[#8E2F45]"
+                className="flex flex-1 items-center gap-2 rounded-full border px-4 py-2.5 text-[13px] font-semibold focus-within:border-[#007AFF]"
                 style={{
                   borderColor: "var(--saas-line-strong)",
                   background: "var(--saas-bg)",

@@ -289,7 +289,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             }}
             className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
               canAccess(packageId, 'canQR')
-                ? 'bg-[#8E2F45] hover:bg-[#732336] text-white cursor-pointer'
+                ? 'bg-[#007AFF] hover:bg-[#0062CC] text-white cursor-pointer'
                 : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
             }`}
           >
@@ -833,7 +833,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <button
                   type="button"
                   onClick={() => handleExportCSV(exportScope)}
-                  className="w-full py-2.5 bg-[#8E2F45] hover:bg-[#732336] text-white border border-[#8E2F45] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full py-2.5 bg-[#007AFF] hover:bg-[#0062CC] text-white border border-[#007AFF] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <Download className="w-4 h-4" />
                   <span>Ekspor File CSV (Excel)</span>

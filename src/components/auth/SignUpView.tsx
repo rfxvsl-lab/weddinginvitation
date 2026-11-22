@@ -576,28 +576,28 @@ export default function SignUpView({
           </div>
 
           {/* Ringkasan Full Gratis */}
-          <div className="rounded-2xl border border-[#E6DFD3] bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-[#E1E7F0] bg-white p-5 space-y-4">
             <div className="flex items-start justify-between gap-4 border-b border-[#EFE8DC] pb-4">
               <div>
-                <span className="inline-flex items-center rounded-full bg-[#EEF6F0] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-[#2D7A4F]">
+                <span className="inline-flex items-center rounded-full bg-[#E8F8EC] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-[#1E7E34]">
                   Full Gratis
                 </span>
-                <h3 className="mt-1.5 text-[17px] font-bold text-[#1C1614]">
+                <h3 className="mt-1.5 text-[17px] font-bold text-[#1D1D1F]">
                   {groomName || '—'} &amp; {brideName || '—'}
                 </h3>
               </div>
               <div className="text-right">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8B7D74]">
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#6E6E73]">
                   Total Biaya
                 </span>
-                <span className="text-[24px] font-extrabold text-[#1C1614]">Rp 0</span>
+                <span className="text-[24px] font-extrabold text-[#1D1D1F]">Rp 0</span>
               </div>
             </div>
 
             <ul className="space-y-2">
               {FREE_PERKS.map((perk) => (
                 <li key={perk} className="flex items-start gap-2.5 text-[12.5px] text-[#4A3E36]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2D7A4F]" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#1E7E34]" />
                   <span>{perk}</span>
                 </li>
               ))}
@@ -610,11 +610,11 @@ export default function SignUpView({
           </div>
 
           {/* Enterprise hint */}
-          <div className="rounded-xl border border-[#E6DFD3] bg-[#FAF6F0] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#6B5D54]">
+          <div className="rounded-xl border border-[#E1E7F0] bg-[#F3F6FB] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#6B5D54]">
             <span className="flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-[#8E2F45]" />
+              <Building2 className="h-3.5 w-3.5 text-[#007AFF]" />
               Untuk WO / Perusahaan? Hubungi{' '}
-              <a href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`} className="font-bold text-[#8E2F45] hover:underline">
+              <a href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`} className="font-bold text-[#007AFF] hover:underline">
                 {ENTERPRISE_CONTACT_EMAIL}
               </a>
             </span>
@@ -622,7 +622,7 @@ export default function SignUpView({
               <button
                 type="button"
                 onClick={onGotoEnterprise}
-                className="font-bold text-[#1C1614] hover:underline cursor-pointer"
+                className="font-bold text-[#1D1D1F] hover:underline cursor-pointer"
               >
                 Portal Enterprise →
               </button>

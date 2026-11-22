@@ -49,7 +49,7 @@ export default function SignInView({
           <Logo isLink={false} className="w-44" />
         </div>
         <span className="saas-kicker inline-flex">Workspace RuangHadir</span>
-        <h2 className="text-[30px] font-serif leading-tight text-[#1C1614]">
+        <h2 className="text-[30px] font-serif leading-tight text-[#1D1D1F]">
           Selamat Datang Kembali
         </h2>
         <p className="text-[13.5px] text-[#6B5D54]">
@@ -75,7 +75,7 @@ export default function SignInView({
           <button
             type="button"
             onClick={onGotoEnterprise}
-            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[#1C1614] cursor-pointer"
+            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[#1D1D1F] cursor-pointer"
             style={{ color: 'var(--saas-muted)' }}
           >
             <Building2 size={13} /> Enterprise
@@ -122,7 +122,7 @@ export default function SignInView({
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-xs text-[#8E2F45] bg-[#8E2F45]/8 p-3.5 border border-[#8E2F45]/25 rounded-xl">
+          <div className="flex items-center gap-2 text-xs text-[#007AFF] bg-[#007AFF]/8 p-3.5 border border-[#007AFF]/25 rounded-xl">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -168,7 +168,7 @@ export default function SignInView({
             type="button"
             id="goto-signup"
             onClick={onGotoSignUp}
-            className="text-[#8E2F45] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
+            className="text-[#007AFF] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
           >
             Daftar Gratis
           </button>

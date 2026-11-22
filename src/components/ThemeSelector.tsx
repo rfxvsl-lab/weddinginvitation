@@ -45,11 +45,11 @@ export default function ThemeSelector({
       {/* Header + Filter Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8E2F45]">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#007AFF]">
             <Palette className="h-3.5 w-3.5" />
             <span>Semua {DEFAULT_THEMES.length} Tema Gratis</span>
           </div>
-          <h2 className="mt-1 font-serif text-[24px] leading-tight text-[#1C1614]">
+          <h2 className="mt-1 font-serif text-[24px] leading-tight text-[#1D1D1F]">
             Pilih Tema Undangan
           </h2>
           <p className="mt-1 text-[13px] text-[#6B5D54]">
@@ -67,8 +67,8 @@ export default function ThemeSelector({
                 onClick={() => setFilter(key)}
                 className={`rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
                   active
-                    ? 'border-[#1C1614] bg-[#1C1614] text-white'
-                    : 'border-[#E6DFD3] bg-white text-[#5C4E45] hover:bg-[#FAF6F0]'
+                    ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white'
+                    : 'border-[#E1E7F0] bg-white text-[#48484A] hover:bg-[#F3F6FB]'
                 }`}
               >
                 {label}
@@ -91,8 +91,8 @@ export default function ThemeSelector({
               onClick={() => onSelectTheme(theme.id)}
               className={`group flex flex-col overflow-hidden rounded-2xl border bg-white text-left transition-all cursor-pointer ${
                 isSelected
-                  ? 'border-[#8E2F45] ring-2 ring-[#8E2F45]/20'
-                  : 'border-[#E6DFD3] hover:border-[#C7B7A1]'
+                  ? 'border-[#007AFF] ring-2 ring-[#007AFF]/20'
+                  : 'border-[#E1E7F0] hover:border-[#C7B7A1]'
               }`}
             >
               {/* Visual Preview Thumbnail */}
@@ -112,14 +112,14 @@ export default function ThemeSelector({
                 ) : (
                   <div className="flex h-full w-full items-center justify-center px-6 py-4">
                     <div
-                      className="flex h-full w-[112px] overflow-hidden rounded-r-lg rounded-l-[3px] shadow-lg ring-1 ring-[#C6A15B]/35"
+                      className="flex h-full w-[112px] overflow-hidden rounded-r-lg rounded-l-[3px] shadow-lg ring-1 ring-[#5856D6]/35"
                       style={{
                         background:
                           'linear-gradient(155deg, #35211E 0%, #241715 65%, #1A100F 100%)',
                       }}
                     >
-                      <div className="w-2 shrink-0 border-r border-[#C6A15B]/25 bg-black/35" />
-                      <div className="m-1.5 flex flex-1 flex-col items-center justify-center rounded border border-[#C6A15B]/30 px-1.5 text-center">
+                      <div className="w-2 shrink-0 border-r border-[#5856D6]/25 bg-black/35" />
+                      <div className="m-1.5 flex flex-1 flex-col items-center justify-center rounded border border-[#5856D6]/30 px-1.5 text-center">
                         <BookOpen className="h-3.5 w-3.5 text-[#DFC086]" />
                         <span className="mt-1 font-serif text-[12px] leading-tight text-[#FAF3E6]">
                           Storybook 3D
@@ -131,7 +131,7 @@ export default function ThemeSelector({
                 )}
 
                 {isSelected && (
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#8E2F45] px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm">
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#007AFF] px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm">
                     <Check className="h-3 w-3" />
                     Aktif
                   </span>
@@ -142,14 +142,14 @@ export default function ThemeSelector({
               <div className="flex flex-1 flex-col justify-between gap-4 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="truncate text-[14px] font-bold text-[#1C1614] group-hover:text-[#8E2F45] transition-colors">
+                    <h3 className="truncate text-[14px] font-bold text-[#1D1D1F] group-hover:text-[#007AFF] transition-colors">
                       {theme.name}
                     </h3>
-                    <p className="mt-0.5 text-[11.5px] text-[#8B7D74]">
+                    <p className="mt-0.5 text-[11.5px] text-[#6E6E73]">
                       {PATTERN_LABELS[theme.pattern] || theme.pattern}
                     </p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#EAE3D8] bg-[#FAF7F2] px-2 py-1 text-[11px] font-semibold text-[#5C4E45]">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#E1E7F0] bg-[#F3F6FB] px-2 py-1 text-[11px] font-semibold text-[#48484A]">
                     <Eye className="h-3 w-3" />
                     Preview
                   </span>
@@ -172,7 +172,7 @@ export default function ThemeSelector({
                       />
                     ))}
                   </div>
-                  <span className="text-[11px] font-semibold text-[#2D7A4F]">
+                  <span className="text-[11px] font-semibold text-[#1E7E34]">
                     Gratis
                   </span>
                 </div>
