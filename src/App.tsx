@@ -34,6 +34,7 @@ type DashboardSegment =
   | 'overview'
   | 'design'
   | 'settings'
+  | 'video'
   | 'guests'
   | 'analytics'
   | 'profile'
@@ -43,6 +44,7 @@ const SEGMENT_META: Record<DashboardSegment, { title: string; sub: string }> = {
   overview: { title: 'Ringkasan', sub: 'Status undangan & metrik utama' },
   design: { title: 'Editor Undangan', sub: 'Konten mempelai, acara, galeri & amplop' },
   settings: { title: 'Koleksi Tema', sub: 'Pilih tampilan & tata letak undangan' },
+  video: { title: 'Video Studio', sub: 'Make Your Invitation Video — Eksklusif Enterprise (Remotion 30fps)' },
   guests: { title: 'Daftar Tamu', sub: 'Nama personal, link WhatsApp & QR check-in' },
   analytics: { title: 'Analitik & RSVP', sub: 'Kunjungan & konfirmasi kehadiran tamu' },
   profile: { title: 'Profil & Pengaturan', sub: 'Informasi akun & tautan undangan' },
