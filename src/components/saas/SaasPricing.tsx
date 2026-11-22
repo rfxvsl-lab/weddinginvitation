@@ -5,7 +5,7 @@ import {
   Check,
   ArrowRight,
   Building2,
-  Sparkles,
+  CheckCircle2,
   Mail,
   Copy,
   KeyRound,
@@ -83,7 +83,7 @@ export function SaasPricing() {
                   color: "var(--saas-success)",
                 }}
               >
-                <Sparkles size={12} /> Full Gratis
+                <CheckCircle2 size={12} /> Full Gratis
               </span>
               <span
                 className="text-[12px] font-semibold"

@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Calendar,
   MapPin,
-  Sparkles,
   BookOpen,
   QrCode,
 } from "lucide-react";
@@ -530,7 +529,7 @@ export function SaasHero() {
                   <div className="relative z-20 px-4 pb-3.5 pt-1">
                     <div className="grid grid-cols-3 gap-1 rounded-full border border-white/15 bg-black/55 p-1 backdrop-blur-md">
                       {[
-                        { id: "cover" as const, label: "Sampul", icon: Sparkles },
+                        { id: "cover" as const, label: "Sampul", icon: BookOpen },
                         { id: "schedule" as const, label: "Acara", icon: Calendar },
                         { id: "rsvp" as const, label: "QR & RSVP", icon: QrCode },
                       ].map((tab) => {

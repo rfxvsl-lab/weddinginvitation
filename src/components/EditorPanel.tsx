@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Heart,
+  Users,
   Calendar,
   BookOpen,
   Image,
@@ -17,7 +17,7 @@ import {
   Trash2,
   Instagram,
   MapPin,
-  Sparkles,
+  Wand2,
   Link2 as Link,
   RefreshCw,
   Upload,
@@ -305,9 +305,6 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-pink-50" />
         {/* Floating decorative orbs */}
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-rose-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-20 -right-20 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-100/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
         {/* Subtle dot pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
       </div>
@@ -320,7 +317,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
           className="flex items-center gap-1 overflow-x-auto py-2.5"
         >
           {([
-            { id: 'couple' as const, label: 'Mempelai', icon: Heart },
+            { id: 'couple' as const, label: 'Mempelai', icon: Users },
             { id: 'events' as const, label: 'Detail Acara', icon: Calendar },
             { id: 'stories' as const, label: 'Cerita Cinta', icon: BookOpen },
             { id: 'gallery' as const, label: 'Galeri & Musik', icon: Image },
@@ -367,7 +364,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             <div className="flex items-center justify-between bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-amber-500" />
+                  <Users className="w-5 h-5 text-[#8E2F45]" />
                 </div>
                 <div>
                   <h4 className="font-bold text-zinc-800 text-sm">Informasi Mempelai</h4>
@@ -626,7 +623,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'events' && (
           <div className="space-y-5">
             <div className="flex items-center gap-3 bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#FAF6F0] border border-[#EAE3D8] flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600" />
               </div>
               <div>
@@ -959,7 +956,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
           <div className="space-y-5">
             {/* Section Header */}
             <div className="flex items-center gap-3 bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#FAF6F0] border border-[#EAE3D8] flex items-center justify-center">
                 <Image className="w-5 h-5 text-zinc-700" />
               </div>
               <div>
@@ -1046,7 +1043,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-emerald-600 shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#8E2F45] hover:bg-[#732336] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#8E2F45] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1095,7 +1092,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-emerald-600 shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#8E2F45] hover:bg-[#732336] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#8E2F45] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1167,7 +1164,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   <p className="text-[10px] text-zinc-500 mt-0.5">Mendukung file .mp3, .wav, atau audio sejenis (disimpan di Cloudinary cloud storage).</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
-                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-violet-50 hover:bg-violet-600 text-violet-700 hover:text-white rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-violet-200 hover:border-violet-600 active:scale-95">
+                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-[#8E2F45] hover:bg-[#732336] text-white rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-[#8E2F45] active:scale-95">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Pilih File Audio</span>
                     <input
@@ -1377,7 +1374,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
           <div className="space-y-5">
             <div className="flex items-center justify-between bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#FAF6F0] border border-[#EAE3D8] flex items-center justify-center">
                   <Gift className="w-5 h-5 text-zinc-700" />
                 </div>
                 <div>
@@ -1388,7 +1385,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <button
                 type="button"
                 onClick={addGiftItem}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-500 text-white rounded-lg text-xs font-semibold hover:bg-zinc-900 transition shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#8E2F45] text-white rounded-lg text-xs font-semibold hover:bg-[#732336] transition shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah
               </button>
@@ -1508,7 +1505,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     }}
                     className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-2 py-0.5 rounded-md transition"
                   >
-                    <Sparkles className="w-3 h-3" /> Buat Pakai AI
+                    <Wand2 className="w-3 h-3" /> Susun Otomatis
                   </button>
                 </div>
                 <textarea

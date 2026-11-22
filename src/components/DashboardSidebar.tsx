@@ -9,7 +9,7 @@ import {
   BarChart3,
   UserCircle,
   Building2,
-  Rocket,
+  Globe,
   LogOut,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -164,7 +164,7 @@ export default function DashboardSidebar({
             }}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#8E2F45] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#732336] cursor-pointer"
           >
-            <Rocket className="h-4 w-4" />
+            <Globe className="h-4 w-4" />
             <span>{isPublished ? 'Bagikan Undangan' : 'Publish Undangan'}</span>
           </button>
         </div>

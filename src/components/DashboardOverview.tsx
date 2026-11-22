@@ -5,17 +5,17 @@ import {
   Eye,
   Users,
   CheckCircle2,
-  MessageSquareHeart,
+  MessageSquare,
   Copy,
   Check,
   ExternalLink,
-  Rocket,
+  Globe,
   ArrowRight,
   Palette,
   PenLine,
   Building2,
   Circle,
-  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import type { SaaSUser, WeddingData, Guest, RSVP, WeddingAnalytics } from '@/types';
 import { isEnterpriseTier, PACKAGE_NAMES, normalizePackageId } from '@/lib/packageLimits';
@@ -151,7 +151,7 @@ export default function DashboardOverview({
                 {isEnt ? (
                   <Building2 className="h-3 w-3 text-[#8E2F45]" />
                 ) : (
-                  <Sparkles className="h-3 w-3 text-[#B89047]" />
+                  <ShieldCheck className="h-3 w-3 text-[#2D7A4F]" />
                 )}
                 Paket {pkgLabel}
               </span>
@@ -179,7 +179,7 @@ export default function DashboardOverview({
               onClick={onPublish}
               className="inline-flex items-center gap-2 rounded-xl bg-[#8E2F45] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#732336] cursor-pointer"
             >
-              <Rocket className="h-4 w-4" />
+              <Globe className="h-4 w-4" />
               {isPublished ? 'Bagikan Undangan' : 'Publish Undangan'}
             </button>
           </div>
@@ -256,7 +256,7 @@ export default function DashboardOverview({
             label: 'Ucapan Masuk',
             value: totalWishes.toLocaleString('id-ID'),
             sub: 'Buku tamu digital',
-            icon: MessageSquareHeart,
+            icon: MessageSquare,
             accent: '#5B4B8A',
             onClick: () => onNavigate('analytics'),
           },

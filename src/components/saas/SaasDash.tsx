@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Search, Bell, Palette, PenLine, Users } from "lucide-react";
-import { BarChart3, UserCircle, Sparkles } from "lucide-react";
+import { BarChart3, UserCircle, Building2 } from "lucide-react";
 
 export function SaasShell({ sidebar, children }: { sidebar?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -42,7 +42,7 @@ export function SaasSideNav({ active, onNav, user, onPublish }: {
     { id: "guests", label: "Daftar Tamu", icon: Users },
     { id: "analytics", label: "Statistik RSVP", icon: BarChart3 },
     { id: "profile", label: "Profil Anda", icon: UserCircle },
-    { id: "upgrade", label: "Upgrade Akun", icon: Sparkles },
+    { id: "upgrade", label: "Paket & Enterprise", icon: Building2 },
   ];
   return (
     <aside className="saas-card flex h-fit flex-col p-4 lg:sticky lg:top-5">

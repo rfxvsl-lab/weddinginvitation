@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   ArrowRight,
   AlertCircle,
-  Sparkles,
+
 } from 'lucide-react';
 import type { SaaSUser } from '../types';
 import {
@@ -146,7 +146,7 @@ export default function UpgradePanel({ user, onSuccess }: UpgradePanelProps) {
                 isEnt ? 'bg-[#FBF4E6] text-[#8A611C]' : 'bg-[#EEF6F0] text-[#2D7A4F]'
               }`}
             >
-              {isEnt ? <Building2 className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
+              {isEnt ? <Building2 className="h-5 w-5" /> : <ShieldCheck className="h-5 w-5" />}
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#8B7D74]">

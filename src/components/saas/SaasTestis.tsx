@@ -2,16 +2,16 @@
 import React from "react";
 import Link from "next/link";
 import {
-  Heart,
-  Crown,
-  Sparkles,
-  CalendarHeart,
+  CalendarCheck,
+  SlidersHorizontal,
+  Share2,
+  CalendarCheck2,
   ArrowUpRight,
 } from "lucide-react";
 
 const USE_CASES = [
   {
-    icon: Heart,
+    icon: CalendarCheck,
     badge: "Intimate & Minimalis",
     title: "Akad Nikah & Resepsi Hangat",
     desc: "Cocok untuk acara keluarga inti dengan tampilan bersih, fokus pada jadwal, peta lokasi, dan ucapan doa yang penuh makna.",
@@ -19,7 +19,7 @@ const USE_CASES = [
     themeLabel: "Luxury Pink Elegant",
   },
   {
-    icon: Crown,
+    icon: SlidersHorizontal,
     badge: "Budaya Nusantara",
     title: "Pernikahan Adat Jawa & Klasik",
     desc: "Sentuhan ornamen tradisi yang anggun dipadukan dengan kemudahan buku tamu digital dan navigasi modern di ponsel tamu.",
@@ -27,7 +27,7 @@ const USE_CASES = [
     themeLabel: "Javanese Classic",
   },
   {
-    icon: Sparkles,
+    icon: Share2,
     badge: "Modern & Sinematik",
     title: "Grand Ballroom & Cinematic",
     desc: "Visual gelap mewah bergaya editorial lengkap dengan galeri foto penuh, musik latar, serta tiket QR check-in untuk tamu undangan.",
@@ -35,7 +35,7 @@ const USE_CASES = [
     themeLabel: "Dark Luxury Cinematic",
   },
   {
-    icon: CalendarHeart,
+    icon: CalendarCheck2,
     badge: "Unik & Personal",
     title: "Konsep Kreatif & Interaktif",
     desc: "Tampilkan perjalanan cinta kalian dengan gaya playlist musik, katalog film, atau buku cerita interaktif yang berkesan.",

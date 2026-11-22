@@ -12,7 +12,7 @@ import {
   Camera,
   Loader2,
   Building2,
-  Sparkles,
+  ShieldCheck,
   CheckCircle2,
   ExternalLink,
 } from 'lucide-react';
@@ -142,7 +142,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
                     : 'bg-[#EEF6F0] text-[#2D7A4F]'
                 }`}
               >
-                {isEnt ? <Building2 className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}
+                {isEnt ? <Building2 className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />}
                 Paket {pkgLabel}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border border-[#E6DFD3] bg-[#FAF7F2] px-2.5 py-1 text-[11px] font-semibold text-[#5C4E45]">

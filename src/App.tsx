@@ -18,7 +18,6 @@ import UpgradePanel from './components/UpgradePanel';
 import {
   Menu,
   Eye,
-  Heart,
   Loader2,
   RefreshCw,
   Copy,
@@ -152,7 +151,7 @@ export default function App() {
   };
 
   return (
-    <div className="saas-scope dashboard-shell-lock flex h-screen w-full overflow-hidden bg-[#F8F6F2] text-[#1C1614] font-sans">
+    <div className="saas-scope dashboard-shell-lock fixed inset-0 flex h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[#F8F6F2] text-[#1C1614] font-sans">
       {/* Loading Overlay */}
       {wedding.isLoading && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#FAF6F0]/90 backdrop-blur-sm">
@@ -283,7 +282,7 @@ export default function App() {
         </header>
 
         {/* Scrollable Workspace Content */}
-        <main className="flex-1 overflow-y-auto min-h-0">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
           {activeSegment === 'overview' && (
             <DashboardOverview
               user={auth.currentUser}
@@ -506,7 +505,7 @@ export default function App() {
                 }}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#8E2F45] px-5 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#732336] cursor-pointer"
               >
-                <Heart className="h-3.5 w-3.5" />
+                <Check className="h-3.5 w-3.5" />
                 Gunakan Tema Ini
               </button>
             </div>

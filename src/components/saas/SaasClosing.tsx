@@ -6,7 +6,7 @@ import {
   Clock,
   Link2,
   ShieldCheck,
-  Sparkles,
+  CheckCircle2,
   ArrowRight,
   Smartphone,
 } from "lucide-react";
@@ -168,7 +168,7 @@ export function SaasCta() {
             }}
           >
             <p className="flex items-center gap-2">
-              <Sparkles size={14} style={{ color: "var(--saas-gold)" }} />
+              <CheckCircle2 size={14} style={{ color: "var(--saas-gold)" }} />
               Gratis Rp 0 — langsung bisa dipakai &amp; diedit
             </p>
             <p className="flex items-center gap-2">
