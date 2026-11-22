@@ -1,9 +1,9 @@
 /**
- * RuangHadir — Procedural Motion Graphic Engine (After Effects–grade Canvas Renderer)
- * Supports 3 flagship Enterprise themes:
- *   1. javanese-classic  (Royal Sogan, Gunungan Trim-Path, Kawung Mandala, Golden Embers)
- *   2. grand-ballroom    (Midnight Obsidian, Volumetric Chandelier Beams, Art Deco Arch, Stardust)
- *   3. luxury-pink       (Blush Pearl, Flowing Silk Ribbons, Rose Gold Rings, Soft Anamorphic Flare)
+ * RuangHadir — Authentic Theme-Matched Motion Graphic Engine (After Effects–grade Canvas Renderer)
+ * 100% matched to the exact palettes, real image assets, and signature opening mechanics of:
+ *   1. javanese-classic  -> #F8F0DF / #8A452C / #C59C62 / #493021 + /assets/wayang/gunungan.png + /assets/flower.webp
+ *   2. grand-ballroom    -> #F3F6FA / #345579 / #8FA8C2 / #23364D + Parting Royal Curtains + Swaying Chandelier + Marble Frame
+ *   3. luxury-pink       -> #FCF3F6 / #A83D68 / #D99AB3 / #54243B + Opening 3D Envelope + Rising Card + Arched Rose Frame
  */
 
 export type VideoThemeId = 'javanese-classic' | 'grand-ballroom' | 'luxury-pink';
@@ -37,8 +37,8 @@ export const VIDEO_DURATION_SEC = 12;
 export const VIDEO_TOTAL_FRAMES = VIDEO_FPS * VIDEO_DURATION_SEC; // 360 frames
 
 export const VIDEO_SCENES = [
-  { id: 0, label: '01 · Intro & Trim Path', start: 0, end: 90 },
-  { id: 1, label: '02 · Kinetic Mempelai', start: 90, end: 180 },
+  { id: 0, label: '01 · Opening Theme', start: 0, end: 90 },
+  { id: 1, label: '02 · Mempelai', start: 90, end: 180 },
   { id: 2, label: '03 · Jadwal & Venue', start: 180, end: 270 },
   { id: 3, label: '04 · Save The Date', start: 270, end: 360 },
 ] as const;
@@ -47,36 +47,52 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
   {
     id: 'javanese-classic',
     name: 'Javanese Classic',
-    shortName: 'Javanese',
-    tagline: 'Gunungan Trim-Path · Batik Mandala · Embers',
-    techniques: ['Trim Paths', 'Mandala Orbit', 'Gold Light Leak'],
-    swatch: ['#150E0A', '#3D2616', '#D8B168'],
-    accent: '#D8B168',
-    isDark: true,
+    shortName: 'Javanese Classic',
+    tagline: 'Sogan #F8F0DF · Gunungan · Flower Orbit · Soga #8A452C',
+    techniques: ['Real Gunungan Asset', 'Corner Trim Paths', 'Track Matte'],
+    swatch: ['#F8F0DF', '#C59C62', '#8A452C'],
+    accent: '#8A452C',
+    isDark: false,
   },
   {
     id: 'grand-ballroom',
     name: 'Grand Ballroom',
     shortName: 'Grand Ballroom',
-    tagline: 'Volumetric Beams · Art Deco Arch · Stardust',
-    techniques: ['Volumetric Beams', 'Track Matte', 'Shutter Wipe'],
-    swatch: ['#090C14', '#1A2238', '#E5C98B'],
-    accent: '#E5C98B',
-    isDark: true,
+    tagline: 'Ice Marble #F3F6FA · Curtain Reveal · Chandelier · Slate #345579',
+    techniques: ['Curtain Reveal', 'Chandelier Sway', 'Marble Frame'],
+    swatch: ['#F3F6FA', '#8FA8C2', '#345579'],
+    accent: '#345579',
+    isDark: false,
   },
   {
     id: 'luxury-pink',
     name: 'Luxury Love Pink',
-    shortName: 'Love Pink',
-    tagline: 'Silk Ribbon Waves · Rose Gold Rings · Bloom',
-    techniques: ['Bezier Ribbons', 'Spring Pop', 'Anamorphic Bloom'],
-    swatch: ['#FFF3F6', '#F8D5E2', '#C65D7B'],
-    accent: '#C65D7B',
+    shortName: 'Luxury Pink',
+    tagline: 'Blush #FCF3F6 · 3D Envelope Open · Arched Frame · Rose #A83D68',
+    techniques: ['3D Envelope Flap', 'Card Rise Physics', 'Arch Trim Path'],
+    swatch: ['#FCF3F6', '#D99AB3', '#A83D68'],
+    accent: '#A83D68',
     isDark: false,
   },
 ];
 
-// ---- Keyframe Easing Graph (After Effects Speed Graph Equivalents) ----
+// ---- Cached Real Theme Assets ----
+const imageCache: Record<string, HTMLImageElement | null> = {};
+
+function getCachedImage(src: string): HTMLImageElement | null {
+  if (typeof window === 'undefined') return null;
+  if (src in imageCache) {
+    const img = imageCache[src];
+    return img && img.complete && img.naturalWidth > 0 ? img : null;
+  }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = src;
+  imageCache[src] = img;
+  return img.complete && img.naturalWidth > 0 ? img : null;
+}
+
+// ---- After Effects Speed-Graph Easings ----
 function clamp01(v: number) {
   return Math.max(0, Math.min(1, v));
 }
@@ -102,7 +118,6 @@ function seg(frame: number, start: number, end: number) {
   return clamp01((frame - start) / Math.max(1, end - start));
 }
 
-// Deterministic pseudo-random for stable particle layers across renders
 function seeded(i: number) {
   const x = Math.sin(i * 127.1 + 311.7) * 43758.5453123;
   return x - Math.floor(x);
@@ -125,7 +140,7 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
-// Track-Matte Masked Text Reveal (signature After Effects kinetic title effect)
+// Track-Matte Masked Kinetic Text Reveal (AE Track Matte)
 function drawMaskedText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -141,7 +156,7 @@ function drawMaskedText(
   const offset = (1 - p) * lineHeight * (fromDirection === 'up' ? 0.95 : -0.95);
   ctx.save();
   ctx.beginPath();
-  ctx.rect(0, cy - lineHeight * 0.62, ctx.canvas.width, lineHeight * 1.24);
+  ctx.rect(0, cy - lineHeight * 0.65, ctx.canvas.width, lineHeight * 1.3);
   ctx.clip();
   ctx.font = font;
   ctx.fillStyle = color;
@@ -152,288 +167,962 @@ function drawMaskedText(
   ctx.restore();
 }
 
-// Progressive Trim-Path Polyline Drawer (AE Trim Paths equivalent)
-function drawTrimPath(
+// Trim-Path Corner Brackets (matching .javanese-border L-corners)
+function drawJavaneseCorners(
   ctx: CanvasRenderingContext2D,
-  points: [number, number][],
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  len: number,
   progress: number,
   color: string,
-  lineWidth: number
+  lw: number
 ) {
-  const p = clamp01(progress);
-  if (p <= 0 || points.length < 2) return;
-
-  const lengths: number[] = [];
-  let total = 0;
-  for (let i = 1; i < points.length; i++) {
-    const dx = points[i][0] - points[i - 1][0];
-    const dy = points[i][1] - points[i - 1][1];
-    const d = Math.hypot(dx, dy);
-    lengths.push(d);
-    total += d;
-  }
-
-  let target = total * p;
+  const p = easeOutExpo(progress);
+  const L = len * p;
+  if (L <= 0.5) return;
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(points[0][0], points[0][1]);
-  for (let i = 0; i < lengths.length; i++) {
-    if (target <= 0) break;
-    if (target >= lengths[i]) {
-      ctx.lineTo(points[i + 1][0], points[i + 1][1]);
-      target -= lengths[i];
-    } else {
-      const r = target / lengths[i];
-      const x = points[i][0] + (points[i + 1][0] - points[i][0]) * r;
-      const y = points[i][1] + (points[i + 1][1] - points[i][1]) * r;
-      ctx.lineTo(x, y);
-      target = 0;
-    }
-  }
   ctx.strokeStyle = color;
-  ctx.lineWidth = lineWidth;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'square';
+  // Top-left
+  ctx.beginPath();
+  ctx.moveTo(x, y + L);
+  ctx.lineTo(x, y);
+  ctx.lineTo(x + L, y);
+  ctx.stroke();
+  // Bottom-right
+  ctx.beginPath();
+  ctx.moveTo(x + w - L, y + h);
+  ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x + w, y + h - L);
+  ctx.stroke();
+  // Top-right & Bottom-left subtle gold accents
+  ctx.globalAlpha = 0.55;
+  ctx.beginPath();
+  ctx.moveTo(x + w - L * 0.7, y);
+  ctx.lineTo(x + w, y);
+  ctx.lineTo(x + w, y + L * 0.7);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y + h - L * 0.7);
+  ctx.lineTo(x, y + h);
+  ctx.lineTo(x + L * 0.7, y + h);
   ctx.stroke();
   ctx.restore();
 }
 
-// ---- Theme-Specific Procedural Background & Technical Motion Layers ----
-
-function renderJavaneseBackdrop(
+// ---- THEME 1: JAVANESE CLASSIC (#F8F0DF, #EBDFC5, #8A452C, #C59C62, #493021) ----
+function renderJavaneseTheme(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
-  t: number,
   f: number,
-  scale: number
+  t: number,
+  scale: number,
+  couple: VideoCoupleProps
 ) {
-  // 1. Deep Royal Sogan Gradient with subtle camera breathing
-  const bg = ctx.createRadialGradient(w * 0.5, h * 0.42, w * 0.05, w * 0.5, h * 0.5, Math.max(w, h) * 0.85);
-  bg.addColorStop(0, '#362113');
-  bg.addColorStop(0.55, '#1D120B');
-  bg.addColorStop(1, '#0E0805');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  // 2. Rotating Kawung Geometric Mandala (AE Repeater + Rotation)
-  ctx.save();
-  ctx.translate(w / 2, h / 2);
-  ctx.rotate(t * Math.PI * 0.5);
-  const ringR = Math.min(w, h) * 0.38;
-  ctx.strokeStyle = 'rgba(216, 177, 104, 0.12)';
-  ctx.lineWidth = 1.2 * scale;
-  for (let i = 0; i < 12; i++) {
-    ctx.rotate((Math.PI * 2) / 12);
-    ctx.beginPath();
-    ctx.ellipse(ringR * 0.55, 0, ringR * 0.38, ringR * 0.16, 0, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // 3. Javanese Gunungan Silhouette Trim-Path (drawn dynamically across scene)
   const cx = w / 2;
   const cy = h / 2;
-  const gw = Math.min(w, h) * 0.44;
-  const gh = Math.min(w, h) * 0.62;
-  const gununganPts: [number, number][] = [
-    [cx, cy - gh * 0.55],
-    [cx + gw * 0.18, cy - gh * 0.25],
-    [cx + gw * 0.42, cy + gh * 0.05],
-    [cx + gw * 0.52, cy + gh * 0.36],
-    [cx + gw * 0.36, cy + gh * 0.48],
-    [cx - gw * 0.36, cy + gh * 0.48],
-    [cx - gw * 0.52, cy + gh * 0.36],
-    [cx - gw * 0.42, cy + gh * 0.05],
-    [cx - gw * 0.18, cy - gh * 0.25],
-    [cx, cy - gh * 0.55],
-  ];
-  const trimP = easeInOutQuart(seg(f, 0, 55));
-  drawTrimPath(ctx, gununganPts, trimP, 'rgba(216, 177, 104, 0.48)', 2 * scale);
+  const sceneIdx = Math.min(3, Math.floor(f / 90));
+  const localF = f - sceneIdx * 90;
+  const exitAlpha = localF > 74 ? 1 - easeInOutQuart((localF - 74) / 16) : 1;
 
-  // Inner ornamental diamond frame
-  const pad = 28 * scale;
-  ctx.save();
-  ctx.strokeStyle = 'rgba(216, 177, 104, 0.25)';
-  ctx.lineWidth = 1.2 * scale;
-  drawRoundedRect(ctx, pad, pad, w - pad * 2, h - pad * 2, 18 * scale);
-  ctx.stroke();
-  ctx.restore();
-
-  // 4. Rising Golden Embers (3 depth planes)
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (let i = 0; i < 34; i++) {
-    const px = seeded(i * 3) * w + Math.sin(t * Math.PI * 2 + i) * 18 * scale;
-    const speed = 0.25 + seeded(i * 7) * 0.55;
-    const py = ((seeded(i * 5) - t * speed + 2) % 1) * h;
-    const r = (1.2 + seeded(i * 11) * 3.4) * scale;
-    const alpha = 0.22 + 0.45 * Math.sin(t * Math.PI * 4 + i);
-    const g = ctx.createRadialGradient(px, py, 0, px, py, r * 3);
-    g.addColorStop(0, `rgba(255, 226, 158, ${clamp01(alpha)})`);
-    g.addColorStop(1, 'rgba(216, 177, 104, 0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(px, py, r * 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-function renderGrandBallroomBackdrop(
-  ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
-  t: number,
-  f: number,
-  scale: number
-) {
-  // 1. Midnight Obsidian Sky
-  const bg = ctx.createLinearGradient(0, 0, w, h);
-  bg.addColorStop(0, '#070A12');
-  bg.addColorStop(0.5, '#131A2D');
-  bg.addColorStop(1, '#090C16');
+  // 1. Exact Javanese Sogan Cream Parchment (#F8F0DF)
+  const bg = ctx.createRadialGradient(cx, cy * 0.85, w * 0.05, cx, cy, Math.max(w, h) * 0.85);
+  bg.addColorStop(0, '#FDF8EC');
+  bg.addColorStop(0.65, '#F8F0DF');
+  bg.addColorStop(1, '#EBDFC5');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // 2. Volumetric Chandelier Spotlights (sweeping cones)
+  // Subtle parchment diamond watermark grid
   ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (let b = 0; b < 3; b++) {
-    const angle = -0.35 + b * 0.35 + Math.sin(t * Math.PI * 2 + b * 1.4) * 0.18;
-    ctx.save();
-    ctx.translate(w * (0.25 + b * 0.25), -20 * scale);
-    ctx.rotate(angle);
-    const cone = ctx.createLinearGradient(0, 0, 0, h * 0.95);
-    cone.addColorStop(0, 'rgba(229, 201, 139, 0.22)');
-    cone.addColorStop(0.55, 'rgba(229, 201, 139, 0.06)');
-    cone.addColorStop(1, 'rgba(229, 201, 139, 0)');
-    ctx.fillStyle = cone;
+  ctx.strokeStyle = 'rgba(197, 156, 98, 0.14)';
+  ctx.lineWidth = 1 * scale;
+  const step = 44 * scale;
+  for (let gx = -step; gx < w + step; gx += step) {
+    for (let gy = -step; gy < h + step; gy += step) {
+      ctx.beginPath();
+      ctx.moveTo(gx, gy - 8 * scale);
+      ctx.lineTo(gx + 8 * scale, gy);
+      ctx.lineTo(gx, gy + 8 * scale);
+      ctx.lineTo(gx - 8 * scale, gy);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // 2. Real /assets/flower.webp Rotating Corner Ornaments (exact JavaneseFlower!)
+  const flowerImg = getCachedImage('/assets/flower.webp');
+  if (flowerImg) {
+    const fSize = 155 * scale;
+    const corners: [number, number][] = [
+      [18 * scale, 18 * scale],
+      [w - 18 * scale, h - 18 * scale],
+    ];
+    corners.forEach(([fx, fy], idx) => {
+      ctx.save();
+      ctx.translate(fx, fy);
+      ctx.rotate((idx === 0 ? 1 : -1) * t * Math.PI * 1.2);
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(flowerImg, -fSize / 2, -fSize / 2, fSize, fSize);
+      ctx.restore();
+    });
+  }
+
+  // 3. Exact .javanese-panel Card (#EBDFC5 / #F8F0DF with #C59C62 border & .javanese-border L-corners)
+  const padX = w * 0.09;
+  const padY = h * 0.12;
+  const cardW = w - padX * 2;
+  const cardH = h - padY * 2;
+
+  ctx.save();
+  drawRoundedRect(ctx, padX, padY, cardW, cardH, 6 * scale);
+  ctx.fillStyle = 'rgba(248, 240, 223, 0.88)';
+  ctx.fill();
+  ctx.strokeStyle = '#C59C62';
+  ctx.lineWidth = 1.5 * scale;
+  ctx.stroke();
+  ctx.restore();
+
+  drawJavaneseCorners(
+    ctx,
+    padX - 6 * scale,
+    padY - 6 * scale,
+    cardW + 12 * scale,
+    cardH + 12 * scale,
+    34 * scale,
+    seg(f, 0, 36),
+    '#8A452C',
+    2.4 * scale
+  );
+
+  // 4. Scene Choreography matching JavaneseClassicLayout.tsx
+  ctx.save();
+  ctx.globalAlpha = exitAlpha;
+
+  if (sceneIdx === 0) {
+    // Scene 01: Real /assets/wayang/gunungan.png + Pawiwahan Opening
+    const gunungan = getCachedImage('/assets/wayang/gunungan.png');
+    const pop = easeOutBack(seg(localF, 4, 34));
+    const gH = Math.min(cardH * 0.44, 240 * scale);
+    const gW = gH * 0.72;
+
+    if (gunungan) {
+      ctx.save();
+      ctx.translate(cx, cy - 58 * scale);
+      ctx.scale(0.8 + 0.2 * pop, 0.8 + 0.2 * pop);
+      ctx.rotate(Math.sin(t * Math.PI * 4) * 0.025);
+      ctx.drawImage(gunungan, -gW / 2, -gH / 2, gW, gH);
+      ctx.restore();
+    }
+
+    // Horizontal soga rule (border-t border-b border-[#8A452C]/30)
+    const ruleW = cardW * 0.65 * easeOutExpo(seg(localF, 16, 42));
+    ctx.strokeStyle = 'rgba(138, 69, 44, 0.35)';
+    ctx.lineWidth = 1.2 * scale;
     ctx.beginPath();
-    ctx.moveTo(-18 * scale, 0);
-    ctx.lineTo(18 * scale, 0);
-    ctx.lineTo(155 * scale, h * 0.95);
-    ctx.lineTo(-155 * scale, h * 0.95);
-    ctx.closePath();
+    ctx.moveTo(cx - ruleW / 2, cy + 56 * scale);
+    ctx.lineTo(cx + ruleW / 2, cy + 56 * scale);
+    ctx.moveTo(cx - ruleW / 2, cy + 126 * scale);
+    ctx.lineTo(cx + ruleW / 2, cy + 126 * scale);
+    ctx.stroke();
+
+    drawMaskedText(
+      ctx,
+      'PAWIWAHAN PERNIKAHAN',
+      cx,
+      cy + 76 * scale,
+      seg(localF, 18, 42),
+      `700 ${Math.round(12 * scale)}px "Montserrat", sans-serif`,
+      '#8A452C',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groom} & ${couple.bride}`,
+      cx,
+      cy + 104 * scale,
+      seg(localF, 24, 50),
+      `700 ${Math.round(30 * scale)}px "Philosopher", Georgia, serif`,
+      '#493021',
+      40 * scale
+    );
+  } else if (sceneIdx === 1) {
+    // Scene 02: "SANG PENGANTEN" (exact JavaneseClassicLayout heading)
+    drawMaskedText(
+      ctx,
+      'SANG PENGANTEN',
+      cx,
+      padY + 56 * scale,
+      seg(localF, 0, 24),
+      `700 ${Math.round(20 * scale)}px "Philosopher", Georgia, serif`,
+      '#8A452C',
+      30 * scale
+    );
+    const uW = 130 * scale * easeOutExpo(seg(localF, 8, 30));
+    ctx.strokeStyle = '#8A452C';
+    ctx.lineWidth = 1.5 * scale;
+    ctx.beginPath();
+    ctx.moveTo(cx - uW / 2, padY + 76 * scale);
+    ctx.lineTo(cx + uW / 2, padY + 76 * scale);
+    ctx.stroke();
+
+    drawMaskedText(
+      ctx,
+      couple.groom,
+      cx,
+      cy - 44 * scale,
+      seg(localF, 10, 34),
+      `700 ${Math.round(44 * scale)}px "Philosopher", Georgia, serif`,
+      '#493021',
+      54 * scale,
+      'up'
+    );
+    drawMaskedText(
+      ctx,
+      '&',
+      cx,
+      cy + 4 * scale,
+      seg(localF, 18, 38),
+      `italic 400 ${Math.round(28 * scale)}px "Gelasio", Georgia, serif`,
+      '#8A452C',
+      36 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.bride,
+      cx,
+      cy + 52 * scale,
+      seg(localF, 22, 46),
+      `700 ${Math.round(44 * scale)}px "Philosopher", Georgia, serif`,
+      '#493021',
+      54 * scale,
+      'down'
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groomFull}  ·  ${couple.brideFull}`,
+      cx,
+      cy + 106 * scale,
+      seg(localF, 30, 56),
+      `500 ${Math.round(12.5 * scale)}px "Gelasio", Georgia, serif`,
+      '#493021',
+      22 * scale
+    );
+  } else if (sceneIdx === 2) {
+    // Scene 03: "PAHARGYAN" + Soga Badge "Ijab Kabul"
+    drawMaskedText(
+      ctx,
+      'PAHARGYAN',
+      cx,
+      padY + 56 * scale,
+      seg(localF, 0, 24),
+      `700 ${Math.round(22 * scale)}px "Philosopher", Georgia, serif`,
+      '#8A452C',
+      32 * scale
+    );
+
+    // Soga Ribbon Tag
+    const badgePop = easeOutBack(seg(localF, 10, 32));
+    ctx.save();
+    ctx.translate(cx, cy - 66 * scale);
+    ctx.scale(badgePop, badgePop);
+    drawRoundedRect(ctx, -64 * scale, -15 * scale, 128 * scale, 30 * scale, 4 * scale);
+    ctx.fillStyle = '#8A452C';
     ctx.fill();
+    ctx.font = `700 ${Math.round(12 * scale)}px "Philosopher", Georgia, serif`;
+    ctx.fillStyle = '#F8F0DF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('IJAB KABUL & RESEPSI', 0, 0.5);
+    ctx.restore();
+
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      cy - 10 * scale,
+      seg(localF, 16, 40),
+      `700 ${Math.round(24 * scale)}px "Gelasio", Georgia, serif`,
+      '#493021',
+      36 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `Pukul ${couple.timeRaw}`,
+      cx,
+      cy + 30 * scale,
+      seg(localF, 22, 46),
+      `700 ${Math.round(16 * scale)}px "Montserrat", sans-serif`,
+      '#8A452C',
+      26 * scale
+    );
+    const vText = couple.venue.length > 38 ? couple.venue.slice(0, 36) + '…' : couple.venue;
+    drawMaskedText(
+      ctx,
+      vText,
+      cx,
+      cy + 72 * scale,
+      seg(localF, 28, 54),
+      `500 ${Math.round(14 * scale)}px "Gelasio", Georgia, serif`,
+      '#493021',
+      24 * scale
+    );
+  } else {
+    // Scene 04: Save The Date + Soga Button
+    const gunungan = getCachedImage('/assets/wayang/gunungan.png');
+    if (gunungan) {
+      ctx.save();
+      ctx.globalAlpha = exitAlpha * 0.14;
+      const gH = cardH * 0.62;
+      ctx.drawImage(gunungan, cx - (gH * 0.72) / 2, cy - gH / 2, gH * 0.72, gH);
+      ctx.restore();
+    }
+    drawMaskedText(
+      ctx,
+      'SAVE THE DATE',
+      cx,
+      cy - 68 * scale,
+      seg(localF, 0, 24),
+      `700 ${Math.round(12 * scale)}px "Montserrat", sans-serif`,
+      '#8A452C',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groom} & ${couple.bride}`,
+      cx,
+      cy - 22 * scale,
+      seg(localF, 8, 34),
+      `700 ${Math.round(38 * scale)}px "Philosopher", Georgia, serif`,
+      '#493021',
+      48 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      cy + 24 * scale,
+      seg(localF, 18, 42),
+      `500 ${Math.round(14 * scale)}px "Gelasio", Georgia, serif`,
+      '#493021',
+      24 * scale
+    );
+
+    const btnPop = easeOutBack(seg(localF, 24, 48));
+    ctx.save();
+    ctx.translate(cx, cy + 76 * scale);
+    ctx.scale(0.85 + 0.15 * btnPop, 0.85 + 0.15 * btnPop);
+    ctx.font = `700 ${Math.round(12.5 * scale)}px "Montserrat", sans-serif`;
+    const bw = Math.min(cardW - 36 * scale, ctx.measureText(couple.slug).width + 42 * scale);
+    drawRoundedRect(ctx, -bw / 2, -19 * scale, bw, 38 * scale, 6 * scale);
+    ctx.fillStyle = '#8A452C';
+    ctx.fill();
+    ctx.fillStyle = '#F8F0DF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(couple.slug, 0, 1);
     ctx.restore();
   }
   ctx.restore();
 
-  // 3. Art Deco Double Arch Trim Path
-  const m = 32 * scale;
-  const archW = w - m * 2;
-  const archH = h - m * 2;
-  const corner = 44 * scale;
-  const decoPts: [number, number][] = [
-    [m + corner, m],
-    [m + archW - corner, m],
-    [m + archW, m + corner],
-    [m + archW, m + archH - corner],
-    [m + archW - corner, m + archH],
-    [m + corner, m + archH],
-    [m, m + archH - corner],
-    [m, m + corner],
-    [m + corner, m],
-  ];
-  const trimP = easeInOutQuart(seg(f, 0, 48));
-  drawTrimPath(ctx, decoPts, trimP, 'rgba(229, 201, 139, 0.58)', 1.8 * scale);
-
-  // Inner champagne hairline
-  ctx.save();
-  ctx.strokeStyle = 'rgba(229, 201, 139, 0.18)';
-  ctx.lineWidth = 1 * scale;
-  ctx.strokeRect(m + 10 * scale, m + 10 * scale, archW - 20 * scale, archH - 20 * scale);
-  ctx.restore();
-
-  // 4. Crystal Bokeh Stardust
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (let i = 0; i < 40; i++) {
-    const px = seeded(i * 13) * w;
-    const py = ((seeded(i * 17) + t * (0.12 + seeded(i * 19) * 0.25)) % 1) * h;
-    const twinkle = 0.2 + 0.75 * Math.pow(Math.sin(t * Math.PI * 6 + i * 2.1) * 0.5 + 0.5, 2);
-    const sz = (1.5 + seeded(i * 23) * 3.5) * scale;
-    ctx.fillStyle = `rgba(248, 232, 194, ${twinkle * 0.7})`;
-    ctx.beginPath();
-    ctx.arc(px, py, sz, 0, Math.PI * 2);
-    ctx.fill();
+  // Warm gold light-sweep transition
+  if (localF < 14) {
+    const flash = 1 - localF / 14;
+    ctx.save();
+    ctx.fillStyle = `rgba(197, 156, 98, ${flash * 0.28})`;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
   }
-  ctx.restore();
 }
 
-function renderLuxuryPinkBackdrop(
+// ---- THEME 2: GRAND BALLROOM (#F3F6FA, #E1E9F2, #345579, #8FA8C2, #23364D) ----
+function renderGrandBallroomTheme(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
-  t: number,
   f: number,
-  scale: number
+  t: number,
+  scale: number,
+  couple: VideoCoupleProps
 ) {
-  // 1. Luminous Blush Pearl Silk Backdrop
+  const cx = w / 2;
+  const cy = h / 2;
+  const sceneIdx = Math.min(3, Math.floor(f / 90));
+  const localF = f - sceneIdx * 90;
+  const exitAlpha = localF > 74 ? 1 - easeInOutQuart((localF - 74) / 16) : 1;
+
+  // 1. Exact Grand Ballroom Ice Marble Background (#F3F6FA -> #E1E9F2)
   const bg = ctx.createLinearGradient(0, 0, w, h);
-  bg.addColorStop(0, '#FFF5F8');
-  bg.addColorStop(0.5, '#FBE2EC');
-  bg.addColorStop(1, '#F6CFE0');
+  bg.addColorStop(0, '#FFFFFF');
+  bg.addColorStop(0.5, '#F3F6FA');
+  bg.addColorStop(1, '#E1E9F2');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // 2. Flowing Sine-Wave Silk Ribbons (AE Trapcode / CC Wave Warp style)
+  // Subtle marble diamond floor lines
   ctx.save();
-  for (let r = 0; r < 5; r++) {
+  ctx.strokeStyle = 'rgba(143, 168, 194, 0.22)';
+  ctx.lineWidth = 1 * scale;
+  const step = 48 * scale;
+  for (let gx = 0; gx < w + step; gx += step) {
     ctx.beginPath();
-    const baseY = h * (0.18 + r * 0.16);
-    for (let x = 0; x <= w; x += 12) {
-      const wave =
-        Math.sin((x / w) * Math.PI * 2.2 + t * Math.PI * 2 + r * 0.9) * (24 + r * 6) * scale +
-        Math.cos((x / w) * Math.PI * 4 - t * Math.PI * 2) * 8 * scale;
-      if (x === 0) ctx.moveTo(x, baseY + wave);
-      else ctx.lineTo(x, baseY + wave);
-    }
-    ctx.strokeStyle = r % 2 === 0 ? 'rgba(198, 93, 123, 0.16)' : 'rgba(255, 255, 255, 0.65)';
-    ctx.lineWidth = (2.2 + r * 0.6) * scale;
+    ctx.moveTo(gx, 0);
+    ctx.lineTo(gx - h * 0.35, h);
     ctx.stroke();
   }
   ctx.restore();
 
-  // 3. Concentric Rose-Gold Trim-Path Rings
-  const cx = w / 2;
-  const cy = h / 2;
-  const rad = Math.min(w, h) * 0.38;
-  const ringP = easeOutExpo(seg(f, 0, 50));
+  // 2. Swaying Crystal Chandelier from top (exact chandelier-sway animation!)
   ctx.save();
-  ctx.strokeStyle = 'rgba(198, 93, 123, 0.38)';
+  ctx.translate(cx, 0);
+  ctx.rotate(Math.sin(t * Math.PI * 4) * 0.035);
+  // Chain
+  ctx.strokeStyle = '#8FA8C2';
+  ctx.lineWidth = 2 * scale;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, 44 * scale);
+  ctx.stroke();
+  // Crystal tiers
+  ctx.strokeStyle = '#345579';
   ctx.lineWidth = 1.6 * scale;
   ctx.beginPath();
-  ctx.arc(cx, cy, rad, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ringP);
+  ctx.arc(0, 46 * scale, 26 * scale, 0.1 * Math.PI, 0.9 * Math.PI);
   ctx.stroke();
-
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-  ctx.lineWidth = 1.2 * scale;
   ctx.beginPath();
-  ctx.arc(cx, cy, rad * 1.07, Math.PI / 2, Math.PI / 2 + Math.PI * 2 * ringP);
+  ctx.arc(0, 52 * scale, 42 * scale, 0.15 * Math.PI, 0.85 * Math.PI);
   ctx.stroke();
+  // Crystal drops
+  [-32, -16, 0, 16, 32].forEach((dx, idx) => {
+    const dy = 66 + (idx === 2 ? 14 : idx === 1 || idx === 3 ? 8 : 0);
+    ctx.fillStyle = 'rgba(143, 168, 194, 0.65)';
+    ctx.beginPath();
+    ctx.arc(dx * scale, dy * scale, 3.2 * scale, 0, Math.PI * 2);
+    ctx.fill();
+  });
   ctx.restore();
 
-  // 4. Floating Rose-Petal Bokeh Particles
-  for (let i = 0; i < 24; i++) {
-    const px = ((seeded(i * 29) + t * 0.15) % 1) * w;
-    const py = ((seeded(i * 31) + t * (0.18 + seeded(i * 37) * 0.2)) % 1) * h;
-    const rot = t * Math.PI * 3 + i;
-    const rx = (5 + seeded(i * 41) * 7) * scale;
-    const ry = rx * 0.55;
+  // 3. Exact .glass-ballroom Double Inset Frame (#F3F6FA + border #8FA8C2 + inset 5px #E1E9F2)
+  const padX = w * 0.09;
+  const padY = h * 0.14;
+  const cardW = w - padX * 2;
+  const cardH = h - padY * 2;
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.86)';
+  ctx.fillRect(padX, padY, cardW, cardH);
+  ctx.strokeStyle = '#8FA8C2';
+  ctx.lineWidth = 1.5 * scale;
+  ctx.strokeRect(padX, padY, cardW, cardH);
+  ctx.strokeStyle = '#E1E9F2';
+  ctx.lineWidth = 6 * scale;
+  ctx.strokeRect(padX + 5 * scale, padY + 5 * scale, cardW - 10 * scale, cardH - 10 * scale);
+  ctx.strokeStyle = 'rgba(52, 85, 121, 0.25)';
+  ctx.lineWidth = 1 * scale;
+  ctx.strokeRect(padX + 12 * scale, padY + 12 * scale, cardW - 24 * scale, cardH - 24 * scale);
+  ctx.restore();
+
+  // 4. Scene Content (Cinzel & Playfair Display in #23364D & #345579)
+  ctx.save();
+  ctx.globalAlpha = exitAlpha;
+
+  if (sceneIdx === 0) {
+    drawMaskedText(
+      ctx,
+      'THE GRAND BALLROOM',
+      cx,
+      cy - 68 * scale,
+      seg(localF, 18, 44),
+      `700 ${Math.round(12 * scale)}px "Cinzel", Georgia, serif`,
+      '#345579',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.initials,
+      cx,
+      cy - 10 * scale,
+      seg(localF, 22, 50),
+      `600 ${Math.round(74 * scale)}px "Cinzel", Georgia, serif`,
+      '#23364D',
+      84 * scale
+    );
+    drawMaskedText(
+      ctx,
+      'WELCOME TO THE ROYAL CELEBRATION',
+      cx,
+      cy + 58 * scale,
+      seg(localF, 30, 58),
+      `700 ${Math.round(11 * scale)}px "Lato", sans-serif`,
+      '#345579',
+      20 * scale
+    );
+  } else if (sceneIdx === 1) {
+    drawMaskedText(
+      ctx,
+      'THE ROYAL COUPLE',
+      cx,
+      padY + 46 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(12 * scale)}px "Cinzel", Georgia, serif`,
+      '#345579',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.groom,
+      cx,
+      cy - 44 * scale,
+      seg(localF, 8, 34),
+      `600 ${Math.round(44 * scale)}px "Cinzel", Georgia, serif`,
+      '#23364D',
+      54 * scale,
+      'up'
+    );
+    drawMaskedText(
+      ctx,
+      '&',
+      cx,
+      cy + 2 * scale,
+      seg(localF, 16, 38),
+      `italic 400 ${Math.round(30 * scale)}px "Playfair Display", Georgia, serif`,
+      '#345579',
+      38 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.bride,
+      cx,
+      cy + 48 * scale,
+      seg(localF, 20, 44),
+      `600 ${Math.round(44 * scale)}px "Cinzel", Georgia, serif`,
+      '#23364D',
+      54 * scale,
+      'down'
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groomFull}  ·  ${couple.brideFull}`,
+      cx,
+      cy + 104 * scale,
+      seg(localF, 28, 54),
+      `400 ${Math.round(12.5 * scale)}px "Lato", sans-serif`,
+      '#345579',
+      22 * scale
+    );
+  } else if (sceneIdx === 2) {
+    drawMaskedText(
+      ctx,
+      'GRAND RECEPTION',
+      cx,
+      padY + 50 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(13 * scale)}px "Cinzel", Georgia, serif`,
+      '#345579',
+      24 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      cy - 28 * scale,
+      seg(localF, 10, 34),
+      `700 ${Math.round(25 * scale)}px "Playfair Display", Georgia, serif`,
+      '#23364D',
+      36 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `Pukul ${couple.timeRaw}`,
+      cx,
+      cy + 16 * scale,
+      seg(localF, 18, 42),
+      `700 ${Math.round(16 * scale)}px "Cinzel", Georgia, serif`,
+      '#345579',
+      26 * scale
+    );
+    const vText = couple.venue.length > 38 ? couple.venue.slice(0, 36) + '…' : couple.venue;
+    drawMaskedText(
+      ctx,
+      vText,
+      cx,
+      cy + 62 * scale,
+      seg(localF, 24, 50),
+      `400 ${Math.round(14 * scale)}px "Lato", sans-serif`,
+      '#23364D',
+      24 * scale
+    );
+  } else {
+    drawMaskedText(
+      ctx,
+      'SAVE THE DATE',
+      cx,
+      cy - 66 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(12 * scale)}px "Cinzel", Georgia, serif`,
+      '#345579',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groom} & ${couple.bride}`,
+      cx,
+      cy - 20 * scale,
+      seg(localF, 8, 34),
+      `600 ${Math.round(36 * scale)}px "Cinzel", Georgia, serif`,
+      '#23364D',
+      46 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      cy + 24 * scale,
+      seg(localF, 16, 40),
+      `400 ${Math.round(14 * scale)}px "Lato", sans-serif`,
+      '#345579',
+      24 * scale
+    );
+    const btnPop = easeOutBack(seg(localF, 22, 46));
     ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(rot);
-    ctx.fillStyle = i % 2 === 0 ? 'rgba(214, 108, 138, 0.22)' : 'rgba(255, 255, 255, 0.58)';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+    ctx.translate(cx, cy + 76 * scale);
+    ctx.scale(0.85 + 0.15 * btnPop, 0.85 + 0.15 * btnPop);
+    ctx.font = `700 ${Math.round(12.5 * scale)}px "Lato", sans-serif`;
+    const bw = Math.min(cardW - 36 * scale, ctx.measureText(couple.slug).width + 44 * scale);
+    drawRoundedRect(ctx, -bw / 2, -19 * scale, bw, 38 * scale, 19 * scale);
+    ctx.fillStyle = '#345579';
     ctx.fill();
+    ctx.fillStyle = '#F3F6FA';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(couple.slug, 0, 1);
     ctx.restore();
+  }
+  ctx.restore();
+
+  // 5. Signature Twin Royal Slate Curtains Parting Open in Scene 01 (exact GrandBallroom CurtainStage!)
+  if (sceneIdx === 0) {
+    const openP = easeInOutQuart(seg(localF, 4, 48));
+    const curtainW = (w / 2) * (1 - openP * 0.92);
+    if (curtainW > 2) {
+      // Left curtain
+      const lg = ctx.createLinearGradient(0, 0, curtainW, 0);
+      lg.addColorStop(0, '#23364D');
+      lg.addColorStop(0.55, '#345579');
+      lg.addColorStop(1, '#1E2E42');
+      ctx.fillStyle = lg;
+      ctx.fillRect(0, 0, curtainW, h);
+      // Right curtain
+      const rg = ctx.createLinearGradient(w - curtainW, 0, w, 0);
+      rg.addColorStop(0, '#1E2E42');
+      rg.addColorStop(0.45, '#345579');
+      rg.addColorStop(1, '#23364D');
+      ctx.fillStyle = rg;
+      ctx.fillRect(w - curtainW, 0, curtainW, h);
+      // Silver trim edges
+      ctx.fillStyle = '#8FA8C2';
+      ctx.fillRect(curtainW - 3 * scale, 0, 3 * scale, h);
+      ctx.fillRect(w - curtainW, 0, 3 * scale, h);
+    }
   }
 }
 
-// ---- Main Frame Renderer ----
+// ---- THEME 3: LUXURY LOVE PINK (#FCF3F6, #F2DEE7, #A83D68, #D99AB3, #54243B) ----
+function renderLuxuryPinkTheme(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  f: number,
+  t: number,
+  scale: number,
+  couple: VideoCoupleProps
+) {
+  const cx = w / 2;
+  const cy = h / 2;
+  const sceneIdx = Math.min(3, Math.floor(f / 90));
+  const localF = f - sceneIdx * 90;
+  const exitAlpha = localF > 74 ? 1 - easeInOutQuart((localF - 74) / 16) : 1;
+
+  // 1. Exact Luxury Pink Blush Background (#FCF3F6 -> #F2DEE7)
+  const bg = ctx.createLinearGradient(0, 0, w, h);
+  bg.addColorStop(0, '#FCF3F6');
+  bg.addColorStop(0.55, '#F8E6EE');
+  bg.addColorStop(1, '#F2DEE7');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  // Floating subtle rose petals/hearts rising (exact .heart-bg feel)
+  for (let i = 0; i < 18; i++) {
+    const px = seeded(i * 19) * w;
+    const py = ((seeded(i * 23) - t * (0.25 + seeded(i * 29) * 0.3) + 2) % 1) * h;
+    const r = (4 + seeded(i * 31) * 6) * scale;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(t * Math.PI * 2 + i);
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(217, 154, 179, 0.34)' : 'rgba(168, 61, 104, 0.14)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r, r * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 2. Signature Luxury Pink Arched Frame (rounded-t-full border-4 border-[#D99AB3] bg-[#FCF3F6])
+  const padX = w * 0.1;
+  const padY = h * 0.12;
+  const cardW = w - padX * 2;
+  const cardH = h - padY * 2;
+  const archR = cardW / 2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, padY + archR, archR, Math.PI, 0);
+  ctx.lineTo(padX + cardW, padY + cardH - 20 * scale);
+  ctx.arcTo(padX + cardW, padY + cardH, padX + cardW - 20 * scale, padY + cardH, 20 * scale);
+  ctx.lineTo(padX + 20 * scale, padY + cardH);
+  ctx.arcTo(padX, padY + cardH, padX, padY + cardH - 20 * scale, 20 * scale);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(252, 243, 246, 0.90)';
+  ctx.fill();
+  ctx.strokeStyle = '#D99AB3';
+  ctx.lineWidth = 3 * scale;
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. Scene Choreography matching LuxuryPinkLayout.tsx
+  ctx.save();
+  ctx.globalAlpha = exitAlpha;
+
+  if (sceneIdx === 0) {
+    // Scene 01: Exact 3D Envelope Open + Rising Invitation Card (#A83D68, #D99AB3, #54243B)
+    const flapP = easeInOutQuart(seg(localF, 6, 32));
+    const cardRiseP = easeOutBack(seg(localF, 22, 56));
+    const envW = Math.min(cardW * 0.78, 280 * scale);
+    const envH = envW * 0.66;
+    const ex = cx - envW / 2;
+    const ey = cy + 16 * scale;
+
+    // Envelope back body (#A83D68)
+    drawRoundedRect(ctx, ex, ey, envW, envH, 10 * scale);
+    ctx.fillStyle = '#A83D68';
+    ctx.fill();
+
+    // Rising inner invitation card (#FCF3F6)
+    const riseY = ey - cardRiseP * (envH * 0.72);
+    ctx.save();
+    drawRoundedRect(ctx, ex + 12 * scale, riseY, envW - 24 * scale, envH * 0.88, 8 * scale);
+    ctx.fillStyle = '#FCF3F6';
+    ctx.fill();
+    ctx.strokeStyle = '#D99AB3';
+    ctx.lineWidth = 1.5 * scale;
+    ctx.stroke();
+    ctx.font = `400 ${Math.round(32 * scale)}px "Great Vibes", Georgia, serif`;
+    ctx.fillStyle = '#A83D68';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${couple.groom} & ${couple.bride}`, cx, riseY + envH * 0.36);
+    ctx.font = `700 ${Math.round(10 * scale)}px "Nunito Sans", sans-serif`;
+    ctx.fillStyle = '#54243B';
+    ctx.fillText('THE WEDDING INVITATION', cx, riseY + envH * 0.62);
+    ctx.restore();
+
+    // Envelope front side & bottom folds (#A83D68 & #D99AB3)
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(cx, ey + envH * 0.52);
+    ctx.lineTo(ex, ey + envH);
+    ctx.closePath();
+    ctx.fillStyle = '#A83D68';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(ex + envW, ey);
+    ctx.lineTo(cx, ey + envH * 0.52);
+    ctx.lineTo(ex + envW, ey + envH);
+    ctx.closePath();
+    ctx.fillStyle = '#D99AB3';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(ex, ey + envH);
+    ctx.lineTo(cx, ey + envH * 0.48);
+    ctx.lineTo(ex + envW, ey + envH);
+    ctx.closePath();
+    ctx.fillStyle = '#8F2E56';
+    ctx.fill();
+
+    // Top triangular flap (#54243B) flipping open upward
+    const flapTipY = ey + envH * 0.52 * (1 - flapP * 2);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex + envW, ey);
+    ctx.lineTo(cx, flapTipY);
+    ctx.closePath();
+    ctx.fillStyle = '#54243B';
+    ctx.globalAlpha = exitAlpha * (flapP > 0.55 ? 0.35 : 1);
+    ctx.fill();
+  } else if (sceneIdx === 1) {
+    drawMaskedText(
+      ctx,
+      'THE WEDDING OF',
+      cx,
+      padY + 86 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(11.5 * scale)}px "Nunito Sans", sans-serif`,
+      '#A83D68',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.groom,
+      cx,
+      cy - 40 * scale,
+      seg(localF, 8, 34),
+      `400 ${Math.round(52 * scale)}px "Great Vibes", Georgia, serif`,
+      '#54243B',
+      62 * scale,
+      'up'
+    );
+    drawMaskedText(
+      ctx,
+      '&',
+      cx,
+      cy + 8 * scale,
+      seg(localF, 16, 38),
+      `italic 400 ${Math.round(28 * scale)}px "Playfair Display", Georgia, serif`,
+      '#A83D68',
+      36 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.bride,
+      cx,
+      cy + 56 * scale,
+      seg(localF, 20, 44),
+      `400 ${Math.round(52 * scale)}px "Great Vibes", Georgia, serif`,
+      '#54243B',
+      62 * scale,
+      'down'
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groomFull}  ·  ${couple.brideFull}`,
+      cx,
+      cy + 112 * scale,
+      seg(localF, 28, 54),
+      `600 ${Math.round(12 * scale)}px "Nunito Sans", sans-serif`,
+      '#A83D68',
+      22 * scale
+    );
+  } else if (sceneIdx === 2) {
+    drawMaskedText(
+      ctx,
+      'WEDDING SCHEDULE',
+      cx,
+      padY + 90 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(12 * scale)}px "Nunito Sans", sans-serif`,
+      '#A83D68',
+      22 * scale
+    );
+
+    // Inner Blush Card (#F2DEE7 with #D99AB3 top accent)
+    const boxW = cardW * 0.82;
+    const boxH = 165 * scale;
+    const bx = cx - boxW / 2;
+    const by = cy - boxH / 2 + 10 * scale;
+    drawRoundedRect(ctx, bx, by, boxW, boxH, 18 * scale);
+    ctx.fillStyle = '#F2DEE7';
+    ctx.fill();
+    ctx.strokeStyle = '#D99AB3';
+    ctx.lineWidth = 1.5 * scale;
+    ctx.stroke();
+
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      by + 48 * scale,
+      seg(localF, 12, 36),
+      `700 ${Math.round(22 * scale)}px "Playfair Display", Georgia, serif`,
+      '#54243B',
+      32 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `Pukul ${couple.timeRaw}`,
+      cx,
+      by + 88 * scale,
+      seg(localF, 18, 42),
+      `700 ${Math.round(15 * scale)}px "Nunito Sans", sans-serif`,
+      '#A83D68',
+      24 * scale
+    );
+    const vText = couple.venue.length > 36 ? couple.venue.slice(0, 34) + '…' : couple.venue;
+    drawMaskedText(
+      ctx,
+      vText,
+      cx,
+      by + 126 * scale,
+      seg(localF, 24, 50),
+      `600 ${Math.round(13 * scale)}px "Nunito Sans", sans-serif`,
+      '#54243B',
+      22 * scale
+    );
+  } else {
+    drawMaskedText(
+      ctx,
+      'SAVE THE DATE',
+      cx,
+      cy - 64 * scale,
+      seg(localF, 0, 22),
+      `700 ${Math.round(12 * scale)}px "Nunito Sans", sans-serif`,
+      '#A83D68',
+      22 * scale
+    );
+    drawMaskedText(
+      ctx,
+      `${couple.groom} & ${couple.bride}`,
+      cx,
+      cy - 14 * scale,
+      seg(localF, 8, 34),
+      `400 ${Math.round(46 * scale)}px "Great Vibes", Georgia, serif`,
+      '#54243B',
+      54 * scale
+    );
+    drawMaskedText(
+      ctx,
+      couple.dateRaw,
+      cx,
+      cy + 30 * scale,
+      seg(localF, 16, 40),
+      `600 ${Math.round(13.5 * scale)}px "Nunito Sans", sans-serif`,
+      '#54243B',
+      24 * scale
+    );
+
+    const btnPop = easeOutBack(seg(localF, 22, 46));
+    ctx.save();
+    ctx.translate(cx, cy + 80 * scale);
+    ctx.scale(0.85 + 0.15 * btnPop, 0.85 + 0.15 * btnPop);
+    ctx.font = `700 ${Math.round(12.5 * scale)}px "Nunito Sans", sans-serif`;
+    const bw = Math.min(cardW - 36 * scale, ctx.measureText(couple.slug).width + 44 * scale);
+    drawRoundedRect(ctx, -bw / 2, -19 * scale, bw, 38 * scale, 19 * scale);
+    ctx.fillStyle = '#A83D68';
+    ctx.fill();
+    ctx.fillStyle = '#FCF3F6';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(couple.slug, 0, 1);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// ---- Main Frame Dispatcher ----
 export function renderInvitationVideoFrame(
   ctx: CanvasRenderingContext2D,
   frame: number,
@@ -447,302 +1136,48 @@ export function renderInvitationVideoFrame(
   const t = f / VIDEO_TOTAL_FRAMES;
   const scale = Math.min(width, height) / 540;
   const cx = width / 2;
-  const cy = height / 2;
 
   ctx.clearRect(0, 0, width, height);
 
-  // Subtle camera Ken Burns scale pulse per scene
-  const sceneIdx = Math.min(3, Math.floor(f / 90));
-  const localF = f - sceneIdx * 90;
-  const camZoom = 1 + 0.035 * easeInOutQuart(localF / 90);
-
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(camZoom, camZoom);
-  ctx.translate(-cx, -cy);
-
   if (themeId === 'javanese-classic') {
-    renderJavaneseBackdrop(ctx, width, height, t, f, scale);
+    renderJavaneseTheme(ctx, width, height, f, t, scale, couple);
   } else if (themeId === 'grand-ballroom') {
-    renderGrandBallroomBackdrop(ctx, width, height, t, f, scale);
+    renderGrandBallroomTheme(ctx, width, height, f, t, scale, couple);
   } else {
-    renderLuxuryPinkBackdrop(ctx, width, height, t, f, scale);
+    renderLuxuryPinkTheme(ctx, width, height, f, t, scale, couple);
   }
-  ctx.restore();
 
-  // Theme color palette for typography & glass layer
-  const isDark = themeId !== 'luxury-pink';
-  const ink = isDark ? '#F9F6F0' : '#3A1824';
-  const subInk = isDark ? 'rgba(249, 246, 240, 0.72)' : 'rgba(58, 24, 36, 0.72)';
+  // Bottom progress bar matched to theme accent
   const accent =
     themeId === 'javanese-classic'
-      ? '#D8B168'
+      ? '#8A452C'
       : themeId === 'grand-ballroom'
-      ? '#E5C98B'
-      : '#C65D7B';
-
-  // Translucent Center Stage Frame (subtle iOS glass sheet)
-  const cardPadX = width * 0.1;
-  const cardPadY = height * 0.14;
-  const cardW = width - cardPadX * 2;
-  const cardH = height - cardPadY * 2;
-  ctx.save();
-  drawRoundedRect(ctx, cardPadX, cardPadY, cardW, cardH, 26 * scale);
-  ctx.fillStyle = isDark ? 'rgba(12, 14, 22, 0.34)' : 'rgba(255, 255, 255, 0.46)';
-  ctx.fill();
-  ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.85)';
-  ctx.lineWidth = 1.5 * scale;
-  ctx.stroke();
-  ctx.restore();
-
-  // Scene exit wipe alpha
-  const exitAlpha = localF > 74 ? 1 - easeInOutQuart((localF - 74) / 16) : 1;
-
-  ctx.save();
-  ctx.globalAlpha = exitAlpha;
-
-  // Top Scene Pill Badge
-  const pillLabel =
-    sceneIdx === 0
-      ? themeId === 'javanese-classic'
-        ? 'PAWIWAHAN AGENG'
-        : themeId === 'grand-ballroom'
-        ? 'THE ROYAL CELEBRATION'
-        : 'THE WEDDING INVITATION'
-      : sceneIdx === 1
-      ? 'MEMPELAI BERBAHAGIA'
-      : sceneIdx === 2
-      ? 'JADWAL & LOKASI ACARA'
-      : 'SAVE THE DATE';
-
-  const pillReveal = easeOutExpo(seg(localF, 0, 20));
-  ctx.save();
-  ctx.globalAlpha = exitAlpha * pillReveal;
-  ctx.font = `700 ${Math.round(12 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-  const pillW = ctx.measureText(pillLabel).width + 34 * scale;
-  const pillH = 28 * scale;
-  drawRoundedRect(ctx, cx - pillW / 2, cardPadY + 28 * scale, pillW, pillH, pillH / 2);
-  ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.75)';
-  ctx.fill();
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 1 * scale;
-  ctx.stroke();
-  ctx.fillStyle = accent;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(pillLabel, cx, cardPadY + 28 * scale + pillH / 2 + 0.5);
-  ctx.restore();
-
-  // Dynamic Scene Choreography
-  if (sceneIdx === 0) {
-    // Scene 01: Spring-pop Monogram + Horizontal Trim Rule + Masked Subtitle
-    const pop = easeOutBack(seg(localF, 6, 34));
-    ctx.save();
-    ctx.translate(cx, cy - 26 * scale);
-    ctx.scale(0.75 + 0.25 * pop, 0.75 + 0.25 * pop);
-    ctx.font = `400 ${Math.round(82 * scale)}px "Cormorant Garamond", Georgia, serif`;
-    ctx.fillStyle = ink;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(couple.initials, 0, 0);
-    ctx.restore();
-
-    // Expanding Center Hairline
-    const lineW = 140 * scale * easeOutExpo(seg(localF, 18, 42));
-    ctx.beginPath();
-    ctx.moveTo(cx - lineW / 2, cy + 28 * scale);
-    ctx.lineTo(cx + lineW / 2, cy + 28 * scale);
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 1.6 * scale;
-    ctx.stroke();
-
-    drawMaskedText(
-      ctx,
-      'Mengundang Anda di hari bahagia kami',
-      cx,
-      cy + 58 * scale,
-      seg(localF, 24, 52),
-      `500 ${Math.round(16 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      subInk,
-      26 * scale
-    );
-  } else if (sceneIdx === 1) {
-    // Scene 02: Dual-direction Track-Matte Kinetic Couple Names
-    drawMaskedText(
-      ctx,
-      couple.groom,
-      cx,
-      cy - 56 * scale,
-      seg(localF, 4, 30),
-      `600 ${Math.round(50 * scale)}px "Cormorant Garamond", Georgia, serif`,
-      ink,
-      62 * scale,
-      'up'
-    );
-
-    const ampScale = easeOutBack(seg(localF, 14, 36));
-    ctx.save();
-    ctx.translate(cx, cy - 2 * scale);
-    ctx.scale(ampScale, ampScale);
-    ctx.font = `italic 400 ${Math.round(32 * scale)}px "Cormorant Garamond", Georgia, serif`;
-    ctx.fillStyle = accent;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('&', 0, 0);
-    ctx.restore();
-
-    drawMaskedText(
-      ctx,
-      couple.bride,
-      cx,
-      cy + 52 * scale,
-      seg(localF, 18, 44),
-      `600 ${Math.round(50 * scale)}px "Cormorant Garamond", Georgia, serif`,
-      ink,
-      62 * scale,
-      'down'
-    );
-
-    drawMaskedText(
-      ctx,
-      `${couple.groomFull}  ·  ${couple.brideFull}`,
-      cx,
-      cy + 110 * scale,
-      seg(localF, 30, 56),
-      `500 ${Math.round(13 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      subInk,
-      22 * scale
-    );
-  } else if (sceneIdx === 2) {
-    // Scene 03: Event Blueprint with Kinetic Rules
-    drawMaskedText(
-      ctx,
-      couple.dateRaw,
-      cx,
-      cy - 44 * scale,
-      seg(localF, 4, 30),
-      `700 ${Math.round(28 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      ink,
-      40 * scale
-    );
-
-    const ruleW = 110 * scale * easeOutExpo(seg(localF, 16, 40));
-    ctx.beginPath();
-    ctx.moveTo(cx - ruleW / 2, cy - 12 * scale);
-    ctx.lineTo(cx + ruleW / 2, cy - 12 * scale);
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 1.5 * scale;
-    ctx.stroke();
-
-    drawMaskedText(
-      ctx,
-      `Pukul ${couple.timeRaw}`,
-      cx,
-      cy + 18 * scale,
-      seg(localF, 18, 42),
-      `700 ${Math.round(18 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      accent,
-      28 * scale
-    );
-
-    const venueText = couple.venue.length > 38 ? couple.venue.slice(0, 36) + '…' : couple.venue;
-    drawMaskedText(
-      ctx,
-      venueText,
-      cx,
-      cy + 62 * scale,
-      seg(localF, 26, 52),
-      `500 ${Math.round(15 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      subInk,
-      26 * scale
-    );
-  } else {
-    // Scene 04: Save The Date + Capsule Link Pop
-    drawMaskedText(
-      ctx,
-      `${couple.groom} & ${couple.bride}`,
-      cx,
-      cy - 46 * scale,
-      seg(localF, 4, 28),
-      `600 ${Math.round(40 * scale)}px "Cormorant Garamond", Georgia, serif`,
-      ink,
-      50 * scale
-    );
-
-    drawMaskedText(
-      ctx,
-      'Konfirmasi RSVP & panduan lokasi di:',
-      cx,
-      cy + 8 * scale,
-      seg(localF, 16, 40),
-      `500 ${Math.round(14 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`,
-      subInk,
-      24 * scale
-    );
-
-    const btnPop = easeOutBack(seg(localF, 24, 48));
-    ctx.save();
-    ctx.translate(cx, cy + 62 * scale);
-    ctx.scale(0.8 + 0.2 * btnPop, 0.8 + 0.2 * btnPop);
-    ctx.font = `700 ${Math.round(13.5 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-    const urlW = Math.min(cardW - 36 * scale, ctx.measureText(couple.slug).width + 44 * scale);
-    const urlH = 40 * scale;
-    drawRoundedRect(ctx, -urlW / 2, -urlH / 2, urlW, urlH, urlH / 2);
-    ctx.fillStyle = accent;
-    ctx.fill();
-    ctx.fillStyle = themeId === 'luxury-pink' ? '#FFFFFF' : '#140E0A';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(couple.slug, 0, 1);
-    ctx.restore();
-  }
-
-  ctx.restore();
-
-  // ---- After Effects Anamorphic Light-Leak Wipe on Scene Transitions ----
-  if (localF < 16 || localF > 78) {
-    const flash = localF < 16 ? 1 - localF / 16 : (localF - 78) / 12;
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    const sweepX = width * (localF < 16 ? 0.5 + (1 - flash) * 0.6 : flash * 0.5);
-    const leak = ctx.createRadialGradient(sweepX, height * 0.5, 10, sweepX, height * 0.5, Math.max(width, height) * 0.7);
-    const leakColor =
-      themeId === 'luxury-pink'
-        ? `rgba(255, 190, 214, ${flash * 0.55})`
-        : `rgba(255, 224, 155, ${flash * 0.45})`;
-    leak.addColorStop(0, leakColor);
-    leak.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = leak;
-    ctx.fillRect(0, 0, width, height);
-    ctx.restore();
-  }
-
-  // ---- Bottom Progress Bar ----
-  const barW = cardW * 0.48;
+      ? '#345579'
+      : '#A83D68';
+  const barW = width * 0.44;
   const barH = 3.5 * scale;
   const barX = cx - barW / 2;
-  const barY = cardPadY + cardH - 26 * scale;
+  const barY = height - 48 * scale;
   drawRoundedRect(ctx, barX, barY, barW, barH, barH / 2);
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(58,24,36,0.12)';
+  ctx.fillStyle = 'rgba(0,0,0,0.10)';
   ctx.fill();
   drawRoundedRect(ctx, barX, barY, barW * t, barH, barH / 2);
   ctx.fillStyle = accent;
   ctx.fill();
 
-  // Enterprise preview watermark if free tier
   if (showEnterpriseWatermark) {
     ctx.save();
     const wm = 'ENTERPRISE MOTION PREVIEW';
     ctx.font = `700 ${Math.round(10 * scale)}px -apple-system, BlinkMacSystemFont, sans-serif`;
     const wmW = ctx.measureText(wm).width + 22 * scale;
     const wmH = 22 * scale;
-    drawRoundedRect(ctx, cx - wmW / 2, cardPadY + cardH - 58 * scale, wmW, wmH, wmH / 2);
-    ctx.fillStyle = 'rgba(20, 22, 30, 0.74)';
+    drawRoundedRect(ctx, cx - wmW / 2, height - 80 * scale, wmW, wmH, wmH / 2);
+    ctx.fillStyle = 'rgba(29, 29, 31, 0.78)';
     ctx.fill();
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(wm, cx, cardPadY + cardH - 58 * scale + wmH / 2 + 0.5);
+    ctx.fillText(wm, cx, height - 80 * scale + wmH / 2 + 0.5);
     ctx.restore();
   }
 }
