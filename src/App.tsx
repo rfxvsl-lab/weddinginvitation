@@ -357,7 +357,7 @@ export default function App() {
             <VideoInvitationStudio
               wedding={wedding.weddingData}
               slug={slug}
-              user={user}
+              user={auth.currentUser}
               onOpenEnterprise={() => setActiveSegment('upgrade')}
             />
           )}
