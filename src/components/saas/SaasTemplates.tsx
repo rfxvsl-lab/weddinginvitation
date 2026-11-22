@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { DEFAULT_THEMES } from "@/data/defaultData";
 
 const THEME_PREVIEW_IMAGES: Record<string, string> = {
@@ -124,24 +124,19 @@ export function SaasTemplates() {
                     className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-6 text-center">
-                    <Sparkles
-                      size={22}
-                      style={{ color: t.accentHex }}
-                      aria-hidden
-                    />
-                    <p
-                      className="text-[9.5px] font-bold uppercase tracking-[0.28em]"
-                      style={{ color: t.accentHex }}
+                  <div className="flex h-full w-full items-center justify-center px-6 py-5">
+                    <div
+                      className="relative flex h-full w-[136px] overflow-hidden rounded-r-xl rounded-l-[4px] shadow-[0_18px_36px_-10px_rgba(0,0,0,0.65)] ring-1 ring-[#C6A15B]/35 transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105"
+                      style={{ background: "linear-gradient(155deg, #35211E 0%, #241715 65%, #1A100F 100%)" }}
                     >
-                      Interactive Theme
-                    </p>
-                    <p
-                      className="saas-statnum text-[26px]"
-                      style={{ color: t.textHex }}
-                    >
-                      {t.name}
-                    </p>
+                      <div className="w-2.5 shrink-0 bg-black/35 border-r border-[#C6A15B]/25" />
+                      <div className="flex flex-1 flex-col items-center justify-center border border-[#C6A15B]/30 m-2 rounded-md px-2 text-center">
+                        <p className="font-mono text-[6.5px] uppercase tracking-[0.26em] text-[#D8BA7D]">The Story Of</p>
+                        <p className="mt-1 font-serif text-[16px] leading-tight text-[#FAF3E6]">Rian &amp; Salsa</p>
+                        <span className="mt-2 rounded-full bg-[#C6A15B] px-2.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wider text-[#1E1308]">Buka Buku</span>
+                      </div>
+                      <div className="w-1.5 shrink-0 bg-[#E8DEC9]" />
+                    </div>
                   </div>
                 )}
 
