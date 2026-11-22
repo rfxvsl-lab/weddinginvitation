@@ -1,11 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap");
 /* ============================================
    ruanghadir.net — Global Design System
    "Blossom Ivory" Color Palette
    ============================================ */
 
 /* Google Fonts: Cormorant Garamond (elegant heading), Lora (body serif), Inter (UI), Great Vibes (script) */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -824,7 +823,7 @@ html {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: 'Manrope', sans-serif;
+  --font-sans: var(--font-ui), "Plus Jakarta Sans", system-ui, sans-serif;
   --font-serif: 'Cormorant Garamond', serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
@@ -1498,7 +1497,6 @@ body {
   overflow-x: clip;
   max-width: 100vw;
   -webkit-text-size-adjust: 100%;
-  touch-action: manipulation;
 }
 
 .dashboard-shell-lock {
@@ -1509,7 +1507,6 @@ body {
   max-width: 100vw;
   max-height: 100dvh;
   overflow: hidden;
-  touch-action: pan-x pan-y;
   overscroll-behavior: none;
   -webkit-user-select: none;
   user-select: none;
@@ -1550,293 +1547,314 @@ body {
   background: #B9AA98;
 }
 
-
 /* ==========================================================================
-   iOS 26 LIQUID GLASS DESIGN SYSTEM (Tailwind v4 + Apple Material Optics)
-   Inspired by admos98/liquid-glass-suite (glx* utilities, specular rim,
-   backdrop blur + saturation, reduced-transparency accessible fallback).
+   RUANGHADIR — EDITORIAL LUXURY (lapisan final aplikasi)
+   --------------------------------------------------------------------------
+   Satu-satunya sumber token untuk landing, auth, dan dashboard.
+   Template undangan TIDAK memakai .saas-scope sehingga tidak terpengaruh.
+
+   Ivory   #F8F5F0  kanvas        Paper  #FFFFFF  permukaan
+   Linen   #F1EBE2  permukaan 2   Ink    #2A1E21  teks utama (plum-hitam)
+   Wine    #7A2E3B  aksi utama    Gold   #B8955A  aksen/ornamen
+   Display: Fraunces (variabel --font-display)  ·  UI: Plus Jakarta Sans
    ========================================================================== */
 
-@utility glx {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
-  backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    inset 0 -1px 1px rgba(15, 23, 42, 0.04),
-    inset 1px 0 1px rgba(255, 255, 255, 0.45),
-    0 12px 36px -16px rgba(15, 23, 42, 0.12);
-}
-
-@utility glx-strong {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.88);
-  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
-  backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 1px rgba(15, 23, 42, 0.05),
-    0 18px 48px -20px rgba(15, 23, 42, 0.16);
-}
-
-@utility glx-pill {
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 8px 24px -12px rgba(15, 23, 42, 0.12);
-}
-
-@utility glx-inset {
-  background: rgba(255, 255, 255, 0.56);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow:
-    inset 0 1px 3px rgba(15, 23, 42, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-@utility glx-dark {
-  background: rgba(28, 28, 30, 0.78);
-  color: #F5F5F7;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  backdrop-filter: blur(28px) saturate(180%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 24px 60px -20px rgba(0, 0, 0, 0.45);
-}
-
-.glx-wallpaper {
-  background-color: #EEF2F8;
-  background-image:
-    radial-gradient(920px 540px at 8% -6%, rgba(0, 122, 255, 0.16), transparent 62%),
-    radial-gradient(840px 560px at 92% 4%, rgba(88, 86, 214, 0.14), transparent 60%),
-    radial-gradient(760px 560px at 52% 96%, rgba(175, 82, 222, 0.10), transparent 64%),
-    linear-gradient(180deg, #F4F7FC 0%, #EDF1F8 100%);
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .glx,
-  .glx-strong,
-  .glx-pill,
-  .saas-card,
-  .saas-glass {
-    background: #FFFFFF !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-color: #DCE2EC !important;
-  }
-}
-
-/* Override .saas-scope to iOS 26 Liquid Glass Aesthetic */
 .saas-scope {
-  --saas-bg: #EEF2F8;
-  --saas-surface: rgba(255, 255, 255, 0.68);
-  --saas-ink: #1D1D1F;
-  --saas-ink-2: #48484A;
-  --saas-muted: #6E6E73;
-  --saas-faint: #8E8E93;
-  --saas-line: rgba(255, 255, 255, 0.78);
-  --saas-line-strong: rgba(15, 23, 42, 0.12);
-  --saas-primary: #007AFF;
-  --saas-primary-hover: #0062CC;
-  --saas-primary-soft: rgba(0, 122, 255, 0.11);
-  --saas-wine: #007AFF;
-  --saas-wine-2: #1E8FFF;
-  --saas-wine-soft: rgba(0, 122, 255, 0.11);
-  --saas-navy: #1C1C1E;
-  --saas-navy-2: #2C2C2E;
-  --saas-gold: #5856D6;
-  --saas-gold-2: #AF52DE;
-  --saas-gold-soft: rgba(88, 86, 214, 0.12);
-  --saas-success: #1E7E34;
-  --saas-green: #1E7E34;
-  --saas-success-soft: rgba(52, 199, 89, 0.14);
-  --saas-amber: #B25000;
-  --saas-amber-soft: rgba(255, 149, 0, 0.14);
-  --saas-danger: #D70015;
-  --saas-danger-soft: rgba(255, 59, 48, 0.12);
-  --saas-radius: 26px;
-  --saas-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 20px 50px -22px rgba(15, 23, 42, 0.18);
-  --saas-shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 12px 32px -18px rgba(15, 23, 42, 0.14);
-  --saas-ring: 0 0 0 3px rgba(0, 122, 255, 0.22);
+  --rh-ivory: #F8F5F0;
+  --rh-paper: #FFFFFF;
+  --rh-linen: #F1EBE2;
+  --rh-ink: #2A1E21;
+  --rh-ink-2: #54464A;
+  --rh-muted: #7D6F71;
+  --rh-faint: #A99C9C;
+  --rh-line: #E6DDD2;
+  --rh-line-strong: #D6C9BA;
+  --rh-wine: #7A2E3B;
+  --rh-wine-hover: #63232F;
+  --rh-wine-soft: #F5E9EA;
+  --rh-gold: #B8955A;
+  --rh-gold-deep: #8C6B34;
+  --rh-gold-soft: #F4ECDD;
 
-  background-color: #EEF2F8;
-  background-image:
-    radial-gradient(960px 540px at 10% -4%, rgba(0, 122, 255, 0.17), transparent 62%),
-    radial-gradient(880px 560px at 90% 6%, rgba(88, 86, 214, 0.15), transparent 60%),
-    radial-gradient(800px 520px at 50% 52%, rgba(90, 200, 250, 0.12), transparent 65%),
-    linear-gradient(180deg, #F5F8FD 0%, #ECF1F8 100%);
-  color: var(--saas-ink);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --saas-bg: var(--rh-ivory);
+  --saas-surface: var(--rh-paper);
+  --saas-ink: var(--rh-ink);
+  --saas-ink-2: var(--rh-ink-2);
+  --saas-muted: var(--rh-muted);
+  --saas-faint: var(--rh-faint);
+  --saas-line: var(--rh-line);
+  --saas-line-strong: var(--rh-line-strong);
+  --saas-primary: var(--rh-wine);
+  --saas-primary-hover: var(--rh-wine-hover);
+  --saas-primary-soft: var(--rh-wine-soft);
+  --saas-wine: var(--rh-wine);
+  --saas-wine-2: #94404F;
+  --saas-wine-soft: var(--rh-wine-soft);
+  --saas-navy: #2A1E21;
+  --saas-navy-2: #3D2A2F;
+  --saas-gold: var(--rh-gold);
+  --saas-gold-2: #D9C29A;
+  --saas-gold-soft: var(--rh-gold-soft);
+  --saas-success: #3F7A52;
+  --saas-green: #3F7A52;
+  --saas-success-soft: #E9F2EA;
+  --saas-amber: #A86E1F;
+  --saas-amber-soft: #F7EDDC;
+  --saas-danger: #B03A3A;
+  --saas-danger-soft: #F9E9E7;
+  --saas-radius: 14px;
+  --saas-shadow: 0 1px 0 rgba(42, 30, 33, 0.04), 0 18px 40px -28px rgba(42, 30, 33, 0.35);
+  --saas-shadow-sm: 0 1px 0 rgba(42, 30, 33, 0.04), 0 8px 22px -18px rgba(42, 30, 33, 0.28);
+  --saas-ring: 0 0 0 3px rgba(122, 46, 59, 0.18);
+
+  background: var(--rh-ivory);
+  color: var(--rh-ink);
+  font-family: var(--font-ui), "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .saas-scope h1,
-.saas-scope h2,
+.saas-scope h2 {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  color: var(--rh-ink);
+  font-variation-settings: "opsz" 96, "SOFT" 50;
+}
 .saas-scope h3 {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
-  letter-spacing: -0.028em;
-  color: var(--saas-ink);
-  font-weight: 700;
+  font-family: var(--font-ui), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--rh-ink);
 }
-
+.saas-scope .rh-display {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
 .saas-scope .saas-serif-i {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-  font-style: normal;
-  font-weight: 700;
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: inherit;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.saas-scope .saas-statnum {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
-.saas-scope .saas-statnum {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+/* Label kecil: sentence case, bukan huruf kapital berspasi */
+.saas-scope .saas-kicker,
+.saas-scope .saas-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0;
+  text-transform: none; color: var(--rh-gold-deep);
+}
+.saas-scope .saas-kicker::before,
+.saas-scope .saas-eyebrow::before { content: none; }
+.saas-scope .saas-field-label {
+  font-size: 12.5px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--rh-ink-2);
 }
 
 .saas-scope .saas-card {
-  background: rgba(255, 255, 255, 0.66);
-  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
-  backdrop-filter: blur(24px) saturate(180%) brightness(1.04);
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  border-radius: 26px;
+  background: var(--rh-paper);
+  border: 1px solid var(--rh-line);
+  border-radius: var(--saas-radius);
   box-shadow: var(--saas-shadow-sm);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
+.saas-scope .saas-card-hover { transition: border-color .2s ease, box-shadow .2s ease; }
+.saas-scope .saas-card-hover:hover { transform: none; border-color: var(--rh-line-strong); box-shadow: var(--saas-shadow); }
 
-.saas-scope .saas-card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--saas-shadow);
-  border-color: rgba(255, 255, 255, 0.96);
+.saas-scope .saas-glass {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-color: var(--rh-line);
 }
 
 .saas-scope .saas-dark-panel,
 .saas-scope .saas-navy-panel {
-  background: linear-gradient(155deg, rgba(28, 28, 30, 0.88) 0%, rgba(20, 24, 38, 0.92) 100%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #F5F5F7;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 28px 64px -22px rgba(15, 23, 42, 0.42);
+  background: var(--rh-ink);
+  color: #F6EFE6;
+  border: 1px solid #3D2A2F;
+  box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
+.saas-scope .saas-dark-panel :is(h1, h2, h3),
+.saas-scope .saas-navy-panel :is(h1, h2, h3) { color: #FFFFFF; }
 
 .saas-scope .saas-btn-primary {
-  background: linear-gradient(180deg, #1E8FFF 0%, #007AFF 100%);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--rh-wine);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    0 12px 26px -10px rgba(0, 122, 255, 0.58);
+  border: 1px solid var(--rh-wine);
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 6px 16px -10px rgba(122, 46, 59, 0.7);
+  filter: none;
 }
-.saas-scope .saas-btn-primary:hover {
-  background: linear-gradient(180deg, #0F84FF 0%, #0062CC 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.48),
-    0 16px 32px -10px rgba(0, 122, 255, 0.65);
-}
-
+.saas-scope .saas-btn-primary:hover { background: var(--rh-wine-hover); border-color: var(--rh-wine-hover); box-shadow: 0 8px 20px -12px rgba(122, 46, 59, 0.8); filter: none; }
 .saas-scope .saas-btn-outline {
-  background: rgba(255, 255, 255, 0.68);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
-  color: #1D1D1F;
-  border: 1px solid rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 6px 18px -10px rgba(15, 23, 42, 0.14);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--rh-paper);
+  color: var(--rh-ink);
+  border: 1px solid var(--rh-line-strong);
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
-.saas-scope .saas-btn-outline:hover {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(0, 122, 255, 0.3);
-}
+.saas-scope .saas-btn-outline:hover { background: var(--rh-paper); border-color: var(--rh-ink); }
 
 .saas-scope .saas-input {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  border-radius: 14px;
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+  background: var(--rh-paper);
+  border: 1px solid var(--rh-line-strong);
+  border-radius: 10px;
+  box-shadow: none;
 }
-.saas-scope .saas-input:focus {
-  background: #FFFFFF;
-  border-color: #007AFF;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.18);
-}
-
-.saas-scope .saas-glass {
-  background: rgba(255, 255, 255, 0.72);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  backdrop-filter: blur(28px) saturate(190%);
-  border-color: rgba(255, 255, 255, 0.8);
-}
-
-.saas-scope .saas-kicker,
-.saas-scope .saas-eyebrow {
-  color: #007AFF;
-  letter-spacing: 0.16em;
-}
-.saas-scope .saas-kicker::before,
-.saas-scope .saas-eyebrow::before {
-  background: linear-gradient(90deg, #007AFF, #5856D6);
-}
+.saas-scope .saas-input:focus { border-color: var(--rh-wine); box-shadow: var(--saas-ring); }
 
 .saas-scope .saas-icon-box {
-  background: rgba(0, 122, 255, 0.10);
-  color: #007AFF;
-  border: 1px solid rgba(0, 122, 255, 0.16);
-  border-radius: 16px;
+  background: var(--rh-gold-soft);
+  color: var(--rh-gold-deep);
+  border: 1px solid #EADCC2;
+  border-radius: 12px;
 }
+.saas-scope .saas-progress > span,
+.saas-scope .saas-stepper-track > span { background: var(--rh-wine); }
 
-/* Dashboard Apple Cool Neutral + System Blue Palette Bridge */
+/* glx* (warisan) dipetakan ke permukaan kertas solid */
+@utility glx {
+  background: #FFFFFF;
+  border: 1px solid #E6DDD2;
+  box-shadow: 0 1px 0 rgba(42, 30, 33, 0.04), 0 8px 22px -18px rgba(42, 30, 33, 0.28);
+}
+@utility glx-strong {
+  background: #FFFFFF;
+  border: 1px solid #E6DDD2;
+  box-shadow: 0 1px 0 rgba(42, 30, 33, 0.04), 0 18px 40px -28px rgba(42, 30, 33, 0.35);
+}
+@utility glx-pill {
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid #E6DDD2;
+}
+@utility glx-inset {
+  background: #F8F5F0;
+  border: 1px solid #E6DDD2;
+}
+@utility glx-dark {
+  background: #2A1E21;
+  color: #F6EFE6;
+  border: 1px solid #3D2A2F;
+}
+.glx-wallpaper { background: #F8F5F0; }
+
+/* Dashboard: palet Tailwind lama (zinc/amber/rose) dipetakan ke Editorial */
 .saas-dash {
-  --color-zinc-50:  #F5F7FB;
-  --color-zinc-100: #ECEFF6;
-  --color-zinc-200: #DCE2EC;
-  --color-zinc-300: #C6CFDE;
-  --color-zinc-400: #8E96A4;
-  --color-zinc-500: #6E6E73;
-  --color-zinc-600: #48484A;
-  --color-zinc-700: #3A3A3C;
-  --color-zinc-800: #2C2C2E;
-  --color-zinc-900: #1D1D1F;
-  --color-zinc-950: #111113;
+  --color-zinc-50:  #FBF9F6;
+  --color-zinc-100: #F4EFE8;
+  --color-zinc-200: #E6DDD2;
+  --color-zinc-300: #D6C9BA;
+  --color-zinc-400: #A99C9C;
+  --color-zinc-500: #7D6F71;
+  --color-zinc-600: #65575A;
+  --color-zinc-700: #54464A;
+  --color-zinc-800: #3B2D31;
+  --color-zinc-900: #2A1E21;
+  --color-zinc-950: #1E1517;
 
-  --color-amber-50:  #F2F1FE;
-  --color-amber-100: #E5E4FC;
-  --color-amber-200: #CECCFA;
-  --color-amber-300: #B1AEF7;
-  --color-amber-400: #8B87F0;
-  --color-amber-500: #5856D6;
-  --color-amber-600: #4B49BD;
-  --color-amber-700: #3E3C9E;
-  --color-amber-800: #323080;
-  --color-amber-900: #252463;
+  --color-amber-50:  #FAF6EE;
+  --color-amber-100: #F4ECDD;
+  --color-amber-200: #EADCC2;
+  --color-amber-300: #DCC59C;
+  --color-amber-400: #C9AC77;
+  --color-amber-500: #B8955A;
+  --color-amber-600: #9E7C44;
+  --color-amber-700: #8C6B34;
+  --color-amber-800: #6E5228;
+  --color-amber-900: #54401F;
 
-  --color-rose-50:  #EDF6FF;
-  --color-rose-100: #D8ECFF;
-  --color-rose-200: #B4DAFF;
-  --color-rose-300: #7EC0FF;
-  --color-rose-400: #3D9EFF;
-  --color-rose-500: #007AFF;
-  --color-rose-600: #0062CC;
-  --color-rose-700: #004DA3;
+  --color-rose-50:  #FBF4F4;
+  --color-rose-100: #F5E9EA;
+  --color-rose-200: #EBD2D5;
+  --color-rose-300: #D7A9AF;
+  --color-rose-400: #B56E79;
+  --color-rose-500: #94404F;
+  --color-rose-600: #7A2E3B;
+  --color-rose-700: #63232F;
 }
 
-.dashboard-shell-lock ::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.16);
+.dashboard-shell-lock ::-webkit-scrollbar-thumb { background: #D6C9BA; }
+.dashboard-shell-lock ::-webkit-scrollbar-thumb:hover { background: #A99C9C; }
+
+/* ---- Landing: kipas kartu undangan (satu-satunya gerak saat halaman dimuat) ---- */
+.rh-fan-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 230px;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(42, 30, 33, 0.12);
+  background: #2A1E21;
+  box-shadow: 0 30px 60px -30px rgba(42, 30, 33, 0.55), 0 2px 6px rgba(42, 30, 33, 0.12);
+  transform-origin: 50% 100%;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-.dashboard-shell-lock ::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 23, 42, 0.28);
+.rh-fan-center { z-index: 3; transform: translate(-50%, -50%); animation: rhFanCenter 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.rh-fan-left   { z-index: 1; transform: translate(-104%, -47%) rotate(-8deg); animation: rhFanLeft 0.9s 0.08s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.rh-fan-right  { z-index: 2; transform: translate(4%, -47%) rotate(8deg); animation: rhFanRight 0.9s 0.08s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.rh-fan-left:hover  { transform: translate(-112%, -50%) rotate(-11deg); }
+.rh-fan-right:hover { transform: translate(12%, -50%) rotate(11deg); }
+.rh-fan-center:hover { transform: translate(-50%, -52%); }
+@keyframes rhFanCenter { from { opacity: 0; transform: translate(-50%, -44%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+@keyframes rhFanLeft { from { opacity: 0; transform: translate(-50%, -47%) rotate(0deg); } to { opacity: 1; transform: translate(-104%, -47%) rotate(-8deg); } }
+@keyframes rhFanRight { from { opacity: 0; transform: translate(-50%, -47%) rotate(0deg); } to { opacity: 1; transform: translate(4%, -47%) rotate(8deg); } }
+
+.rh-fan-tag {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 2%;
+  transform: translateX(-50%) rotate(-2deg);
+  padding: 10px 18px 11px;
+  background: #FFFFFF;
+  border: 1px solid #E6DDD2;
+  border-radius: 4px;
+  box-shadow: 0 12px 24px -14px rgba(42, 30, 33, 0.45);
+  text-align: center;
+  white-space: nowrap;
+  animation: rhTag 0.6s 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.rh-fan-tag::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: 50%;
+  width: 9px; height: 9px; margin-left: -4.5px;
+  border-radius: 999px;
+  background: #B8955A;
+}
+@keyframes rhTag { from { opacity: 0; transform: translateX(-50%) translateY(10px) rotate(-2deg); } to { opacity: 1; transform: translateX(-50%) rotate(-2deg); } }
+
+@media (max-width: 640px) {
+  .rh-fan-card { width: 175px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rh-fan-card, .rh-fan-tag { animation: none !important; transition: none !important; }
 }
 
-/* Ensure headings inside dark glass panels stay crisp white */
-.saas-scope .saas-dark-panel h1,
-.saas-scope .saas-dark-panel h2,
-.saas-scope .saas-dark-panel h3,
-.saas-scope .saas-navy-panel h1,
-.saas-scope .saas-navy-panel h2,
-.saas-scope .saas-navy-panel h3 {
-  color: #FFFFFF;
+/* Dashboard: judul kartu memakai sans agar terbaca di ukuran kecil */
+.saas-dash h2,
+.saas-dash h3,
+.saas-dash h4 {
+  font-family: var(--font-ui), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  font-variation-settings: normal;
 }
+.saas-scope h1, .saas-scope h2 { font-variation-settings: normal; font-optical-sizing: auto; }

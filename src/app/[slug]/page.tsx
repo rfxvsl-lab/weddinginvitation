@@ -1,10 +1,11 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getInvitationBySlug, getRSVPsByInvitation, getUserById, validateGuestCode } from '../../lib/db';
 import { getSession } from '../../lib/server/auth';
 import InvitationClient from './InvitationClient';
 import type { Guest } from '../../types';
-import { Globe, Timer } from 'lucide-react';
+import { Timer } from 'lucide-react';
 import { getWatermarkType } from '../../lib/packageLimits';
 
 // Always fetch fresh data — no caching (important for post-publish updates)
@@ -64,27 +65,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
   const inv = found && (found.isPublished || isOwnerPreview) ? found : null;
 
-  if (!inv) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] p-6 text-center">
-        <div className="max-w-md w-full bg-[#0a0a0e] rounded-3xl p-8 border border-zinc-800/50 flex flex-col items-center">
-          <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mb-6">
-            <Globe className="w-8 h-8 text-rose-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Undangan Tidak Ditemukan</h1>
-          <p className="text-zinc-400 mb-8 text-sm">
-            Maaf, halaman undangan yang Anda cari tidak dapat ditemukan. Pastikan URL atau slug yang Anda masukkan sudah benar.
-          </p>
-          <a
-            href="/"
-            className="px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition text-sm"
-          >
-            Buat Undangan Sendiri
-          </a>
-        </div>
-      </div>
-    );
-  }
+  if (!inv) notFound();
 
   // Check if invitation has expired (masa aktif habis)
   if (inv.isExpired) {

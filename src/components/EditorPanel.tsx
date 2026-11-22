@@ -310,7 +310,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
       </div>
 
       {/* Unified Pro SaaS Sticky Tab Bar */}
-      <div className="sticky top-0 z-20 border-b border-[#E1E7F0] bg-white px-4 sm:px-6">
+      <div className="sticky top-0 z-20 border-b border-[#E6DDD2] bg-white px-4 sm:px-6">
         <div
           role="tablist"
           aria-label="Bagian Editor Undangan"
@@ -335,8 +335,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 onClick={() => setActiveTab(tab.id)}
                 className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-[#007AFF]/10 text-[#007AFF]'
-                    : 'text-[#48484A] hover:bg-[#F3F6FB] hover:text-[#1D1D1F]'
+                    ? 'bg-[#7A2E3B]/10 text-[#7A2E3B]'
+                    : 'text-[#54464A] hover:bg-[#F8F5F0] hover:text-[#2A1E21]'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -361,10 +361,10 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'couple' && (
           <div className="space-y-5 animate-fadeIn">
             {/* Section Header */}
-            <div className="flex items-center justify-between bg-white border border-[#E1E7F0] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white border border-[#E6DDD2] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-[#007AFF]" />
+                  <Users className="w-5 h-5 text-[#7A2E3B]" />
                 </div>
                 <div>
                   <h4 className="font-bold text-zinc-800 text-sm">Informasi Mempelai</h4>
@@ -383,9 +383,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* GROOM PANEL */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Groom */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#007AFF]" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#7A2E3B]" />
                 <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
-                  <span className="bg-[#007AFF]/10 text-[#007AFF] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
+                  <span className="bg-[#7A2E3B]/10 text-[#7A2E3B] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
                   <h5 className="font-bold text-zinc-800 text-sm">Mempelai Pria (Groom)</h5>
                 </div>
 
@@ -622,8 +622,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 2: DETIL ACARA */}
         {activeTab === 'events' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white border border-[#E1E7F0] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-[#F3F6FB] border border-[#E1E7F0] flex items-center justify-center">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DDD2] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+              <div className="w-10 h-10 rounded-xl bg-[#F8F5F0] border border-[#E6DDD2] flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600" />
               </div>
               <div>
@@ -636,7 +636,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* AKAD */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Akad */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#007AFF]" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#7A2E3B]" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
                   <h5 className="font-bold text-zinc-700 font-bold text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-zinc-500" />
@@ -955,8 +955,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'gallery' && (
           <div className="space-y-5">
             {/* Section Header */}
-            <div className="flex items-center gap-3 bg-white border border-[#E1E7F0] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-[#F3F6FB] border border-[#E1E7F0] flex items-center justify-center">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DDD2] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+              <div className="w-10 h-10 rounded-xl bg-[#F8F5F0] border border-[#E6DDD2] flex items-center justify-center">
                 <Image className="w-5 h-5 text-zinc-700" />
               </div>
               <div>
@@ -1043,7 +1043,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#007AFF] hover:bg-[#0062CC] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#007AFF] shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#7A2E3B] hover:bg-[#63232F] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#7A2E3B] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1092,7 +1092,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#007AFF] hover:bg-[#0062CC] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#007AFF] shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#7A2E3B] hover:bg-[#63232F] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[#7A2E3B] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1164,7 +1164,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   <p className="text-[10px] text-zinc-500 mt-0.5">Mendukung file .mp3, .wav, atau audio sejenis (disimpan di Cloudinary cloud storage).</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
-                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-[#007AFF] hover:bg-[#0062CC] text-white rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-[#007AFF] active:scale-95">
+                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-[#7A2E3B] hover:bg-[#63232F] text-white rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-[#7A2E3B] active:scale-95">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Pilih File Audio</span>
                     <input
@@ -1200,7 +1200,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         musicTitle: 'Beautiful Piano - Canon in D'
                       });
                     }}
-                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white border border-[#E1E7F0] rounded-xl text-xs font-bold transition active:scale-95"
+                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white border border-[#E6DDD2] rounded-xl text-xs font-bold transition active:scale-95"
                   >
                     Atur Ulang
                   </button>
@@ -1372,9 +1372,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 5: DIGITAL GIFT */}
         {activeTab === 'gifts' && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between bg-white border border-[#E1E7F0] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white border border-[#E6DDD2] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#F3F6FB] border border-[#E1E7F0] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#F8F5F0] border border-[#E6DDD2] flex items-center justify-center">
                   <Gift className="w-5 h-5 text-zinc-700" />
                 </div>
                 <div>
@@ -1385,7 +1385,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               <button
                 type="button"
                 onClick={addGiftItem}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#007AFF] text-white rounded-lg text-xs font-semibold hover:bg-[#0062CC] transition shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#7A2E3B] text-white rounded-lg text-xs font-semibold hover:bg-[#63232F] transition shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah
               </button>
@@ -1462,7 +1462,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 6: QUOTE & COUNTDOWN */}
         {activeTab === 'quote' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white border border-[#E1E7F0] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DDD2] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <Quote className="w-5 h-5 text-purple-600" />
               </div>

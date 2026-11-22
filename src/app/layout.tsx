@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Serif_Display, DM_Sans, Caveat } from 'next/font/google';
+import { DM_Serif_Display, DM_Sans, Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
@@ -20,9 +20,17 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const caveat = Caveat({
-  variable: "--font-hand",
-  weight: ["500", "600", "700"],
+// Tipografi aplikasi (landing, auth, dashboard)
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  axes: ["SOFT", "opsz"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-ui",
   subsets: ["latin"],
   display: "swap",
 });
@@ -47,9 +55,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: '#FAF7F2',
+  themeColor: '#F8F5F0',
 };
 
 export default function RootLayout({
@@ -59,16 +65,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <head>
-        <meta name="theme-color" content="#FAF7F2" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className={`${dmSerif.variable} ${dmSans.variable} ${caveat.variable} antialiased bg-background text-foreground`}>
+      <body className={`${dmSerif.variable} ${dmSans.variable} ${fraunces.variable} ${jakarta.variable} antialiased bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

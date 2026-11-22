@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0] — 2026-11-23 — Keamanan server-side & Editorial Luxury
+
+### Keamanan (breaking)
+- Sesi login kini cookie `rh_session` httpOnly bertanda tangan HMAC; cookie base64 `saas_user_session` lama tidak berlaku lagi (semua user login ulang sekali).
+- Login, daftar, Google, logout, dan `me` dipindah ke `/api/auth/*`. Google ID token diverifikasi di server.
+- Password memakai scrypt + salt; hash SHA-256 lama di-upgrade otomatis saat login.
+- `src/lib/api.ts` (server actions) kini hanya berisi fungsi ber-guard (owner / self / admin / publik). Akses database langsung ada di `src/lib/db.ts` (server-only).
+- Halaman undangan publik tidak lagi mengirim daftar tamu ke browser, draf hanya bisa dilihat pemilik, dan konfirmasi tamu wajib kode undangan.
+- Endpoint `debug-invitation` & halaman `test-*` dihapus; `simulate-payment` mati di production; `update-profile`, `notify-admin`, AI copy memerlukan sesi.
+- Pembayaran Pakasir dinonaktifkan lewat `PAYMENTS_ENABLED` (kode tetap ada).
+- `middleware.ts` diganti `proxy.ts` (konvensi Next.js 16).
+
+### Desain
+- Design system tunggal **Editorial Luxury**: ivory `#F8F5F0`, wine `#7A2E3B`, gold `#B8955A`, Fraunces + Plus Jakarta Sans. Lapisan iOS Liquid Glass dihapus.
+- Landing page ditulis ulang (`src/components/landing/*`) dengan screenshot asli setiap tema.
+- Auth dengan panel visual undangan; dashboard memakai palet yang sama (zinc/amber/rose dipetakan ulang via `.saas-dash`).
+- Zoom browser tidak lagi dikunci (aksesibilitas).
+
+### Dibersihkan
+- 60+ file mati (landing lama, komponen shadcn tak terpakai, file Vite) dan 35 dependensi tak terpakai.
+- Slug undangan baru memakai tautan pilihan user, bukan `inv-inv--1234`.
+
 ## [2.3.0] — iOS 26 Liquid Glass Overhaul & Enterprise Video Studio
 ### Added
 - **iOS 26 Liquid Glass Design System** (`src/index.css`): Added Tailwind v4 `@utility glx`, `glx-strong`, `glx-pill`, `glx-inset`, `glx-dark`, and `.glx-wallpaper` atmospheric backdrop inspired by Apple Liquid Glass material optics (`admos98/liquid-glass-suite`), with accessible `prefers-reduced-transparency` fallbacks.

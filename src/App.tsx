@@ -56,7 +56,12 @@ export default function App() {
   const auth = useAuth();
   const wedding = useWeddingData();
 
-  const [activeSegment, setActiveSegment] = useState<DashboardSegment>('overview');
+  const [activeSegment, setActiveSegment] = useState<DashboardSegment>(() => {
+    if (typeof window === 'undefined') return 'overview';
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    const allowed: DashboardSegment[] = ['overview', 'design', 'settings', 'guests', 'analytics', 'profile', 'upgrade'];
+    return allowed.includes(tab as DashboardSegment) ? (tab as DashboardSegment) : 'overview';
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showRightPreview, setShowRightPreview] = useState(true);
   const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
@@ -84,21 +89,6 @@ export default function App() {
     setTimeout(calcPreviewScale, 150);
   }, [calcPreviewScale]);
 
-  // Lock pinch-to-zoom & browser trackpad zoom inside dashboard workspace
-  useEffect(() => {
-    const preventGesture = (e: Event) => e.preventDefault();
-    const preventCtrlWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) e.preventDefault();
-    };
-    document.addEventListener('gesturestart', preventGesture, { passive: false });
-    document.addEventListener('gesturechange', preventGesture, { passive: false });
-    window.addEventListener('wheel', preventCtrlWheel, { passive: false });
-    return () => {
-      document.removeEventListener('gesturestart', preventGesture);
-      document.removeEventListener('gesturechange', preventGesture);
-      window.removeEventListener('wheel', preventCtrlWheel);
-    };
-  }, []);
 
   // Auto-load user data whenever auth.currentUser becomes available
   useEffect(() => {
@@ -156,13 +146,13 @@ export default function App() {
   };
 
   return (
-    <div className="saas-scope dashboard-shell-lock fixed inset-0 flex h-[100dvh] w-full max-w-[100vw] overflow-hidden glx-wallpaper text-[#1D1D1F] font-sans">
+    <div className="saas-scope saas-dash dashboard-shell-lock fixed inset-0 flex h-[100dvh] w-full max-w-[100vw] overflow-hidden glx-wallpaper text-[#2A1E21] font-sans">
       {/* Loading Overlay */}
       {wedding.isLoading && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F3F6FB]/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F8F5F0]/90 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-7 w-7 animate-spin text-[#007AFF]" />
-            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#48484A]">
+            <Loader2 className="h-7 w-7 animate-spin text-[#7A2E3B]" />
+            <p className="text-[13px] font-medium text-[#54464A]">
               Memuat Workspace…
             </p>
           </div>
@@ -189,37 +179,37 @@ export default function App() {
       {/* 2. MAIN WORKSPACE COLUMN */}
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         {/* Top Workspace Bar */}
-        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#E1E7F0] bg-white/70 backdrop-blur-2xl px-4 sm:px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#E6DDD2] bg-white/70 backdrop-blur-2xl px-4 sm:px-6">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="inline-flex lg:hidden h-9 w-9 items-center justify-center rounded-xl border border-[#E1E7F0] text-[#1D1D1F] hover:bg-[#F3F6FB] cursor-pointer"
+              className="inline-flex lg:hidden h-9 w-9 items-center justify-center rounded-xl border border-[#E6DDD2] text-[#2A1E21] hover:bg-[#F8F5F0] cursor-pointer"
               aria-label="Buka navigasi"
             >
               <Menu className="h-4.5 w-4.5" />
             </button>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="truncate text-[15px] font-bold text-[#1D1D1F]">
+                <h1 className="truncate text-[15px] font-bold text-[#2A1E21]">
                   {segMeta.title}
                 </h1>
                 <span
                   className={`hidden sm:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
                     isPublished
-                      ? 'bg-[#E8F8EC] text-[#1E7E34]'
-                      : 'bg-[#EEEDFE] text-[#9A6B1E]'
+                      ? 'bg-[#E9F2EA] text-[#3F7A52]'
+                      : 'bg-[#F4ECDD] text-[#9A6B1E]'
                   }`}
                 >
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
-                      isPublished ? 'bg-[#1E7E34]' : 'bg-[#C6933A]'
+                      isPublished ? 'bg-[#3F7A52]' : 'bg-[#C6933A]'
                     }`}
                   />
                   {isPublished ? 'Publik' : 'Draft'}
                 </span>
               </div>
-              <p className="hidden md:block truncate text-[11.5px] text-[#6E6E73]">
+              <p className="hidden md:block truncate text-[11.5px] text-[#7D6F71]">
                 {segMeta.sub}
               </p>
             </div>
@@ -230,11 +220,11 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-[#E1E7F0] bg-[#F3F6FB] px-3 py-1.5 text-[12px] font-semibold text-[#1D1D1F] transition hover:bg-[#F2ECE2] cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DDD2] bg-[#F8F5F0] px-3 py-1.5 text-[12px] font-semibold text-[#2A1E21] transition hover:bg-[#F2ECE2] cursor-pointer"
                 title={`Salin ruanghadir.net/${slug}`}
               >
                 {copiedSlug ? (
-                  <Check className="h-3.5 w-3.5 text-[#1E7E34]" />
+                  <Check className="h-3.5 w-3.5 text-[#3F7A52]" />
                 ) : (
                   <Copy className="h-3.5 w-3.5 text-[#6B5D54]" />
                 )}
@@ -249,9 +239,9 @@ export default function App() {
                 href={`/${slug}`}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden md:inline-flex items-center gap-1.5 rounded-lg border border-[#E1E7F0] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#1D1D1F] transition hover:bg-[#F3F6FB]"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DDD2] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#2A1E21] transition hover:bg-[#F8F5F0]"
               >
-                <ExternalLink className="h-3.5 w-3.5 text-[#007AFF]" />
+                <ExternalLink className="h-3.5 w-3.5 text-[#7A2E3B]" />
                 Buka
               </a>
             )}
@@ -259,7 +249,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsFullscreenPreview(true)}
-              className="inline-flex xl:hidden items-center gap-1.5 rounded-lg bg-[#007AFF] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#0062CC] cursor-pointer"
+              className="inline-flex xl:hidden items-center gap-1.5 rounded-lg bg-[#7A2E3B] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#63232F] cursor-pointer"
             >
               <Eye className="h-3.5 w-3.5" />
               Pratinjau
@@ -268,7 +258,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setShowRightPreview((v) => !v)}
-              className="hidden xl:inline-flex items-center gap-1.5 rounded-lg border border-[#E1E7F0] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#48484A] transition hover:bg-[#F3F6FB] hover:text-[#1D1D1F] cursor-pointer"
+              className="hidden xl:inline-flex items-center gap-1.5 rounded-lg border border-[#E6DDD2] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#54464A] transition hover:bg-[#F8F5F0] hover:text-[#2A1E21] cursor-pointer"
               title={showRightPreview ? 'Sembunyikan panel pratinjau' : 'Tampilkan panel pratinjau'}
             >
               {showRightPreview ? (
@@ -382,11 +372,11 @@ export default function App() {
 
       {/* 3. RIGHT LIVE PREVIEW PANE (Toggleable on xl+ screens) */}
       {showRightPreview && (
-        <aside className="hidden xl:flex w-[380px] shrink-0 flex-col border-l border-[#E1E7F0] bg-[#F3EFE8]">
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#E1E7F0] bg-white px-4">
+        <aside className="hidden xl:flex w-[380px] shrink-0 flex-col border-l border-[#E6DDD2] bg-[#F3EFE8]">
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#E6DDD2] bg-white px-4">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#1E7E34]" />
-              <span className="text-[12px] font-bold uppercase tracking-wider text-[#1D1D1F]">
+              <span className="h-2 w-2 rounded-full bg-[#3F7A52]" />
+              <span className="text-[12px] font-bold uppercase tracking-wider text-[#2A1E21]">
                 Live Preview
               </span>
             </div>
@@ -394,7 +384,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={refreshPreview}
-                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#F3F6FB] hover:text-[#1D1D1F] cursor-pointer"
+                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#F8F5F0] hover:text-[#2A1E21] cursor-pointer"
                 title="Muat ulang pratinjau"
                 aria-label="Muat ulang pratinjau"
               >
@@ -403,7 +393,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsFullscreenPreview(true)}
-                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#F3F6FB] hover:text-[#1D1D1F] cursor-pointer"
+                className="rounded-lg p-1.5 text-[#6B5D54] transition hover:bg-[#F8F5F0] hover:text-[#2A1E21] cursor-pointer"
                 title="Perbesar layar penuh"
                 aria-label="Perbesar layar penuh"
               >
@@ -458,7 +448,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsFullscreenPreview(false)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-[12px] font-bold text-[#1D1D1F] hover:bg-white/90 cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-[12px] font-bold text-[#2A1E21] hover:bg-white/90 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
                 Tutup
@@ -518,7 +508,7 @@ export default function App() {
                   wedding.setThemeId(previewThemeId);
                   setPreviewThemeId(null);
                 }}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#007AFF] px-5 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#0062CC] cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#7A2E3B] px-5 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#63232F] cursor-pointer"
               >
                 <Check className="h-3.5 w-3.5" />
                 Gunakan Tema Ini

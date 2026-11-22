@@ -1,31 +1,34 @@
-"use client";
-
-import React from "react";
-import { SaasNav } from "@/components/saas/SaasNav";
-import { SaasHero } from "@/components/saas/SaasHero";
-import { SaasFeatures } from "@/components/saas/SaasFeatures";
-import { SaasTemplates } from "@/components/saas/SaasTemplates";
-import { SaasVideoStudio } from "@/components/saas/SaasVideoStudio";
-import { SaasSteps } from "@/components/saas/SaasSteps";
-import { SaasPricing } from "@/components/saas/SaasPricing";
-import { SaasTestis } from "@/components/saas/SaasTestis";
-import { SaasFaq } from "@/components/saas/SaasFaq";
-import { SaasStrip, SaasCtaFooter } from "@/components/saas/SaasClosing";
+import React from 'react';
+import { LandingNav } from '@/components/landing/LandingNav';
+import { LandingHero } from '@/components/landing/LandingHero';
+import { LandingThemes } from '@/components/landing/LandingThemes';
+import { LandingSteps } from '@/components/landing/LandingSteps';
+import { LandingFeatures } from '@/components/landing/LandingFeatures';
+import { LandingPricing } from '@/components/landing/LandingPricing';
+import { LandingFaq } from '@/components/landing/LandingFaq';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { SaasVideoStudio } from '@/components/saas/SaasVideoStudio';
 
 export default function LandingPage() {
   return (
-    <div className="saas-scope min-h-screen pb-0">
-      <SaasNav />
-      <SaasHero />
-      <SaasStrip />
-      <SaasFeatures />
-      <SaasTemplates />
-      <SaasVideoStudio />
-      <SaasSteps />
-      <SaasPricing />
-      <SaasTestis />
-      <SaasFaq />
-      <SaasCtaFooter />
+    <div className="saas-scope min-h-screen">
+      <a
+        href="#konten"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-2"
+      >
+        Lewati ke konten
+      </a>
+      <LandingNav />
+      <main id="konten">
+        <LandingHero />
+        <LandingThemes />
+        <LandingSteps />
+        <LandingFeatures />
+        <SaasVideoStudio />
+        <LandingPricing />
+        <LandingFaq />
+      </main>
+      <LandingFooter />
     </div>
   );
 }

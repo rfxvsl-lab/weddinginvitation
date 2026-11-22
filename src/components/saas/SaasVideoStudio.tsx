@@ -110,19 +110,19 @@ export function SaasVideoStudio() {
             {/* Left Copy & Technical Specs */}
             <div className="lg:col-span-7 space-y-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5856D6]/12 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5856D6]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#8C6B34]/12 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#8C6B34]">
                   <Film size={13} /> Eksklusif Enterprise
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-3 py-1 text-[11px] font-semibold text-[#48484A]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-3 py-1 text-[11px] font-semibold text-[#54464A]">
                   1:1 Theme Motion Graphic · 60fps FX
                 </span>
               </div>
 
-              <h2 className="text-[30px] sm:text-[42px] font-bold leading-[1.08] tracking-[-0.03em] text-[#1D1D1F]">
+              <h2 className="text-[30px] sm:text-[42px] font-bold leading-[1.08] tracking-[-0.03em] text-[#2A1E21]">
                 Make Your Invitation Video — 1:1 sesuai tema undangan asli.
               </h2>
 
-              <p className="text-[15px] sm:text-[16px] leading-[1.7] text-[#48484A] max-w-xl">
+              <p className="text-[15px] sm:text-[16px] leading-[1.7] text-[#54464A] max-w-xl">
                 Lihat sampel langsung 3 tema unggulan Enterprise:{" "}
                 <strong>Javanese Classic</strong>,{" "}
                 <strong>Grand Ballroom</strong>, dan{" "}
@@ -135,11 +135,11 @@ export function SaasVideoStudio() {
               {/* Technical Layer Badges */}
               <div className="rounded-2xl bg-white/60 border border-white/85 p-4 space-y-2.5">
                 <div className="flex items-center justify-between gap-2 text-[12px]">
-                  <span className="inline-flex items-center gap-1.5 font-bold text-[#1D1D1F]">
-                    <SlidersHorizontal size={13} className="text-[#007AFF]" />
+                  <span className="inline-flex items-center gap-1.5 font-bold text-[#2A1E21]">
+                    <SlidersHorizontal size={13} className="text-[#7A2E3B]" />
                     Sampel Aktif: {activeTheme.name}
                   </span>
-                  <span className="font-mono text-[11.5px] font-semibold text-[#007AFF] tabular">
+                  <span className="font-mono text-[11.5px] font-semibold text-[#7A2E3B] tabular">
                     TC {formatTimecode(Math.floor(frame))} · 30fps
                   </span>
                 </div>
@@ -147,12 +147,12 @@ export function SaasVideoStudio() {
                   {activeTheme.techniques.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded-full bg-[#007AFF]/10 px-2.5 py-1 text-[11px] font-semibold text-[#007AFF]"
+                      className="rounded-full bg-[#7A2E3B]/10 px-2.5 py-1 text-[11px] font-semibold text-[#7A2E3B]"
                     >
                       {tech}
                     </span>
                   ))}
-                  <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-[11px] font-semibold text-[#48484A]">
+                  <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-[11px] font-semibold text-[#54464A]">
                     {VIDEO_SCENES[currentSceneIdx]?.label}
                   </span>
                 </div>
@@ -162,12 +162,12 @@ export function SaasVideoStudio() {
                 {HIGHLIGHTS.map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-3 text-[14px] text-[#1D1D1F]"
+                    className="flex items-start gap-3 text-[14px] text-[#2A1E21]"
                   >
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#007AFF]/12 text-[#007AFF]">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#7A2E3B]/12 text-[#7A2E3B]">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span className="leading-relaxed text-[#48484A]">
+                    <span className="leading-relaxed text-[#54464A]">
                       {item}
                     </span>
                   </li>
@@ -190,7 +190,7 @@ export function SaasVideoStudio() {
 
             {/* Right: Live 9:16 1:1 Theme Motion Graphic Player */}
             <div className="lg:col-span-5 flex flex-col items-center gap-4">
-              <div className="relative w-full max-w-[304px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#1D1D1F] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.48)] border border-white/25">
+              <div className="relative w-full max-w-[304px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#2A1E21] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.48)] border border-white/25">
                 {/* Dynamic Island */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 h-5 w-24 rounded-full bg-black/90" />
 
@@ -252,8 +252,8 @@ export function SaasVideoStudio() {
                       }}
                       className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
                         active
-                          ? "bg-[#007AFF] text-white shadow-sm"
-                          : "text-[#48484A] hover:text-[#1D1D1F]"
+                          ? "bg-[#7A2E3B] text-white shadow-sm"
+                          : "text-[#54464A] hover:text-[#2A1E21]"
                       }`}
                     >
                       <span
@@ -266,8 +266,8 @@ export function SaasVideoStudio() {
                 })}
               </div>
 
-              <p className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-[#6E6E73]">
-                <Layers size={13} className="text-[#007AFF]" /> Ganti tema untuk
+              <p className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-[#7D6F71]">
+                <Layers size={13} className="text-[#7A2E3B]" /> Ganti tema untuk
                 melihat sampel video 1:1 sesuai desain asli
               </p>
             </div>

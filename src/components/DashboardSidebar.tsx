@@ -105,7 +105,7 @@ export default function DashboardSidebar({
   };
 
   const sidebarBody = (
-    <div className="flex h-full flex-col bg-white/75 backdrop-blur-2xl text-[#1D1D1F] font-sans">
+    <div className="flex h-full flex-col bg-white/75 backdrop-blur-2xl text-[#2A1E21] font-sans">
       {/* Brand Header */}
       <div className="flex h-14 items-center border-b border-black/[0.06] px-5 shrink-0">
         <Logo variant="lockup" isLink={false} height="h-7" />
@@ -119,6 +119,7 @@ export default function DashboardSidebar({
               currentInvitationId={currentInvitationId || null}
               invitations={allInvitations}
               packageId={user?.packageId || 'free'}
+              userSlug={user?.activeSlug}
               onSwitch={(id) => {
                 onSwitchInvitation?.(id);
                 onMobileOpenChange(false);
@@ -135,7 +136,7 @@ export default function DashboardSidebar({
         <nav className="space-y-5" aria-label="Navigasi Dashboard">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
-              <p className="mb-1.5 px-3 text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#8E8E93]">
+              <p className="mb-1.5 px-3 text-[12px] font-medium text-[#A99C9C]">
                 {group.label}
               </p>
               <div className="space-y-1">
@@ -149,8 +150,8 @@ export default function DashboardSidebar({
                       onClick={() => handleSelect(item.id)}
                       className={`flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-[13px] font-semibold transition-all cursor-pointer ${
                         active
-                          ? 'bg-[#007AFF] text-white shadow-[0_8px_20px_-8px_rgba(0,122,255,0.65)]'
-                          : 'text-[#48484A] hover:bg-white/80 hover:text-[#1D1D1F]'
+                          ? 'bg-[#7A2E3B] text-white shadow-[0_8px_20px_-8px_rgba(122, 46, 59,0.65)]'
+                          : 'text-[#54464A] hover:bg-white/80 hover:text-[#2A1E21]'
                       }`}
                     >
                       <span className="flex items-center gap-2.5 min-w-0">
@@ -159,10 +160,10 @@ export default function DashboardSidebar({
                       </span>
                       {item.badge && (
                         <span
-                          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[12px] font-medium ${
                             active
                               ? 'bg-white/25 text-white'
-                              : 'bg-[#5856D6]/12 text-[#5856D6]'
+                              : 'bg-[#8C6B34]/12 text-[#8C6B34]'
                           }`}
                         >
                           {item.badge}
@@ -184,7 +185,7 @@ export default function DashboardSidebar({
               onPublish?.();
               onMobileOpenChange(false);
             }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#1E8FFF] to-[#007AFF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(0,122,255,0.65)] transition hover:brightness-105 active:scale-[0.98] cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#94404F] to-[#7A2E3B] px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(122, 46, 59,0.65)] transition hover:brightness-105 active:scale-[0.98] cursor-pointer"
           >
             <Globe className="h-4 w-4" />
             <span>{isPublished ? 'Bagikan Undangan' : 'Publish Undangan'}</span>
@@ -208,26 +209,26 @@ export default function DashboardSidebar({
                   className="h-full w-full object-cover rounded-full"
                 />
               ) : null}
-              <AvatarFallback className="bg-[#007AFF]/12 text-[#007AFF] text-[11px] font-bold uppercase">
+              <AvatarFallback className="bg-[#7A2E3B]/12 text-[#7A2E3B] text-[11px] font-bold uppercase">
                 {user?.fullName?.substring(0, 2) || 'RH'}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="truncate text-[13px] font-bold text-[#1D1D1F]">
+                <p className="truncate text-[13px] font-bold text-[#2A1E21]">
                   {user?.fullName || 'Pengguna'}
                 </p>
                 <span
-                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider ${
+                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[12px] font-medium ${
                     isEnt
-                      ? 'bg-[#5856D6]/14 text-[#5856D6]'
-                      : 'bg-[#34C759]/14 text-[#1E7E34]'
+                      ? 'bg-[#8C6B34]/14 text-[#8C6B34]'
+                      : 'bg-[#3F7A52]/14 text-[#3F7A52]'
                   }`}
                 >
                   {pkgLabel}
                 </span>
               </div>
-              <p className="truncate text-[11px] text-[#6E6E73]">{user?.email || ''}</p>
+              <p className="truncate text-[11px] text-[#7D6F71]">{user?.email || ''}</p>
             </div>
           </button>
 
@@ -236,7 +237,7 @@ export default function DashboardSidebar({
             onClick={onLogout}
             title="Keluar Akun"
             aria-label="Keluar Akun"
-            className="rounded-xl p-2 text-[#6E6E73] transition hover:bg-[#FF3B30]/12 hover:text-[#D70015] cursor-pointer shrink-0"
+            className="rounded-xl p-2 text-[#7D6F71] transition hover:bg-[#B03A3A]/12 hover:text-[#B03A3A] cursor-pointer shrink-0"
           >
             <LogOut className="h-4 w-4" />
           </button>

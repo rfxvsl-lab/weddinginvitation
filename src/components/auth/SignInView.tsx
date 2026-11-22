@@ -49,7 +49,7 @@ export default function SignInView({
           <Logo isLink={false} className="w-44" />
         </div>
         <span className="saas-kicker inline-flex">Workspace RuangHadir</span>
-        <h2 className="text-[30px] font-serif leading-tight text-[#1D1D1F]">
+        <h2 className="text-[30px] font-serif leading-tight text-[#2A1E21]">
           Selamat Datang Kembali
         </h2>
         <p className="text-[13.5px] text-[#6B5D54]">
@@ -75,7 +75,7 @@ export default function SignInView({
           <button
             type="button"
             onClick={onGotoEnterprise}
-            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[#1D1D1F] cursor-pointer"
+            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[#2A1E21] cursor-pointer"
             style={{ color: 'var(--saas-muted)' }}
           >
             <Building2 size={13} /> Enterprise
@@ -122,7 +122,7 @@ export default function SignInView({
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-xs text-[#007AFF] bg-[#007AFF]/8 p-3.5 border border-[#007AFF]/25 rounded-xl">
+          <div className="flex items-center gap-2 text-xs text-[#7A2E3B] bg-[#7A2E3B]/8 p-3.5 border border-[#7A2E3B]/25 rounded-xl">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -134,7 +134,7 @@ export default function SignInView({
           disabled={isLoading}
           className="saas-btn-primary w-full !mt-2"
         >
-          <span>{isLoading ? 'Memproses...' : 'Masuk Sekarang'}</span>
+          <span>{isLoading ? 'Memproses...' : 'Masuk'}</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </form>
@@ -144,7 +144,7 @@ export default function SignInView({
           <div className="w-full border-t border-[#E4D8C3]"></div>
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2.5 text-[#A3917B] uppercase tracking-widest font-bold">
+          <span className="bg-white px-2.5 text-[#A3917B] font-medium">
             Atau
           </span>
         </div>
@@ -168,7 +168,7 @@ export default function SignInView({
             type="button"
             id="goto-signup"
             onClick={onGotoSignUp}
-            className="text-[#007AFF] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
+            className="text-[#7A2E3B] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
           >
             Daftar Gratis
           </button>

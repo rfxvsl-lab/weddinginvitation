@@ -204,30 +204,30 @@ export default function VideoInvitationStudio({
       <div className="glx rounded-[28px] p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5856D6]/12 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#5856D6]">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#8C6B34]/12 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#8C6B34]">
               <Film className="h-3.5 w-3.5" /> Enterprise Video Studio
             </span>
-            <span className="inline-flex items-center rounded-full bg-white/75 border border-white/80 px-2.5 py-1 text-[11px] font-semibold text-[#48484A]">
+            <span className="inline-flex items-center rounded-full bg-white/75 border border-white/80 px-2.5 py-1 text-[11px] font-semibold text-[#54464A]">
               After Effects Motion Engine · 30fps HD
             </span>
           </div>
-          <h2 className="text-[22px] sm:text-[26px] font-bold tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="text-[22px] sm:text-[26px] font-bold tracking-[-0.025em] text-[#2A1E21]">
             Make Your Invitation Video
           </h2>
-          <p className="text-[13.5px] text-[#48484A] max-w-2xl">
+          <p className="text-[13.5px] text-[#54464A] max-w-2xl">
             Render undangan Anda menjadi video motion graphic teknis (Trim Paths, Track Matte, Volumetric Light Leak) dengan 3 tema unggulan: Javanese Classic, Grand Ballroom, dan Luxury Love Pink.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           {isEnt ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#34C759]/14 px-3.5 py-1.5 text-[12px] font-bold text-[#1E7E34]">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#3F7A52]/14 px-3.5 py-1.5 text-[12px] font-bold text-[#3F7A52]">
               <CheckCircle2 className="h-4 w-4" /> Akses Enterprise Aktif
             </span>
           ) : (
             <a
               href="mailto:admin@ruanghadir.net?subject=Aktivasi%20Enterprise%20-%20Make%20Your%20Invitation%20Video"
-              className="inline-flex items-center gap-2 rounded-full bg-[#007AFF] px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(0,122,255,0.65)] transition hover:bg-[#0062CC] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#7A2E3B] px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(122, 46, 59,0.65)] transition hover:bg-[#63232F] active:scale-[0.98]"
             >
               <Mail className="h-4 w-4" /> Hubungi Enterprise
             </a>
@@ -241,14 +241,14 @@ export default function VideoInvitationStudio({
         <div className="xl:col-span-7 glx-strong rounded-[30px] p-5 sm:p-6 space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8E8E93]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#A99C9C]">
                 Live Motion Composition · {activeTheme.name}
               </p>
-              <p className="text-[14px] font-semibold text-[#1D1D1F]">
+              <p className="text-[14px] font-semibold text-[#2A1E21]">
                 {VIDEO_SCENES[currentSceneIdx]?.label} · {aspect.label}
               </p>
             </div>
-            <span className="rounded-full bg-[#1D1D1F]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[#1D1D1F] tabular">
+            <span className="rounded-full bg-[#2A1E21]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[#2A1E21] tabular">
               TC {formatTimecode(Math.floor(frame))} / 00:12:00
             </span>
           </div>
@@ -288,7 +288,7 @@ export default function VideoInvitationStudio({
                 type="button"
                 onClick={() => setIsPlaying((p) => !p)}
                 disabled={isRendering}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#007AFF] text-white shadow-sm transition hover:bg-[#0062CC] active:scale-95 cursor-pointer disabled:opacity-50"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#7A2E3B] text-white shadow-sm transition hover:bg-[#63232F] active:scale-95 cursor-pointer disabled:opacity-50"
                 aria-label={isPlaying ? 'Jeda video' : 'Putar video'}
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
@@ -300,7 +300,7 @@ export default function VideoInvitationStudio({
                   setIsPlaying(true);
                 }}
                 disabled={isRendering}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/75 border border-white/80 text-[#1D1D1F] transition hover:bg-white cursor-pointer disabled:opacity-50"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/75 border border-white/80 text-[#2A1E21] transition hover:bg-white cursor-pointer disabled:opacity-50"
                 aria-label="Ulangi dari awal"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -316,7 +316,7 @@ export default function VideoInvitationStudio({
                   setIsPlaying(false);
                   setFrame(Number(e.target.value));
                 }}
-                className="flex-1 accent-[#007AFF] cursor-pointer"
+                className="flex-1 accent-[#7A2E3B] cursor-pointer"
                 aria-label="Timeline video"
               />
             </div>
@@ -335,8 +335,8 @@ export default function VideoInvitationStudio({
                     }}
                     className={`rounded-2xl px-3 py-2 text-left text-[11.5px] font-semibold transition cursor-pointer ${
                       active
-                        ? 'bg-[#007AFF] text-white shadow-sm'
-                        : 'bg-white/65 border border-white/80 text-[#48484A] hover:bg-white'
+                        ? 'bg-[#7A2E3B] text-white shadow-sm'
+                        : 'bg-white/65 border border-white/80 text-[#54464A] hover:bg-white'
                     }`}
                   >
                     {sc.label}
@@ -351,8 +351,8 @@ export default function VideoInvitationStudio({
         <div className="xl:col-span-5 space-y-5">
           {/* Aspect Ratio */}
           <div className="glx rounded-[26px] p-5 space-y-3.5">
-            <div className="flex items-center gap-2 text-[13px] font-bold text-[#1D1D1F]">
-              <SlidersHorizontal className="h-4 w-4 text-[#007AFF]" />
+            <div className="flex items-center gap-2 text-[13px] font-bold text-[#2A1E21]">
+              <SlidersHorizontal className="h-4 w-4 text-[#7A2E3B]" />
               Format Rasio Video
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -366,8 +366,8 @@ export default function VideoInvitationStudio({
                     onClick={() => setAspectId(a.id)}
                     className={`flex flex-col items-center justify-center gap-1 rounded-2xl p-3 text-center transition cursor-pointer ${
                       active
-                        ? 'bg-[#007AFF] text-white shadow-[0_8px_20px_-8px_rgba(0,122,255,0.7)]'
-                        : 'bg-white/65 border border-white/80 text-[#1D1D1F] hover:bg-white'
+                        ? 'bg-[#7A2E3B] text-white shadow-[0_8px_20px_-8px_rgba(122, 46, 59,0.7)]'
+                        : 'bg-white/65 border border-white/80 text-[#2A1E21] hover:bg-white'
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -376,13 +376,13 @@ export default function VideoInvitationStudio({
                 );
               })}
             </div>
-            <p className="text-[11.5px] text-[#6E6E73]">{aspect.desc}</p>
+            <p className="text-[11.5px] text-[#7D6F71]">{aspect.desc}</p>
           </div>
 
           {/* 3 Flagship AE Motion Theme Presets */}
           <div className="glx rounded-[26px] p-5 space-y-3.5">
-            <div className="flex items-center gap-2 text-[13px] font-bold text-[#1D1D1F]">
-              <Layers className="h-4 w-4 text-[#007AFF]" />
+            <div className="flex items-center gap-2 text-[13px] font-bold text-[#2A1E21]">
+              <Layers className="h-4 w-4 text-[#7A2E3B]" />
               Tema Motion Graphic (After Effects Style)
             </div>
             <div className="space-y-2.5">
@@ -399,7 +399,7 @@ export default function VideoInvitationStudio({
                     }}
                     className={`w-full rounded-2xl p-3.5 text-left transition cursor-pointer border ${
                       active
-                        ? 'bg-white/95 border-[#007AFF] ring-2 ring-[#007AFF]/20'
+                        ? 'bg-white/95 border-[#7A2E3B] ring-2 ring-[#7A2E3B]/20'
                         : 'bg-white/55 border-white/80 hover:bg-white/80'
                     }`}
                   >
@@ -411,16 +411,16 @@ export default function VideoInvitationStudio({
                             background: `linear-gradient(135deg, ${p.swatch[0]}, ${p.swatch[1]}, ${p.swatch[2]})`,
                           }}
                         />
-                        <p className="text-[13px] font-bold text-[#1D1D1F]">{p.name}</p>
+                        <p className="text-[13px] font-bold text-[#2A1E21]">{p.name}</p>
                       </div>
-                      {active && <CheckCircle2 className="h-4 w-4 text-[#007AFF]" />}
+                      {active && <CheckCircle2 className="h-4 w-4 text-[#7A2E3B]" />}
                     </div>
-                    <p className="text-[11.5px] text-[#6E6E73] leading-snug">{p.tagline}</p>
+                    <p className="text-[11.5px] text-[#7D6F71] leading-snug">{p.tagline}</p>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {p.techniques.map((tech) => (
                         <span
                           key={tech}
-                          className="rounded-full bg-[#007AFF]/8 px-2 py-0.5 text-[10px] font-semibold text-[#007AFF]"
+                          className="rounded-full bg-[#7A2E3B]/8 px-2 py-0.5 text-[10px] font-semibold text-[#7A2E3B]"
                         >
                           {tech}
                         </span>
@@ -435,12 +435,12 @@ export default function VideoInvitationStudio({
           {/* Export / Enterprise Gate Card */}
           <div className="glx-strong rounded-[26px] p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[13.5px] font-bold text-[#1D1D1F]">Render & Ekspor Video</p>
+              <p className="text-[13.5px] font-bold text-[#2A1E21]">Render & Ekspor Video</p>
               <span
                 className={`rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider ${
                   isEnt
-                    ? 'bg-[#34C759]/15 text-[#1E7E34]'
-                    : 'bg-[#5856D6]/12 text-[#5856D6]'
+                    ? 'bg-[#3F7A52]/15 text-[#3F7A52]'
+                    : 'bg-[#8C6B34]/12 text-[#8C6B34]'
                 }`}
               >
                 {isEnt ? 'Siap Ekspor' : 'Khusus Enterprise'}
@@ -453,7 +453,7 @@ export default function VideoInvitationStudio({
                   type="button"
                   onClick={handleRenderVideo}
                   disabled={isRendering}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#007AFF] px-5 py-3 text-[13.5px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(0,122,255,0.65)] transition hover:bg-[#0062CC] active:scale-[0.98] cursor-pointer disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#7A2E3B] px-5 py-3 text-[13.5px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(122, 46, 59,0.65)] transition hover:bg-[#63232F] active:scale-[0.98] cursor-pointer disabled:opacity-60"
                 >
                   {isRendering ? (
                     <>
@@ -469,26 +469,26 @@ export default function VideoInvitationStudio({
                 <button
                   type="button"
                   onClick={handleCopyRemotionSpec}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-white/75 border border-white/85 px-4 py-2.5 text-[12.5px] font-semibold text-[#1D1D1F] transition hover:bg-white cursor-pointer"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-white/75 border border-white/85 px-4 py-2.5 text-[12.5px] font-semibold text-[#2A1E21] transition hover:bg-white cursor-pointer"
                 >
-                  <Code2 className="h-4 w-4 text-[#5856D6]" />
+                  <Code2 className="h-4 w-4 text-[#8C6B34]" />
                   {copiedSpec ? 'Remotion JSON Tersalin' : 'Salin Remotion Render Spec (JSON)'}
                 </button>
 
                 {renderDoneMsg && (
-                  <p className="rounded-2xl bg-[#34C759]/12 px-3.5 py-2.5 text-[12px] font-medium text-[#1E7E34]">
+                  <p className="rounded-2xl bg-[#3F7A52]/12 px-3.5 py-2.5 text-[12px] font-medium text-[#3F7A52]">
                     {renderDoneMsg}
                   </p>
                 )}
               </div>
             ) : (
               <div className="space-y-3.5">
-                <div className="rounded-2xl bg-[#1D1D1F]/[0.04] border border-white/70 p-3.5 flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#5856D6]/12 text-[#5856D6]">
+                <div className="rounded-2xl bg-[#2A1E21]/[0.04] border border-white/70 p-3.5 flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8C6B34]/12 text-[#8C6B34]">
                     <Lock className="h-4 w-4" />
                   </div>
-                  <div className="text-[12.5px] text-[#48484A] leading-relaxed">
-                    <p className="font-bold text-[#1D1D1F]">Ekspor video tanpa watermark khusus akun Enterprise.</p>
+                  <div className="text-[12.5px] text-[#54464A] leading-relaxed">
+                    <p className="font-bold text-[#2A1E21]">Ekspor video tanpa watermark khusus akun Enterprise.</p>
                     <p className="mt-0.5">
                       Hubungi <strong>admin@ruanghadir.net</strong> untuk aktivasi email perusahaan dan kode akses Enterprise Anda.
                     </p>
@@ -498,16 +498,16 @@ export default function VideoInvitationStudio({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <a
                     href="mailto:admin@ruanghadir.net?subject=Aktivasi%20Enterprise%20RuangHadir%20Video%20Studio"
-                    className="flex items-center justify-center gap-1.5 rounded-full bg-[#007AFF] px-4 py-2.5 text-[12.5px] font-semibold text-white transition hover:bg-[#0062CC]"
+                    className="flex items-center justify-center gap-1.5 rounded-full bg-[#7A2E3B] px-4 py-2.5 text-[12.5px] font-semibold text-white transition hover:bg-[#63232F]"
                   >
                     <Mail className="h-3.5 w-3.5" /> Email Admin
                   </a>
                   <button
                     type="button"
                     onClick={onOpenEnterprise}
-                    className="flex items-center justify-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-4 py-2.5 text-[12.5px] font-semibold text-[#1D1D1F] transition hover:bg-white cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-4 py-2.5 text-[12.5px] font-semibold text-[#2A1E21] transition hover:bg-white cursor-pointer"
                   >
-                    <Building2 className="h-3.5 w-3.5 text-[#5856D6]" /> Info Enterprise
+                    <Building2 className="h-3.5 w-3.5 text-[#8C6B34]" /> Info Enterprise
                   </button>
                 </div>
               </div>

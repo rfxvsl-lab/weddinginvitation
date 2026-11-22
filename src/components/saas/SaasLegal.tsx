@@ -4,8 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Mail, FileText, ShieldCheck, Cookie } from "lucide-react";
-import { SaasNav } from "@/components/saas/SaasNav";
-import { SaasFooter } from "@/components/saas/SaasClosing";
+import { LandingNav as SaasNav } from "@/components/landing/LandingNav";
+import { LandingFooter as SaasFooter } from "@/components/landing/LandingFooter";
 import { ENTERPRISE_CONTACT_EMAIL } from "@/lib/packageLimits";
 
 export function SaasPageShell({ children }: { children: React.ReactNode }) {

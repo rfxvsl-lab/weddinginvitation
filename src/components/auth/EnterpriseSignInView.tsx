@@ -98,7 +98,7 @@ export default function EnterpriseSignInView({
           <Logo isLink={false} className="w-44" />
         </div>
         <span
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10.5px] font-extrabold uppercase tracking-[0.16em]"
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium"
           style={{
             background: 'var(--saas-gold-soft)',
             color: '#7E5A1E',
@@ -106,7 +106,7 @@ export default function EnterpriseSignInView({
         >
           <Building2 size={12} /> Portal Akses Enterprise
         </span>
-        <h2 className="text-[28px] font-serif leading-tight text-[#1D1D1F]">
+        <h2 className="text-[28px] font-serif leading-tight text-[#2A1E21]">
           Masuk dengan Email Perusahaan
         </h2>
         <p className="text-[13.5px] leading-relaxed text-[#6B5D54]">
@@ -133,7 +133,7 @@ export default function EnterpriseSignInView({
               autoComplete="email"
             />
           </div>
-          <p className="text-[11px] text-[#6E6E73]">
+          <p className="text-[11px] text-[#7D6F71]">
             Domain webmail publik (Gmail, Yahoo, Outlook) tidak diizinkan pada
             jalur Enterprise.
           </p>
@@ -173,7 +173,7 @@ export default function EnterpriseSignInView({
         </div>
 
         {error && (
-          <div className="flex items-start gap-2.5 rounded-xl border border-[#B03A3A]/25 bg-[#FFEBEA] p-3.5 text-[12.5px] font-medium text-[#D70015]">
+          <div className="flex items-start gap-2.5 rounded-xl border border-[#B03A3A]/25 bg-[#F9E9E7] p-3.5 text-[12.5px] font-medium text-[#B03A3A]">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -197,7 +197,7 @@ export default function EnterpriseSignInView({
           color: 'var(--saas-ink-2)',
         }}
       >
-        <p className="flex items-center gap-1.5 font-bold text-[#1D1D1F]">
+        <p className="flex items-center gap-1.5 font-bold text-[#2A1E21]">
           <ShieldCheck size={14} style={{ color: 'var(--saas-gold)' }} />
           Belum memiliki kode akses Enterprise?
         </p>
@@ -205,7 +205,7 @@ export default function EnterpriseSignInView({
           Hubungi{' '}
           <a
             href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Permintaan%20Kode%20Akses%20Enterprise`}
-            className="font-bold text-[#007AFF] hover:underline"
+            className="font-bold text-[#7A2E3B] hover:underline"
           >
             {ENTERPRISE_CONTACT_EMAIL}
           </a>{' '}
@@ -216,7 +216,7 @@ export default function EnterpriseSignInView({
       <button
         type="button"
         onClick={onBackToPersonal}
-        className="flex w-full items-center justify-center gap-1.5 text-[13px] font-bold text-[#6B5D54] hover:text-[#1D1D1F] cursor-pointer"
+        className="flex w-full items-center justify-center gap-1.5 text-[13px] font-bold text-[#6B5D54] hover:text-[#2A1E21] cursor-pointer"
       >
         <ArrowLeft size={14} /> Kembali ke Login Akun Gratis
       </button>

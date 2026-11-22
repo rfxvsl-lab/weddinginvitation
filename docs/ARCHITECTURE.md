@@ -4,6 +4,22 @@ Dokumen ini menjelaskan arsitektur teknis, skema database, endpoint API, dan sis
 
 ---
 
+## 0. Keamanan & Akses Data (v3)
+
+```text
+Browser ──fetch──▶ /api/auth/*        (login, register, google, logout, me) → cookie httpOnly rh_session
+Browser ──server action──▶ src/lib/api.ts   (guard: owner / self / admin / public)
+                                   └──▶ src/lib/db.ts (server-only, query Turso)
+Route handler & server component ─────▶ src/lib/db.ts
+src/proxy.ts → verifikasi tanda tangan sesi untuk /dashboard & /admin
+```
+
+- Jangan pernah mengimpor `src/lib/db.ts` dari komponen client.
+- Setiap fungsi baru di `src/lib/api.ts` WAJIB memanggil salah satu guard (`requireSession`, `requireInvitationOwner`, `requireAdmin`, atau `requirePublicInvitation`).
+- ENV wajib di production: `SESSION_SECRET` (≥32 karakter acak), `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`. Admin ditentukan oleh `ADMIN_EMAILS`.
+
+---
+
 ## 1. Tech Stack
 - **Framework:** Next.js 16 (App Router, React 19, TypeScript 5.8)
 - **Styling:** Tailwind CSS v4 (`@tailwindcss/postcss`) + Custom Design Tokens (`.saas-scope`, `.saas-dash`)
@@ -55,15 +71,15 @@ CREATE TABLE IF NOT EXISTS enterprise_access (
 
 Seluruh halaman marketing, autentikasi, dan dashboard berbagi satu bahasa visual yang kohesif:
 
-- **Canvas:** `#F8F6F2` (Warm Alabaster) — bersih, tenang, kontras tinggi terhadap kartu.
-- **Surface:** `#FFFFFF` dengan border halus `1px solid #E7E1D8`.
-- **Ink Primary / Secondary / Muted:** `#1C1614` / `#574B45` / `#7F726B`.
-- **Brand Primary (Burgundy Wine):** `#8E2F45` (hover `#742539`, soft `#F9ECEF`).
-- **Brand Accent (Antique Gold):** `#C6A15B` (soft `#F7EEDD`).
+- **Canvas (Ivory):** `#F8F5F0` · **Surface (Paper):** `#FFFFFF` · **Linen:** `#F1EBE2` · **Line:** `#E6DDD2`.
+- **Ink / Ink-2 / Muted:** `#2A1E21` / `#54464A` / `#7D6F71`.
+- **Wine (aksi utama):** `#7A2E3B` (hover `#63232F`, soft `#F5E9EA`).
+- **Gold (aksen):** `#B8955A` (deep `#8C6B34`, soft `#F4ECDD`).
+- Token tersedia sebagai `var(--rh-*)` di dalam `.saas-scope`.
 - **Tipografi:**
-  - Editorial Heading (Marketing): `Cormorant Garamond`
-  - UI & Dashboard Typography: `Plus Jakarta Sans` & `Inter`
-  - Monospace (Slug, Kode, Angka Tabular): `JetBrains Mono`
+  - Display: `Fraunces` (`--font-display`, via next/font)
+  - UI & Dashboard: `Plus Jakarta Sans` (`--font-ui`, via next/font)
+  - Font template undangan tetap dimuat oleh masing-masing template.
 
 ---
 

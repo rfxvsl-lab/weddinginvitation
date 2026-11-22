@@ -289,7 +289,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             }}
             className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
               canAccess(packageId, 'canQR')
-                ? 'bg-[#007AFF] hover:bg-[#0062CC] text-white cursor-pointer'
+                ? 'bg-[#7A2E3B] hover:bg-[#63232F] text-white cursor-pointer'
                 : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
             }`}
           >
@@ -431,7 +431,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               setExportScope('filtered');
               setIsExportModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#7A2E3B] hover:bg-[#63232F] text-white rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Cetak PDF / Absensi</span>
@@ -440,7 +440,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           <button
             type="button"
             onClick={() => handleExportCSV('filtered')}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl text-[11px] font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#D6C9BA] hover:border-[#2A1E21] text-[#2A1E21] rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
             title="Ekspor daftar tamu aktif saat ini sebagai dokumen file .csv"
           >
             <Download className="w-3.5 h-3.5" />
@@ -681,7 +681,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             {!checkinOf(selectedQRBoxGuest) && !checkInSuccess && (
               <div className="grid grid-cols-2 gap-2 text-left">
                 <div>
-                  <label className="block text-[9px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Jumlah hadir</label>
+                  <label className="block text-[12px] font-medium text-on-surface-variant mb-1">Jumlah hadir</label>
                   <input
                     type="number"
                     min={1}
@@ -692,7 +692,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">No. meja</label>
+                  <label className="block text-[12px] font-medium text-on-surface-variant mb-1">No. meja</label>
                   <input
                     value={modalTable}
                     onChange={(e) => setModalTable(e.target.value)}
@@ -833,7 +833,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <button
                   type="button"
                   onClick={() => handleExportCSV(exportScope)}
-                  className="w-full py-2.5 bg-[#007AFF] hover:bg-[#0062CC] text-white border border-[#007AFF] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full py-2.5 bg-[#7A2E3B] hover:bg-[#63232F] text-white border border-[#7A2E3B] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <Download className="w-4 h-4" />
                   <span>Ekspor File CSV (Excel)</span>

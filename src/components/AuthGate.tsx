@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth, type GoogleSignupInfo } from '../hooks/useAuth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import {
@@ -212,8 +213,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         toast.warning('Form tidak lengkap', 'Harap lengkapi email dan password akun Anda.');
         return;
       }
-      if (password.length < 6) {
-        toast.warning('Password terlalu pendek', 'Password minimal 6 karakter.');
+      if (password.length < 8) {
+        toast.warning('Password terlalu pendek', 'Password minimal 8 karakter.');
         return;
       }
 
@@ -282,8 +283,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   };
 
   return (
-    <div className="saas-scope min-h-screen bg-[#F3F6FB] text-[#1D1D1F] flex flex-col font-sans relative selection:bg-[#007AFF] selection:text-white">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 z-10">
+    <div className="saas-scope min-h-screen lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
         {/* ==================== SIGN IN VIEW ==================== */}
         {mode === 'signin' && !showWelcome && (
           <ErrorBoundary name="SignIn">
@@ -360,13 +361,13 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         {/* ==================== WELCOME GREETING ==================== */}
         {showWelcome && welcomeUser && (
           <div className="w-full max-w-md saas-card p-8 sm:p-10 text-center space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#E8F8EC] border border-[#1E7E34]/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-[#1E7E34]" />
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#E9F2EA] border border-[#3F7A52]/20 flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-[#3F7A52]" />
             </div>
 
             <div className="space-y-2">
               <span className="saas-kicker">Akun Aktif · Full Gratis</span>
-              <h2 className="text-[28px] font-serif text-[#1D1D1F] leading-tight">
+              <h2 className="text-[28px] font-serif text-[#2A1E21] leading-tight">
                 Selamat Datang, {welcomeUser.fullName}
               </h2>
               <p className="text-[13.5px] text-[#6B5D54] leading-relaxed">
@@ -374,16 +375,16 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               </p>
             </div>
 
-            <div className="bg-[#F3F6FB] border border-[#E1E7F0] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
+            <div className="bg-[#F8F5F0] border border-[#E6DDD2] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
               <div className="flex justify-between items-center">
                 <span className="text-[#6B5D54]">Paket Aktif</span>
-                <span className="font-bold text-[#1E7E34] bg-[#E8F8EC] px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#3F7A52] bg-[#E9F2EA] px-2.5 py-0.5 rounded-full text-[12px] font-medium">
                   Full Gratis · Rp 0
                 </span>
               </div>
               <div className="flex justify-between items-center gap-3">
                 <span className="text-[#6B5D54]">Tautan Undangan</span>
-                <span className="font-mono text-[12px] font-semibold text-[#1D1D1F] truncate">
+                <span className="font-mono text-[12px] font-semibold text-[#2A1E21] truncate">
                   ruanghadir.net/{welcomeUser.activeSlug}
                 </span>
               </div>
@@ -418,6 +419,26 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
           </ErrorBoundary>
         )}
       </div>
+
+      {/* Panel visual (desktop): tampilan undangan asli */}
+      <aside className="relative hidden overflow-hidden bg-[#2A1E21] lg:block" aria-hidden>
+        <Image
+          src="/assets/themes/shots/storybook-interactive.webp"
+          alt=""
+          fill
+          sizes="45vw"
+          className="object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2A1E21] via-[#2A1E21]/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-12 text-[#F6EFE6]">
+          <p className="rh-display max-w-[420px] text-[34px] leading-[1.12]">
+            Satu tautan untuk seluruh tamu, lengkap dengan nama mereka.
+          </p>
+          <p className="mt-4 max-w-[380px] text-[15px] leading-[1.6] text-[#D9CCC4]">
+            Tema, RSVP, amplop digital, dan check-in QR — gratis untuk setiap pasangan.
+          </p>
+        </div>
+      </aside>
     </div>
   );
 }
