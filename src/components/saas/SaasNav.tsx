@@ -1,45 +1,138 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
 const LINKS: [string, string][] = [
-  ["Fitur", "/#fitur"], ["Template", "/#template"], ["Cara Kerja", "/#cara-kerja"],
-  ["Harga", "/#harga"], ["Testimoni", "/#testimoni"], ["FAQ", "/#faq"],
+  ["Fitur", "/#fitur"],
+  ["Tema", "/#template"],
+  ["Cara Kerja", "/#cara-kerja"],
+  ["Akses Gratis", "/#harga"],
+  ["FAQ", "/#faq"],
 ];
 
 export function SaasNav() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div className="sticky top-0 z-50">
-      <div className="saas-glass border-b" style={{ borderColor: "var(--saas-line)" }}>
-        <header className="saas-shell flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="flex items-center">
+      <div
+        className={`transition-all duration-300 ${
+          scrolled
+            ? "saas-glass border-b shadow-[0_10px_30px_-20px_rgba(36,20,24,0.22)]"
+            : "bg-transparent border-b border-transparent"
+        }`}
+        style={scrolled ? { borderColor: "var(--saas-line)" } : undefined}
+      >
+        <header className="saas-shell flex h-[72px] items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2.5 group">
             <Logo variant="lockup" isLink={false} height="h-9" />
+            <span
+              className="hidden sm:inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.14em]"
+              style={{
+                background: "var(--saas-success-soft)",
+                color: "var(--saas-success)",
+              }}
+            >
+              Gratis
+            </span>
           </Link>
-          <nav className="hidden items-center gap-7 lg:flex">
-            {LINKS.map(([l, h]) => (<a key={h} href={h} className="saas-navlink">{l}</a>))}
+
+          <nav
+            aria-label="Navigasi utama"
+            className="hidden items-center gap-1 rounded-full border px-2 py-1.5 lg:flex"
+            style={{
+              background: "rgba(255,255,255,0.68)",
+              borderColor: "var(--saas-line)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            {LINKS.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors hover:bg-[#F5ECE2]"
+                style={{ color: "var(--saas-ink-2)" }}
+              >
+                {label}
+              </a>
+            ))}
           </nav>
-          <div className="hidden items-center gap-5 md:flex">
-            <Link href="/auth" className="saas-navlink">Masuk</Link>
-            <Link href="/auth?mode=register" className="saas-btn-primary !px-5 !py-2.5">Buat Undangan</Link>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <Link
+              href="/auth"
+              className="saas-btn-ghost !text-[13.5px] !px-4"
+            >
+              Masuk
+            </Link>
+            <Link
+              href="/auth?mode=register"
+              className="saas-btn-primary !px-5 !py-2.5 !min-h-[42px] !text-[13.5px]"
+            >
+              Buat Gratis <ArrowRight size={15} />
+            </Link>
           </div>
-          <button className="p-2 lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
-            {open ? <X size={20} /> : <Menu size={20} />}
+
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border lg:hidden"
+            style={{
+              borderColor: "var(--saas-line)",
+              background: "rgba(255,255,255,0.75)",
+              color: "var(--saas-ink)",
+            }}
+            onClick={() => setOpen(!open)}
+            aria-label={open ? "Tutup menu" : "Buka menu"}
+            aria-expanded={open}
+          >
+            {open ? <X size={19} /> : <Menu size={19} />}
           </button>
         </header>
       </div>
+
       {open && (
-        <div className="saas-glass border-b px-4 pb-4 pt-2 lg:hidden" style={{ borderColor: "var(--saas-line)" }}>
-          {LINKS.map(([l, h]) => (
-            <a key={h} href={h} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 text-[14px] font-semibold" style={{ color: "var(--saas-ink)" }}>
-              {l}
-            </a>
-          ))}
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <Link href="/auth" className="saas-btn-outline !py-2.5">Masuk</Link>
-            <Link href="/auth?mode=register" className="saas-btn-primary !py-2.5">Buat</Link>
+        <div
+          className="saas-glass border-b px-4 pb-5 pt-3 shadow-lg lg:hidden"
+          style={{ borderColor: "var(--saas-line)" }}
+        >
+          <div className="space-y-1">
+            {LINKS.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="block rounded-xl px-3.5 py-3 text-[14.5px] font-semibold transition-colors hover:bg-white/70"
+                style={{ color: "var(--saas-ink)" }}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2.5 border-t pt-4" style={{ borderColor: "var(--saas-line)" }}>
+            <Link
+              href="/auth"
+              onClick={() => setOpen(false)}
+              className="saas-btn-outline !py-2.5 !text-[13.5px]"
+            >
+              Masuk
+            </Link>
+            <Link
+              href="/auth?mode=register"
+              onClick={() => setOpen(false)}
+              className="saas-btn-primary !py-2.5 !text-[13.5px]"
+            >
+              Buat Gratis
+            </Link>
           </div>
         </div>
       )}

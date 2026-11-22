@@ -1,65 +1,115 @@
 "use client";
 import React from "react";
-import { Star, MapPin, Quote } from "lucide-react";
-import { TESTIMONIALS, VERIFIED, UNVERIFIED_LABEL } from "@/data/socialProof";
+import Link from "next/link";
+import {
+  Heart,
+  Crown,
+  Sparkles,
+  CalendarHeart,
+  ArrowUpRight,
+} from "lucide-react";
+
+const USE_CASES = [
+  {
+    icon: Heart,
+    badge: "Intimate & Minimalis",
+    title: "Akad Nikah & Resepsi Hangat",
+    desc: "Cocok untuk acara keluarga inti dengan tampilan bersih, fokus pada jadwal, peta lokasi, dan ucapan doa yang penuh makna.",
+    themeId: "cremy-rose",
+    themeLabel: "Luxury Pink Elegant",
+  },
+  {
+    icon: Crown,
+    badge: "Budaya Nusantara",
+    title: "Pernikahan Adat Jawa & Klasik",
+    desc: "Sentuhan ornamen tradisi yang anggun dipadukan dengan kemudahan buku tamu digital dan navigasi modern di ponsel tamu.",
+    themeId: "javanese-classic",
+    themeLabel: "Javanese Classic",
+  },
+  {
+    icon: Sparkles,
+    badge: "Modern & Sinematik",
+    title: "Grand Ballroom & Cinematic",
+    desc: "Visual gelap mewah bergaya editorial lengkap dengan galeri foto penuh, musik latar, serta tiket QR check-in untuk tamu undangan.",
+    themeId: "rfx-dark",
+    themeLabel: "Dark Luxury Cinematic",
+  },
+  {
+    icon: CalendarHeart,
+    badge: "Unik & Personal",
+    title: "Konsep Kreatif & Interaktif",
+    desc: "Tampilkan perjalanan cinta kalian dengan gaya playlist musik, katalog film, atau buku cerita interaktif yang berkesan.",
+    themeId: "spotilove",
+    themeLabel: "SpotiLove Playlist",
+  },
+];
 
 export function SaasTestis() {
   return (
     <section id="testimoni" className="saas-shell pt-24">
-      <div className="max-w-[620px]">
-        <p className="saas-kicker">Cerita mereka</p>
-        <h2 className="mt-4 text-[32px] sm:text-[40px]">
-          {VERIFIED ? (
-            <>
-              Dipercaya <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>12.400</span> pasangan.
-            </>
-          ) : (
-            <>
-              Apa kata <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>pengguna</span> kami.
-            </>
-          )}
-        </h2>
-        {!VERIFIED && (
-          <p className="mt-3 text-[13px] font-semibold" style={{ color: "var(--saas-muted)" }}>
-            {UNVERIFIED_LABEL} — kutipan di bawah adalah contoh tampilan.
-          </p>
-        )}
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div className="max-w-[620px]">
+          <p className="saas-kicker">Fleksibel untuk setiap gaya</p>
+          <h2 className="mt-3.5 text-[32px] leading-[1.08] sm:text-[42px]">
+            Dirancang untuk berbagai{" "}
+            <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>
+              konsep acara
+            </span>
+            .
+          </h2>
+        </div>
+        <Link
+          href="/rian-salsa?to=Tamu%20Kehormatan&code=W-TAMU"
+          target="_blank"
+          className="saas-btn-outline self-start md:self-auto"
+        >
+          Buka Contoh Undangan <ArrowUpRight size={15} />
+        </Link>
       </div>
 
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
-        {TESTIMONIALS.map((t) => (
-          <figure key={t.name} className={`saas-card saas-card-hover flex flex-col p-6 ${t.wide ? "md:col-span-2" : ""}`}>
-            <div className="flex items-center justify-between">
-              <span className="flex gap-0.5" aria-label="Rating 5 dari 5">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Star key={i} size={14} fill="var(--saas-gold)" color="var(--saas-gold)" aria-hidden />
-                ))}
-              </span>
-              <Quote aria-hidden size={26} style={{ color: "var(--saas-line-strong)" }} />
-            </div>
-            <blockquote
-              className={`mt-3 flex-1 ${t.wide ? "saas-serif-i text-[21px] leading-snug sm:text-[23px]" : "text-[14.5px] leading-relaxed"}`}
-              style={{ color: "var(--saas-ink)" }}
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {USE_CASES.map((item) => {
+          const Icon = item.icon;
+          return (
+            <div
+              key={item.title}
+              className="saas-card saas-card-hover flex flex-col justify-between p-6"
             >
-              “{t.quote}”
-            </blockquote>
-            <figcaption className="mt-5 flex items-center gap-3 pt-4" style={{ borderTop: "1px solid var(--saas-line)" }}>
-              <span
-                aria-hidden
-                className="flex h-10 w-10 items-center justify-center rounded-full text-[11px] font-extrabold text-white"
-                style={{ background: t.color }}
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="saas-icon-box">
+                    <Icon size={19} />
+                  </span>
+                  <span className="saas-badge saas-badge-gold !text-[10px]">
+                    {item.badge}
+                  </span>
+                </div>
+                <h3 className="mt-4 text-[16.5px] font-extrabold leading-snug">
+                  {item.title}
+                </h3>
+                <p
+                  className="mt-2 text-[13.5px] leading-relaxed"
+                  style={{ color: "var(--saas-ink-2)" }}
+                >
+                  {item.desc}
+                </p>
+              </div>
+
+              <div
+                className="mt-5 border-t pt-4"
+                style={{ borderColor: "var(--saas-line)" }}
               >
-                {t.initials}
-              </span>
-              <span>
-                <span className="block text-[13.5px] font-extrabold">{t.name}</span>
-                <span className="mt-0.5 flex items-center gap-1 text-[11.5px] font-semibold" style={{ color: "var(--saas-muted)" }}>
-                  <MapPin size={11} aria-hidden /> {t.venue}
-                </span>
-              </span>
-            </figcaption>
-          </figure>
-        ))}
+                <Link
+                  href={`/preview/${item.themeId}`}
+                  className="inline-flex items-center gap-1.5 text-[12.5px] font-bold transition-colors hover:underline"
+                  style={{ color: "var(--saas-wine)" }}
+                >
+                  Lihat tema {item.themeLabel} <ArrowUpRight size={13} />
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

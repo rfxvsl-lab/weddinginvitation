@@ -28,24 +28,24 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: 'ruanghadir.net — Buat Undangan Pernikahan Digital yang Elegan',
-  description: 'Platform pembuatan undangan pernikahan digital premium. Desain elegan, RSVP digital, dan personalisasi tanpa batas.',
-  keywords: ['undangan digital', 'undangan pernikahan', 'wedding invitation', 'undangan online', 'RSVP digital', 'RUANGHADIR'],
+  title: 'RuangHadir — Platform Undangan Pernikahan Digital Gratis & Elegan',
+  description: 'Buat undangan pernikahan digital modern secara gratis di ruanghadir.net. Dilengkapi 9 tema elegan, link personal nama tamu, RSVP real-time, amplop digital, dan QR check-in.',
+  keywords: ['undangan digital gratis', 'undangan pernikahan gratis', 'undangan online gratis', 'wedding invitation', 'RSVP digital', 'ruanghadir'],
   authors: [{ name: 'ruanghadir.net' }],
   icons: {
     icon: '/logo-browser.png',
     apple: '/logo-browser.png',
   },
   openGraph: {
-    title: 'ruanghadir.net — Buat Undangan Digital Premium',
-    description: 'Platform pembuatan undangan pernikahan digital premium. Desain elegan, RSVP digital, dan personalisasi tanpa batas.',
+    title: 'RuangHadir — Platform Undangan Pernikahan Digital Gratis & Elegan',
+    description: 'Buat undangan pernikahan digital modern secara gratis. 9 tema elegan, link personal nama tamu, RSVP real-time, amplop digital, dan QR check-in.',
     siteName: 'ruanghadir.net',
     type: 'website',
   },
 };
 
 export const viewport = {
-  themeColor: '#FBF8F4',
+  themeColor: '#FAF7F2',
 };
 
 export default function RootLayout({
@@ -56,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#FBF8F4" />
+        <meta name="theme-color" content="#FAF7F2" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
