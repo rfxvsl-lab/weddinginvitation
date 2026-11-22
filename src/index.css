@@ -1484,3 +1484,59 @@ textarea.saas-input { padding-left: 14px; padding-top: 12px; resize: vertical; }
   --color-rose-600: #8E2F45;
   --color-rose-700: #742539;
 }
+
+
+/* ==========================================================================
+   PRO SAAS DASHBOARD LOCK & CONSISTENT SURFACE SYSTEM
+   - Locks pinch-zoom / elastic overscroll on workspace canvas
+   - Prevents iOS Safari auto-zoom on form inputs
+   - Unifies card, border, and scrollbar rhythm across all dashboard modules
+   ========================================================================== */
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+.dashboard-shell-lock {
+  touch-action: pan-x pan-y;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.dashboard-shell-lock input,
+.dashboard-shell-lock textarea,
+.dashboard-shell-lock select,
+.dashboard-shell-lock [contenteditable="true"],
+.dashboard-shell-lock .select-text {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+@media (pointer: coarse) {
+  .dashboard-shell-lock input,
+  .dashboard-shell-lock textarea,
+  .dashboard-shell-lock select {
+    font-size: 16px !important;
+  }
+}
+
+.dashboard-shell-lock ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dashboard-shell-lock ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-shell-lock ::-webkit-scrollbar-thumb {
+  background: #D8CFC2;
+  border-radius: 999px;
+}
+
+.dashboard-shell-lock ::-webkit-scrollbar-thumb:hover {
+  background: #B9AA98;
+}

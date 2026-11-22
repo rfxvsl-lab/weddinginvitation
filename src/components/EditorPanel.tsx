@@ -5,37 +5,36 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  PiHeartDuotone as Heart, 
-  PiCalendarDuotone as Calendar, 
-  PiBookOpenDuotone as BookOpen, 
-  PiImageDuotone as Image, 
-  PiMusicNotesDuotone as Music, 
-  PiGiftDuotone as Gift, 
-  PiQuotesDuotone as Quote, 
-  PiPlusDuotone as Plus, 
-  PiTrashDuotone as Trash2, 
-  PiInstagramLogoDuotone as Instagram, 
-  PiMapPinDuotone as MapPin, 
-  PiSparkleDuotone as Sparkles,
-  PiLinkDuotone as Link,
-  PiArrowsClockwiseDuotone as RefreshCw,
-  PiUploadDuotone as Upload,
-  PiMagnifyingGlassDuotone as Search,
-  PiPlayDuotone as Play,
-  PiStopDuotone as Stop,
-  PiImageSquareDuotone as ImageSquare,
-  PiTimerDuotone as Timer,
-  PiCheckCircleDuotone as Check,
-  PiWarningDuotone as AlertTriangle
-} from 'react-icons/pi';
+import {
+  Heart,
+  Calendar,
+  BookOpen,
+  Image,
+  Music,
+  Gift,
+  Quote,
+  Plus,
+  Trash2,
+  Instagram,
+  MapPin,
+  Sparkles,
+  Link2 as Link,
+  RefreshCw,
+  Upload,
+  Search,
+  Play,
+  Square as Stop,
+  Image as ImageSquare,
+  Timer,
+  CheckCircle2 as Check,
+  AlertTriangle,
+} from 'lucide-react';
 import { WeddingData, LoveStoryItem, DigitalGift } from '../types';
 import { convertGoogleDriveUrl } from '../utils/googleDrive';
 import { uploadWeddingPhoto as uploadWeddingImage, uploadWeddingAudio } from '../lib/cloudinary';
 import { getLimits, isLimitReached, formatLimit, canAccess, type PackageId } from '../lib/packageLimits';
 import UpgradePrompt from './UpgradePrompt';
 import { useAlertModal } from '../hooks/useAlertModal';
-import { FloatingDock } from './ui/floating-dock';
 
 interface EditorPanelProps {
   data: WeddingData;
@@ -313,48 +312,42 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
       </div>
 
-      {/* Mobile Tab Bar — horizontal scroll pills */}
-      <div className="relative z-10 flex md:hidden gap-1.5 px-3 py-2.5 bg-white/80 backdrop-blur-xl border-b border-zinc-200/40 overflow-x-auto custom-scrollbar-tabs">
-        {([
-          { id: 'couple' as const, label: 'Mempelai', icon: Heart, color: 'text-amber-500' },
-          { id: 'events' as const, label: 'Acara', icon: Calendar, color: 'text-amber-500' },
-          { id: 'stories' as const, label: 'Cerita', icon: BookOpen, color: 'text-violet-500' },
-          { id: 'gallery' as const, label: 'Galeri', icon: Image, color: 'text-sky-500' },
-          { id: 'gifts' as const, label: 'Kado', icon: Gift, color: 'text-emerald-500' },
-          { id: 'quote' as const, label: 'Kutipan', icon: Quote, color: 'text-fuchsia-500' },
-        ] as const).map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all duration-200 ${
-                isActive
-                  ? 'bg-zinc-500 text-white font-semibold shadow-md shadow-rose-200'
-                  : 'text-zinc-500 bg-zinc-100/80 hover:bg-zinc-200/80 font-medium'
-              }`}
-            >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : tab.color}`} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Desktop FloatingDock — macOS-style magnetic dock */}
-      <div className="relative z-10 hidden md:flex justify-center py-3 bg-white/60 backdrop-blur-xl border-b border-zinc-200/40">
-        <FloatingDock
-          desktopClassName="shadow-xl shadow-zinc-200/40 border-zinc-200/50"
-          items={[
-            { title: 'Mempelai', icon: <Heart className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('couple'), active: activeTab === 'couple' },
-            { title: 'Detail Acara', icon: <Calendar className="h-full w-full text-amber-500" />, onClick: () => setActiveTab('events'), active: activeTab === 'events' },
-            { title: 'Cerita Cinta', icon: <BookOpen className="h-full w-full text-violet-500" />, onClick: () => setActiveTab('stories'), active: activeTab === 'stories' },
-            { title: 'Galeri & Musik', icon: <Image className="h-full w-full text-sky-500" />, onClick: () => setActiveTab('gallery'), active: activeTab === 'gallery' },
-            { title: 'Kado Digital', icon: <Gift className="h-full w-full text-emerald-500" />, onClick: () => setActiveTab('gifts'), active: activeTab === 'gifts' },
-            { title: 'Kutipan', icon: <Quote className="h-full w-full text-fuchsia-500" />, onClick: () => setActiveTab('quote'), active: activeTab === 'quote' },
-          ]}
-        />
+      {/* Unified Pro SaaS Sticky Tab Bar */}
+      <div className="sticky top-0 z-20 border-b border-[#EAE3D8] bg-white px-4 sm:px-6">
+        <div
+          role="tablist"
+          aria-label="Bagian Editor Undangan"
+          className="flex items-center gap-1 overflow-x-auto py-2.5"
+        >
+          {([
+            { id: 'couple' as const, label: 'Mempelai', icon: Heart },
+            { id: 'events' as const, label: 'Detail Acara', icon: Calendar },
+            { id: 'stories' as const, label: 'Cerita Cinta', icon: BookOpen },
+            { id: 'gallery' as const, label: 'Galeri & Musik', icon: Image },
+            { id: 'gifts' as const, label: 'Kado Digital', icon: Gift },
+            { id: 'quote' as const, label: 'Kutipan', icon: Quote },
+          ] as const).map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                  isActive
+                    ? 'bg-[#8E2F45]/10 text-[#8E2F45]'
+                    : 'text-[#5C4E45] hover:bg-[#FAF6F0] hover:text-[#1C1614]'
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5 shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Content area with AnimatePresence */}
@@ -371,7 +364,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'couple' && (
           <div className="space-y-5 animate-fadeIn">
             {/* Section Header */}
-            <div className="flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
                   <Heart className="w-5 h-5 text-amber-500" />
@@ -393,9 +386,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* GROOM PANEL */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Groom */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#8E2F45]" />
                 <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
-                  <span className="bg-zinc-500 text-white text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
+                  <span className="bg-[#8E2F45]/10 text-[#8E2F45] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
                   <h5 className="font-bold text-zinc-800 text-sm">Mempelai Pria (Groom)</h5>
                 </div>
 
@@ -632,7 +625,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 2: DETIL ACARA */}
         {activeTab === 'events' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600" />
               </div>
@@ -646,7 +639,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               {/* AKAD */}
               <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
                 {/* Aksen garis gradasi atas Akad */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-400" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#8E2F45]" />
                 <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
                   <h5 className="font-bold text-zinc-700 font-bold text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-zinc-500" />
@@ -965,7 +958,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'gallery' && (
           <div className="space-y-5">
             {/* Section Header */}
-            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
                 <Image className="w-5 h-5 text-zinc-700" />
               </div>
@@ -1210,7 +1203,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         musicTitle: 'Beautiful Piano - Canon in D'
                       });
                     }}
-                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl text-xs font-bold transition active:scale-95"
+                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white border border-[#E6DFD3] rounded-xl text-xs font-bold transition active:scale-95"
                   >
                     Atur Ulang
                   </button>
@@ -1382,7 +1375,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 5: DIGITAL GIFT */}
         {activeTab === 'gifts' && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                   <Gift className="w-5 h-5 text-zinc-700" />
@@ -1472,7 +1465,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 6: QUOTE & COUNTDOWN */}
         {activeTab === 'quote' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-white border border-[#E6DFD3] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <Quote className="w-5 h-5 text-purple-600" />
               </div>

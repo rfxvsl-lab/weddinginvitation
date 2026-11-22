@@ -1,9 +1,8 @@
-import React from 'react';
-import { PiCheckCircleFill as Check, PiPaletteDuotone as Palette, PiCrownDuotone as Crown } from 'react-icons/pi';
+'use client';
+
+import React, { useState } from 'react';
+import { Check, Palette, Eye, BookOpen } from 'lucide-react';
 import { DEFAULT_THEMES } from '../data/defaultData';
-import { isThemeAvailable, PACKAGE_NAMES, getUpgradeTier, type PackageId } from '../lib/packageLimits';
-import { LockBadge } from './UpgradePrompt';
-import { useAlertModal } from '../hooks/useAlertModal';
 
 interface ThemeSelectorProps {
   currentThemeId: string;
@@ -11,124 +10,171 @@ interface ThemeSelectorProps {
   packageId?: string;
 }
 
-export default function ThemeSelector({ currentThemeId, onSelectTheme, packageId = 'luxury' }: ThemeSelectorProps) {
-  const alertModal = useAlertModal();
-  const handleThemeClick = (themeId: string) => {
-    if (!isThemeAvailable(packageId, themeId)) {
-      const upgradeTo = getUpgradeTier(packageId);
-      const upgradeName = upgradeTo ? PACKAGE_NAMES[upgradeTo] : 'Premium';
-      alertModal.upgrade('Tema Terkunci', `Tema ini hanya tersedia di paket ${upgradeName} ke atas. Silakan upgrade untuk mengaksesnya.`);
-      return;
-    }
-    onSelectTheme(themeId);
-  };
+const THEME_PREVIEW_IMAGES: Record<string, string> = {
+  'rfx-dark': '/assets/themes/rfx-dark.png',
+  'cremy-rose': '/assets/themes/cremy-rose.png',
+  'grand-ballroom': '/assets/themes/grand-ballroom.png',
+  'netflix-luxury': '/assets/themes/netflix-luxury.png',
+  'royal-arabian': '/assets/themes/royal-arabian.png',
+  spotilove: '/assets/themes/spotilove.png',
+  'javanese-classic': '/assets/themes/javanese-classic.png',
+  'parallax-cinematic': '/assets/themes/parallax-cinematic.png',
+};
+
+const PATTERN_LABELS: Record<string, string> = {
+  all: 'Semua',
+  modern: 'Modern',
+  classic: 'Klasik & Adat',
+  floral: 'Floral',
+  storybook: 'Interaktif',
+};
+
+export default function ThemeSelector({
+  currentThemeId,
+  onSelectTheme,
+}: ThemeSelectorProps) {
+  const [filter, setFilter] = useState<string>('all');
+
+  const filteredThemes =
+    filter === 'all'
+      ? DEFAULT_THEMES
+      : DEFAULT_THEMES.filter((t) => t.pattern === filter);
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="flex flex-col gap-1.5">
-        <h3 className="saas-ui-title text-xl font-bold text-zinc-900 flex items-center gap-2.5 tracking-tight">
-          <div className="saas-icon-box !rounded-2xl">
-            <Palette className="w-5 h-5" />
+    <div className="space-y-6">
+      {/* Header + Filter Bar */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8E2F45]">
+            <Palette className="h-3.5 w-3.5" />
+            <span>Semua {DEFAULT_THEMES.length} Tema Gratis</span>
           </div>
-          Pilihan Tema Undangan
-        </h3>
-        <p className="text-xs text-zinc-500 font-medium max-w-xl leading-relaxed">
-          Eksplorasi koleksi palet warna eksklusif kami. Setiap tema dirancang dengan harmoni warna yang menciptakan kesan elegan, estetik, dan premium untuk hari bahagia Anda.
-        </p>
+          <h2 className="mt-1 font-serif text-[24px] leading-tight text-[#1C1614]">
+            Pilih Tema Undangan
+          </h2>
+          <p className="mt-1 text-[13px] text-[#6B5D54]">
+            Ganti tema kapan saja tanpa menghapus data mempelai, acara, maupun daftar tamu.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {Object.entries(PATTERN_LABELS).map(([key, label]) => {
+            const active = filter === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setFilter(key)}
+                className={`rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
+                  active
+                    ? 'border-[#1C1614] bg-[#1C1614] text-white'
+                    : 'border-[#E6DFD3] bg-white text-[#5C4E45] hover:bg-[#FAF6F0]'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {DEFAULT_THEMES.map((theme) => {
+      {/* Theme Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredThemes.map((theme) => {
           const isSelected = theme.id === currentThemeId;
-          const isAvailable = isThemeAvailable(packageId, theme.id);
+          const imgSrc = THEME_PREVIEW_IMAGES[theme.id];
+
           return (
             <button
               key={theme.id}
-              onClick={() => handleThemeClick(theme.id)}
-              className={`group text-left relative overflow-hidden rounded-[2rem] transition-all duration-500 ease-out flex flex-col ${
-                !isAvailable
-                  ? 'opacity-80 cursor-not-allowed border border-white/40'
-                  : isSelected
-                  ? 'scale-[1.02] border-2 border-[var(--saas-primary)] shadow-[0_20px_50px_-12px_rgba(142,47,69,0.28)] ring-4 ring-[var(--saas-primary-soft)]'
-                  : 'border border-white/60 hover:border-[var(--saas-gold)] hover:shadow-[0_20px_40px_-15px_rgba(36,20,24,0.12)] hover:-translate-y-1'
-              } bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(36,20,24,0.06)]`}
+              type="button"
+              onClick={() => onSelectTheme(theme.id)}
+              className={`group flex flex-col overflow-hidden rounded-2xl border bg-white text-left transition-all cursor-pointer ${
+                isSelected
+                  ? 'border-[#8E2F45] ring-2 ring-[#8E2F45]/20'
+                  : 'border-[#E6DFD3] hover:border-[#C7B7A1]'
+              }`}
             >
-              {/* Lock badge for unavailable themes */}
-              {!isAvailable && (
-                <div className="absolute inset-0 z-30 bg-zinc-50/40 backdrop-blur-[2px] flex items-center justify-center">
-                  <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 border border-zinc-200/50">
-                    <Crown className="w-4 h-4 text-amber-600" />
-                    <span className="text-xs font-bold text-zinc-800">Upgrade Required</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Top Section - Theme Gradient Preview */}
-              <div className="h-32 w-full relative overflow-hidden bg-[#050505]">
-                {/* Native Iframe Render */}
-                <img 
-                  src={`/assets/themes/${theme.id}.png`}
-                  alt={theme.name}
-                  className="w-full h-full object-cover absolute top-0 left-0 pointer-events-none opacity-90 transition-opacity duration-500 group-hover:opacity-100"
-                  loading="lazy"
-                />
-                
-                {/* Floating Preview Pill */}
-                <div 
-                  className="absolute bottom-3 left-3 z-10 px-4 py-1.5 rounded-xl shadow-lg backdrop-blur-md border border-white/20 transition-transform duration-500 group-hover:scale-105"
-                  style={{ 
-                    backgroundColor: `${theme.bgHex}ee`,
-                    color: theme.textHex
-                  }}
-                >
-                  <span className="text-[10px] font-bold tracking-[0.2em] uppercase">
-                    {theme.name.split(' ')[0]}
-                  </span>
-                </div>
-
-                {/* Selected Checkmark overlay */}
-                {isSelected && (
-                  <div className="absolute top-4 right-4 z-20 animate-scaleIn">
-                    <div className="bg-amber-500 rounded-full p-1 shadow-lg shadow-amber-500/40">
-                      <Check className="w-5 h-5 text-white" />
+              {/* Visual Preview Thumbnail */}
+              <div
+                className="relative aspect-[16/10] w-full overflow-hidden"
+                style={{
+                  background: `radial-gradient(130% 100% at 20% 0%, ${theme.bgPatternHex}, ${theme.bgHex} 72%)`,
+                }}
+              >
+                {imgSrc ? (
+                  <img
+                    src={imgSrc}
+                    alt={theme.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center px-6 py-4">
+                    <div
+                      className="flex h-full w-[112px] overflow-hidden rounded-r-lg rounded-l-[3px] shadow-lg ring-1 ring-[#C6A15B]/35"
+                      style={{
+                        background:
+                          'linear-gradient(155deg, #35211E 0%, #241715 65%, #1A100F 100%)',
+                      }}
+                    >
+                      <div className="w-2 shrink-0 border-r border-[#C6A15B]/25 bg-black/35" />
+                      <div className="m-1.5 flex flex-1 flex-col items-center justify-center rounded border border-[#C6A15B]/30 px-1.5 text-center">
+                        <BookOpen className="h-3.5 w-3.5 text-[#DFC086]" />
+                        <span className="mt-1 font-serif text-[12px] leading-tight text-[#FAF3E6]">
+                          Storybook 3D
+                        </span>
+                      </div>
+                      <div className="w-1 shrink-0 bg-[#E8DEC9]" />
                     </div>
                   </div>
                 )}
+
+                {isSelected && (
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#8E2F45] px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm">
+                    <Check className="h-3 w-3" />
+                    Aktif
+                  </span>
+                )}
               </div>
 
-              {/* Bottom Section - Theme Details (Glass) */}
-              <div className="p-5 flex flex-col gap-5 border-t border-white/50 bg-white/40">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-bold text-zinc-900 text-sm tracking-tight group-hover:text-amber-600 transition-colors">
+              {/* Card Body */}
+              <div className="flex flex-1 flex-col justify-between gap-4 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-[14px] font-bold text-[#1C1614] group-hover:text-[#8E2F45] transition-colors">
                       {theme.name}
-                    </h4>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono font-semibold bg-white/80 px-2 py-0.5 rounded-lg border border-white">
-                        {theme.pattern}
-                      </span>
-                    </div>
+                    </h3>
+                    <p className="mt-0.5 text-[11.5px] text-[#8B7D74]">
+                      {PATTERN_LABELS[theme.pattern] || theme.pattern}
+                    </p>
                   </div>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#EAE3D8] bg-[#FAF7F2] px-2 py-1 text-[11px] font-semibold text-[#5C4E45]">
+                    <Eye className="h-3 w-3" />
+                    Preview
+                  </span>
                 </div>
 
-                {/* Color Swatches */}
-                <div className="flex items-center gap-3">
+                {/* Color Palette Swatches */}
+                <div className="flex items-center justify-between border-t border-[#F2ECE2] pt-3">
                   <div className="flex -space-x-1.5">
                     {[
-                      { hex: theme.primaryHex, name: "Utama" },
-                      { hex: theme.secondaryHex, name: "Sekunder" },
-                      { hex: theme.bgHex, name: "Background" },
-                      { hex: theme.accentHex, name: "Aksen" },
-                      { hex: theme.textHex, name: "Teks" }
-                    ].map((color, i) => (
-                      <div
+                      theme.primaryHex,
+                      theme.secondaryHex,
+                      theme.bgHex,
+                      theme.accentHex,
+                      theme.textHex,
+                    ].map((hex, i) => (
+                      <span
                         key={i}
-                        className="w-7 h-7 rounded-full border-[2.5px] border-white shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 hover:!scale-110 hover:!z-10 relative"
-                        style={{ backgroundColor: color.hex, transitionDelay: `${i * 40}ms`, zIndex: 5 - i }}
-                        title={color.name}
+                        className="h-5 w-5 rounded-full border-2 border-white shadow-xs"
+                        style={{ backgroundColor: hex }}
                       />
                     ))}
                   </div>
+                  <span className="text-[11px] font-semibold text-[#2D7A4F]">
+                    Gratis
+                  </span>
                 </div>
               </div>
             </button>

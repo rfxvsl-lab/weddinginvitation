@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Serif_Display, DM_Sans, Caveat } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '../hooks/useAuth';
@@ -44,7 +44,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: '#FAF7F2',
 };
 

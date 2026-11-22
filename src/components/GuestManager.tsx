@@ -5,26 +5,26 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  PiUsersDuotone as Users,
-  PiPlusDuotone as Plus,
-  PiMagnifyingGlassDuotone as Search,
-  PiTrashDuotone as Trash2,
-  PiCopyDuotone as Copy,
-  PiShareNetworkDuotone as Share2,
-  PiPaperPlaneTiltDuotone as Send,
-  PiCheckDuotone as Check,
-  PiFunnelDuotone as Filter,
-  PiUserPlusDuotone as UserPlus,
-  PiArrowSquareOutDuotone as ExternalLink,
-  PiQrCodeDuotone as QrCode,
-  PiTicketDuotone as Ticket,
-  PiPrinterDuotone as Printer,
-  PiDownloadDuotone as Download,
-  PiFileTextDuotone as FileText,
-  PiCheckCircleDuotone as CheckCircle,
-  PiCalendarDuotone as Calendar,
-  PiWarningCircleDuotone as AlertCircle
-} from 'react-icons/pi';
+  Users,
+  Plus,
+  Search,
+  Trash2,
+  Copy,
+  Share2,
+  Send,
+  Check,
+  Filter,
+  UserPlus,
+  ExternalLink,
+  QrCode,
+  Ticket,
+  Printer,
+  Download,
+  FileText,
+  CheckCircle2 as CheckCircle,
+  Calendar,
+  AlertCircle,
+} from 'lucide-react';
 import { Guest } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { getLimits, canAccess, isLimitReached, formatLimit, PACKAGE_NAMES, type PackageId } from '../lib/packageLimits';

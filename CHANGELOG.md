@@ -34,3 +34,15 @@ Semua perubahan signifikan pada **RuangHadir** (`www.ruanghadir.net`) dicatat se
 ### Diperbaiki
 - **Blocker Deployment Vercel:** Mengganti 3 entri registry rusak (`http://mirrors.tencentyun.com/npm/...` untuk `@types/qrcode`, `jsqr`, `qrcode`) di `package-lock.json` ke `https://registry.npmjs.org/`.
 - **Konfigurasi `package.json`:** Menghapus self-dependency `undangankita-rfxvisual: file:` dan mengunci `"engines": { "node": "22.x" }`.
+
+
+---
+
+## [2.1.0] — 2026-11-23
+
+### Added & Polished
+- **Interactive Editorial Hero Stage (`SaasHero.tsx`):** Replaced stiff static phone mockup and broken `/rian-salsa` link with a tactile, interactive phone stage featuring 3 live-switchable editions (*Grand Ballroom*, *Storybook 3D*, *Javanese Classic*), working in-phone tabs (*Sampul*, *Acara*, *QR & RSVP*), and real `/preview/<themeId>` links.
+- **Anti-Pinch-Zoom & Viewport Lock (`layout.tsx`, `index.css`, `App.tsx`):** Locked `maximumScale: 1, userScalable: false`, `overscroll-behavior: none`, `touch-action: pan-x pan-y`, coarse-pointer 16px input floor, and gesture/ctrl+wheel zoom guards inside the dashboard workspace.
+- **100% Unified Iconography (`lucide-react`):** Eliminated mixed `react-icons/pi` duotone icons and custom legacy icon sets across `EditorPanel`, `ThemeSelector`, `GuestManager`, `AnalyticsDashboard`, `ProfilePanel`, `AuthGate`, `SignInView`, and `SignUpView`.
+- **Dashboard Inner Layout Polish:** Replaced the bouncing macOS `FloatingDock` and rainbow pills in `EditorPanel` with a crisp sticky SaaS tab bar; removed dead simulator buttons and pastel gradient cards in `AnalyticsDashboard`; added Storybook 3D visual cover & category filters to `ThemeSelector`; unified `ProfilePanel` to 2-tier Gratis/Enterprise status.
+- **Legal Pages & Footer Sync (`SaasLegal.tsx`, `terms-of-service`, `privacy-policy`, `cookie-policy`, `SaasClosing.tsx`):** Updated all legal copy to the 2026 Full Gratis + Enterprise (`admin@ruanghadir.net`) model, added sibling legal document switcher tabs, and fixed dead `/about` & `/contact` links.

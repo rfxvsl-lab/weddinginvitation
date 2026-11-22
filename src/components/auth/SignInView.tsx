@@ -8,13 +8,13 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { Logo } from '@/components/ui/Logo';
-import { Building2 } from 'lucide-react';
 import {
-  PiEnvelopeDuotone as Mail,
-  PiLockKeyDuotone as Lock,
-  PiWarningCircleDuotone as AlertCircle,
-  PiCaretRightDuotone as ChevronRight,
-} from 'react-icons/pi';
+  Building2,
+  Mail,
+  Lock,
+  AlertCircle,
+  ChevronRight,
+} from 'lucide-react';
 
 interface SignInViewProps {
   loginEmail: string;

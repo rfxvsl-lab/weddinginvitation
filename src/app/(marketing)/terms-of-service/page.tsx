@@ -4,108 +4,90 @@ import { SaasLegalShell } from "@/components/saas/SaasLegal";
 
 export const metadata: Metadata = {
   title: "Ketentuan Layanan — RuangHadir.net",
-  description: "Ketentuan Layanan RuangHadir.net — Syarat dan ketentuan penggunaan platform undangan digital.",
+  description:
+    "Ketentuan Layanan RuangHadir.net — Syarat dan ketentuan penggunaan platform undangan pernikahan digital gratis dan Enterprise.",
 };
 
 export default function TermsOfServicePage() {
   return (
-    <SaasLegalShell title="Ketentuan" accent="Layanan" updated="Terakhir diperbarui · 1 Januari 2025">
+    <SaasLegalShell
+      title="Ketentuan"
+      accent="Layanan"
+      updated="Terakhir diperbarui · November 2026"
+    >
       <h2>1. Penerimaan Ketentuan</h2>
       <p>
-        Dengan mengakses dan menggunakan layanan RuangHadir.net (&quot;Layanan&quot;), Anda menyetujui untuk terikat
-        oleh Ketentuan Layanan ini. Jika Anda tidak menyetujui ketentuan ini, mohon untuk tidak menggunakan Layanan
-        kami. RuangHadir.net dioperasikan oleh RFX Visual.
+        Dengan mengakses dan menggunakan layanan RuangHadir.net (&quot;Layanan&quot;) yang dioperasikan
+        oleh RFX Visual, Anda menyetujui untuk terikat oleh Ketentuan Layanan ini. Jika Anda tidak
+        menyetujui sebagian atau seluruh ketentuan ini, mohon hentikan penggunaan Layanan.
       </p>
 
       <h2>2. Deskripsi Layanan</h2>
       <p>
-        RuangHadir.net menyediakan platform pembuatan undangan pernikahan digital yang mencakup: desain template
-        undangan, manajemen daftar tamu dan RSVP, amplop digital, analytics pengunjung, QR code check-in, dan fitur
-        lainnya sesuai paket yang dipilih.
+        RuangHadir.net menyediakan platform pembuatan undangan pernikahan digital mencakup koleksi tema
+        siap pakai, editor konten real-time, tautan sapaan tamu personal, manajemen daftar tamu &amp;
+        RSVP, amplop digital, analitik kunjungan, serta QR check-in di lokasi acara.
       </p>
 
-      <h2>3. Pendaftaran Akun</h2>
+      <h2>3. Model Paket: Full Gratis &amp; Enterprise</h2>
       <ul>
-        <li>Anda harus berusia minimal 17 tahun untuk menggunakan Layanan.</li>
-        <li>Informasi yang Anda berikan saat pendaftaran harus akurat dan lengkap.</li>
-        <li>Anda bertanggung jawab menjaga kerahasiaan kredensial akun Anda.</li>
-        <li>Satu akun hanya boleh digunakan oleh satu pengguna.</li>
-        <li>Kami berhak menangguhkan atau menghapus akun yang melanggar ketentuan.</li>
+        <li>
+          <strong>Paket Full Gratis (Rp 0):</strong> Seluruh fitur inti undangan digital terbuka
+          gratis untuk pengguna personal tanpa biaya pendaftaran, tanpa kartu kredit, dan tanpa
+          watermark.
+        </li>
+        <li>
+          <strong>Paket Enterprise:</strong> Ditujukan bagi Wedding Organizer (WO), agensi event,
+          maupun perusahaan dengan kebutuhan custom domain, multi-seat tim, dan SLA prioritas.
+          Pemesanan dilakukan melalui <strong>admin@ruanghadir.net</strong>, dan akses masuk wajib
+          menggunakan alamat email domain perusahaan resmi serta kode akses khusus yang diterbitkan
+          oleh admin RuangHadir.
+        </li>
       </ul>
 
-      <h2>4. Paket Layanan &amp; Pembayaran</h2>
+      <h2>4. Pendaftaran &amp; Keamanan Akun</h2>
       <ul>
-        <li><strong>Paket Demo:</strong> Gratis dengan fitur terbatas. Masa aktif 3 hari. Tidak dapat dipublish.</li>
-        <li><strong>Paket Reguler:</strong> Mulai dari Rp 35.000 (Buat Sendiri). Masa aktif 20 hari.</li>
-        <li><strong>Paket Premium:</strong> Mulai dari Rp 90.000 (Buat Sendiri). Masa aktif 60 hari.</li>
-        <li><strong>Paket Luxury:</strong> Mulai dari Rp 150.000 (Buat Sendiri). Masa aktif 90 hari.</li>
-        <li>Harga dapat berubah sewaktu-waktu dengan pemberitahuan sebelumnya.</li>
-        <li>Pembayaran dilakukan melalui QRIS atau Virtual Account via Pakasir.</li>
-        <li>Pembayaran bersifat satu kali (one-time) per paket, bukan langganan bulanan.</li>
+        <li>Informasi yang Anda berikan saat mendaftar harus akurat dan dapat dipertanggungjawabkan.</li>
+        <li>Anda bertanggung jawab penuh menjaga kerahasiaan kata sandi maupun kode akses Enterprise.</li>
+        <li>
+          Penggunaan alamat email webmail publik (seperti Gmail, Yahoo, atau Outlook) tidak diizinkan
+          pada jalur Portal Enterprise.
+        </li>
       </ul>
 
-      <h2>5. Masa Aktif &amp; Perpanjangan</h2>
-      <p>
-        Setiap paket berbayar memiliki masa aktif yang dihitung sejak undangan diaktifkan. Setelah masa aktif berakhir,
-        undangan Anda tidak lagi dapat diakses publik hingga diperpanjang. Perpanjangan dapat dilakukan melalui
-        dashboard dengan membayar biaya sesuai paket. Data undangan Anda tetap tersimpan meskipun masa aktif telah
-        berakhir.
-      </p>
-
-      <h2>6. Konten Pengguna</h2>
+      <h2>5. Konten Pengguna</h2>
       <ul>
-        <li>Anda bertanggung jawab penuh atas konten yang Anda unggah (foto, teks, informasi).</li>
-        <li>Konten tidak boleh mengandung unsur SARA, pornografi, kekerasan, atau materi ilegal.</li>
-        <li>Anda menjamin bahwa Anda memiliki hak atas semua konten yang diunggah.</li>
-        <li>Kami berhak menghapus konten yang melanggar ketentuan tanpa pemberitahuan.</li>
-        <li>Hak kepemilikan konten tetap menjadi milik Anda. Kami hanya menggunakan konten untuk menyediakan Layanan.</li>
+        <li>Hak kepemilikan foto, teks, musik, dan data acara tetap sepenuhnya milik Anda.</li>
+        <li>
+          Anda dilarang mengunggah konten yang melanggar hukum, mengandung unsur SARA, pornografi,
+          ujaran kebencian, atau melanggar hak kekayaan intelektual pihak lain.
+        </li>
+        <li>
+          Kami berhak menonaktifkan undangan atau akun yang terbukti melanggar ketentuan ini demi
+          menjaga keamanan platform.
+        </li>
       </ul>
 
-      <h2>7. Pembatasan Penggunaan</h2>
-      <p>Anda dilarang menggunakan Layanan untuk:</p>
-      <ul>
-        <li>Tujuan komersial selain yang dimaksudkan (menjual kembali akses, dll).</li>
-        <li>Mengirim spam, phishing, atau konten berbahaya melalui undangan.</li>
-        <li>Mengakses atau memodifikasi sistem kami tanpa izin.</li>
-        <li>Menggunakan bot atau skrip otomatis untuk mengakses Layanan.</li>
-        <li>Memalsukan identitas atau menyamar sebagai pihak lain.</li>
-      </ul>
-
-      <h2>8. Ketersediaan Layanan</h2>
+      <h2>6. Ketersediaan Layanan &amp; Batasan Tanggung Jawab</h2>
       <p>
-        Kami berupaya menjaga ketersediaan Layanan 24/7, namun tidak menjamin uptime 100%. Kami dapat melakukan
-        pemeliharaan terjadwal yang mungkin menyebabkan gangguan sementara. Kami tidak bertanggung jawab atas kerugian
-        akibat gangguan layanan di luar kendali kami (force majeure, kegagalan infrastruktur pihak ketiga, dll).
+        Kami berupaya menjaga ketersediaan platform secara optimal setiap hari. Layanan disediakan
+        &quot;sebagaimana adanya&quot; (as is) dan kami dapat melakukan pemeliharaan sistem secara
+        berkala. Untuk klien Enterprise, ketentuan ketersediaan layanan mengikuti perjanjian SLA yang
+        disepakati bersama.
       </p>
 
-      <h2>9. Batasan Tanggung Jawab</h2>
+      <h2>7. Perubahan Ketentuan</h2>
       <p>
-        Layanan disediakan &quot;sebagaimana adanya&quot; (as is). Kami tidak memberikan jaminan tersurat maupun
-        tersirat mengenai kesesuaian untuk tujuan tertentu. Total tanggung jawab kami dalam keadaan apapun tidak akan
-        melebihi jumlah yang Anda bayarkan kepada kami dalam 12 bulan terakhir.
+        Kami dapat memperbarui Ketentuan Layanan ini sewaktu-waktu seiring perkembangan fitur platform.
+        Versi terbaru akan selalu dipublikasikan di halaman ini beserta tanggal pembaruannya.
       </p>
 
-      <h2>10. Perubahan Ketentuan</h2>
+      <h2>8. Hukum yang Berlaku &amp; Kontak Resmi</h2>
       <p>
-        Kami dapat mengubah Ketentuan Layanan ini kapan saja. Perubahan material akan diberitahukan melalui email atau
-        notifikasi di platform minimal 14 hari sebelum berlaku efektif. Penggunaan berkelanjutan setelah perubahan
-        berlaku dianggap sebagai persetujuan Anda.
+        Ketentuan ini diatur oleh hukum Republik Indonesia. Untuk pertanyaan, pelaporan pelanggaran,
+        atau permintaan kemitraan Enterprise, silakan hubungi{" "}
+        <a href="mailto:admin@ruanghadir.net">admin@ruanghadir.net</a>.
       </p>
-
-      <h2>11. Hukum yang Berlaku</h2>
-      <p>
-        Ketentuan Layanan ini diatur oleh dan ditafsirkan sesuai hukum Republik Indonesia. Setiap sengketa yang timbul
-        akan diselesaikan melalui musyawarah mufakat terlebih dahulu, dan jika tidak tercapai, akan diselesaikan
-        melalui pengadilan yang berwenang di Indonesia.
-      </p>
-
-      <h2>12. Hubungi Kami</h2>
-      <p>Untuk pertanyaan terkait Ketentuan Layanan ini:</p>
-      <ul>
-        <li><strong>WhatsApp:</strong> 085731021469</li>
-        <li><strong>Instagram:</strong> @ruanghadir_net</li>
-        <li><strong>Website:</strong> ruanghadir.net/contact</li>
-      </ul>
     </SaasLegalShell>
   );
 }

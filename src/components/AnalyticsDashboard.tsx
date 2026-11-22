@@ -1,361 +1,316 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+'use client';
 
-import React, { useState } from 'react';
-import { 
-  PiChartBarDuotone as BarChart2, 
-  PiUsersDuotone as Users, 
-  PiChatCircleDuotone as MessageSquare, 
-  PiCheckCircleDuotone as CheckCircle2, 
-  PiQuestionDuotone as HelpCircle, 
-  PiXCircleDuotone as XCircle, 
-  PiEyeDuotone as Eye, 
-  PiClockDuotone as Clock, 
-  PiPulseDuotone as Activity, 
-  PiLaptopDuotone as Laptop, 
-  PiDeviceMobileCameraDuotone as Smartphone,
-  PiTrashDuotone as Trash2,
-  PiArrowsClockwiseDuotone as ListRestart
-} from 'react-icons/pi';
+import React from 'react';
+import {
+  BarChart3,
+  Users,
+  MessageSquare,
+  CheckCircle2,
+  HelpCircle,
+  XCircle,
+  Eye,
+  Clock,
+  Laptop,
+  Smartphone,
+  Trash2,
+} from 'lucide-react';
 import { RSVP, WeddingAnalytics } from '../types';
 
 interface AnalyticsDashboardProps {
   analytics: WeddingAnalytics;
   rsvps: RSVP[];
   onDeleteRSVP: (id: string) => void;
-  onSimulateGuestRSVP: () => void;
-  onSimulatePageView: () => void;
+  onSimulateGuestRSVP?: () => void;
+  onSimulatePageView?: () => void;
 }
 
-export default function AnalyticsDashboard({ 
-  analytics, 
-  rsvps, 
-  onDeleteRSVP, 
-  onSimulateGuestRSVP,
-  onSimulatePageView
+export default function AnalyticsDashboard({
+  analytics,
+  rsvps,
+  onDeleteRSVP,
 }: AnalyticsDashboardProps) {
+  const countHadir = rsvps.filter((r) => r.status === 'Hadir').length;
+  const countAbsen = rsvps.filter((r) => r.status === 'Tidak Hadir').length;
+  const countRagu = rsvps.filter((r) => r.status === 'Ragu-ragu').length;
 
-  // Calculate real aggregates from RSVPs
-  const totalRSVPDariState = rsvps.length;
-  const countHadir = rsvps.filter(r => r.status === 'Hadir').length;
-  const countAbsen = rsvps.filter(r => r.status === 'Tidak Hadir').length;
-  const countRagu = rsvps.filter(r => r.status === 'Ragu-ragu').length;
-  
   const totalPaxAttending = rsvps
-    .filter(r => r.status === 'Hadir')
-    .reduce((sum, r) => sum + r.paxCount, 0);
+    .filter((r) => r.status === 'Hadir')
+    .reduce((sum, r) => sum + (r.paxCount || 1), 0);
 
-  // SVG Chart Dimensions & Computations
-  const chartHeight = 120;
-  const chartWidth = 500;
-  const maxTrafficViews = Math.max(...analytics.dailyTraffic.map(v => v.views), 10);
-  
+  const chartHeight = 130;
+  const chartWidth = 520;
+  const maxTrafficViews = Math.max(
+    ...(analytics?.dailyTraffic?.map((v) => v.views) || [0]),
+    10
+  );
+
   return (
     <div className="space-y-6">
-      {/* HEADER WITH REALTIME SIMULATORS */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-bold text-zinc-800 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-primary animate-pulse" />
-            Sistem Analitik Undangan
-          </h3>
-          <p className="text-xs text-zinc-500">
-            Monitor kunjungan tamu, status RSVP, dan kiriman ucapan doa restu secara langsung.
-          </p>
-        </div>
-
-        {/* DEMO SIMULATION BUTTONS */}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onSimulatePageView}
-            className="flex items-center gap-1.5 px-3 py-2 border border-zinc-200 text-zinc-600 font-bold bg-zinc-50 hover:bg-zinc-100 rounded-xl text-xs transition-all cursor-pointer"
-            title="Simulasikan tamu asing membuka halaman undangan Anda"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            + Simulasi Kunjungan
-          </button>
-          
-          <button
-            type="button"
-            onClick={onSimulateGuestRSVP}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-xs font-bold scale-100 hover:scale-102 active:scale-98 transition-all cursor-pointer"
-            title="Simulasikan ada tamu yang melakukan konfirmasi kehadiran secara instan"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            + Simulasi Tamu RSVP
-          </button>
-        </div>
+      {/* ── 4 Editorial KPI Cards ── */}
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+        {[
+          {
+            label: 'Total Kunjungan',
+            value: `${analytics?.viewsCount || 0}`,
+            sub: 'Halaman undangan dibuka',
+            icon: Eye,
+            accent: '#8E2F45',
+          },
+          {
+            label: 'Konfirmasi Hadir',
+            value: `${countHadir}`,
+            sub: 'Tamu menyatakan hadir',
+            icon: CheckCircle2,
+            accent: '#2D7A4F',
+          },
+          {
+            label: 'Estimasi Pax',
+            value: `${totalPaxAttending}`,
+            sub: 'Total kursi tamu hadir',
+            icon: Users,
+            accent: '#9A6B1E',
+          },
+          {
+            label: 'Absen / Ragu',
+            value: `${countAbsen} / ${countRagu}`,
+            sub: 'Tidak hadir / belum pasti',
+            icon: HelpCircle,
+            accent: '#6B5D54',
+          },
+        ].map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-[#E6DFD3] bg-white p-4"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-semibold text-[#6B5D54]">
+                  {stat.label}
+                </span>
+                <Icon className="h-4 w-4" style={{ color: stat.accent }} />
+              </div>
+              <p className="mt-2.5 text-[26px] font-bold tracking-tight text-[#1C1614] tabular-nums">
+                {stat.value}
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#8B7D74]">{stat.sub}</p>
+            </div>
+          );
+        })}
       </div>
 
-      {/* CORE STATS GRID */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {/* VIEW COUNT */}
-        <div className="p-4 bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl border border-zinc-200 hover:border-zinc-300 flex items-center gap-4 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-200">
-          <div className="p-3 rounded-xl bg-sky-100 text-sky-600">
-            <Eye className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-sky-600/70">Total Dibuka</span>
-            <span className="text-lg font-bold text-zinc-800 font-mono">{analytics.viewsCount}x</span>
-          </div>
-          <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-[0.04] pointer-events-none group-hover:scale-110 transition-transform">
-            <Eye className="w-20 h-20 text-sky-500" />
-          </div>
-        </div>
-
-        {/* HADIR STAT */}
-        <div className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-zinc-200 hover:border-zinc-300 flex items-center gap-4 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-200">
-          <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600">
-            <CheckCircle2 className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-emerald-600/70">Konfirmasi Hadir</span>
-            <span className="text-lg font-bold text-zinc-800 font-mono">{countHadir} Tamu</span>
-          </div>
-          <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-[0.04] pointer-events-none group-hover:scale-110 transition-transform">
-            <CheckCircle2 className="w-20 h-20 text-emerald-500" />
-          </div>
-        </div>
-
-        {/* TOTAL PAX */}
-        <div className="p-4 bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl border border-zinc-200 hover:border-zinc-300 flex items-center gap-4 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-200">
-          <div className="p-3 rounded-xl bg-violet-100 text-violet-600">
-            <Users className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-violet-600/70">Estimasi Porsi Pax</span>
-            <span className="text-lg font-bold text-zinc-800 font-mono">{totalPaxAttending} Orang</span>
-          </div>
-          <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-[0.04] pointer-events-none group-hover:scale-110 transition-transform">
-            <Users className="w-20 h-20 text-violet-500" />
-          </div>
-        </div>
-
-        {/* RAGU & ABSEN */}
-        <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-zinc-200 hover:border-zinc-300 flex items-center gap-4 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-200">
-          <div className="p-3 rounded-xl bg-amber-100 text-amber-600">
-            <HelpCircle className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-amber-600/70">Absen / Ragu-ragu</span>
-            <span className="text-lg font-bold text-zinc-800 font-mono">{countAbsen} / {countRagu}</span>
-          </div>
-          <div className="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-[0.04] pointer-events-none group-hover:scale-110 transition-transform">
-            <HelpCircle className="w-20 h-20 text-amber-500" />
-          </div>
-        </div>
-      </div>
-
-      {/* TRAFFIC GRAPH & DEVICE BREAKDOWN */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* CUSTOM SVG LINE CHART (100% RESPONSIVE) */}
-        <div className="p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-xl hover:border-zinc-300 transition-all duration-200 lg:col-span-2 space-y-4">
+      {/* ── Traffic Chart & Visitor Log ── */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        <div className="rounded-2xl border border-[#E6DFD3] bg-white p-5 lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="font-bold text-zinc-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-              <BarChart2 className="w-4 h-4 text-zinc-500" />
-              Trafik Pembaca harian (7 Hari Terakhir)
-            </h4>
-            <span className="text-[10px] bg-zinc-50 text-zinc-500 font-bold px-2 py-0.5 rounded-full">
-              Live Real-Time
+            <h3 className="flex items-center gap-2 text-[13px] font-bold text-[#1C1614]">
+              <BarChart3 className="h-4 w-4 text-[#8E2F45]" />
+              Trafik Kunjungan (7 Hari Terakhir)
+            </h3>
+            <span className="rounded-full bg-[#EEF6F0] px-2.5 py-0.5 text-[10.5px] font-bold text-[#2D7A4F]">
+              Real-Time
             </span>
           </div>
 
-          {/* SVG RENDERING */}
-          <div className="w-full h-36">
-            <svg 
-              viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
-              className="w-full h-full overflow-visible"
+          <div className="h-36 w-full">
+            <svg
+              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+              className="h-full w-full overflow-visible"
               preserveAspectRatio="none"
             >
-              {/* Grid Lines */}
-              <line x1="0" y1="0" x2={chartWidth} y2="0" stroke="#F1F5F9" strokeWidth="1" />
-              <line x1="0" y1={chartHeight / 2} x2={chartWidth} y2={chartHeight / 2} stroke="#F1F5F9" strokeWidth="1" />
-              <line x1="0" y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="#E2E8F0" strokeWidth="1" />
+              <line x1="0" y1="0" x2={chartWidth} y2="0" stroke="#F0E9DE" strokeWidth="1" />
+              <line
+                x1="0"
+                y1={chartHeight / 2}
+                x2={chartWidth}
+                y2={chartHeight / 2}
+                stroke="#F0E9DE"
+                strokeWidth="1"
+              />
+              <line
+                x1="0"
+                y1={chartHeight}
+                x2={chartWidth}
+                y2={chartHeight}
+                stroke="#E6DFD3"
+                strokeWidth="1"
+              />
 
-              {/* Draw Line Path and Shading */}
               {(() => {
-                if (!analytics.dailyTraffic || analytics.dailyTraffic.length === 0) return null;
+                if (!analytics?.dailyTraffic || analytics.dailyTraffic.length === 0) return null;
                 const trafficLength = Math.max(analytics.dailyTraffic.length - 1, 1);
                 const stepX = chartWidth / trafficLength;
-                
+
                 const points = analytics.dailyTraffic.map((d, index) => {
                   const x = index * stepX;
-                  // Map max value to layout bounds
-                  const y = chartHeight - (d.views / maxTrafficViews) * (chartHeight - 15);
+                  const y = chartHeight - (d.views / maxTrafficViews) * (chartHeight - 16);
                   return { x, y };
                 });
 
-                const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+                const linePath = points
+                  .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
+                  .join(' ');
                 const areaPath = `${linePath} L ${points[points.length - 1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
 
                 return (
                   <>
-                    {/* Area fill */}
-                    <path d={areaPath} fill="url(#primary-gradient)" opacity="0.15" />
-                    {/* Linestroke */}
-                    <path d={linePath} fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" />
-                    
-                    {/* Point Nodes */}
+                    <path d={areaPath} fill="url(#rh-chart-grad)" opacity="0.18" />
+                    <path
+                      d={linePath}
+                      fill="none"
+                      stroke="#8E2F45"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
                     {points.map((p, i) => (
-                      <g key={i} className="group/node">
-                        <circle 
-                          cx={p.x} 
-                          cy={p.y} 
-                          r="4" 
-                          fill="#4F46E5" 
-                          stroke="#FFFFFF" 
-                          strokeWidth="2.5" 
-                          className="hover:r-5 transition-all cursor-pointer"
-                        />
-                        <rect 
-                          x={p.x - 20} 
-                          y={p.y - 18} 
-                          width="40" 
-                          height="14" 
-                          rx="4" 
-                          fill="#1E293B" 
-                          className="opacity-0 group-hover/node:opacity-100 transition-opacity"
-                        />
-                        <text 
-                          x={p.x} 
-                          y={p.y - 8} 
-                          fill="#FFFFFF" 
-                          fontSize="8" 
-                          fontWeight="bold"
-                          textAnchor="middle"
-                          className="opacity-0 pointer-events-none group-hover/node:opacity-100 shadow-sm"
-                        >
-                          {analytics.dailyTraffic[i].views}x
-                        </text>
-                      </g>
+                      <circle
+                        key={i}
+                        cx={p.x}
+                        cy={p.y}
+                        r="3.5"
+                        fill="#8E2F45"
+                        stroke="#FFFFFF"
+                        strokeWidth="2"
+                      />
                     ))}
                   </>
                 );
               })()}
 
               <defs>
-                <linearGradient id="primary-gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4F46E5" />
-                  <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
+                <linearGradient id="rh-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8E2F45" />
+                  <stop offset="100%" stopColor="#8E2F45" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>
           </div>
 
-          {/* X Axis Labels */}
-          <div className="flex justify-between px-1 text-[9px] font-mono font-bold text-zinc-500">
-            {analytics.dailyTraffic.map((d, index) => (
+          <div className="flex justify-between px-1 font-mono text-[10px] font-semibold text-[#8B7D74]">
+            {(analytics?.dailyTraffic || []).map((d, index) => (
               <span key={index}>{d.date}</span>
             ))}
           </div>
         </div>
 
-        {/* LIVE VISITOR DEVICE LOG */}
-        <div className="p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-xl hover:border-zinc-300 transition-all duration-200 space-y-4">
-          <h4 className="font-bold text-zinc-800 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-200 pb-2.5">
-            <Clock className="w-4 h-4 text-zinc-500" />
-            Aktivitas Pengunjung Terbaru
-          </h4>
+        {/* Visitor Logs */}
+        <div className="rounded-2xl border border-[#E6DFD3] bg-white p-5 lg:col-span-4 space-y-4">
+          <h3 className="flex items-center gap-2 border-b border-[#F0E9DE] pb-3 text-[13px] font-bold text-[#1C1614]">
+            <Clock className="h-4 w-4 text-[#8E2F45]" />
+            Aktivitas Pengunjung
+          </h3>
 
-          <div className="space-y-3 max-h-[145px] overflow-y-auto pr-1">
-            {analytics.visitorLogs.map((log) => {
-              const isMobile = log.device.toLowerCase() === 'mobile';
-              return (
-                <div key={log.id} className="flex items-start justify-between text-[11px] hover:bg-zinc-50 p-1.5 rounded-lg transition">
-                  <div className="flex items-start gap-2">
-                    <span className="p-1 rounded bg-zinc-50 text-zinc-500 mt-0.5">
-                      {isMobile ? <Smartphone className="w-3.5 h-3.5" /> : <Laptop className="w-3.5 h-3.5" />}
-                    </span>
-                    <div>
-                      <span className="font-bold text-zinc-800 block">
-                        {log.guestName || 'Anonym / Penasaran'}
+          {!analytics?.visitorLogs || analytics.visitorLogs.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-[#DFD6C7] bg-[#FAF7F2] p-5 text-center text-[12px] text-[#6B5D54]">
+              Belum ada aktivitas kunjungan tercatat.
+            </div>
+          ) : (
+            <div className="max-h-[168px] space-y-2.5 overflow-y-auto pr-1">
+              {analytics.visitorLogs.map((log) => {
+                const isMobile = log.device.toLowerCase() === 'mobile';
+                return (
+                  <div
+                    key={log.id}
+                    className="flex items-start justify-between gap-2 rounded-xl border border-[#F2ECE2] bg-[#FCFBF8] p-2.5 text-[12px]"
+                  >
+                    <div className="flex items-start gap-2 min-w-0">
+                      <span className="mt-0.5 text-[#8B7D74]">
+                        {isMobile ? (
+                          <Smartphone className="h-3.5 w-3.5" />
+                        ) : (
+                          <Laptop className="h-3.5 w-3.5" />
+                        )}
                       </span>
-                      <span className="text-[10px] text-zinc-500">
-                        {log.browser} • {log.device}
-                      </span>
+                      <div className="min-w-0">
+                        <span className="block truncate font-semibold text-[#1C1614]">
+                          {log.guestName || 'Tamu Umum'}
+                        </span>
+                        <span className="text-[10.5px] text-[#8B7D74]">
+                          {log.browser} · {log.device}
+                        </span>
+                      </div>
                     </div>
+                    <span className="shrink-0 font-mono text-[10px] text-[#8B7D74]">
+                      {log.timestamp}
+                    </span>
                   </div>
-                  <span className="text-[9px] font-mono text-zinc-500 mt-0.5">{log.timestamp}</span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* FEEDBACK WISHES / DIALOGUE BOX AUTOMATION */}
-      <div className="p-6 bg-white border border-zinc-200 rounded-xl hover:shadow-xl hover:border-zinc-300 transition-all duration-200 space-y-4">
-        <h4 className="font-bold text-zinc-800 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-200 pb-2.5">
-          <MessageSquare className="w-4 h-4 text-zinc-500" />
-          Manajemen RSVP & Buku Ucapan Tamu ({rsvps.length})
-        </h4>
+      {/* ── RSVP & Wishes Table ── */}
+      <div className="rounded-2xl border border-[#E6DFD3] bg-white p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#F0E9DE] pb-3">
+          <h3 className="flex items-center gap-2 text-[13.5px] font-bold text-[#1C1614]">
+            <MessageSquare className="h-4 w-4 text-[#8E2F45]" />
+            Konfirmasi RSVP &amp; Buku Ucapan ({rsvps.length})
+          </h3>
+        </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sans border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="bg-zinc-50 text-[10px] uppercase font-bold text-zinc-500 border-b border-zinc-200">
-                <th className="px-4 py-2">Nama Pengirim</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2 text-center">Porsi</th>
-                <th className="px-4 py-2">Ucapan & Doa Hangat</th>
-                <th className="px-4 py-2 text-right">Tindakan</th>
+              <tr className="border-b border-[#EAE3D8] bg-[#FAF7F2] text-[11px] font-bold uppercase tracking-wider text-[#6B5D54]">
+                <th className="px-4 py-2.5">Nama Tamu</th>
+                <th className="px-4 py-2.5">Status</th>
+                <th className="px-4 py-2.5 text-center">Pax</th>
+                <th className="px-4 py-2.5">Ucapan &amp; Doa</th>
+                <th className="px-4 py-2.5 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#F0E9DE] text-[13px]">
               {rsvps.length > 0 ? (
                 rsvps.map((entry) => (
-                  <tr key={entry.id} className="text-xs hover:bg-zinc-50 transition">
-                    <td className="px-4 py-3 font-bold text-zinc-800 whitespace-nowrap">
+                  <tr key={entry.id} className="transition hover:bg-[#FAF7F2]/70">
+                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-[#1C1614]">
                       {entry.guestName}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        entry.status === 'Hadir'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : entry.status === 'Ragu-ragu'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-rose-100 text-rose-800'
-                      }`}>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                          entry.status === 'Hadir'
+                            ? 'bg-[#EEF6F0] text-[#2D7A4F]'
+                            : entry.status === 'Ragu-ragu'
+                            ? 'bg-[#FBF4E6] text-[#9A6B1E]'
+                            : 'bg-[#FBECEA] text-[#9B2C2C]'
+                        }`}
+                      >
                         {entry.status === 'Hadir' ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3" /> Hadir
-                          </>
+                          <CheckCircle2 className="h-3 w-3" />
                         ) : entry.status === 'Ragu-ragu' ? (
-                          <>
-                            <HelpCircle className="w-3 h-3" /> Ragu-ragu
-                          </>
+                          <HelpCircle className="h-3 w-3" />
                         ) : (
-                          <>
-                            <XCircle className="w-3 h-3" /> Absen
-                          </>
+                          <XCircle className="h-3 w-3" />
                         )}
+                        {entry.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center font-bold text-zinc-800">
-                      {entry.paxCount} Pax
+                    <td className="px-4 py-3 text-center font-semibold text-[#1C1614] tabular-nums">
+                      {entry.paxCount}
                     </td>
-                    <td className="px-4 py-3 text-zinc-500 max-w-sm whitespace-pre-wrap leading-relaxed truncate hover:text-clip hover:whitespace-normal">
-                      "{entry.wishes}"
+                    <td className="max-w-md px-4 py-3 text-[#5C4E45] leading-relaxed">
+                      {entry.wishes || '—'}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         type="button"
                         onClick={() => onDeleteRSVP(entry.id)}
-                        className="p-1 px-2 rounded-lg border border-slate-150 hover:border-rose-250 text-zinc-500 hover:text-primary bg-white hover:bg-rose-50/50 transition duration-300"
-                        title="Hapus RSVP"
+                        className="inline-flex items-center justify-center rounded-lg border border-[#EAE3D8] p-1.5 text-[#8B7D74] transition hover:border-[#B03A3A]/30 hover:bg-[#FBECEA] hover:text-[#9B2C2C] cursor-pointer"
+                        title="Hapus ucapan"
+                        aria-label="Hapus ucapan"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-zinc-500 text-xs">
-                    Belum ada konfirmasi RSVP masuk. Bagikan tautan undangan kustom atau gunakan simulator di atas untuk mengetes.
+                  <td colSpan={5} className="px-4 py-10 text-center text-[13px] text-[#8B7D74]">
+                    Belum ada konfirmasi RSVP masuk. Bagikan tautan undangan Anda untuk mulai menerima ucapan.
                   </td>
                 </tr>
               )}

@@ -5,9 +5,9 @@ import { useAuth } from '../hooks/useAuth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import {
-  PiCheckCircleDuotone as CheckCircle,
-  PiCaretRightDuotone as ChevronRight,
-} from 'react-icons/pi';
+  CheckCircle2 as CheckCircle,
+  ChevronRight,
+} from 'lucide-react';
 import { SaaSUser, UserPackageId } from '../types';
 import { useToast } from '../hooks/useToast';
 import { ErrorBoundary } from './ErrorBoundary';

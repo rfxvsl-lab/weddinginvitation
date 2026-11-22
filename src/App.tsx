@@ -81,6 +81,22 @@ export default function App() {
     setTimeout(calcPreviewScale, 150);
   }, [calcPreviewScale]);
 
+  // Lock pinch-to-zoom & browser trackpad zoom inside dashboard workspace
+  useEffect(() => {
+    const preventGesture = (e: Event) => e.preventDefault();
+    const preventCtrlWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) e.preventDefault();
+    };
+    document.addEventListener('gesturestart', preventGesture, { passive: false });
+    document.addEventListener('gesturechange', preventGesture, { passive: false });
+    window.addEventListener('wheel', preventCtrlWheel, { passive: false });
+    return () => {
+      document.removeEventListener('gesturestart', preventGesture);
+      document.removeEventListener('gesturechange', preventGesture);
+      window.removeEventListener('wheel', preventCtrlWheel);
+    };
+  }, []);
+
   // Auto-load user data whenever auth.currentUser becomes available
   useEffect(() => {
     if (auth.currentUser && !wedding.invitation && !wedding.isLoading) {
@@ -136,7 +152,7 @@ export default function App() {
   };
 
   return (
-    <div className="saas-scope flex h-screen w-full overflow-hidden bg-[#F8F6F2] text-[#1C1614] font-sans">
+    <div className="saas-scope dashboard-shell-lock flex h-screen w-full overflow-hidden bg-[#F8F6F2] text-[#1C1614] font-sans">
       {/* Loading Overlay */}
       {wedding.isLoading && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#FAF6F0]/90 backdrop-blur-sm">

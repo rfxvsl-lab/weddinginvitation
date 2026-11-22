@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { DEFAULT_THEMES } from "@/data/defaultData";
+import { ENTERPRISE_CONTACT_EMAIL } from "@/lib/packageLimits";
 
 const PLATFORM_HIGHLIGHTS = [
   { value: "Rp 0", label: "Gratis untuk mulai" },
@@ -225,21 +226,22 @@ export function SaasFooter() {
             [
               ["Katalog Tema", "/preview"],
               ["Fitur Lengkap", "/#fitur"],
-              ["Akses Gratis", "/#harga"],
+              ["Akses Gratis & Enterprise", "/#harga"],
             ],
           ],
           [
-            "Perusahaan",
+            "Enterprise",
             [
-              ["Tentang", "/about"],
-              ["Kontak", "/contact"],
+              ["Portal Login Enterprise", "/auth?mode=enterprise"],
+              ["Hubungi Admin", `mailto:${ENTERPRISE_CONTACT_EMAIL}`],
             ],
           ],
           [
             "Bantuan",
             [
+              ["Alur Pembuatan", "/#cara-kerja"],
               ["FAQ", "/#faq"],
-              ["Kebijakan Pengembalian", "/refund-policy"],
+              ["Kebijakan Layanan", "/terms-of-service"],
             ],
           ],
         ].map(([title, items]) => (
@@ -253,13 +255,23 @@ export function SaasFooter() {
             <ul className="mt-4 space-y-2.5 text-[13.5px] font-medium">
               {(items as [string, string][]).map(([l, h]) => (
                 <li key={l}>
-                  <Link
-                    href={h}
-                    className="transition-colors hover:font-bold"
-                    style={{ color: "var(--saas-ink-2)" }}
-                  >
-                    {l}
-                  </Link>
+                  {h.startsWith("mailto:") ? (
+                    <a
+                      href={h}
+                      className="transition-colors hover:font-bold"
+                      style={{ color: "var(--saas-ink-2)" }}
+                    >
+                      {l}
+                    </a>
+                  ) : (
+                    <Link
+                      href={h}
+                      className="transition-colors hover:font-bold"
+                      style={{ color: "var(--saas-ink-2)" }}
+                    >
+                      {l}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

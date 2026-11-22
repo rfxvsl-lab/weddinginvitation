@@ -9,20 +9,21 @@
 
 import React, { useMemo, useState } from 'react';
 import {
-  PiUserDuotone as User,
-  PiEnvelopeDuotone as Mail,
-  PiPhoneDuotone as Phone,
-  PiGlobeHemisphereWestDuotone as Globe,
-  PiWarningCircleDuotone as AlertCircle,
-  PiCaretRightDuotone as ChevronRight,
-  PiCaretLeftDuotone as ChevronLeft,
-  PiLockKeyDuotone as Lock,
-  PiEyeDuotone as Eye,
-  PiEyeSlashDuotone as EyeSlash,
-  PiCheckCircleDuotone as CheckCircle,
-  PiShieldCheckDuotone as ShieldCheck,
-} from 'react-icons/pi';
-import { Building2, Check } from 'lucide-react';
+  User,
+  Mail,
+  Phone,
+  Globe,
+  AlertCircle,
+  ChevronRight,
+  ChevronLeft,
+  Lock,
+  Eye,
+  EyeOff as EyeSlash,
+  CheckCircle2 as CheckCircle,
+  ShieldCheck,
+  Building2,
+  Check,
+} from 'lucide-react';
 import { ENTERPRISE_CONTACT_EMAIL } from '../../lib/packageLimits';
 import type { UserPackageId } from '../../types';
 
