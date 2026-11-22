@@ -169,9 +169,9 @@ export default function VideoInvitationStudio({
     const dateRaw = wedding?.events?.akad?.date || wedding?.events?.resepsi?.date || 'Sabtu, 24 Oktober 2026';
     const timeRaw = wedding?.events?.resepsi?.timeStart || wedding?.events?.akad?.timeStart || '10:00 WIB';
     const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'The Glasshouse Pavilion, Jakarta';
-    const slug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
+    const displaySlug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
     const initials = `${groom.charAt(0).toUpperCase()} & ${bride.charAt(0).toUpperCase()}`;
-    return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug, initials };
+    return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials };
   }, [wedding, slug]);
 
   const drawFrame = useCallback(
