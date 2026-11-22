@@ -154,20 +154,20 @@ export function SaasPricing() {
         {/* Card 2: ENTERPRISE */}
         <div
           className="saas-card saas-dark-panel flex flex-col justify-between p-7 sm:p-9"
-          style={{ borderColor: "rgba(198,161,91,0.42)" }}
+          style={{ borderColor: "rgba(255,255,255,0.16)" }}
         >
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span
                 className="saas-badge"
                 style={{
-                  background: "var(--saas-gold)",
-                  color: "#221406",
+                  background: "#5856D6",
+                  color: "#FFFFFF",
                 }}
               >
                 <Building2 size={12} /> Enterprise
               </span>
-              <span className="text-[12px] font-semibold text-[#DEC9BC]">
+              <span className="text-[12px] font-semibold text-[#A1A1A6]">
                 WO · Event Agency · Korporat
               </span>
             </div>
@@ -176,12 +176,12 @@ export function SaasPricing() {
               <span className="font-serif text-[46px] leading-none font-semibold text-white">
                 Custom
               </span>
-              <span className="ml-1 text-[13.5px] font-medium text-[#DEC9BC]">
+              <span className="ml-1 text-[13.5px] font-medium text-[#A1A1A6]">
                 / sesuai skala &amp; kebutuhan tim
               </span>
             </div>
 
-            <p className="mt-3 text-[14px] leading-relaxed text-[#EAD9CE]">
+            <p className="mt-3 text-[14px] leading-relaxed text-[#D1D1D6]">
               Dirancang untuk organisasi yang mengelola banyak klien atau acara
               resmi. Akses masuk diamankan dengan{" "}
               <strong className="text-white">email perusahaan</strong> dan{" "}
@@ -192,13 +192,13 @@ export function SaasPricing() {
               {ENTERPRISE_FEATURES.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-2.5 text-[13.5px] font-medium text-[#F5EBE3]"
+                  className="flex items-start gap-2.5 text-[13.5px] font-medium text-[#F5F5F7]"
                 >
                   <span
                     className="saas-check mt-0.5"
                     style={{
                       background: "rgba(255,255,255,0.14)",
-                      color: "var(--saas-gold-2)",
+                      color: "#64D2FF",
                     }}
                   >
                     <Check size={12} strokeWidth={3} />
@@ -214,18 +214,15 @@ export function SaasPricing() {
               <a
                 href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Permintaan%20Akses%20RuangHadir%20Enterprise`}
                 className="saas-btn-primary flex-1 !border-transparent !py-3.5"
-                style={{
-                  background: "#FFF6F1",
-                  color: "var(--saas-wine)",
-                }}
+                
               >
                 <Mail size={15} /> Hubungi {ENTERPRISE_CONTACT_EMAIL}
               </a>
               <button
                 type="button"
                 onClick={handleCopyEmail}
-                className="saas-btn-outline !bg-transparent !text-[#F6EFE7] !px-4 !py-3.5"
-                style={{ borderColor: "rgba(246,239,231,0.32)" }}
+                className="saas-btn-outline !bg-transparent !text-white !px-4 !py-3.5"
+                style={{ borderColor: "rgba(255,255,255,0.22)" }}
                 title="Salin email admin Enterprise"
               >
                 {copied ? <Check size={15} /> : <Copy size={15} />}
@@ -233,14 +230,14 @@ export function SaasPricing() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[12px] text-[#DEC9BC]">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[12px] text-[#A1A1A6]">
               <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck size={14} style={{ color: "var(--saas-gold-2)" }} />
+                <ShieldCheck size={14} style={{ color: "#64D2FF" }} />
                 Sudah punya kode akses perusahaan?
               </span>
               <Link
                 href="/auth?mode=enterprise"
-                className="inline-flex items-center gap-1 font-bold text-[#F3D9A4] underline-offset-4 hover:underline"
+                className="inline-flex items-center gap-1 font-bold text-[#64D2FF] underline-offset-4 hover:underline"
               >
                 <KeyRound size={13} /> Masuk Portal Enterprise
               </Link>

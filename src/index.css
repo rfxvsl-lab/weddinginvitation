@@ -1830,3 +1830,13 @@ body {
 .dashboard-shell-lock ::-webkit-scrollbar-thumb:hover {
   background: rgba(15, 23, 42, 0.28);
 }
+
+/* Ensure headings inside dark glass panels stay crisp white */
+.saas-scope .saas-dark-panel h1,
+.saas-scope .saas-dark-panel h2,
+.saas-scope .saas-dark-panel h3,
+.saas-scope .saas-navy-panel h1,
+.saas-scope .saas-navy-panel h2,
+.saas-scope .saas-navy-panel h3 {
+  color: #FFFFFF;
+}

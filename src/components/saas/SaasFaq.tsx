@@ -11,7 +11,7 @@ const FAQS = [
   },
   {
     q: "Apa bedanya akun Gratis dengan Enterprise?",
-    a: "Akun Gratis ditujukan untuk pasangan dan acara pribadi (hingga 3 proyek undangan). Paket Enterprise dirancang untuk Wedding Organizer, agensi event, dan korporat dengan proyek tanpa batas, multi-seat tim, custom domain, white-label, dan dukungan prioritas.",
+    a: "Akun Gratis ditujukan untuk pasangan dan acara pribadi (hingga 3 proyek undangan). Paket Enterprise dirancang untuk Wedding Organizer, agensi event, dan korporat dengan proyek tanpa batas, Make Your Invitation Video (HD 9:16/16:9), multi-seat tim, custom domain, dan dukungan prioritas.",
   },
   {
     q: "Bagaimana cara mendaftar dan masuk ke akun Enterprise?",
@@ -34,16 +34,13 @@ const FAQS = [
 export function SaasFaq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="saas-shell pt-24">
+    <section id="faq" className="saas-shell pt-20">
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div>
           <p className="saas-kicker">Pusat bantuan</p>
           <h2 className="mt-3.5 text-[32px] leading-[1.08] sm:text-[42px]">
             Pertanyaan yang{" "}
-            <span className="saas-serif-i" style={{ color: "var(--saas-wine)" }}>
-              sering ditanyakan
-            </span>
-            .
+            <span className="saas-serif-i">sering ditanyakan</span>.
           </h2>
           <div className="saas-card saas-divide mt-8">
             {FAQS.map((f, i) => (
@@ -54,12 +51,14 @@ export function SaasFaq() {
                   aria-expanded={open === i}
                   className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left"
                 >
-                  <span className="text-[15px] font-bold">{f.q}</span>
+                  <span className="text-[15px] font-semibold text-[#1D1D1F]">
+                    {f.q}
+                  </span>
                   <span
                     className="saas-check shrink-0 transition-all duration-300"
                     style={
                       open === i
-                        ? { background: "var(--saas-wine)", color: "#fff" }
+                        ? { background: "#007AFF", color: "#FFFFFF" }
                         : undefined
                     }
                   >
@@ -79,10 +78,7 @@ export function SaasFaq() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p
-                      className="px-6 pb-5 text-[14px] leading-relaxed"
-                      style={{ color: "var(--saas-ink-2)" }}
-                    >
+                    <p className="px-6 pb-5 text-[14px] leading-relaxed text-[#48484A]">
                       {f.a}
                     </p>
                   </div>
@@ -92,37 +88,29 @@ export function SaasFaq() {
           </div>
         </div>
 
-        <aside className="saas-card saas-dark-panel h-fit p-7 lg:sticky lg:top-24">
-          <span
-            className="saas-check"
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              color: "var(--saas-gold-2)",
-              width: 44,
-              height: 44,
-            }}
-          >
+        {/* Light iOS Liquid Glass Enterprise Card — cohesive with FAQ & avoids double dark box */}
+        <aside className="glx-strong h-fit rounded-[28px] p-7 lg:sticky lg:top-24">
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#007AFF]/12 text-[#007AFF] border border-[#007AFF]/15">
             <ShieldCheck size={20} />
           </span>
-          <h3 className="mt-4 text-[19px] font-extrabold">
+          <h3 className="mt-4 text-[19px] font-bold text-[#1D1D1F]">
             Butuh Paket Enterprise?
           </h3>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-[#EFE0D6]">
+          <p className="mt-2 text-[13.5px] leading-relaxed text-[#48484A]">
             Kirimkan kebutuhan organisasi, Wedding Organizer, atau acara
             korporat Anda langsung ke tim kami via email resmi.
           </p>
           <a
             href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Konsultasi%20RuangHadir%20Enterprise`}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-[13px] font-extrabold transition-transform hover:scale-[1.01]"
-            style={{ background: "var(--saas-gold)", color: "#241505" }}
+            className="saas-btn-primary mt-6 w-full !py-3 !text-[13px]"
           >
             <Mail size={15} /> {ENTERPRISE_CONTACT_EMAIL}
           </a>
           <Link
             href="/auth?mode=enterprise"
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/25 py-2.5 text-[12.5px] font-bold text-[#F5EBE3] transition-colors hover:bg-white/10"
+            className="saas-btn-outline mt-3 w-full !py-2.5 !text-[12.5px]"
           >
-            <KeyRound size={14} /> Portal Login Enterprise
+            <KeyRound size={14} className="text-[#007AFF]" /> Portal Login Enterprise
           </Link>
         </aside>
       </div>
