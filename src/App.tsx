@@ -355,7 +355,8 @@ export default function App() {
 
           {activeSegment === 'video' && (
             <VideoInvitationStudio
-              wedding={wedding}
+              wedding={wedding.data}
+              slug={wedding.slug}
               user={user}
               onOpenEnterprise={() => setActiveSegment('upgrade')}
             />

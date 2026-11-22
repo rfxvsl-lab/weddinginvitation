@@ -24,6 +24,7 @@ import { WeddingData, SaaSUser } from '@/types';
 
 interface VideoInvitationStudioProps {
   wedding: WeddingData;
+  slug?: string | null;
   user: SaaSUser | null;
   onOpenEnterprise?: () => void;
 }
@@ -136,6 +137,7 @@ function drawRoundedRect(
 
 export default function VideoInvitationStudio({
   wedding,
+  slug,
   user,
   onOpenEnterprise,
 }: VideoInvitationStudioProps) {
@@ -160,17 +162,17 @@ export default function VideoInvitationStudio({
   );
 
   const coupleData = useMemo(() => {
-    const groom = wedding?.groom?.nickname || wedding?.groom?.fullName || 'Rian';
-    const bride = wedding?.bride?.nickname || wedding?.bride?.fullName || 'Salsa';
-    const groomFull = wedding?.groom?.fullName || 'Rian Pratama, S.T.';
-    const brideFull = wedding?.bride?.fullName || 'Salsa Putri, S.Ars.';
+    const groom = wedding?.couple?.groom?.nickname || wedding?.couple?.groom?.fullName || 'Rian';
+    const bride = wedding?.couple?.bride?.nickname || wedding?.couple?.bride?.fullName || 'Salsa';
+    const groomFull = wedding?.couple?.groom?.fullName || 'Rian Pratama, S.T.';
+    const brideFull = wedding?.couple?.bride?.fullName || 'Salsa Putri, S.Ars.';
     const dateRaw = wedding?.events?.akad?.date || wedding?.events?.resepsi?.date || 'Sabtu, 24 Oktober 2026';
     const timeRaw = wedding?.events?.resepsi?.timeStart || wedding?.events?.akad?.timeStart || '10:00 WIB';
     const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'The Glasshouse Pavilion, Jakarta';
-    const slug = wedding?.slug ? `ruanghadir.net/${wedding.slug}` : 'ruanghadir.net/undangan-anda';
+    const slug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
     const initials = `${groom.charAt(0).toUpperCase()} & ${bride.charAt(0).toUpperCase()}`;
     return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug, initials };
-  }, [wedding]);
+  }, [wedding, slug]);
 
   const drawFrame = useCallback(
     (ctx: CanvasRenderingContext2D, f: number, w: number, h: number) => {
