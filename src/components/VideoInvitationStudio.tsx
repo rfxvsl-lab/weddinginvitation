@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Play,
   Pause,
@@ -21,6 +21,16 @@ import {
 } from 'lucide-react';
 import { isEnterpriseTier } from '@/lib/packageLimits';
 import { WeddingData, SaaSUser } from '@/types';
+import {
+  VIDEO_THEMES,
+  VIDEO_SCENES,
+  VIDEO_FPS,
+  VIDEO_TOTAL_FRAMES,
+  VideoThemeId,
+  VideoAspectId,
+  renderInvitationVideoFrame,
+  formatTimecode,
+} from '@/lib/invitationVideoEngine';
 
 interface VideoInvitationStudioProps {
   wedding: WeddingData;
@@ -29,111 +39,18 @@ interface VideoInvitationStudioProps {
   onOpenEnterprise?: () => void;
 }
 
-type AspectId = '9:16' | '1:1' | '16:9';
-type MotionThemeId = 'liquid-glass' | 'ivory-film' | 'midnight-noir' | 'botanical-air';
-
-interface MotionPreset {
-  id: MotionThemeId;
-  name: string;
-  tagline: string;
-  bgStops: [string, string, string];
-  cardBg: string;
-  cardBorder: string;
-  ink: string;
-  subInk: string;
-  accent: string;
-  isDark: boolean;
-}
-
-const MOTION_PRESETS: MotionPreset[] = [
-  {
-    id: 'liquid-glass',
-    name: 'Liquid Glass',
-    tagline: 'iOS 26 translucent frost & luminous sky',
-    bgStops: ['#DCEEFF', '#ECE7FF', '#FBE9F4'],
-    cardBg: 'rgba(255, 255, 255, 0.56)',
-    cardBorder: 'rgba(255, 255, 255, 0.85)',
-    ink: '#1D1D1F',
-    subInk: '#48484A',
-    accent: '#007AFF',
-    isDark: false,
-  },
-  {
-    id: 'midnight-noir',
-    name: 'Midnight Titanium',
-    tagline: 'Dark cinema glass & titanium gold',
-    bgStops: ['#0B0D14', '#161B2E', '#0F1320'],
-    cardBg: 'rgba(255, 255, 255, 0.08)',
-    cardBorder: 'rgba(255, 255, 255, 0.22)',
-    ink: '#F5F5F7',
-    subInk: '#A1A1A6',
-    accent: '#64D2FF',
-    isDark: true,
-  },
-  {
-    id: 'ivory-film',
-    name: 'Editorial Pearl',
-    tagline: 'Warm gallery grain & timeless serif',
-    bgStops: ['#F7F4EE', '#EFE8DC', '#F9F6F0'],
-    cardBg: 'rgba(255, 255, 255, 0.72)',
-    cardBorder: 'rgba(255, 255, 255, 0.92)',
-    ink: '#1D1D1F',
-    subInk: '#5E5852',
-    accent: '#007AFF',
-    isDark: false,
-  },
-  {
-    id: 'botanical-air',
-    name: 'Botanical Mist',
-    tagline: 'Airy sage glass & morning light',
-    bgStops: ['#E4F3EC', '#EDF6F7', '#F2F5FA'],
-    cardBg: 'rgba(255, 255, 255, 0.62)',
-    cardBorder: 'rgba(255, 255, 255, 0.88)',
-    ink: '#16241E',
-    subInk: '#486056',
-    accent: '#248A3D',
-    isDark: false,
-  },
-];
-
-const ASPECTS: { id: AspectId; label: string; desc: string; w: number; h: number; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: '9:16', label: '9:16 Reels', desc: '1080×1920 · TikTok & WA Status', w: 540, h: 960, icon: Smartphone },
+const ASPECTS: {
+  id: VideoAspectId;
+  label: string;
+  desc: string;
+  w: number;
+  h: number;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { id: '9:16', label: '9:16 Reels', desc: '1080×1920 · TikTok, Reels & WA Status', w: 540, h: 960, icon: Smartphone },
   { id: '1:1', label: '1:1 Feed', desc: '1080×1080 · Instagram Feed', w: 720, h: 720, icon: Square },
-  { id: '16:9', label: '16:9 Layar', desc: '1920×1080 · Venue & YouTube', w: 960, h: 540, icon: Monitor },
+  { id: '16:9', label: '16:9 Layar', desc: '1920×1080 · Layar Venue & YouTube', w: 960, h: 540, icon: Monitor },
 ];
-
-const FPS = 30;
-const DURATION_SECONDS = 12;
-const TOTAL_FRAMES = FPS * DURATION_SECONDS; // 360 frames
-
-const SCENES = [
-  { id: 0, label: '01 · Pembuka', start: 0, end: 90 },
-  { id: 1, label: '02 · Mempelai', start: 90, end: 180 },
-  { id: 2, label: '03 · Jadwal', start: 180, end: 270 },
-  { id: 3, label: '04 · Save The Date', start: 270, end: 360 },
-];
-
-function easeOutCubic(t: number) {
-  const c = Math.max(0, Math.min(1, t));
-  return 1 - Math.pow(1 - c, 3);
-}
-
-function drawRoundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number
-) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
 
 export default function VideoInvitationStudio({
   wedding,
@@ -142,8 +59,8 @@ export default function VideoInvitationStudio({
   onOpenEnterprise,
 }: VideoInvitationStudioProps) {
   const isEnt = isEnterpriseTier(user?.packageId);
-  const [presetId, setPresetId] = useState<MotionThemeId>('liquid-glass');
-  const [aspectId, setAspectId] = useState<AspectId>('9:16');
+  const [themeId, setThemeId] = useState<VideoThemeId>('javanese-classic');
+  const [aspectId, setAspectId] = useState<VideoAspectId>('9:16');
   const [frame, setFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isRendering, setIsRendering] = useState(false);
@@ -152,9 +69,9 @@ export default function VideoInvitationStudio({
   const [copiedSpec, setCopiedSpec] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const preset = useMemo(
-    () => MOTION_PRESETS.find((p) => p.id === presetId) || MOTION_PRESETS[0],
-    [presetId]
+  const activeTheme = useMemo(
+    () => VIDEO_THEMES.find((p) => p.id === themeId) || VIDEO_THEMES[0],
+    [themeId]
   );
   const aspect = useMemo(
     () => ASPECTS.find((a) => a.id === aspectId) || ASPECTS[0],
@@ -164,216 +81,27 @@ export default function VideoInvitationStudio({
   const coupleData = useMemo(() => {
     const groom = wedding?.couple?.groom?.nickname || wedding?.couple?.groom?.fullName || 'Rian';
     const bride = wedding?.couple?.bride?.nickname || wedding?.couple?.bride?.fullName || 'Salsa';
-    const groomFull = wedding?.couple?.groom?.fullName || 'Rian Pratama, S.T.';
-    const brideFull = wedding?.couple?.bride?.fullName || 'Salsa Putri, S.Ars.';
+    const groomFull = wedding?.couple?.groom?.fullName || 'Rian Mahendra, M.B.A.';
+    const brideFull = wedding?.couple?.bride?.fullName || 'Salsa Kirana, S.E.';
     const dateRaw = wedding?.events?.akad?.date || wedding?.events?.resepsi?.date || 'Sabtu, 24 Oktober 2026';
     const timeRaw = wedding?.events?.resepsi?.timeStart || wedding?.events?.akad?.timeStart || '10:00 WIB';
-    const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'The Glasshouse Pavilion, Jakarta';
+    const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'Grand Ballroom Hotel Mulia, Jakarta';
     const displaySlug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
     const initials = `${groom.charAt(0).toUpperCase()} & ${bride.charAt(0).toUpperCase()}`;
     return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials };
   }, [wedding, slug]);
 
-  const drawFrame = useCallback(
-    (ctx: CanvasRenderingContext2D, f: number, w: number, h: number) => {
-      const t = f / TOTAL_FRAMES;
-      ctx.clearRect(0, 0, w, h);
-
-      // 1. Animated luminous mesh backdrop
-      const grad = ctx.createLinearGradient(
-        w * (0.1 + 0.25 * Math.sin(t * Math.PI * 2)),
-        0,
-        w * (0.9 - 0.2 * Math.cos(t * Math.PI * 2)),
-        h
-      );
-      grad.addColorStop(0, preset.bgStops[0]);
-      grad.addColorStop(0.5, preset.bgStops[1]);
-      grad.addColorStop(1, preset.bgStops[2]);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      // Floating soft orbs for glass depth
-      const orb1X = w * (0.25 + 0.18 * Math.sin(t * Math.PI * 2));
-      const orb1Y = h * (0.22 + 0.1 * Math.cos(t * Math.PI * 2));
-      const rad1 = ctx.createRadialGradient(orb1X, orb1Y, 10, orb1X, orb1Y, Math.max(w, h) * 0.45);
-      rad1.addColorStop(0, preset.isDark ? 'rgba(0,122,255,0.28)' : 'rgba(0,122,255,0.18)');
-      rad1.addColorStop(1, 'rgba(0,122,255,0)');
-      ctx.fillStyle = rad1;
-      ctx.fillRect(0, 0, w, h);
-
-      const orb2X = w * (0.78 - 0.15 * Math.cos(t * Math.PI * 2));
-      const orb2Y = h * (0.76 - 0.12 * Math.sin(t * Math.PI * 2));
-      const rad2 = ctx.createRadialGradient(orb2X, orb2Y, 10, orb2X, orb2Y, Math.max(w, h) * 0.42);
-      rad2.addColorStop(0, preset.isDark ? 'rgba(88,86,214,0.28)' : 'rgba(175,82,222,0.14)');
-      rad2.addColorStop(1, 'rgba(175,82,222,0)');
-      ctx.fillStyle = rad2;
-      ctx.fillRect(0, 0, w, h);
-
-      // 2. Central iOS Liquid Glass card
-      const padX = w * 0.08;
-      const padY = h * 0.1;
-      const cardW = w - padX * 2;
-      const cardH = h - padY * 2;
-      const radius = Math.min(w, h) * 0.065;
-
-      ctx.save();
-      drawRoundedRect(ctx, padX, padY, cardW, cardH, radius);
-      ctx.fillStyle = preset.cardBg;
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = preset.cardBorder;
-      ctx.stroke();
-
-      // Top specular glass highlight
-      ctx.beginPath();
-      ctx.moveTo(padX + radius, padY + 2);
-      ctx.lineTo(padX + cardW - radius, padY + 2);
-      ctx.strokeStyle = preset.isDark ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.92)';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-      ctx.restore();
-
-      // 3. Scene transitions (4 scenes × 90 frames)
-      const sceneIdx = Math.min(3, Math.floor(f / 90));
-      const localF = f - sceneIdx * 90;
-      const enter = easeOutCubic(localF / 22);
-      const exit = localF > 74 ? 1 - easeOutCubic((localF - 74) / 16) : 1;
-      const alpha = Math.max(0, Math.min(1, enter * exit));
-      const slideY = (1 - enter) * 28 - (1 - exit) * 18;
-
-      const cx = w / 2;
-      const cy = h / 2;
-      const scale = Math.min(w, h) / 540;
-
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // Top eyebrow pill
-      const pillText =
-        sceneIdx === 0
-          ? 'THE WEDDING INVITATION'
-          : sceneIdx === 1
-          ? 'MEMPELAI BERBAHAGIA'
-          : sceneIdx === 2
-          ? 'JADWAL & LOKASI ACARA'
-          : 'SAVE THE DATE';
-
-      ctx.font = `700 ${Math.round(13 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-      const pillW = ctx.measureText(pillText).width + 36 * scale;
-      const pillH = 30 * scale;
-      drawRoundedRect(ctx, cx - pillW / 2, padY + 38 * scale, pillW, pillH, pillH / 2);
-      ctx.fillStyle = preset.isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.78)';
-      ctx.fill();
-      ctx.fillStyle = preset.accent;
-      ctx.fillText(pillText, cx, padY + 38 * scale + pillH / 2 + 1);
-
-      if (sceneIdx === 0) {
-        // Scene 01: Opening Monogram
-        ctx.font = `300 ${Math.round(88 * scale)}px Georgia, serif`;
-        ctx.fillStyle = preset.ink;
-        ctx.fillText(coupleData.initials, cx, cy - 26 * scale + slideY);
-
-        ctx.font = `500 ${Math.round(18 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.subInk;
-        ctx.fillText('Mengundang Anda merayakan hari bahagia kami', cx, cy + 48 * scale + slideY);
-      } else if (sceneIdx === 1) {
-        // Scene 02: Couple Names
-        ctx.font = `600 ${Math.round(46 * scale)}px Georgia, serif`;
-        ctx.fillStyle = preset.ink;
-        ctx.fillText(coupleData.groom, cx, cy - 62 * scale + slideY);
-
-        ctx.font = `400 ${Math.round(28 * scale)}px Georgia, serif`;
-        ctx.fillStyle = preset.accent;
-        ctx.fillText('&', cx, cy - 4 * scale + slideY);
-
-        ctx.font = `600 ${Math.round(46 * scale)}px Georgia, serif`;
-        ctx.fillStyle = preset.ink;
-        ctx.fillText(coupleData.bride, cx, cy + 54 * scale + slideY);
-
-        ctx.font = `500 ${Math.round(14 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.subInk;
-        ctx.fillText(`${coupleData.groomFull}  ·  ${coupleData.brideFull}`, cx, cy + 114 * scale + slideY);
-      } else if (sceneIdx === 2) {
-        // Scene 03: Date & Venue
-        ctx.font = `700 ${Math.round(30 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.ink;
-        ctx.fillText(coupleData.dateRaw, cx, cy - 42 * scale + slideY);
-
-        ctx.font = `600 ${Math.round(18 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.accent;
-        ctx.fillText(`Pukul ${coupleData.timeRaw}`, cx, cy + 8 * scale + slideY);
-
-        ctx.font = `500 ${Math.round(16 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.subInk;
-        const venueLine = coupleData.venue.length > 42 ? coupleData.venue.slice(0, 40) + '…' : coupleData.venue;
-        ctx.fillText(venueLine, cx, cy + 56 * scale + slideY);
-      } else {
-        // Scene 04: Save the date + URL
-        ctx.font = `600 ${Math.round(36 * scale)}px Georgia, serif`;
-        ctx.fillStyle = preset.ink;
-        ctx.fillText(`${coupleData.groom} & ${coupleData.bride}`, cx, cy - 42 * scale + slideY);
-
-        ctx.font = `500 ${Math.round(15 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = preset.subInk;
-        ctx.fillText('Konfirmasi kehadiran & panduan lokasi di:', cx, cy + 10 * scale + slideY);
-
-        const urlW = Math.min(cardW - 48 * scale, ctx.measureText(coupleData.slug).width + 52 * scale);
-        const urlH = 42 * scale;
-        drawRoundedRect(ctx, cx - urlW / 2, cy + 44 * scale + slideY, urlW, urlH, urlH / 2);
-        ctx.fillStyle = preset.accent;
-        ctx.fill();
-        ctx.font = `700 ${Math.round(14 * scale)}px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif`;
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(coupleData.slug, cx, cy + 44 * scale + urlH / 2 + slideY + 1);
-      }
-
-      ctx.restore();
-
-      // Bottom subtle progress indicator
-      const barW = cardW * 0.42;
-      const barH = 4 * scale;
-      const barX = cx - barW / 2;
-      const barY = padY + cardH - 34 * scale;
-      drawRoundedRect(ctx, barX, barY, barW, barH, barH / 2);
-      ctx.fillStyle = preset.isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)';
-      ctx.fill();
-      drawRoundedRect(ctx, barX, barY, barW * (f / TOTAL_FRAMES), barH, barH / 2);
-      ctx.fillStyle = preset.accent;
-      ctx.fill();
-
-      // Watermark pill if non-enterprise preview
-      if (!isEnt) {
-        ctx.save();
-        const wm = 'ENTERPRISE VIDEO PREVIEW';
-        ctx.font = `700 ${Math.round(11 * scale)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        const wmW = ctx.measureText(wm).width + 24 * scale;
-        const wmH = 24 * scale;
-        drawRoundedRect(ctx, cx - wmW / 2, padY + cardH - 72 * scale, wmW, wmH, wmH / 2);
-        ctx.fillStyle = 'rgba(29,29,31,0.72)';
-        ctx.fill();
-        ctx.fillStyle = '#FFFFFF';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(wm, cx, padY + cardH - 72 * scale + wmH / 2 + 0.5);
-        ctx.restore();
-      }
-    },
-    [preset, coupleData, isEnt]
-  );
-
-  // Playback loop (30fps)
+  // 30fps live timeline loop
   useEffect(() => {
     if (!isPlaying || isRendering) return;
     let rafId = 0;
     let last = performance.now();
-    const stepMs = 1000 / FPS;
+    const stepMs = 1000 / VIDEO_FPS;
 
     const tick = (now: number) => {
       if (now - last >= stepMs) {
         last = now;
-        setFrame((prev) => (prev + 1) % TOTAL_FRAMES);
+        setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -381,14 +109,14 @@ export default function VideoInvitationStudio({
     return () => cancelAnimationFrame(rafId);
   }, [isPlaying, isRendering]);
 
-  // Draw current frame
+  // Render active frame using shared AE-grade motion engine
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    drawFrame(ctx, frame, canvas.width, canvas.height);
-  }, [frame, aspect, drawFrame]);
+    renderInvitationVideoFrame(ctx, frame, canvas.width, canvas.height, themeId, coupleData, !isEnt);
+  }, [frame, aspect, themeId, coupleData, isEnt]);
 
   const handleRenderVideo = async () => {
     if (!isEnt || !canvasRef.current || isRendering) return;
@@ -397,7 +125,7 @@ export default function VideoInvitationStudio({
     if (!ctx) return;
 
     if (typeof MediaRecorder === 'undefined' || !canvas.captureStream) {
-      setRenderDoneMsg('Browser ini belum mendukung rekaman Canvas MediaRecorder. Gunakan Chrome/Edge/Safari terbaru atau ekspor Remotion JSON.');
+      setRenderDoneMsg('Browser ini belum mendukung rekaman Canvas MediaRecorder. Gunakan Chrome/Edge/Safari terbaru atau salin Remotion Spec JSON.');
       return;
     }
 
@@ -407,11 +135,11 @@ export default function VideoInvitationStudio({
     setRenderDoneMsg(null);
 
     try {
-      const stream = canvas.captureStream(FPS);
+      const stream = canvas.captureStream(VIDEO_FPS);
       const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
         ? 'video/webm;codecs=vp9'
         : 'video/webm';
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 6_000_000 });
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 7_500_000 });
       const chunks: Blob[] = [];
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -422,11 +150,11 @@ export default function VideoInvitationStudio({
       });
 
       recorder.start();
-      for (let f = 0; f < TOTAL_FRAMES; f++) {
-        drawFrame(ctx, f, canvas.width, canvas.height);
+      for (let f = 0; f < VIDEO_TOTAL_FRAMES; f++) {
+        renderInvitationVideoFrame(ctx, f, canvas.width, canvas.height, themeId, coupleData, false);
         setFrame(f);
-        setRenderProgress(Math.round(((f + 1) / TOTAL_FRAMES) * 100));
-        await new Promise((r) => setTimeout(r, Math.round(1000 / FPS)));
+        setRenderProgress(Math.round(((f + 1) / VIDEO_TOTAL_FRAMES) * 100));
+        await new Promise((r) => setTimeout(r, Math.round(1000 / VIDEO_FPS)));
       }
       recorder.stop();
       await donePromise;
@@ -435,10 +163,10 @@ export default function VideoInvitationStudio({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ruanghadir-video-${coupleData.groom.toLowerCase()}-${coupleData.bride.toLowerCase()}-${aspectId.replace(':', 'x')}.webm`;
+      a.download = `ruanghadir-${themeId}-${coupleData.groom.toLowerCase()}-${coupleData.bride.toLowerCase()}-${aspectId.replace(':', 'x')}.webm`;
       a.click();
       URL.revokeObjectURL(url);
-      setRenderDoneMsg('Video undangan berhasil dirender dan diunduh.');
+      setRenderDoneMsg('Video motion graphic HD berhasil dirender dan diunduh.');
     } catch {
       setRenderDoneMsg('Gagal merender video di browser ini. Coba ulangi atau gunakan ekspor Remotion Spec.');
     } finally {
@@ -449,14 +177,15 @@ export default function VideoInvitationStudio({
 
   const handleCopyRemotionSpec = () => {
     const spec = {
-      engine: 'remotion-4',
-      compositionId: `InvitationVideo-${aspectId.replace(':', 'x')}`,
-      fps: FPS,
-      durationInFrames: TOTAL_FRAMES,
+      engine: 'remotion-4-ae-motion',
+      compositionId: `InvitationMotion-${themeId}-${aspectId.replace(':', 'x')}`,
+      fps: VIDEO_FPS,
+      durationInFrames: VIDEO_TOTAL_FRAMES,
       width: aspectId === '9:16' ? 1080 : aspectId === '1:1' ? 1080 : 1920,
       height: aspectId === '9:16' ? 1920 : aspectId === '1:1' ? 1080 : 1080,
+      techniques: activeTheme.techniques,
       inputProps: {
-        preset: preset.id,
+        themeId,
         ...coupleData,
       },
     };
@@ -466,7 +195,6 @@ export default function VideoInvitationStudio({
   };
 
   const currentSceneIdx = Math.min(3, Math.floor(frame / 90));
-  const currentSec = (frame / FPS).toFixed(1);
 
   return (
     <div className="space-y-6 pb-8">
@@ -478,14 +206,14 @@ export default function VideoInvitationStudio({
               <Film className="h-3.5 w-3.5" /> Enterprise Video Studio
             </span>
             <span className="inline-flex items-center rounded-full bg-white/75 border border-white/80 px-2.5 py-1 text-[11px] font-semibold text-[#48484A]">
-              Remotion Architecture · 30fps HD
+              After Effects Motion Engine · 30fps HD
             </span>
           </div>
           <h2 className="text-[22px] sm:text-[26px] font-bold tracking-[-0.025em] text-[#1D1D1F]">
             Make Your Invitation Video
           </h2>
           <p className="text-[13.5px] text-[#48484A] max-w-2xl">
-            Ubah data undangan Anda secara otomatis menjadi video undangan vertikal (Reels, TikTok, WhatsApp Status) maupun layar venue tanpa edit manual dari nol.
+            Render undangan Anda menjadi video motion graphic teknis (Trim Paths, Track Matte, Volumetric Light Leak) dengan 3 tema unggulan: Javanese Classic, Grand Ballroom, dan Luxury Love Pink.
           </p>
         </div>
 
@@ -509,27 +237,27 @@ export default function VideoInvitationStudio({
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Left: Live Video Stage (7 cols) */}
         <div className="xl:col-span-7 glx-strong rounded-[30px] p-5 sm:p-6 space-y-5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8E8E93]">
-                Live Composition Stage
+                Live Motion Composition · {activeTheme.name}
               </p>
               <p className="text-[14px] font-semibold text-[#1D1D1F]">
-                {SCENES[currentSceneIdx]?.label} · {aspect.label}
+                {VIDEO_SCENES[currentSceneIdx]?.label} · {aspect.label}
               </p>
             </div>
             <span className="rounded-full bg-[#1D1D1F]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[#1D1D1F] tabular">
-              {currentSec}s / {DURATION_SECONDS}.0s
+              TC {formatTimecode(frame)} / 00:12:00
             </span>
           </div>
 
           {/* Stage Canvas Frame */}
-          <div className="relative flex items-center justify-center rounded-[24px] bg-[#1C1C1E]/92 p-4 sm:p-6 min-h-[380px] sm:min-h-[460px] overflow-hidden border border-white/15">
+          <div className="relative flex items-center justify-center rounded-[24px] bg-[#14161F] p-4 sm:p-6 min-h-[380px] sm:min-h-[460px] overflow-hidden border border-white/15">
             <canvas
               ref={canvasRef}
               width={aspect.w}
               height={aspect.h}
-              className="rounded-[20px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.55)] max-h-[430px] w-auto max-w-full object-contain"
+              className="rounded-[20px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)] max-h-[430px] w-auto max-w-full object-contain"
             />
           </div>
 
@@ -561,7 +289,7 @@ export default function VideoInvitationStudio({
               <input
                 type="range"
                 min={0}
-                max={TOTAL_FRAMES - 1}
+                max={VIDEO_TOTAL_FRAMES - 1}
                 value={frame}
                 disabled={isRendering}
                 onChange={(e) => {
@@ -573,9 +301,9 @@ export default function VideoInvitationStudio({
               />
             </div>
 
-            {/* Scene Pills */}
+            {/* Scene Keyframe Pills */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {SCENES.map((sc) => {
+              {VIDEO_SCENES.map((sc) => {
                 const active = currentSceneIdx === sc.id;
                 return (
                   <button
@@ -631,37 +359,53 @@ export default function VideoInvitationStudio({
             <p className="text-[11.5px] text-[#6E6E73]">{aspect.desc}</p>
           </div>
 
-          {/* Motion Style Presets */}
+          {/* 3 Flagship AE Motion Theme Presets */}
           <div className="glx rounded-[26px] p-5 space-y-3.5">
             <div className="flex items-center gap-2 text-[13px] font-bold text-[#1D1D1F]">
               <Layers className="h-4 w-4 text-[#007AFF]" />
-              Gaya Motion Video
+              Tema Motion Graphic (After Effects Style)
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {MOTION_PRESETS.map((p) => {
-                const active = presetId === p.id;
+            <div className="space-y-2.5">
+              {VIDEO_THEMES.map((p) => {
+                const active = themeId === p.id;
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => setPresetId(p.id)}
-                    className={`rounded-2xl p-3.5 text-left transition cursor-pointer border ${
+                    onClick={() => {
+                      setThemeId(p.id);
+                      setFrame(0);
+                      setIsPlaying(true);
+                    }}
+                    className={`w-full rounded-2xl p-3.5 text-left transition cursor-pointer border ${
                       active
                         ? 'bg-white/95 border-[#007AFF] ring-2 ring-[#007AFF]/20'
                         : 'bg-white/55 border-white/80 hover:bg-white/80'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <span
-                        className="h-4 w-10 rounded-full border border-black/10"
-                        style={{
-                          background: `linear-gradient(135deg, ${p.bgStops[0]}, ${p.bgStops[1]}, ${p.bgStops[2]})`,
-                        }}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="h-4 w-10 rounded-full border border-black/10"
+                          style={{
+                            background: `linear-gradient(135deg, ${p.swatch[0]}, ${p.swatch[1]}, ${p.swatch[2]})`,
+                          }}
+                        />
+                        <p className="text-[13px] font-bold text-[#1D1D1F]">{p.name}</p>
+                      </div>
                       {active && <CheckCircle2 className="h-4 w-4 text-[#007AFF]" />}
                     </div>
-                    <p className="text-[13px] font-bold text-[#1D1D1F]">{p.name}</p>
-                    <p className="text-[11px] text-[#6E6E73] leading-snug mt-0.5">{p.tagline}</p>
+                    <p className="text-[11.5px] text-[#6E6E73] leading-snug">{p.tagline}</p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {p.techniques.map((tech) => (
+                        <span
+                          key={tech}
+                          className="rounded-full bg-[#007AFF]/8 px-2 py-0.5 text-[10px] font-semibold text-[#007AFF]"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </button>
                 );
               })}

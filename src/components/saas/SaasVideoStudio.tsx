@@ -1,90 +1,186 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Film,
-  Smartphone,
-  Layers,
   Building2,
   ArrowRight,
   Mail,
   Check,
   Play,
+  Pause,
+  RotateCcw,
+  Layers,
+  SlidersHorizontal,
 } from "lucide-react";
+import {
+  VIDEO_THEMES,
+  VIDEO_SCENES,
+  VIDEO_FPS,
+  VIDEO_TOTAL_FRAMES,
+  VideoThemeId,
+  VideoCoupleProps,
+  renderInvitationVideoFrame,
+  formatTimecode,
+} from "@/lib/invitationVideoEngine";
 
-const PRESETS = [
-  {
-    id: "liquid",
-    name: "Liquid Glass",
-    ratio: "9:16 Reels",
-    bg: "linear-gradient(155deg, #DCEEFF 0%, #ECE7FF 52%, #FBE9F4 100%)",
-    cardBg: "rgba(255,255,255,0.62)",
-    ink: "#1D1D1F",
-    accent: "#007AFF",
+const DEMO_SAMPLES: Record<VideoThemeId, VideoCoupleProps> = {
+  "javanese-classic": {
+    groom: "Bagas",
+    bride: "Sekar",
+    groomFull: "R. Bagas Pratama, S.T.",
+    brideFull: "R.A. Sekar Ayu, S.Ars.",
+    dateRaw: "Minggu, 18 Oktober 2026",
+    timeRaw: "09:00 WIB",
+    venue: "Pendopo Agung Royal Ambarrukmo, Yogyakarta",
+    slug: "ruanghadir.net/bagas-sekar",
+    initials: "B & S",
   },
-  {
-    id: "noir",
-    name: "Midnight Titanium",
-    ratio: "9:16 TikTok",
-    bg: "linear-gradient(155deg, #0B0D14 0%, #171D32 55%, #0F1320 100%)",
-    cardBg: "rgba(255,255,255,0.09)",
-    ink: "#F5F5F7",
-    accent: "#64D2FF",
+  "grand-ballroom": {
+    groom: "Rian",
+    bride: "Salsa",
+    groomFull: "Rian Mahendra, M.B.A.",
+    brideFull: "Salsa Kirana, S.E.",
+    dateRaw: "Sabtu, 24 Oktober 2026",
+    timeRaw: "19:00 WIB",
+    venue: "Grand Ballroom Hotel Mulia, Jakarta",
+    slug: "ruanghadir.net/rian-salsa",
+    initials: "R & S",
   },
-  {
-    id: "botanical",
-    name: "Botanical Mist",
-    ratio: "9:16 WA Status",
-    bg: "linear-gradient(155deg, #E3F3EC 0%, #EDF6F7 55%, #F2F5FA 100%)",
-    cardBg: "rgba(255,255,255,0.68)",
-    ink: "#16241E",
-    accent: "#248A3D",
+  "luxury-pink": {
+    groom: "Dimas",
+    bride: "Nadia",
+    groomFull: "Dimas Aditya, S.Kom.",
+    brideFull: "Nadia Putri, S.Psi.",
+    dateRaw: "Sabtu, 7 November 2026",
+    timeRaw: "11:00 WIB",
+    venue: "The Glasshouse Rose Garden, Bandung",
+    slug: "ruanghadir.net/dimas-nadia",
+    initials: "D & N",
   },
-];
+};
 
 const HIGHLIGHTS = [
-  "Sinkronisasi otomatis nama mempelai, jadwal akad/resepsi, dan lokasi dari undangan digital",
-  "Format siap sebar 9:16 (Reels, TikTok, WhatsApp Status), 1:1 Feed, hingga 16:9 layar venue",
-  "Dibangun di atas arsitektur komposisi Remotion 30fps yang presisi tanpa perlu software edit video",
-  "Ekspor video HD bebas watermark eksklusif untuk akun perusahaan (Enterprise)",
+  "Engine motion graphic ala After Effects: Trim Paths, Track Matte kinetic text, volumetric light leak, dan partikel berlapis",
+  "3 contoh preset resmi siap pakai: Javanese Classic, Grand Ballroom, dan Luxury Love Pink",
+  "Sinkronisasi otomatis nama mempelai, jadwal, dan venue dari data undangan — siap ekspor 9:16 Reels/TikTok/WA Status hingga 16:9",
+  "Ekspor video HD bebas watermark + Remotion Render Spec (JSON) eksklusif untuk akun Enterprise",
 ];
 
 export function SaasVideoStudio() {
-  const [active, setActive] = useState(0);
-  const current = PRESETS[active];
+  const [themeId, setThemeId] = useState<VideoThemeId>("javanese-classic");
+  const [frame, setFrame] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const activeTheme =
+    VIDEO_THEMES.find((t) => t.id === themeId) || VIDEO_THEMES[0];
+  const sampleCouple = DEMO_SAMPLES[themeId];
+  const currentSceneIdx = Math.min(3, Math.floor(frame / 90));
+
+  // 30fps live motion playback
+  useEffect(() => {
+    if (!isPlaying) return;
+    let rafId = 0;
+    let last = performance.now();
+    const stepMs = 1000 / VIDEO_FPS;
+
+    const tick = (now: number) => {
+      if (now - last >= stepMs) {
+        last = now;
+        setFrame((prev) => (prev + 1) % VIDEO_TOTAL_FRAMES);
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying]);
+
+  // Draw live motion frame
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    renderInvitationVideoFrame(
+      ctx,
+      frame,
+      canvas.width,
+      canvas.height,
+      themeId,
+      sampleCouple,
+      false
+    );
+  }, [frame, themeId, sampleCouple]);
 
   return (
     <section id="video-enterprise" className="py-16 md:py-24">
       <div className="saas-shell">
         <div className="glx-strong rounded-[34px] p-6 sm:p-10 lg:p-12 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left Copy */}
+            {/* Left Copy & Technical Specs */}
             <div className="lg:col-span-7 space-y-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5856D6]/12 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5856D6]">
                   <Film size={13} /> Eksklusif Enterprise
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/75 border border-white/90 px-3 py-1 text-[11px] font-semibold text-[#48484A]">
-                  Remotion Motion Engine
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-white/90 px-3 py-1 text-[11px] font-semibold text-[#48484A]">
+                  After Effects Motion Engine · 30fps
                 </span>
               </div>
 
-              <h2 className="text-[32px] sm:text-[42px] font-bold leading-[1.08] tracking-[-0.03em] text-[#1D1D1F]">
-                Make Your Invitation Video — langsung dari data undangan.
+              <h2 className="text-[30px] sm:text-[42px] font-bold leading-[1.08] tracking-[-0.03em] text-[#1D1D1F]">
+                Make Your Invitation Video — motion graphic kelas studio.
               </h2>
 
               <p className="text-[15px] sm:text-[16px] leading-[1.7] text-[#48484A] max-w-xl">
-                Dirancang khusus untuk wedding organizer, agensi kreatif, dan tim korporasi. Cukup pilih gaya motion dan rasio layar, lalu render video undangan vertikal siap tayang dalam hitungan detik.
+                Coba langsung 3 contoh motion graphic Enterprise di samping (
+                <strong>Javanese Classic</strong>,{" "}
+                <strong>Grand Ballroom</strong>, dan{" "}
+                <strong>Luxury Love Pink</strong>). Semua animasi dijalankan
+                secara prosedural lengkap dengan trim-path ornamen, track-matte
+                tipografi, dan light-leak transisi.
               </p>
 
-              <ul className="space-y-3 pt-1">
+              {/* Technical Layer Badges for Active Theme */}
+              <div className="rounded-2xl bg-white/60 border border-white/85 p-4 space-y-2.5">
+                <div className="flex items-center justify-between gap-2 text-[12px]">
+                  <span className="inline-flex items-center gap-1.5 font-bold text-[#1D1D1F]">
+                    <SlidersHorizontal size={13} className="text-[#007AFF]" />
+                    Komposisi Aktif: {activeTheme.name}
+                  </span>
+                  <span className="font-mono text-[11.5px] font-semibold text-[#007AFF] tabular">
+                    TC {formatTimecode(frame)} · 30fps
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeTheme.techniques.map((tech) => (
+                    <span
+                      key={tech}
+                      className="rounded-full bg-[#007AFF]/10 px-2.5 py-1 text-[11px] font-semibold text-[#007AFF]"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-[11px] font-semibold text-[#48484A]">
+                    {VIDEO_SCENES[currentSceneIdx]?.label}
+                  </span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 pt-1">
                 {HIGHLIGHTS.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[14px] text-[#1D1D1F]">
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 text-[14px] text-[#1D1D1F]"
+                  >
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#007AFF]/12 text-[#007AFF]">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span className="leading-relaxed text-[#48484A]">{item}</span>
+                    <span className="leading-relaxed text-[#48484A]">
+                      {item}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -97,112 +193,93 @@ export function SaasVideoStudio() {
                   <Mail size={16} /> Hubungi admin@ruanghadir.net
                 </a>
                 <Link href="/auth?mode=enterprise" className="saas-btn-outline">
-                  <Building2 size={16} /> Portal Enterprise <ArrowRight size={15} />
+                  <Building2 size={16} /> Portal Enterprise{" "}
+                  <ArrowRight size={15} />
                 </Link>
               </div>
             </div>
 
-            {/* Right Interactive 9:16 iOS Glass Video Preview */}
-            <div className="lg:col-span-5 flex flex-col items-center gap-5">
-              {/* iOS Phone Bezel */}
-              <div className="relative w-full max-w-[290px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#1D1D1F] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.45)] border border-white/25">
+            {/* Right: Live 9:16 After Effects Motion Graphic Player */}
+            <div className="lg:col-span-5 flex flex-col items-center gap-4">
+              {/* iOS Phone Frame */}
+              <div className="relative w-full max-w-[300px] aspect-[9/16] rounded-[42px] p-2.5 bg-[#1D1D1F] shadow-[0_32px_70px_-20px_rgba(15,23,42,0.48)] border border-white/25">
                 {/* Dynamic Island */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 h-5 w-24 rounded-full bg-black/90" />
 
-                <div
-                  className="relative h-full w-full rounded-[33px] overflow-hidden flex flex-col items-center justify-between p-5 text-center transition-all duration-500"
-                  style={{ background: current.bg }}
-                >
-                  <div className="pt-6">
-                    <span
-                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
-                      style={{
-                        background: current.cardBg,
-                        color: current.accent,
-                        backdropFilter: "blur(14px)",
-                      }}
-                    >
-                      <Smartphone size={11} /> {current.ratio}
-                    </span>
-                  </div>
+                <div className="relative h-full w-full rounded-[33px] overflow-hidden bg-black">
+                  <canvas
+                    ref={canvasRef}
+                    width={540}
+                    height={960}
+                    className="h-full w-full object-cover"
+                  />
 
-                  {/* Translucent Inner Glass Card */}
-                  <div
-                    className="w-full rounded-[24px] p-5 border space-y-3"
-                    style={{
-                      background: current.cardBg,
-                      borderColor: "rgba(255,255,255,0.45)",
-                      backdropFilter: "blur(20px) saturate(180%)",
-                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                    }}
-                  >
-                    <p
-                      className="text-[10px] font-bold uppercase tracking-[0.2em]"
-                      style={{ color: current.accent }}
-                    >
-                      Save The Date
-                    </p>
-                    <p
-                      className="font-serif text-[32px] leading-none"
-                      style={{ color: current.ink }}
-                    >
-                      Rian &amp; Salsa
-                    </p>
-                    <p
-                      className="text-[12px] font-medium opacity-80"
-                      style={{ color: current.ink }}
-                    >
-                      Sabtu, 24 Oktober 2026
-                      <br />
-                      The Glasshouse, Jakarta
-                    </p>
-                    <div className="pt-1 flex items-center justify-center">
-                      <span
-                        className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11px] font-semibold text-white"
-                        style={{ background: current.accent }}
+                  {/* Subtle Floating Transport Overlay */}
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 px-3 py-1.5 text-white">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setIsPlaying((p) => !p)}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition cursor-pointer"
+                        aria-label={isPlaying ? "Jeda motion" : "Putar motion"}
                       >
-                        <Play size={11} className="fill-current" /> 12s · 30fps HD
-                      </span>
+                        {isPlaying ? (
+                          <Pause size={12} />
+                        ) : (
+                          <Play size={12} className="ml-0.5" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFrame(0);
+                          setIsPlaying(true);
+                        }}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition cursor-pointer"
+                        aria-label="Ulangi animasi"
+                      >
+                        <RotateCcw size={12} />
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Mini Timeline Pill */}
-                  <div className="w-full space-y-1.5 pb-1">
-                    <div className="h-1.5 w-full rounded-full bg-black/10 overflow-hidden">
-                      <div
-                        className="h-full w-2/3 rounded-full transition-all duration-500"
-                        style={{ background: current.accent }}
-                      />
-                    </div>
-                    <p
-                      className="text-[10px] font-semibold opacity-70"
-                      style={{ color: current.ink }}
-                    >
-                      ruanghadir.net/rian-salsa
-                    </p>
+                    <span className="font-mono text-[10.5px] font-semibold tracking-wider text-white/90 tabular">
+                      {formatTimecode(frame)} / 00:12:00
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Segmented Preset Switcher */}
-              <div className="glx-pill p-1.5 inline-flex items-center gap-1">
-                {PRESETS.map((p, idx) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setActive(idx)}
-                    className={`rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
-                      active === idx
-                        ? "bg-[#007AFF] text-white shadow-sm"
-                        : "text-[#48484A] hover:text-[#1D1D1F]"
-                    }`}
-                  >
-                    {p.name}
-                  </button>
-                ))}
+              {/* 3-Theme Segmented Pill Switcher */}
+              <div className="glx-pill p-1.5 inline-flex flex-wrap items-center justify-center gap-1">
+                {VIDEO_THEMES.map((t) => {
+                  const active = themeId === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setThemeId(t.id);
+                        setFrame(0);
+                        setIsPlaying(true);
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
+                        active
+                          ? "bg-[#007AFF] text-white shadow-sm"
+                          : "text-[#48484A] hover:text-[#1D1D1F]"
+                      }`}
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-full border border-black/15"
+                        style={{ background: t.accent }}
+                      />
+                      {t.shortName}
+                    </button>
+                  );
+                })}
               </div>
+
               <p className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-[#6E6E73]">
-                <Layers size={13} className="text-[#007AFF]" /> Ganti preset untuk melihat gaya motion video
+                <Layers size={13} className="text-[#007AFF]" /> Pilih tema di
+                atas untuk preview live motion graphic 9:16
               </p>
             </div>
           </div>
