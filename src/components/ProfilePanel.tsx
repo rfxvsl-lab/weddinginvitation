@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { resolvePublicSlug } from '../lib/utils';
 import {
   User,
   Mail,
@@ -174,7 +175,7 @@ export default function ProfilePanel({ wedding }: { wedding?: any }) {
 
           <div className="divide-y divide-[#F0E9DE] rounded-xl border border-[#ECE4D8] bg-[#F3F6FB]">
             {invitations.map((inv: any) => {
-              const displaySlug = inv.slug || user.activeSlug || 'undangan';
+              const displaySlug = resolvePublicSlug(inv.slug, user.activeSlug, invitations.length) || 'undangan';
               const fullUrl = `${appHost}/${displaySlug}`;
               const isCopied = copiedId === inv.id;
 

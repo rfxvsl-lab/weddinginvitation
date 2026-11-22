@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import InvitationPreview from '../../components/InvitationPreview';
 import WatermarkOverlay from '../../components/WatermarkOverlay';
 import LiveMomentsDock from '../../components/LiveMomentsDock';
-import { addRSVP, addVisitorLog } from '../../lib/api';
+import { addRSVP, addVisitorLog, confirmGuestAttendance } from '../../lib/api';
 import type { WeddingData, Guest, RSVP } from '../../types';
 import type { WatermarkType } from '../../lib/packageLimits';
 
@@ -12,7 +12,6 @@ interface InvitationClientProps {
   invitationId: string;
   weddingData: WeddingData;
   themeId: string;
-  guests: Guest[];
   initialRsvps: RSVP[];
   urlGuest?: Guest;
   watermarkType?: WatermarkType;
@@ -25,7 +24,6 @@ export default function InvitationClient({
   invitationId,
   weddingData,
   themeId,
-  guests,
   initialRsvps,
   urlGuest,
   watermarkType = 'none',
@@ -40,11 +38,9 @@ export default function InvitationClient({
       const saved = await addRSVP(invitationId, newRSVP);
       setRsvps(prev => [saved, ...prev]);
 
-      // Alur RE: Jika tamu teridentifikasi atau ada guestId, auto-konfirmasi kehadiran & status RSVP di DB
-      const targetGuestId = newRSVP.guestId || urlGuest?.id;
-      if (targetGuestId) {
-        const { confirmGuestAttendance } = await import('../../lib/api');
-        await confirmGuestAttendance(targetGuestId, newRSVP.status, newRSVP.paxCount);
+      // Tamu personal (punya kode undangan): status kehadiran ikut dikonfirmasi di daftar tamu
+      if (urlGuest?.invitationCode) {
+        await confirmGuestAttendance(invitationId, urlGuest.invitationCode, newRSVP.status, newRSVP.paxCount);
       }
     } catch (err) {
       console.error('Failed to save RSVP:', err);

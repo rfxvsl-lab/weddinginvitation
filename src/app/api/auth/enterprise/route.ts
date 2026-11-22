@@ -7,8 +7,10 @@ import {
   getUserByEmail,
   createUser,
   checkSlugExists,
-} from '@/lib/api';
+} from '@/lib/db';
 import { dbExecute } from '@/lib/turso';
+import { attachSession, toClientUser } from '@/lib/server/auth';
+import { limitOr429 } from '@/lib/server/http';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +23,8 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    const limited = limitOr429(req, 'enterprise-auth', 10, 15 * 60);
+    if (limited) return limited;
     const body = await req.json();
     const email = String(body?.email || '').trim().toLowerCase();
     const accessCode = String(body?.accessCode || '').trim();
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
         isCustomByRfx: true,
         paymentStatus: 'success',
         authProvider: 'enterprise',
-        ipAddress: req.headers.get('x-forwarded-for') || '',
+        ipAddress: (req.headers.get('x-forwarded-for') || '').split(',')[0].trim(),
       });
 
       if (verification.recordId) {
@@ -110,31 +114,14 @@ export async function POST(req: NextRequest) {
 
     const res = NextResponse.json({
       ok: true,
-      user: enrichedUser,
+      user: toClientUser(enrichedUser),
       enterprise: {
         companyName: verification.companyName,
         allowedDomain: verification.allowedDomain,
       },
     });
 
-    // Set cookie session agar konsisten dengan middleware
-    const payload = Buffer.from(
-      JSON.stringify({
-        email: enrichedUser.email,
-        packageId: 'enterprise',
-        isAdmin: false,
-        isEnterprise: true,
-        companyName: verification.companyName,
-      })
-    ).toString('base64');
-
-    res.cookies.set('saas_user_session', payload, {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
+    await attachSession(res, user);
     return res;
   } catch (err: any) {
     console.error('[POST /api/auth/enterprise] Error:', err);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { resolvePublicSlug } from './lib/utils';
 import { useAuth } from './hooks/useAuth';
 import { useWeddingData } from './hooks/useWeddingData';
 import AuthGate from './components/AuthGate';
@@ -142,7 +143,8 @@ export default function App() {
     );
   }
 
-  const slug = wedding.invitation?.slug || auth.currentUser.activeSlug || '';
+  // Undangan lama punya slug otomatis "inv-…"; untuk proyek utama tampilkan tautan pilihan user.
+  const slug = resolvePublicSlug(wedding.invitation?.slug, auth.currentUser.activeSlug, wedding.allInvitations.length);
   const isPublished = Boolean(wedding.invitation?.isPublished);
   const segMeta = SEGMENT_META[activeSegment];
 
@@ -296,6 +298,7 @@ export default function App() {
               analytics={wedding.analytics}
               onNavigate={(seg) => setActiveSegment(seg)}
               onPublish={() => setShowPublishModal(true)}
+              publicSlug={slug}
             />
           )}
 

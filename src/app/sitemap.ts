@@ -1,35 +1,23 @@
-import { MetadataRoute } from 'next';
-import { getAllUsers } from '../lib/api';
+import type { MetadataRoute } from 'next';
+import { getPublishedSlugs } from '../lib/db';
+
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ruanghadir.net';
-  
-  let users = [];
+  const now = new Date();
+  const entries: MetadataRoute.Sitemap = [
+    { url: appUrl, lastModified: now, changeFrequency: 'daily', priority: 1 },
+    { url: `${appUrl}/preview`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+  ];
+
   try {
-    users = await getAllUsers();
+    const slugs = await getPublishedSlugs();
+    for (const slug of new Set(slugs)) {
+      entries.push({ url: `${appUrl}/${slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 });
+    }
   } catch (err) {
     console.error('Sitemap dynamic fetch failed:', err);
   }
-
-  const entries: MetadataRoute.Sitemap = [
-    {
-      url: appUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-  ];
-
-  for (const user of users) {
-    if (user.activeSlug && user.paymentStatus === 'success') {
-      entries.push({
-        url: `${appUrl}/${user.activeSlug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      });
-    }
-  }
-
   return entries;
 }

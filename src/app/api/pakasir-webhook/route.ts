@@ -1,8 +1,10 @@
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
 import { NextResponse } from 'next/server';
 import { pakasir } from '../../../lib/pakasir';
-import { updateTransactionStatus, getAllTransactions, updateUserPaymentStatus, updateUserPackage, extendInvitation, getInvitationsByUserId, activateInvitation } from '../../../lib/api';
+import { updateTransactionStatus, getAllTransactions, updateUserPaymentStatus, updateUserPackage, extendInvitation, getInvitationsByUserId, activateInvitation } from '../../../lib/db';
 import { PACKAGE_LIMITS } from '../../../lib/packageLimits';
 import type { WebhookPayload } from 'pakasir-client';
+import { notifyAdmin } from '../../../lib/server/notify';
 
 export const runtime = 'nodejs';
 
@@ -13,6 +15,7 @@ export const runtime = 'nodejs';
  * Handles: new signups, upgrades, and extensions.
  */
 export async function POST(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
   try {
     const payload: WebhookPayload = await req.json();
 
@@ -37,8 +40,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Status verification failed' }, { status: 400 });
       }
     } catch (verifyErr) {
+      // Jangan pernah menandai lunas tanpa konfirmasi langsung dari Pakasir.
       console.error('[pakasir-webhook] Failed to verify with Pakasir API:', verifyErr);
-      // Continue anyway — webhook is validated, and Pakasir may have rate limits on check
+      return NextResponse.json({ error: 'Status verification unavailable' }, { status: 503 });
     }
 
     // 4. Find matching transaction in DB by order_id embedded in aiResult.reasons
@@ -103,21 +107,11 @@ export async function POST(req: Request) {
     }
 
     // 8. Notify admin (optional)
-    try {
-      const baseUrl = req.headers.get('origin') || req.headers.get('host') || '';
-      const notifyUrl = baseUrl.startsWith('http') ? `${baseUrl}/api/notify-admin` : `https://${baseUrl}/api/notify-admin`;
-      await fetch(notifyUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: '✅ Pembayaran Pakasir Berhasil',
-          message: `User: ${matchingTx.userName} (Rp ${payload.amount.toLocaleString('id-ID')}). Order: ${payload.order_id}. Metode: ${payload.payment_method}${typeReason ? `. ${typeReason}` : ''}`,
-          data: { userId: matchingTx.userId, status: 'success' },
-        }),
-      });
-    } catch (e) {
-      console.error('[pakasir-webhook] Failed to notify admin:', e);
-    }
+    await notifyAdmin(
+      '✅ Pembayaran Pakasir Berhasil',
+      `User: ${matchingTx.userName} (Rp ${payload.amount.toLocaleString('id-ID')}). Order: ${payload.order_id}. Metode: ${payload.payment_method}${typeReason ? `. ${typeReason}` : ''}`,
+      { userId: matchingTx.userId, status: 'success' }
+    );
 
     return NextResponse.json({ received: true, success: true });
   } catch (error: any) {

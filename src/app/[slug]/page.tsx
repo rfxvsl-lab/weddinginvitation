@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getInvitationBySlug, getGuestsByInvitation, getRSVPsByInvitation, getUserById } from '../../lib/api';
+import { getInvitationBySlug, getRSVPsByInvitation, getUserById, validateGuestCode } from '../../lib/db';
+import { getSession } from '../../lib/server/auth';
 import InvitationClient from './InvitationClient';
 import type { Guest } from '../../types';
 import { Globe, Timer } from 'lucide-react';
@@ -20,9 +21,10 @@ export async function generateMetadata(
   const { slug } = await params;
   const inv = await getInvitationBySlug(slug);
 
-  if (!inv) {
+  if (!inv || !inv.isPublished) {
     return {
-      title: 'Undangan Tidak Ditemukan - RFX VISUAL',
+      title: 'Undangan Tidak Ditemukan — RuangHadir',
+      robots: { index: false, follow: false },
       description: 'Halaman undangan pernikahan tidak dapat ditemukan.',
     };
   }
@@ -53,7 +55,14 @@ export default async function Page({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const { to: guestTo, code: guestCode } = await searchParams;
 
-  const inv = await getInvitationBySlug(slug);
+  const found = await getInvitationBySlug(slug);
+  // Draft hanya boleh dilihat pemiliknya (pratinjau). Publik hanya melihat versi terbit.
+  let isOwnerPreview = false;
+  if (found && !found.isPublished) {
+    const session = await getSession();
+    isOwnerPreview = !!session && (session.uid === found.userId || session.role === 'admin');
+  }
+  const inv = found && (found.isPublished || isOwnerPreview) ? found : null;
 
   if (!inv) {
     return (
@@ -118,35 +127,30 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
-  // Load guests, RSVPs, and user info on server
-  const [guestsData, rsvpsData, userData] = await Promise.all([
-    getGuestsByInvitation(inv.id),
+  // Hanya data yang diperlukan halaman publik — daftar tamu TIDAK dikirim ke browser.
+  const [rsvpsData, userData] = await Promise.all([
     getRSVPsByInvitation(inv.id),
     getUserById(inv.userId),
   ]);
 
-  const watermarkType = getWatermarkType(userData?.packageId || 'demo');
+  const watermarkType = getWatermarkType(userData?.packageId || 'free');
 
-  // Match urlGuest
+  // Tamu personal: dicocokkan lewat kode undangan (bukan daftar lengkap di client)
   let urlGuest: Guest | undefined = undefined;
-  if (guestTo) {
-    const matched = guestsData.find(
-      g => g.name.toLowerCase() === guestTo.toLowerCase() || g.invitationCode === guestCode
-    );
-
-    if (matched) {
-      urlGuest = matched;
-    } else {
-      urlGuest = {
-        id: `tg-${Date.now()}`,
-        name: guestTo,
-        group: 'Tamu Berharga',
-        paxLimit: 2,
-        phoneNumber: '081234567890',
-        status: 'Opened',
-        invitationCode: guestCode || 'W-TEMP'
-      };
-    }
+  if (guestCode) {
+    const matched = await validateGuestCode(inv.id, String(guestCode).slice(0, 32));
+    if (matched) urlGuest = { ...matched, phoneNumber: '' };
+  }
+  if (!urlGuest && guestTo) {
+    urlGuest = {
+      id: '',
+      name: String(guestTo).slice(0, 80),
+      group: 'Tamu Undangan',
+      paxLimit: 2,
+      phoneNumber: '',
+      status: 'Opened',
+      invitationCode: '',
+    };
   }
 
   // JSON-LD structured data (Event details)
@@ -154,7 +158,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'Event',
     'name': `Pernikahan ${inv.weddingData?.couple?.groom?.fullName} & ${inv.weddingData?.couple?.bride?.fullName}`,
-    'startDate': inv.weddingData?.countdownDate || '2026-08-08T08:00:00+07:00',
+    'startDate': inv.weddingData?.countdownDate || undefined,
     'location': {
       '@type': 'Place',
       'name': inv.weddingData?.events?.akad?.venueName || 'Venue Akad',
@@ -172,13 +176,17 @@ export default async function Page({ params, searchParams }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {isOwnerPreview && (
+        <div className="fixed top-0 inset-x-0 z-[9999] bg-[#7A2E3B] text-white text-center text-xs font-medium py-2 px-4">
+          Pratinjau draf — hanya Anda yang dapat melihat halaman ini sampai undangan dipublikasikan.
+        </div>
+      )}
       <div className="relative w-full min-h-screen bg-[#050505] flex items-center justify-center font-sans overflow-hidden">
         <div className="w-full h-full relative animate-fadeIn">
           <InvitationClient
             invitationId={inv.id}
             weddingData={inv.weddingData}
             themeId={inv.themeId}
-            guests={guestsData}
             initialRsvps={rsvpsData}
             urlGuest={urlGuest}
             watermarkType={watermarkType}

@@ -31,6 +31,26 @@ import {
 } from '../lib/api';
 import type { PhotoMoment, VoiceWish } from '../types';
 
+// Token hapus disimpan di perangkat pengunggah — hanya pengunggah (atau pemilik undangan) yang bisa menghapus.
+const TOKEN_KEY = 'rh_moment_tokens';
+function readTokens(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(TOKEN_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+function saveToken(id: string, token?: string) {
+  if (!token) return;
+  try {
+    const all = readTokens();
+    all[id] = token;
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+}
+
 interface LiveMomentsDockProps {
   invitationId: string;
   guestName?: string;
@@ -173,6 +193,7 @@ export default function LiveMomentsDock({
         imageUrl: uploaded.secureUrl,
         caption: caption.trim(),
       });
+      saveToken(saved.id, (saved as any).deleteToken);
       setMoments((prev) => [saved, ...prev]);
       setCaption('');
       persistName();
@@ -189,7 +210,7 @@ export default function LiveMomentsDock({
     if (!window.confirm('Hapus momen ini dari dinding?')) return;
     setMoments((prev) => prev.filter((x) => x.id !== m.id));
     try {
-      await deletePhotoMoment(m.id);
+      await deletePhotoMoment(m.id, readTokens()[m.id]);
     } catch {
       void loadAll();
     }
@@ -281,6 +302,7 @@ export default function LiveMomentsDock({
         audioUrl: uploaded.secureUrl,
         durationSec: seconds,
       });
+      saveToken(saved.id, (saved as any).deleteToken);
       setVoices((prev) => [saved, ...prev]);
       setAudioBlob(null);
       setAudioPreview('');
@@ -298,7 +320,7 @@ export default function LiveMomentsDock({
     if (!window.confirm('Hapus ucapan suara ini?')) return;
     setVoices((prev) => prev.filter((x) => x.id !== v.id));
     try {
-      await deleteVoiceWish(v.id);
+      await deleteVoiceWish(v.id, readTokens()[v.id]);
     } catch {
       void loadAll();
     }
@@ -648,9 +670,11 @@ export default function LiveMomentsDock({
             <button onClick={() => downloadImage(lightbox)} className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[11px] font-bold text-black">
               <Download className="h-3.5 w-3.5" /> Unduh
             </button>
-            <button onClick={() => handleDeleteMoment(lightbox)} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-[11px] font-bold">
-              <Trash className="h-3.5 w-3.5" /> Hapus
-            </button>
+            {readTokens()[lightbox.id] && (
+              <button onClick={() => handleDeleteMoment(lightbox)} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-[11px] font-bold">
+                <Trash className="h-3.5 w-3.5" /> Hapus
+              </button>
+            )}
           </div>
         </div>
       )}

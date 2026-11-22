@@ -1,6 +1,7 @@
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
 import { NextResponse } from 'next/server';
 import { pakasir, generateOrderId } from '../../../lib/pakasir';
-import { createTransaction } from '../../../lib/api';
+import { createTransaction } from '../../../lib/db';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 
 export const runtime = 'nodejs';
@@ -14,6 +15,7 @@ const VALID_METHODS = [
 ];
 
 export async function POST(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
   try {
     // Rate limiting
     const clientIp = getClientIp(req);

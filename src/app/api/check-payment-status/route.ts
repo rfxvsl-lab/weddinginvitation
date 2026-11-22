@@ -1,5 +1,6 @@
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
 import { NextResponse } from 'next/server';
-import { getUserById } from '../../../lib/api';
+import { getUserById } from '../../../lib/db';
 
 export const runtime = 'nodejs';
 
@@ -7,6 +8,7 @@ export const runtime = 'nodejs';
  * Check payment status for frontend polling
  */
 export async function GET(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');

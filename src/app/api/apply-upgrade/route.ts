@@ -1,5 +1,6 @@
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
 import { NextResponse } from 'next/server';
-import { updateUserPackage, updateUserPaymentStatus, extendInvitation, getInvitationsByUserId, activateInvitation, getUserById } from '../../../lib/api';
+import { updateUserPackage, updateUserPaymentStatus, extendInvitation, getInvitationsByUserId, activateInvitation, getUserById } from '../../../lib/db';
 import { PACKAGE_LIMITS } from '../../../lib/packageLimits';
 
 export const runtime = 'nodejs';
@@ -12,6 +13,7 @@ export const runtime = 'nodejs';
  * type='extend'  → extend masa aktif tanpa ganti tier
  */
 export async function POST(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
   try {
     const body = await req.json();
     const { userId, type, targetPackageId, invitationId } = body;

@@ -1,11 +1,13 @@
-﻿import { NextResponse } from 'next/server';
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
+import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { createTransaction, updateUserPaymentStatus } from '../../../lib/api';
+import { createTransaction, updateUserPaymentStatus } from '../../../lib/db';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
   try {
     // Rate limiting: maks 5 request per IP per 10 menit
     const clientIp = getClientIp(req);
@@ -51,7 +53,7 @@ export async function POST(req: Request) {
     const contentType = imgResponse.headers.get('content-type') || 'image/jpeg';
 
     // 2. Initialize Gemini API Client
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+    const apiKey = process.env.GEMINI_API_KEY || '';
     if (!apiKey) {
       console.warn('GEMINI_API_KEY tidak dikonfigurasi. Menggunakan mode mock sukses.');
     }

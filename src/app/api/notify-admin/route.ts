@@ -1,65 +1,22 @@
-﻿import { NextResponse } from 'next/server';
-import { dbExecute } from '../../../lib/turso';
-import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { NextResponse } from 'next/server';
+import { requireAdmin } from '../../../lib/server/auth';
+import { notifyAdmin } from '../../../lib/server/notify';
+import { handleRouteError } from '../../../lib/server/http';
 
+export const runtime = 'nodejs';
+
+/** Kirim notifikasi uji ke aplikasi admin. Hanya admin yang login. */
 export async function POST(req: Request) {
   try {
-    // Rate limiting: maks 10 notifikasi per IP per menit
-    const clientIp = getClientIp(req);
-    const rateLimit = checkRateLimit({
-      identifier: `notify-admin:${clientIp}`,
-      max: 10,
-      windowSecs: 60, // 1 menit
-    });
-
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: 'Terlalu banyak notifikasi. Coba lagi nanti.' },
-        { status: 429, headers: { 'Retry-After': String(rateLimit.resetIn) } }
-      );
-    }
-
-    const body = await req.json();
-    const { title, message, data } = body;
-
-    const result = await dbExecute(
-      'SELECT value FROM admin_settings WHERE key = :key LIMIT 1',
-      { key: 'expo_push_token' }
+    await requireAdmin();
+    const body = await req.json().catch(() => ({}));
+    const result = await notifyAdmin(
+      String(body?.title || 'Notifikasi RuangHadir').slice(0, 120),
+      String(body?.message || 'Ada pemberitahuan baru').slice(0, 500),
+      typeof body?.data === 'object' && body.data ? body.data : {}
     );
-
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Admin Expo Push Token not found' },
-        { status: 404 }
-      );
-    }
-
-    const pushToken = result.rows[0].value as string;
-
-    const expoResponse = await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: pushToken,
-        sound: 'default',
-        title: title || 'Notifikasi Admin RFX',
-        body: message || 'Ada pemberitahuan baru',
-        data: data || {},
-      }),
-    });
-
-    const expoResult = await expoResponse.json();
-
-    return NextResponse.json({ success: true, expoResult });
-  } catch (error: any) {
-    console.error('Notify admin route error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: result.ok, ...result });
+  } catch (err) {
+    return handleRouteError('notify-admin', err);
   }
 }

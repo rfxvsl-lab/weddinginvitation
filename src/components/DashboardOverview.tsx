@@ -37,6 +37,7 @@ interface DashboardOverviewProps {
     segment: 'overview' | 'design' | 'settings' | 'guests' | 'analytics' | 'profile' | 'upgrade'
   ) => void;
   onPublish: () => void;
+  publicSlug?: string;
 }
 
 export default function DashboardOverview({
@@ -48,10 +49,11 @@ export default function DashboardOverview({
   analytics,
   onNavigate,
   onPublish,
+  publicSlug,
 }: DashboardOverviewProps) {
   const [copied, setCopied] = useState(false);
 
-  const slug = invitation?.slug || user.activeSlug || '';
+  const slug = publicSlug || invitation?.slug || user.activeSlug || '';
   const liveUrl = slug ? `https://ruanghadir.net/${slug}` : 'https://ruanghadir.net';
   const isPublished = Boolean(invitation?.isPublished);
   const isEnt = isEnterpriseTier(user.packageId);

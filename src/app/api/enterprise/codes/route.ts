@@ -5,41 +5,23 @@ import {
   revokeEnterpriseCode,
   PUBLIC_EMAIL_DOMAINS,
 } from '@/lib/enterprise';
+import { getSession } from '@/lib/server/auth';
 
 export const runtime = 'nodejs';
 
-function isAuthorizedAdmin(req: NextRequest): boolean {
-  const adminEmail = (
-    process.env.ADMIN_EMAIL ||
-    process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
-    'mhmmadridho64@gmail.com'
-  )
-    .toLowerCase()
-    .trim();
-
-  // 1. Cek header secret opsional untuk integrasi CLI/otomasi
+async function isAuthorizedAdmin(req: NextRequest): Promise<boolean> {
+  // 1. Header secret opsional untuk integrasi CLI/otomasi
   const apiSecret = process.env.ENTERPRISE_ADMIN_SECRET;
   const headerSecret = req.headers.get('x-admin-secret');
-  if (apiSecret && headerSecret && headerSecret === apiSecret) {
-    return true;
-  }
+  if (apiSecret && headerSecret && headerSecret === apiSecret) return true;
 
-  // 2. Cek cookie session admin
-  const rawCookie = req.cookies.get('saas_user_session')?.value;
-  if (!rawCookie) return false;
-  try {
-    const parsed = JSON.parse(Buffer.from(rawCookie, 'base64').toString('utf8'));
-    return (
-      Boolean(parsed?.isAdmin) ||
-      String(parsed?.email || '').toLowerCase().trim() === adminEmail
-    );
-  } catch {
-    return false;
-  }
+  // 2. Sesi admin bertanda tangan (httpOnly)
+  const session = await getSession();
+  return session?.role === 'admin';
 }
 
 export async function GET(req: NextRequest) {
-  if (!isAuthorizedAdmin(req)) {
+  if (!(await isAuthorizedAdmin(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
@@ -54,7 +36,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAuthorizedAdmin(req)) {
+  if (!(await isAuthorizedAdmin(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
@@ -109,7 +91,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  if (!isAuthorizedAdmin(req)) {
+  if (!(await isAuthorizedAdmin(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {

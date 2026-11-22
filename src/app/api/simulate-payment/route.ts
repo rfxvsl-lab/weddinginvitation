@@ -1,6 +1,7 @@
+import { paymentsEnabled, paymentsDisabledResponse } from '../../../lib/server/payments';
 import { NextResponse } from 'next/server';
 import { pakasir } from '../../../lib/pakasir';
-import { getAllTransactions, updateTransactionStatus, updateUserPaymentStatus } from '../../../lib/api';
+import { getAllTransactions, updateTransactionStatus, updateUserPaymentStatus } from '../../../lib/db';
 
 export const runtime = 'nodejs';
 
@@ -12,6 +13,8 @@ export const runtime = 'nodejs';
  * Endpoint ini TIDAK diperlukan di production.
  */
 export async function POST(req: Request) {
+  if (!paymentsEnabled()) return paymentsDisabledResponse();
+  if (process.env.NODE_ENV === 'production') return paymentsDisabledResponse();
   try {
     const body = await req.json();
     const { orderId, amount, userId } = body;

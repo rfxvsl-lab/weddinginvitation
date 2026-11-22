@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth, type GoogleSignupInfo } from '../hooks/useAuth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 import {
   CheckCircle2 as CheckCircle,
   ChevronRight,
@@ -96,11 +95,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const [noWa, setNoWa] = useState('');
   const [sosmed, setSosmed] = useState('');
   const [packageId, setPackageId] = useState<UserPackageId>('free');
-  const [googleUser, setGoogleUser] = useState<{
-    unverifiedEmail: string;
-    name: string;
-    avatarUrl?: string;
-  } | null>(null);
+  const [googleUser, setGoogleUser] = useState<GoogleSignupInfo | null>(null);
 
   // Login Inputs
   const [loginEmail, setLoginEmail] = useState('');
@@ -180,12 +175,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     if (!credentialResponse.credential) return;
     try {
-      const decoded: any = jwtDecode(credentialResponse.credential);
-      const userEmail = decoded.email;
-      const name = decoded.name;
-      const picture = decoded.picture;
-
-      const result = await auth.loginWithGoogle(userEmail, name, picture);
+      const result = await auth.loginWithGoogle(credentialResponse.credential);
       if (result) {
         if ('unverifiedEmail' in result) {
           setGoogleUser(result);
@@ -255,9 +245,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       coupleBride: brideName.trim(),
       activeSlug: finalSlug,
       email: email.trim().toLowerCase(),
-      password: googleUser
-        ? Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2)
-        : password,
+      password: googleUser ? undefined : password,
+      googleSignupToken: googleUser?.signupToken,
       noWa: noWa.trim(),
       sosmed: sosmed.trim(),
       packageId: 'free',

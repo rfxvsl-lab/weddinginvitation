@@ -8,8 +8,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { limitOr429 } from '@/lib/server/http';
 
 export async function GET(request: NextRequest) {
+  const limited = limitOr429(request, 'music-search', 60, 60);
+  if (limited) return limited;
   const { searchParams } = new URL(request.url);
   const term = searchParams.get('term');
 

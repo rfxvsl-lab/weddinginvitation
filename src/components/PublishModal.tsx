@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { resolvePublicSlug } from '../lib/utils';
 import { Copy, Check, MessageSquare, AlertCircle, ChevronRight, CheckCircle, ExternalLink, Send, Globe } from 'lucide-react';
 import { Logo } from './ui/Logo';
 import { SaaSUser } from '../types';
@@ -33,7 +34,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
     if (!guest) return '';
     const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
     const appProtocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
-    const url = `${appProtocol}//${appHost}/${wedding.invitation?.slug || user?.activeSlug || 'demo'}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
+    const url = `${appProtocol}//${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
     
     if (templateId === 'formal') {
       return `Kepada Yth. Bapak/Ibu/Saudara/i ${guest.name},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami.\n\nDetail acara dan undangan lengkap dapat dilihat melalui tautan berikut:\n${url}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.\n\nTerima kasih.\n\nHormat kami,\n${wedding.weddingData.couple.bride.nickname} & ${wedding.weddingData.couple.groom.nickname}`;
@@ -63,7 +64,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const publishAllowed = canAccess(packageId, 'canPublish');
   const themeName = DEFAULT_THEMES.find(t => t.id === wedding.themeId)?.name || 'Grand Ballroom';
   const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
-  const siteUrl = `${appHost}/${wedding.invitation?.slug || activeSaaSUser.activeSlug || 'demo'}`;
+  const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, activeSaaSUser.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
 
   // If publish not allowed (demo), show upgrade prompt
   if (!publishAllowed) {

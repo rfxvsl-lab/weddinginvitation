@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getInvitationBySlug } from '@/lib/api';
+import { getInvitationBySlug } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,7 @@ function escapeIcs(text: string) {
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const inv = await getInvitationBySlug(slug);
-  if (!inv) return new Response('Undangan tidak ditemukan', { status: 404 });
+  if (!inv || !inv.isPublished || inv.isExpired) return new Response('Undangan tidak ditemukan', { status: 404 });
 
   const data = inv.weddingData as any;
   const groom = data?.couple?.groom?.nickname || 'Mempelai';

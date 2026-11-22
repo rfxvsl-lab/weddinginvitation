@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { getSession } from '@/lib/server/auth';
+import { limitOr429 } from '@/lib/server/http';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,10 +15,16 @@ interface AICopyRequest {
 
 export async function POST(req: NextRequest) {
   try {
+    // Hanya pengguna yang login, dan dibatasi agar kuota AI tidak disalahgunakan.
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Silakan masuk terlebih dahulu.' }, { status: 401 });
+    const limited = limitOr429(req, 'ai-copy', 20, 60 * 60, session.uid);
+    if (limited) return limited;
+
     const body = (await req.json()) as AICopyRequest;
     const { type, tone = 'romantis', groomName = 'Mempelai Pria', brideName = 'Mempelai Wanita', notes = '' } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+    const apiKey = process.env.GEMINI_API_KEY || '';
 
     // Fallback template jika belum ada API key
     if (!apiKey) {

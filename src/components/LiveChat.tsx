@@ -84,7 +84,7 @@ export default function LiveChat({ currentUser }: LiveChatProps) {
   const alertModal = useAlertModal();
 
   const conversationId = currentUser.id; // Each user has one conversation
-  const isAdmin = currentUser.email === 'mhmmadridho64@gmail.com';
+  const isAdmin = Boolean((currentUser as { isAdmin?: boolean }).isAdmin);
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {

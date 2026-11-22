@@ -1,57 +1,37 @@
 import { NextResponse } from 'next/server';
-import { dbExecute } from '../../../lib/turso';
-import { checkSlugExists, updateUserProfile } from '../../../lib/api';
+import { checkSlugExists, updateUserProfile } from '../../../lib/db';
+import { requireSession } from '../../../lib/server/auth';
+import { handleRouteError, jsonError, normalizeSlug, RESERVED_SLUGS } from '../../../lib/server/http';
 
 export const runtime = 'nodejs';
 
+/** Update avatar / slug untuk akun yang sedang login (userId dari sesi, bukan dari body). */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { userId, avatarUrl, activeSlug } = body;
+    const session = await requireSession();
+    const userId = session.uid;
+    const body = await req.json().catch(() => ({}));
+    const { avatarUrl, activeSlug } = body ?? {};
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId diperlukan.' }, { status: 400 });
-    }
-
-    // Handle avatar update
     if (avatarUrl !== undefined) {
-      await dbExecute(
-        'UPDATE users SET avatar_url = :avatarUrl WHERE id = :userId',
-        { avatarUrl, userId }
-      );
-      console.log(`[update-profile] ✅ Avatar updated for user ${userId}`);
+      const url = String(avatarUrl || '').trim().slice(0, 500);
+      if (url && !/^https:\/\//.test(url)) return jsonError('URL foto profil tidak valid.');
+      await updateUserProfile(userId, { avatarUrl: url });
     }
 
-    // Handle slug update
     if (activeSlug !== undefined) {
-      // Validate format
-      const cleanSlug = activeSlug.toLowerCase().replace(/[^a-z0-9-]/g, '');
-      if (cleanSlug.length < 3) {
-        return NextResponse.json({ error: 'Slug harus minimal 3 karakter.' }, { status: 400 });
+      const cleanSlug = normalizeSlug(String(activeSlug));
+      if (cleanSlug.length < 3) return jsonError('Slug harus minimal 3 karakter.');
+      if (RESERVED_SLUGS.has(cleanSlug)) return jsonError('Slug tersebut tidak tersedia.');
+      if (await checkSlugExists(cleanSlug, userId)) {
+        return jsonError('Slug sudah digunakan oleh pengguna lain.', 409);
       }
-      if (cleanSlug.length > 50) {
-        return NextResponse.json({ error: 'Slug maksimal 50 karakter.' }, { status: 400 });
-      }
-
-      // Check uniqueness (exclude current user)
-      const exists = await checkSlugExists(cleanSlug, userId);
-      if (exists) {
-        return NextResponse.json({ error: 'Slug sudah digunakan oleh pengguna lain.' }, { status: 409 });
-      }
-
-      // Update slug in DB
       await updateUserProfile(userId, { activeSlug: cleanSlug });
-      console.log(`[update-profile] ✅ Slug updated for user ${userId}: ${cleanSlug}`);
-
       return NextResponse.json({ success: true, activeSlug: cleanSlug });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('[update-profile] Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Gagal update profil.' },
-      { status: 500 }
-    );
+  } catch (err) {
+    return handleRouteError('update-profile', err);
   }
 }
