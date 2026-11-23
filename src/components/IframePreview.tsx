@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { lockZoom } from './system/ZoomLock';
 
 /** A real mobile viewport for media queries, viewport units and fixed overlays. */
 const IFRAME_SRCDOC =
-  '<!DOCTYPE html><html lang="id"><head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><body></body></html>';
+  '<!DOCTYPE html><html lang="id"><head><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" /></head><body></body></html>';
 
 export default function IframePreview({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
@@ -18,7 +19,12 @@ export default function IframePreview({ children, className = '' }: { children: 
     }
     doc.documentElement.lang = 'id';
     doc.documentElement.style.height = '100%';
-    Object.assign(doc.body.style, { margin: '0', padding: '0', minHeight: '100%', height: '100%', background: 'transparent', overflowX: 'hidden' });
+    Object.assign(doc.body.style, { margin: '0', padding: '0', minHeight: '100%', height: '100%', background: 'transparent', overflowX: 'hidden', touchAction: 'pan-x pan-y' });
+    doc.documentElement.style.touchAction = 'pan-x pan-y';
+    if (!(doc as Document & { __zoomLocked?: boolean }).__zoomLocked && doc.defaultView) {
+      (doc as Document & { __zoomLocked?: boolean }).__zoomLocked = true;
+      lockZoom(doc, doc.defaultView);
+    }
     setIframeBody(previous => previous === doc.body ? previous : doc.body);
   }, []);
 

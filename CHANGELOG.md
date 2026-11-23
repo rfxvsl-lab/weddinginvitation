@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.1.1] — 2026-11-23
+
+- Zoom kembali dikunci di seluruh aplikasi & pratinjau undangan (viewport `user-scalable=no`, `touch-action: pan-x pan-y`, pencegahan gesture pinch iOS, ctrl+scroll, ctrl +/-) lewat `components/system/ZoomLock.tsx`.
+
 ## [3.1.0] — 2026-11-23 — Film undangan Enterprise 1:1 dengan template
 
 - Video contoh Enterprise dibangun ulang per tema dari aset, tipografi, dan mekanik template aslinya:

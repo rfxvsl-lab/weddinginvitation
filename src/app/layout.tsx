@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import ZoomLock from '@/components/system/ZoomLock';
 import { DM_Serif_Display, DM_Sans, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '../hooks/useAuth';
@@ -54,6 +55,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  minimumScale: 1,
+  userScalable: false,
   themeColor: '#F8F5F0',
 };
 
@@ -65,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`${dmSerif.variable} ${dmSans.variable} ${playfair.variable} ${jakarta.variable} antialiased bg-background text-foreground`}>
+        <ZoomLock />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
