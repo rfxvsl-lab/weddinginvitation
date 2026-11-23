@@ -37,10 +37,10 @@ export const VIDEO_DURATION_SEC = 18;
 export const VIDEO_TOTAL_FRAMES = VIDEO_FPS * VIDEO_DURATION_SEC; // 540 frames
 
 export const VIDEO_SCENES = [
-  { id: 0, label: '01 · Opening Gate', start: 0, end: 135 },
-  { id: 1, label: '02 · Polaroid Mempelai', start: 135, end: 270 },
-  { id: 2, label: '03 · Kartu Undangan', start: 270, end: 405 },
-  { id: 3, label: '04 · Golden Finale', start: 405, end: 540 },
+  { id: 0, label: 'Monogram & nama', start: 0, end: 135 },
+  { id: 1, label: 'Potret mempelai', start: 135, end: 270 },
+  { id: 2, label: 'Tanggal & lokasi', start: 270, end: 405 },
+  { id: 3, label: 'Penutup', start: 405, end: 540 },
 ] as const;
 
 export const VIDEO_THEMES: VideoThemeMeta[] = [

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Serif_Display, DM_Sans, Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
+import { DM_Serif_Display, DM_Sans, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
@@ -21,10 +21,9 @@ const dmSans = DM_Sans({
 });
 
 // Tipografi aplikasi (landing, auth, dashboard)
-const fraunces = Fraunces({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin"],
-  axes: ["SOFT", "opsz"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -65,7 +64,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={`${dmSerif.variable} ${dmSans.variable} ${fraunces.variable} ${jakarta.variable} antialiased bg-background text-foreground`}>
+      <body className={`${dmSerif.variable} ${dmSans.variable} ${playfair.variable} ${jakarta.variable} antialiased bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

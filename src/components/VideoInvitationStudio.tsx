@@ -249,7 +249,7 @@ export default function VideoInvitationStudio({
               </p>
             </div>
             <span className="rounded-full bg-[#2A1E21]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[#2A1E21] tabular">
-              TC {formatTimecode(Math.floor(frame))} / 00:12:00
+              TC {formatTimecode(Math.floor(frame))} / {formatTimecode(VIDEO_TOTAL_FRAMES - 1)}
             </span>
           </div>
 

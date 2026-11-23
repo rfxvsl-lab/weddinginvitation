@@ -13,7 +13,7 @@
 - `middleware.ts` diganti `proxy.ts` (konvensi Next.js 16).
 
 ### Desain
-- Design system tunggal **Editorial Luxury**: ivory `#F8F5F0`, wine `#7A2E3B`, gold `#B8955A`, Fraunces + Plus Jakarta Sans. Lapisan iOS Liquid Glass dihapus.
+- Design system tunggal **Editorial Luxury**: ivory `#F8F5F0`, wine `#7A2E3B`, gold `#B8955A`, Playfair Display + Plus Jakarta Sans. Lapisan iOS Liquid Glass dihapus.
 - Landing page ditulis ulang (`src/components/landing/*`) dengan screenshot asli setiap tema.
 - Auth dengan panel visual undangan; dashboard memakai palet yang sama (zinc/amber/rose dipetakan ulang via `.saas-dash`).
 - Zoom browser tidak lagi dikunci (aksesibilitas).

@@ -1,8 +1,26 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin } from 'lucide-react';
-import { VideoThemeId, VideoCoupleProps } from '@/lib/invitationVideoEngine';
+/**
+ * EnterpriseMotionPlayer — komposisi motion graphic ala After Effects.
+ *
+ * Sepenuhnya deterministik: setiap frame adalah fungsi murni dari `progress` (0..1),
+ * seperti komposisi Remotion. Tidak ada animasi CSS/RAF internal, sehingga scrub,
+ * pause, dan render frame-by-frame selalu konsisten.
+ *
+ * Bahasa visual AE yang dipakai:
+ *   • Text animator per huruf (mask reveal, tracking, blur-in, overshoot)
+ *   • Shape layer dengan Trim Paths (garis, cincin, lengkung bingkai)
+ *   • Transisi grafis: stripe wipe, iris (circle) wipe, light-leak flash, diagonal wipe
+ *   • Kamera 2.5D: Ken Burns, parallax, whip-zoom keluar scene
+ *   • Odometer angka tanggal, pin lokasi dengan ripple, typewriter URL
+ *   • Grain film, vignette, partikel atmosfer per tema
+ *
+ * Komposisi dirancang di stage tinggi 640 unit dan diskalakan ke kontainer,
+ * jadi rapi untuk 9:16, 1:1, maupun 16:9.
+ */
+
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { VideoThemeId, VideoCoupleProps, VIDEO_DURATION_SEC } from '@/lib/invitationVideoEngine';
 
 export interface MotionPlayerCouple extends VideoCoupleProps {
   heroPhoto?: string;
@@ -13,11 +31,11 @@ export interface MotionPlayerCouple extends VideoCoupleProps {
 interface EnterpriseMotionPlayerProps {
   themeId: VideoThemeId;
   couple: MotionPlayerCouple;
-  /** 0..3 active act index */
-  sceneIdx: number;
-  /** 0..1 continuous timeline progress (Remotion-style frame-driven) */
+  /** 0..3 babak aktif (dipakai label UI di luar) */
+  sceneIdx?: number;
+  /** 0..1 progres timeline */
   progress: number;
-  isPlaying: boolean;
+  isPlaying?: boolean;
   showWatermark?: boolean;
 }
 
@@ -25,1230 +43,1335 @@ const DEFAULT_HERO = '/assets/kharis-lia/hero.jpg';
 const DEFAULT_GROOM = '/assets/kharis-lia/groom.jpg';
 const DEFAULT_BRIDE = '/assets/kharis-lia/bride.jpg';
 
-// ---- Remotion-style Deterministic Interpolation Helpers ----
-function clamp01(v: number) {
-  return Math.max(0, Math.min(1, v));
+const STAGE_H = 640;
+const COL_W = 360;
+const DUR = VIDEO_DURATION_SEC;
+
+// ============================================================
+// Easing & keyframe helpers (setara graph editor AE)
+// ============================================================
+
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const seg = (t: number, a: number, b: number) => clamp01((t - a) / Math.max(0.0001, b - a));
+
+const ease = {
+  linear: (x: number) => x,
+  inCubic: (x: number) => x * x * x,
+  outCubic: (x: number) => 1 - Math.pow(1 - x, 3),
+  inOutCubic: (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+  outExpo: (x: number) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x)),
+  inExpo: (x: number) => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10)),
+  inOutExpo: (x: number) =>
+    x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2,
+  outBack: (x: number) => {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  },
+  outQuint: (x: number) => 1 - Math.pow(1 - x, 5),
+};
+
+/** Nilai animasi antara dua waktu dengan easing (seperti 2 keyframe AE). */
+function anim(t: number, a: number, b: number, from: number, to: number, fn: (x: number) => number = ease.outCubic) {
+  return lerp(from, to, fn(seg(t, a, b)));
 }
 
-function easeOutCubic(t: number) {
-  const x = clamp01(t);
-  return 1 - Math.pow(1 - x, 3);
+function seeded(i: number) {
+  const x = Math.sin(i * 127.1 + 311.7) * 43758.5453123;
+  return x - Math.floor(x);
 }
 
-function easeInOutCubic(t: number) {
-  const x = clamp01(t);
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-}
+// ============================================================
+// Konfigurasi tema
+// ============================================================
 
-function easeOutExpo(t: number) {
-  const x = clamp01(t);
-  return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
-}
-
-function easeInCubic(t: number) {
-  const x = clamp01(t);
-  return x * x * x;
-}
-
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * clamp01(t);
-}
-
-function seg(progress: number, start: number, end: number) {
-  if (end <= start) return progress >= end ? 1 : 0;
-  return clamp01((progress - start) / (end - start));
-}
-
-/** Smooth bell-curve (0 -> 1 -> 0) around a cut point for volumetric sun-flare transitions */
-function flareBell(progress: number, center: number, halfWidth: number) {
-  const dist = Math.abs(progress - center);
-  if (dist >= halfWidth) return 0;
-  return Math.cos((dist / halfWidth) * (Math.PI / 2));
-}
-
-interface ThemeCinemaConfig {
-  scenes: {
-    gate: string;
-    hall: string;
-    sky: string;
-  };
+interface ThemeMotionConfig {
+  plates: { gate: string; hall: string; sky: string };
   palette: {
     bg: string;
-    cardBg: string;
-    cardBorder: string;
+    paper: string;
     primary: string;
     secondary: string;
     text: string;
     muted: string;
-    flareInner: string;
-    flareOuter: string;
-    skyTextColor: string;
-    skyShadow: string;
+    leak: string;
   };
-  fonts: {
-    display: string;
-    serif: string;
-    sans: string;
-  };
-  copy: {
-    openingTag: string;
-    openingStory: string;
-    coupleStory: string;
-    eventTag: string;
-    eventHeading: string;
-    farewell: string;
-  };
+  fonts: { display: string; script: string; serif: string; sans: string };
+  particle: 'ember' | 'sparkle' | 'petal';
+  copy: { tag: string; story: string; groomRole: string; brideRole: string; dateTag: string; farewell: string };
 }
 
-const THEME_CINEMA: Record<VideoThemeId, ThemeCinemaConfig> = {
+const THEMES: Record<VideoThemeId, ThemeMotionConfig> = {
   'javanese-classic': {
-    scenes: {
+    plates: {
       gate: '/assets/video-scenes/javanese-gate.webp',
       hall: '/assets/video-scenes/javanese-hall.webp',
       sky: '/assets/video-scenes/javanese-sky.webp',
     },
     palette: {
-      bg: '#F8F0DF',
-      cardBg: 'rgba(250, 243, 229, 0.94)',
-      cardBorder: '#C59C62',
-      primary: '#8A452C',
+      bg: '#F6EEDC',
+      paper: '#FBF6EA',
+      primary: '#7E3E27',
       secondary: '#C59C62',
-      text: '#493021',
+      text: '#3F2A1D',
       muted: '#6B4E35',
-      flareInner: 'rgba(255, 243, 210, 0.92)',
-      flareOuter: 'rgba(197, 156, 98, 0.38)',
-      skyTextColor: '#493021',
-      skyShadow: '0 2px 24px rgba(248, 240, 223, 0.95), 0 1px 2px rgba(255,255,255,0.9)',
+      leak: 'rgba(255, 196, 120, 0.55)',
     },
     fonts: {
-      display: "'Philosopher', 'Playfair Display', Georgia, serif",
-      serif: "'Gelasio', Georgia, serif",
-      sans: "'Montserrat', sans-serif",
+      display: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+      script: "'Cormorant Garamond', Georgia, serif",
+      serif: "'Lora', Georgia, serif",
+      sans: "var(--font-ui), 'Plus Jakarta Sans', system-ui, sans-serif",
     },
+    particle: 'ember',
     copy: {
-      openingTag: 'PAHARGYAN PERNIKAHAN',
-      openingStory:
-        'Dengan memohon rahmat dan ridho-Nya, perjalanan baru kami dimulai.',
-      coupleStory: 'Dua hati yang dipertemukan untuk melangkah bersama.',
-      eventTag: 'IJAB KABUL & RESEPSI',
-      eventHeading: 'Pahargyan',
-      farewell: 'Sampai Jumpa',
+      tag: 'Pahargyan Pernikahan',
+      story: 'Dengan memohon rahmat dan ridho-Nya, kami mengundang Anda di hari bahagia kami.',
+      groomRole: 'Mempelai Pria',
+      brideRole: 'Mempelai Wanita',
+      dateTag: 'Ijab Kabul & Resepsi',
+      farewell: 'Sampai jumpa',
     },
   },
   'grand-ballroom': {
-    scenes: {
+    plates: {
       gate: '/assets/video-scenes/ballroom-gate.webp',
       hall: '/assets/video-scenes/ballroom-hall.webp',
       sky: '/assets/video-scenes/ballroom-sky.webp',
     },
     palette: {
-      bg: '#F3F6FA',
-      cardBg: 'rgba(246, 249, 253, 0.92)',
-      cardBorder: '#8FA8C2',
-      primary: '#345579',
-      secondary: '#8FA8C2',
-      text: '#23364D',
+      bg: '#EEF2F7',
+      paper: '#F8FAFD',
+      primary: '#2C4A6E',
+      secondary: '#B39B6B',
+      text: '#1C2E44',
       muted: '#4B637E',
-      flareInner: 'rgba(255, 255, 255, 0.94)',
-      flareOuter: 'rgba(143, 168, 194, 0.42)',
-      skyTextColor: '#1E3147',
-      skyShadow: '0 2px 24px rgba(243, 246, 250, 0.96), 0 1px 2px rgba(255,255,255,0.95)',
+      leak: 'rgba(255, 236, 200, 0.55)',
     },
     fonts: {
       display: "'Cinzel', 'Playfair Display', Georgia, serif",
+      script: "'Playfair Display', Georgia, serif",
       serif: "'Playfair Display', Georgia, serif",
-      sans: "'Lato', sans-serif",
+      sans: "var(--font-ui), 'Plus Jakarta Sans', system-ui, sans-serif",
     },
+    particle: 'sparkle',
     copy: {
-      openingTag: 'THE ROYAL WEDDING',
-      openingStory:
-        'Under crystal light and timeless grace, our forever begins tonight.',
-      coupleStory: 'Two souls united in a celebration of enduring love.',
-      eventTag: 'ROYAL CEREMONY & RECEPTION',
-      eventHeading: 'Grand Reception',
-      farewell: 'See You There',
+      tag: 'The Royal Wedding',
+      story: 'Di bawah cahaya kristal, kami memulai babak selamanya — dan ingin Anda menjadi saksinya.',
+      groomRole: 'The Groom',
+      brideRole: 'The Bride',
+      dateTag: 'Royal Ceremony & Reception',
+      farewell: 'See you there',
     },
   },
   'luxury-pink': {
-    scenes: {
+    plates: {
       gate: '/assets/video-scenes/pink-gate.webp',
       hall: '/assets/video-scenes/pink-hall.webp',
       sky: '/assets/video-scenes/pink-sky.webp',
     },
     palette: {
-      bg: '#FCF3F6',
-      cardBg: 'rgba(253, 246, 249, 0.94)',
-      cardBorder: '#D99AB3',
-      primary: '#A83D68',
+      bg: '#FBF0F3',
+      paper: '#FFF8FA',
+      primary: '#9C355E',
       secondary: '#D99AB3',
-      text: '#54243B',
+      text: '#4E2236',
       muted: '#7B465F',
-      flareInner: 'rgba(255, 244, 248, 0.95)',
-      flareOuter: 'rgba(217, 154, 179, 0.44)',
-      skyTextColor: '#54243B',
-      skyShadow: '0 2px 24px rgba(252, 243, 246, 0.96), 0 1px 2px rgba(255,255,255,0.95)',
+      leak: 'rgba(255, 170, 190, 0.5)',
     },
     fonts: {
-      display: "'Great Vibes', 'Playfair Display', cursive",
+      display: "'Playfair Display', Georgia, serif",
+      script: "'Great Vibes', 'Playfair Display', cursive",
       serif: "'Playfair Display', Georgia, serif",
-      sans: "'Nunito Sans', sans-serif",
+      sans: "var(--font-ui), 'Plus Jakarta Sans', system-ui, sans-serif",
     },
+    particle: 'petal',
     copy: {
-      openingTag: 'THE WEDDING OF',
-      openingStory:
-        'Semesta mempertemukan langkah kami untuk merangkai kisah selamanya.',
-      coupleStory: 'Kisah cinta yang mekar hangat di setiap langkah kami.',
-      eventTag: 'AKAD NIKAH & RESEPSI',
-      eventHeading: 'Wedding Schedule',
-      farewell: 'Sampai Jumpa',
+      tag: 'The Wedding of',
+      story: 'Semesta mempertemukan langkah kami untuk merangkai kisah selamanya.',
+      groomRole: 'Mempelai Pria',
+      brideRole: 'Mempelai Wanita',
+      dateTag: 'Akad Nikah & Resepsi',
+      farewell: 'Sampai jumpa',
     },
   },
 };
 
-/**
- * 60fps Atmospheric Particle Canvas
- * - javanese-classic: Rising golden firefly embers & drifting white melati petals
- * - grand-ballroom:   Twinkling 4-point crystal stardust & luminous bokeh orbs
- * - luxury-pink:      3D fluttering blush rose petals & warm rose-gold sparkles
- */
-function ThemeParticleOverlay({
-  themeId,
-  isPlaying,
+// ============================================================
+// Timeline (detik). Overlap = durasi transisi.
+// ============================================================
+
+const T = {
+  open: [0, 3.9],
+  names: [3.6, 7.85],
+  couple: [7.7, 11.9],
+  date: [11.55, 15.7],
+  close: [15.35, DUR],
+} as const;
+
+function parseDate(raw: string) {
+  const m = raw.match(/(?:([A-Za-z]+),\s*)?(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+  if (!m) return null;
+  return { weekday: m[1] || '', day: m[2].padStart(2, '0'), month: m[3], year: m[4] };
+}
+
+// ============================================================
+// Primitif layer
+// ============================================================
+
+/** Text animator per huruf: mask reveal dari bawah + blur, opsional keluar ke atas. */
+function SplitText({
+  text,
+  t,
+  start,
+  stagger = 0.035,
+  dur = 0.55,
+  exitAt,
+  exitStagger = 0.02,
+  style,
+  mode = 'rise',
 }: {
-  themeId: VideoThemeId;
-  isPlaying: boolean;
+  text: string;
+  t: number;
+  start: number;
+  stagger?: number;
+  dur?: number;
+  exitAt?: number;
+  exitStagger?: number;
+  style?: React.CSSProperties;
+  mode?: 'rise' | 'fade' | 'scale';
 }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const W = (canvas.width = 360);
-    const H = (canvas.height = 640);
-
-    const particles = Array.from({ length: 42 }, (_, i) => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: 1.6 + Math.random() * 4.4,
-      vx: (Math.random() - 0.5) * 0.48,
-      vy:
-        themeId === 'luxury-pink'
-          ? 0.42 + Math.random() * 0.85
-          : -(0.22 + Math.random() * 0.65),
-      phase: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.045,
-      angle: Math.random() * Math.PI * 2,
-      kind: i % 4 === 0 ? 'petal' : 'orb',
-    }));
-
-    let raf = 0;
-    let tick = 0;
-
-    const render = () => {
-      if (isPlaying) tick += 0.028;
-      ctx.clearRect(0, 0, W, H);
-
-      for (const p of particles) {
-        if (isPlaying) {
-          p.x += p.vx + Math.sin(tick + p.phase) * 0.42;
-          p.y += p.vy;
-          p.angle += p.spin;
-          if (p.y < -22) {
-            p.y = H + 22;
-            p.x = Math.random() * W;
-          }
-          if (p.y > H + 22) {
-            p.y = -22;
-            p.x = Math.random() * W;
-          }
-          if (p.x < -22) p.x = W + 22;
-          if (p.x > W + 22) p.x = -22;
-        }
-
-        const pulse = 0.45 + 0.55 * Math.sin(tick * 2.1 + p.phase);
-
-        if (themeId === 'javanese-classic') {
-          if (p.kind === 'petal') {
-            // Drifting white jasmine petal
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.angle);
-            ctx.scale(1, 0.55 + 0.45 * Math.sin(tick * 2.5 + p.phase));
-            ctx.fillStyle = `rgba(255, 251, 240, ${0.72 * pulse})`;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, p.r * 1.6, p.r * 0.8, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          } else {
-            // Warm golden firefly ember
-            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.2);
-            g.addColorStop(0, `rgba(255, 232, 165, ${0.88 * pulse})`);
-            g.addColorStop(0.45, `rgba(218, 174, 96, ${0.38 * pulse})`);
-            g.addColorStop(1, 'rgba(197, 156, 98, 0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r * 3.2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        } else if (themeId === 'grand-ballroom') {
-          if (p.kind === 'petal') {
-            // Soft luminous bokeh orb
-            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.4);
-            g.addColorStop(0, `rgba(255, 255, 255, ${0.75 * pulse})`);
-            g.addColorStop(0.5, `rgba(210, 226, 245, ${0.3 * pulse})`);
-            g.addColorStop(1, 'rgba(143, 168, 194, 0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r * 3.4, 0, Math.PI * 2);
-            ctx.fill();
-          } else {
-            // 4-point crystal diamond sparkle
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.angle * 0.4);
-            ctx.fillStyle = `rgba(255, 255, 255, ${0.82 * pulse})`;
-            const s = p.r * 1.5;
-            ctx.beginPath();
-            ctx.moveTo(0, -s);
-            ctx.quadraticCurveTo(0, 0, s, 0);
-            ctx.quadraticCurveTo(0, 0, 0, s);
-            ctx.quadraticCurveTo(0, 0, -s, 0);
-            ctx.quadraticCurveTo(0, 0, 0, -s);
-            ctx.fill();
-            ctx.restore();
-          }
-        } else {
-          // Luxury Pink: fluttering rose petals & golden-blush sparkles
-          if (p.kind === 'orb') {
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.angle);
-            ctx.scale(1, 0.45 + 0.55 * Math.abs(Math.sin(tick * 2.2 + p.phase)));
-            ctx.fillStyle =
-              p.r > 3.6
-                ? `rgba(225, 145, 178, ${0.65 * pulse})`
-                : `rgba(252, 224, 236, ${0.82 * pulse})`;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, p.r * 1.85, p.r * 0.95, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          } else {
-            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 2.8);
-            g.addColorStop(0, `rgba(255, 245, 248, ${0.88 * pulse})`);
-            g.addColorStop(0.5, `rgba(217, 154, 179, ${0.32 * pulse})`);
-            g.addColorStop(1, 'rgba(217, 154, 179, 0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r * 2.8, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-      }
-
-      raf = requestAnimationFrame(render);
-    };
-
-    raf = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(raf);
-  }, [themeId, isPlaying]);
-
+  const chars = Array.from(text);
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-30 h-full w-full"
+    <span style={{ display: 'inline-block', whiteSpace: 'pre', ...style }} aria-label={text}>
+      {chars.map((ch, i) => {
+        const inP = ease.outExpo(seg(t, start + i * stagger, start + i * stagger + dur));
+        const outP = exitAt !== undefined ? ease.inCubic(seg(t, exitAt + i * exitStagger, exitAt + i * exitStagger + 0.35)) : 0;
+        let transform = '';
+        let opacity = 1;
+        let filter: string | undefined;
+        if (mode === 'rise') {
+          const y = (1 - inP) * 105 - outP * 105;
+          transform = `translate3d(0, ${y}%, 0)`;
+          opacity = 1;
+        } else if (mode === 'fade') {
+          opacity = inP * (1 - outP);
+          transform = `translate3d(0, ${(1 - inP) * 30 - outP * 30}%, 0)`;
+          const b = (1 - inP) * 6 + outP * 6;
+          filter = b > 0.1 ? `blur(${b}px)` : undefined;
+        } else {
+          const s = lerp(0.2, 1, ease.outBack(seg(t, start + i * stagger, start + i * stagger + dur)));
+          opacity = inP * (1 - outP);
+          transform = `scale(${s * (1 - outP * 0.4)})`;
+        }
+        const inner = (
+          <span
+            aria-hidden
+            style={{ display: 'inline-block', transform, opacity, filter, willChange: 'transform' }}
+          >
+            {ch === ' ' ? ' ' : ch}
+          </span>
+        );
+        return mode === 'rise' ? (
+          <span key={i} aria-hidden style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', paddingBottom: '0.08em', marginBottom: '-0.08em' }}>
+            {inner}
+          </span>
+        ) : (
+          <React.Fragment key={i}>{inner}</React.Fragment>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Garis dengan Trim Paths (0..1 → panjang terlihat). */
+function TrimPath({
+  d,
+  length,
+  trim,
+  stroke,
+  width = 1.5,
+  dash,
+  style,
+  viewBox,
+  className,
+}: {
+  d: string;
+  length: number;
+  trim: number;
+  stroke: string;
+  width?: number;
+  dash?: string;
+  style?: React.CSSProperties;
+  viewBox: string;
+  className?: string;
+}) {
+  return (
+    <svg viewBox={viewBox} className={className} style={{ position: 'absolute', overflow: 'visible', ...style }} aria-hidden>
+      <path
+        d={d}
+        fill="none"
+        stroke={stroke}
+        strokeWidth={width}
+        strokeLinecap="round"
+        strokeDasharray={dash ?? `${length} ${length}`}
+        strokeDashoffset={dash ? undefined : length * (1 - clamp01(trim))}
+        style={dash ? { opacity: clamp01(trim) } : undefined}
+      />
+    </svg>
+  );
+}
+
+/** Plate latar dengan Ken Burns + parallax. */
+function Plate({
+  src,
+  t,
+  range,
+  scaleFrom,
+  scaleTo,
+  xFrom = 0,
+  xTo = 0,
+  yFrom = 0,
+  yTo = 0,
+  blur = 0,
+  style,
+}: {
+  src: string;
+  t: number;
+  range: readonly [number, number];
+  scaleFrom: number;
+  scaleTo: number;
+  xFrom?: number;
+  xTo?: number;
+  yFrom?: number;
+  yTo?: number;
+  blur?: number;
+  style?: React.CSSProperties;
+}) {
+  const p = ease.inOutCubic(seg(t, range[0], range[1]));
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        transform: `translate3d(${lerp(xFrom, xTo, p)}%, ${lerp(yFrom, yTo, p)}%, 0) scale(${lerp(scaleFrom, scaleTo, p)})`,
+        filter: blur > 0.15 ? `blur(${blur}px)` : undefined,
+        willChange: 'transform',
+        ...style,
+      }}
     />
   );
 }
 
-/**
- * Volumetric God Rays Overlay (Sweeping sunlight shafts inspired by anime/cinematic wedding films)
- */
-function VolumetricGodRays({
-  progress,
-  themeId,
-}: {
-  progress: number;
-  themeId: VideoThemeId;
-}) {
-  const sway = Math.sin(progress * Math.PI * 4) * 8;
-  const breath = 0.24 + 0.14 * Math.sin(progress * Math.PI * 6);
-  const tint =
-    themeId === 'javanese-classic'
-      ? 'rgba(255, 236, 185, 0.55)'
-      : themeId === 'grand-ballroom'
-      ? 'rgba(235, 244, 255, 0.58)'
-      : 'rgba(255, 228, 239, 0.58)';
-
+/** Odometer: setiap digit berputar ke angka target. */
+function Odometer({ value, t, start, dur, style }: { value: string; t: number; start: number; dur: number; style: React.CSSProperties }) {
   return (
-    <div
-      className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
-      style={{ mixBlendMode: 'screen', opacity: breath }}
-    >
-      <div
-        className="absolute -top-[25%] -left-[35%] h-[155%] w-[170%]"
-        style={{
-          transform: `rotate(${-24 + sway * 0.35}deg) translateX(${sway}px)`,
-          background: `repeating-linear-gradient(
-            90deg,
-            transparent 0%,
-            transparent 11%,
-            ${tint} 16%,
-            transparent 23%,
-            transparent 35%,
-            ${tint} 41%,
-            transparent 49%
-          )`,
-          filter: 'blur(18px)',
-        }}
-      />
+    <span style={{ display: 'inline-flex', ...style }} aria-label={value}>
+      {Array.from(value).map((d, i) => {
+        const target = Number(d);
+        const spins = 1 + i; // digit kanan berputar lebih banyak
+        const p = ease.outExpo(seg(t, start + i * 0.08, start + i * 0.08 + dur));
+        const pos = p * (spins * 10 + target);
+        return (
+          <span key={i} aria-hidden style={{ display: 'inline-block', height: '1.2em', width: '0.58em', overflow: 'hidden', lineHeight: '1.2em', textAlign: 'center' }}>
+            <span style={{ display: 'block', transform: `translate3d(0, ${-(pos % 10) * 1.2}em, 0)` }}>
+              {Array.from({ length: 11 }, (_, n) => (
+                <span key={n} style={{ display: 'block', height: '1.2em' }}>
+                  {n % 10}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Partikel deterministik per tema. */
+function Particles({ kind, t, color, accent, width }: { kind: ThemeMotionConfig['particle']; t: number; color: string; accent: string; width: number }) {
+  const count = kind === 'petal' ? 16 : 22;
+  return (
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 40 }} aria-hidden>
+      {Array.from({ length: count }, (_, i) => {
+        const r1 = seeded(i + 1);
+        const r2 = seeded(i + 41);
+        const r3 = seeded(i + 97);
+        const speed = 0.25 + r3 * 0.6;
+        const x = r1 * width + Math.sin(t * (0.6 + r2) + i) * 14;
+        const rise = kind === 'petal' ? -1 : 1; // kelopak jatuh, bara naik
+        const yRaw = r2 * STAGE_H - rise * t * speed * 38;
+        const y = ((yRaw % STAGE_H) + STAGE_H) % STAGE_H;
+        const flicker = 0.35 + 0.65 * Math.abs(Math.sin(t * (1.4 + r1 * 2) + i * 1.7));
+        if (kind === 'petal') {
+          const size = 7 + r3 * 7;
+          return (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                left: x,
+                top: y,
+                width: size,
+                height: size * 0.62,
+                borderRadius: '80% 10% 80% 10%',
+                background: `linear-gradient(135deg, ${accent}, ${color})`,
+                opacity: 0.55 * flicker + 0.2,
+                transform: `rotate(${t * 60 * (r1 - 0.5) * 3 + i * 40}deg)`,
+              }}
+            />
+          );
+        }
+        const size = kind === 'ember' ? 2 + r3 * 3.5 : 1.5 + r3 * 3;
+        return (
+          <span
+            key={i}
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              width: size,
+              height: size,
+              borderRadius: 999,
+              background: kind === 'ember' ? accent : '#FFFFFF',
+              boxShadow: `0 0 ${size * 3}px ${size}px ${kind === 'ember' ? accent : 'rgba(255,255,255,0.8)'}`,
+              opacity: flicker * 0.75,
+            }}
+          />
+        );
+      })}
     </div>
   );
 }
 
-/**
- * EnterpriseMotionPlayer — 2.5D Continuous One-Take Cinematic Wedding Film Engine
- * Modeled after bespoke studio animated wedding invitations:
- * - Act 1 (0.00–0.25): Painterly Gateway + Signature Opener + Sky Calligraphy + Camera Push-Through
- * - Act 2 (0.25–0.50): Sunlit Venue Interior + Tactile Polaroid Keepsake Cards (Real Couple Photos) + Dolly Dive
- * - Act 3 (0.50–0.75): Couple Hero Frame + Diegetic Tilted-to-Flat Paper Invitation Note
- * - Act 4 (0.75–1.00): Golden-Hour Sky Tilt-Up -> "Sampai Jumpa" -> Radiant Monogram Finale
- */
+// Grain film (SVG noise statis, digeser per frame)
+const GRAIN =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
+
+// ============================================================
+// Komposisi utama
+// ============================================================
+
 export default function EnterpriseMotionPlayer({
   themeId,
   couple,
   progress,
-  isPlaying,
   showWatermark = true,
 }: EnterpriseMotionPlayerProps) {
-  const cfg = THEME_CINEMA[themeId];
+  const cfg = THEMES[themeId] || THEMES['javanese-classic'];
+  const pal = cfg.palette;
+  const t = clamp01(progress) * DUR;
+
+  // ---- Stage scaling (desain 640 unit tinggi) ----
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ w: 360, h: 640 });
+  useLayoutEffect(() => {
+    const el = hostRef.current;
+    if (!el) return;
+    const update = () => setBox({ w: el.clientWidth || 360, h: el.clientHeight || 640 });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const scale = box.h / STAGE_H;
+  const stageW = Math.max(COL_W, box.w / scale);
+  const cx = stageW / 2; // pusat horizontal
+  const colL = cx - COL_W / 2;
+
   const heroPhoto = couple.heroPhoto || DEFAULT_HERO;
   const groomPhoto = couple.groomPhoto || DEFAULT_GROOM;
   const bridePhoto = couple.bridePhoto || DEFAULT_BRIDE;
+  const date = parseDate(couple.dateRaw || '');
+  const initials = couple.initials || `${couple.groom?.[0] || ''} & ${couple.bride?.[0] || ''}`;
+  const [iniA, iniB] = initials.split('&').map((s) => s.trim());
 
-  // Continuous normalized progress (0..1)
-  const p = clamp01(progress);
+  const on = (r: readonly [number, number]) => t >= r[0] && t <= r[1];
 
-  // ---- ACT 1: GATEWAY JOURNEY (0.00 -> 0.27 with overlap fade) ----
-  const act1Local = seg(p, 0, 0.25);
-  const act1Dive = easeInCubic(seg(p, 0.205, 0.265));
-  const act1Opacity = 1 - easeInOutCubic(seg(p, 0.225, 0.27));
-  const act1CamScale = lerp(1.02, 1.15, easeOutCubic(act1Local)) + act1Dive * 0.45;
-  const act1CamY = lerp(1.5, -1.5, act1Local) - act1Dive * 4;
-  const act1Blur = act1Dive * 4.5;
-  const act1TitleIn = easeOutExpo(seg(p, 0.025, 0.11));
-  const act1StoryIn = easeOutCubic(seg(p, 0.09, 0.17));
-  const curtainOpen = easeInOutCubic(seg(p, 0.015, 0.11));
+  // ======== Transisi ========
+  // A→B: stripe wipe (3 bar naik)
+  const stripe = (i: number) => {
+    const a = 3.2 + i * 0.07;
+    const inY = anim(t, a, a + 0.42, 100, 0, ease.inOutExpo);
+    const outY = anim(t, a + 0.5, a + 0.92, 0, -100, ease.inOutExpo);
+    return t < a + 0.5 ? inY : outY;
+  };
+  const stripeVisible = t > 3.2 && t < 4.35;
 
-  // ---- ACT 2: VENUE INTERIOR & POLAROID KEEPSAKES (0.23 -> 0.52) ----
-  const act2In = easeOutCubic(seg(p, 0.23, 0.275));
-  const act2Dive = easeInCubic(seg(p, 0.46, 0.52));
-  const act2Out = 1 - easeInOutCubic(seg(p, 0.48, 0.525));
-  const act2Opacity = act2In * act2Out;
-  const act2Local = seg(p, 0.24, 0.50);
-  const act2CamScale = lerp(1.24, 1.06, easeOutCubic(act2Local)) + act2Dive * 0.36;
-  const act2CamX = lerp(-2.2, 2.2, easeInOutCubic(act2Local));
-  const act2Blur = (1 - act2In) * 3.5 + act2Dive * 4;
-  const groomCardIn = easeOutExpo(seg(p, 0.27, 0.355));
-  const brideCardIn = easeOutExpo(seg(p, 0.32, 0.405));
-  const act2CaptionIn = easeOutCubic(seg(p, 0.265, 0.33));
+  // B→C: iris wipe
+  const irisCover = ease.inOutExpo(seg(t, 7.25, 7.75)); // lingkaran warna menutup
+  const irisReveal = ease.inOutExpo(seg(t, 7.75, 8.35)); // scene C terbuka dalam lingkaran
+  const irisVisible = t > 7.25 && t < 8.4;
 
-  // ---- ACT 3: COUPLE HERO + DIEGETIC INVITATION NOTE (0.48 -> 0.77) ----
-  const act3In = easeOutCubic(seg(p, 0.48, 0.525));
-  const act3Out = 1 - easeInOutCubic(seg(p, 0.73, 0.775));
-  const act3Opacity = act3In * act3Out;
-  const act3Local = seg(p, 0.49, 0.75);
-  const act3CamScale = lerp(1.18, 1.04, easeOutCubic(act3Local));
-  const act3TiltUp = easeInCubic(seg(p, 0.71, 0.77)) * 18;
-  const heroFrameIn = easeOutExpo(seg(p, 0.51, 0.60));
-  const noteCardIn = easeOutExpo(seg(p, 0.55, 0.64));
-  // Diegetic paper tilts straight as camera pushes in
-  const noteTiltX = lerp(14, 0, noteCardIn);
-  const noteTiltZ = lerp(-3.5, 0, noteCardIn);
+  // C→D: light-leak flash
+  const flash = Math.max(0, 1 - Math.abs(t - 11.7) / 0.4);
 
-  // ---- ACT 4: GOLDEN-HOUR SKY TILT-UP -> "SAMPAI JUMPA" -> MONOGRAM FINALE (0.73 -> 1.00) ----
-  const act4In = easeOutCubic(seg(p, 0.73, 0.78));
-  const act4Local = seg(p, 0.74, 1.0);
-  const act4CamScale = lerp(1.12, 1.01, easeOutCubic(act4Local));
-  const act4CamY = lerp(5, -2, easeOutCubic(act4Local));
-  // Phase 4A: "Sampai Jumpa" (0.76 -> 0.87)
-  const farewellIn = easeOutCubic(seg(p, 0.755, 0.805));
-  const farewellOut = 1 - easeInOutCubic(seg(p, 0.84, 0.885));
-  const farewellOpacity = farewellIn * farewellOut;
-  // Phase 4B: Radiant Monogram Finale (0.86 -> 1.00)
-  const finaleIn = easeOutExpo(seg(p, 0.865, 0.945));
-  const finaleHalo = easeOutCubic(seg(p, 0.85, 0.96));
+  // D→E: diagonal wipe
+  const diag = t < 15.55 ? anim(t, 15.1, 15.55, -130, 0, ease.inOutExpo) : anim(t, 15.6, 16.05, 0, 130, ease.inOutExpo);
+  const diagVisible = t > 15.1 && t < 16.05;
 
-  // ---- SEAMLESS VOLUMETRIC SUN-FLARE TRANSITIONS OVER CUT POINTS ----
-  const cutFlare = Math.max(
-    flareBell(p, 0.25, 0.048),
-    flareBell(p, 0.5, 0.048),
-    flareBell(p, 0.75, 0.052)
-  );
+  // Kamera global (napas halus)
+  const camBreath = 1 + Math.sin(t * 0.5) * 0.004;
 
-  // Envelope flap opening physics for Luxury Pink in Act 1
-  const pinkFlapDeg = lerp(0, -172, easeInOutCubic(seg(p, 0.02, 0.11)));
+  const sans: React.CSSProperties = { fontFamily: cfg.fonts.sans };
+  const display: React.CSSProperties = { fontFamily: cfg.fonts.display };
 
   return (
-    <div
-      className="relative h-full w-full overflow-hidden select-none"
-      style={{ backgroundColor: cfg.palette.bg }}
-    >
-      {/* ================================================================ */}
-      {/* ACT 1: PAINTERLY GATEWAY + SIGNATURE OPENER + SKY CALLIGRAPHY   */}
-      {/* ================================================================ */}
-      {act1Opacity > 0.005 && (
-        <div
-          className="absolute inset-0 z-10 overflow-hidden"
-          style={{ opacity: act1Opacity }}
-        >
-          {/* 2.5D Camera Layer — Full-Bleed Painterly Gateway */}
-          <img
-            src={cfg.scenes.gate}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover will-change-transform"
-            style={{
-              transform: `scale(${act1CamScale}) translate3d(0, ${act1CamY}%, 0)`,
-              filter: act1Blur > 0.2 ? `blur(${act1Blur}px)` : undefined,
-            }}
-          />
-
-          {/* Soft upper atmospheric veil so sky calligraphy reads like painted ink */}
+    <div ref={hostRef} className="relative h-full w-full overflow-hidden select-none" style={{ background: pal.bg }}>
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: stageW,
+          height: STAGE_H,
+          transform: `scale(${scale * camBreath})`,
+          transformOrigin: '0 0',
+          color: pal.text,
+          ...sans,
+        }}
+      >
+        {/* ============================================================
+            SCENE A — PEMBUKA: cincin trim-path + monogram
+           ============================================================ */}
+        {on(T.open) && (
           <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-[44%]"
             style={{
-              background: `linear-gradient(to bottom, ${cfg.palette.bg}CC 0%, ${cfg.palette.bg}55 55%, transparent 100%)`,
-            }}
-          />
-
-          {/* Bottom warm gradient feather for story subtitle */}
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%]"
-            style={{
-              background:
-                'linear-gradient(to top, rgba(16, 12, 10, 0.68) 0%, rgba(16, 12, 10, 0.28) 55%, transparent 100%)',
-            }}
-          />
-
-          {/* 1:1 Theme Foreground Signature Accent Layer (1.3x Parallax) */}
-          {themeId === 'javanese-classic' && (
-            <>
-              <img
-                src="/assets/flower.webp"
-                alt=""
-                className="pointer-events-none absolute -top-4 -left-4 h-16 w-16 object-contain opacity-85 drop-shadow"
-                style={{
-                  transform: `rotate(${p * 90}deg) scale(${1 + act1Dive * 0.4})`,
-                }}
-              />
-              <img
-                src="/assets/flower.webp"
-                alt=""
-                className="pointer-events-none absolute -top-4 -right-4 h-16 w-16 object-contain opacity-85 drop-shadow"
-                style={{
-                  transform: `rotate(${-p * 90}deg) scale(${1 + act1Dive * 0.4})`,
-                }}
-              />
-              {/* Subtle authentic Gunungan watermark emblem above title */}
-              <img
-                src="/assets/wayang/gunungan.png"
-                alt=""
-                className="pointer-events-none absolute left-1/2 top-5 h-11 w-11 -translate-x-1/2 object-contain drop-shadow-sm"
-                style={{
-                  opacity: act1TitleIn * 0.92,
-                  transform: `translate(-50%, ${lerp(12, 0, act1TitleIn)}px) scale(${lerp(0.85, 1, act1TitleIn)})`,
-                }}
-              />
-            </>
-          )}
-
-          {themeId === 'grand-ballroom' && (
-            <>
-              {/* Parting Royal Slate Velvet Curtains — Signature Ballroom Reveal */}
-              <div
-                className="pointer-events-none absolute inset-y-0 left-0 w-[52%] z-20"
-                style={{
-                  transform: `translateX(${lerp(0, -104, curtainOpen)}%)`,
-                  background:
-                    'repeating-linear-gradient(90deg, #1F354D 0px, #345579 16px, #253D58 32px)',
-                  boxShadow: '10px 0 28px rgba(15, 25, 38, 0.55)',
-                }}
-              />
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-[52%] z-20"
-                style={{
-                  transform: `translateX(${lerp(0, 104, curtainOpen)}%)`,
-                  background:
-                    'repeating-linear-gradient(90deg, #253D58 0px, #345579 16px, #1F354D 32px)',
-                  boxShadow: '-10px 0 28px rgba(15, 25, 38, 0.55)',
-                }}
-              />
-            </>
-          )}
-
-          {themeId === 'luxury-pink' && (
-            /* Miniature 3D Wax-Seal Envelope Accent Floating Gently at Upper Center */
-            <div
-              className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2"
-              style={{
-                perspective: '600px',
-                opacity: act1TitleIn * 0.95,
-                transform: `translate(-50%, ${lerp(10, 0, act1TitleIn)}px)`,
-              }}
-            >
-              <div
-                className="relative h-8 w-12 rounded-[4px] border shadow-sm"
-                style={{
-                  backgroundColor: '#FCF3F6',
-                  borderColor: '#D99AB3',
-                }}
-              >
-                <div
-                  className="absolute inset-x-0 top-0 h-4 origin-top"
-                  style={{
-                    backgroundColor: '#F2DEE7',
-                    clipPath: 'polygon(0 0, 50% 100%, 100% 0)',
-                    transform: `rotateX(${pinkFlapDeg}deg)`,
-                  }}
-                />
-                <div
-                  className="absolute left-1/2 top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full"
-                  style={{ backgroundColor: '#A83D68' }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Sky Calligraphic Title Composition */}
-          <div
-            className="absolute inset-x-5 top-[13%] flex flex-col items-center text-center"
-            style={{
-              opacity: act1TitleIn,
-              transform: `translate3d(0, ${lerp(16, 0, act1TitleIn) - act1Dive * 18}px, 0) scale(${lerp(0.94, 1, act1TitleIn) + act1Dive * 0.14})`,
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              transform: `scale(${anim(t, 3.05, 3.6, 1, 1.22, ease.inExpo)})`,
+              filter: t > 3.05 ? `blur(${anim(t, 3.05, 3.6, 0, 6, ease.inCubic)}px)` : undefined,
             }}
           >
-            <p
-              className="text-[9px] font-bold uppercase tracking-[0.26em]"
+            <Plate src={cfg.plates.gate} t={t} range={T.open} scaleFrom={1.32} scaleTo={1.08} yFrom={2} yTo={-1} />
+            <div
               style={{
-                color: cfg.palette.primary,
-                fontFamily: cfg.fonts.sans,
-                textShadow: cfg.palette.skyShadow,
+                position: 'absolute',
+                inset: 0,
+                background: `radial-gradient(ellipse 90% 46% at 50% 50%, ${pal.paper}F5 0%, ${pal.paper}E0 50%, ${pal.paper}33 100%)`,
+                opacity: anim(t, 0, 0.9, 0, 1),
+              }}
+            />
+
+            {/* Tag dengan animasi tracking */}
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 168,
+                textAlign: 'center',
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                color: pal.primary,
+                letterSpacing: `${anim(t, 0.4, 1.8, 0.7, 0.32, ease.outQuint)}em`,
+                opacity: anim(t, 0.4, 1.1, 0, 1) * anim(t, 2.9, 3.2, 1, 0),
               }}
             >
-              {cfg.copy.openingTag}
-            </p>
-            <h2
-              className={
-                themeId === 'luxury-pink'
-                  ? 'mt-1 text-[40px] leading-[1.05]'
-                  : 'mt-1.5 text-[30px] font-bold leading-[1.08] tracking-[0.02em]'
-              }
+              {cfg.copy.tag}
+            </div>
+
+            {/* Cincin ganda (trim path + putaran) */}
+            <TrimPath
+              viewBox="0 0 200 200"
+              d="M100 10 A90 90 0 1 1 99.99 10"
+              length={566}
+              trim={anim(t, 0.15, 1.35, 0, 1, ease.inOutCubic)}
+              stroke={pal.secondary}
+              width={1.4}
+              style={{ left: cx - 100, top: 200, width: 200, height: 200, transform: `rotate(${-90 + t * 8}deg)` }}
+            />
+            <TrimPath
+              viewBox="0 0 200 200"
+              d="M100 20 A80 80 0 1 1 99.99 20"
+              length={503}
+              trim={anim(t, 0.35, 1.55, 0, 1, ease.inOutCubic)}
+              stroke={pal.primary}
+              width={0.8}
+              dash="2 6"
+              style={{ left: cx - 100, top: 200, width: 200, height: 200, transform: `rotate(${-t * 14}deg)` }}
+            />
+
+            {/* Monogram */}
+            <div
               style={{
-                color: cfg.palette.skyTextColor,
-                fontFamily: cfg.fonts.display,
-                textShadow: cfg.palette.skyShadow,
+                position: 'absolute',
+                left: cx - 100,
+                top: 200,
+                width: 200,
+                height: 200,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                ...display,
+                color: pal.text,
               }}
             >
-              {couple.groom} &amp; {couple.bride}
-            </h2>
-            <div className="mt-2 flex items-center gap-2">
               <span
-                className="h-[1px] w-7"
-                style={{ backgroundColor: cfg.palette.secondary }}
-              />
-              <span
-                className="text-[9.5px] font-semibold tracking-[0.14em]"
                 style={{
-                  color: cfg.palette.primary,
-                  fontFamily: cfg.fonts.sans,
-                  textShadow: cfg.palette.skyShadow,
+                  fontSize: 64,
+                  lineHeight: 1,
+                  display: 'inline-block',
+                  transform: `translateX(${anim(t, 0.9, 1.7, -26, 0, ease.outExpo)}px)`,
+                  opacity: anim(t, 0.9, 1.4, 0, 1),
+                  filter: `blur(${anim(t, 0.9, 1.5, 8, 0)}px)`,
                 }}
               >
-                {couple.dateRaw}
+                {iniA}
               </span>
               <span
-                className="h-[1px] w-7"
-                style={{ backgroundColor: cfg.palette.secondary }}
-              />
-            </div>
-          </div>
-
-          {/* Poetic Cinematic Story Subtitle at Bottom (like @emootehaya opening caption) */}
-          <div
-            className="absolute inset-x-6 bottom-[11%] text-center"
-            style={{
-              opacity: act1StoryIn * (1 - act1Dive),
-              transform: `translateY(${lerp(10, 0, act1StoryIn)}px)`,
-            }}
-          >
-            <p
-              className="text-[11.5px] italic leading-[1.55] text-white/95"
-              style={{
-                fontFamily: cfg.fonts.serif,
-                textShadow: '0 2px 10px rgba(0,0,0,0.65)',
-              }}
-            >
-              {cfg.copy.openingStory}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================ */}
-      {/* ACT 2: INSIDE THE VENUE · POLAROID KEEPSAKE COUPLE MOMENTS      */}
-      {/* ================================================================ */}
-      {act2Opacity > 0.005 && (
-        <div
-          className="absolute inset-0 z-10 overflow-hidden"
-          style={{ opacity: act2Opacity }}
-        >
-          {/* Full-Bleed Painterly Venue Interior with 2.5D Pan & Zoom */}
-          <img
-            src={cfg.scenes.hall}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover will-change-transform"
-            style={{
-              transform: `scale(${act2CamScale}) translate3d(${act2CamX}%, 0, 0)`,
-              filter: act2Blur > 0.2 ? `blur(${act2Blur}px)` : undefined,
-            }}
-          />
-
-          {/* Subtle warm atmospheric scrim to make physical Polaroids pop */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 48%, rgba(255,255,255,0.12) 0%, rgba(18,14,12,0.34) 100%)',
-            }}
-          />
-
-          {/* Top Narrative Story Line */}
-          <div
-            className="absolute inset-x-6 top-[9%] text-center"
-            style={{
-              opacity: act2CaptionIn,
-              transform: `translateY(${lerp(-10, 0, act2CaptionIn)}px)`,
-            }}
-          >
-            <p
-              className="inline-block rounded-full px-3.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] backdrop-blur-md"
-              style={{
-                backgroundColor: cfg.palette.cardBg,
-                color: cfg.palette.primary,
-                border: `1px solid ${cfg.palette.cardBorder}88`,
-                fontFamily: cfg.fonts.sans,
-              }}
-            >
-              {themeId === 'javanese-classic'
-                ? 'SANG PENGANTEN'
-                : themeId === 'grand-ballroom'
-                ? 'THE ROYAL COUPLE'
-                : 'THE BRIDE & GROOM'}
-            </p>
-            <p
-              className="mt-2 text-[11px] italic leading-[1.45] text-white"
-              style={{
-                fontFamily: cfg.fonts.serif,
-                textShadow: '0 2px 12px rgba(0,0,0,0.65)',
-              }}
-            >
-              {cfg.copy.coupleStory}
-            </p>
-          </div>
-
-          {/* Tactile Physical Polaroid / Keepsake Cards (Real Couple Photos) */}
-          <div
-            className="absolute inset-x-4 top-[24%] bottom-[13%] flex flex-col items-center justify-center gap-3.5"
-            style={{ perspective: '1000px' }}
-          >
-            {/* Groom Polaroid Keepsake */}
-            <div
-              className="w-[78%] max-w-[238px] rounded-[8px] p-2 pb-3 shadow-[0_18px_40px_rgba(0,0,0,0.34)]"
-              style={{
-                backgroundColor: '#FFFDF9',
-                border: `1px solid ${cfg.palette.cardBorder}66`,
-                opacity: groomCardIn,
-                transform: `translate3d(${lerp(-28, -8, groomCardIn)}px, ${lerp(24, 0, groomCardIn)}px, 0) rotate(${lerp(-9, -3.5, groomCardIn)}deg) scale(${lerp(0.88, 1, groomCardIn) + act2Dive * 0.14})`,
-              }}
-            >
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={`h-[78px] w-[70px] shrink-0 overflow-hidden border ${
-                    themeId === 'luxury-pink'
-                      ? 'rounded-t-full rounded-b-md'
-                      : 'rounded-[4px]'
-                  }`}
-                  style={{ borderColor: `${cfg.palette.cardBorder}88` }}
-                >
-                  <img
-                    src={groomPhoto}
-                    alt={couple.groom}
-                    className="h-full w-full object-cover"
-                    style={{
-                      transform: `scale(${lerp(1.12, 1.02, act2Local)})`,
-                    }}
-                  />
-                </div>
-                <div className="min-w-0 flex-1 text-left">
-                  <p
-                    className="text-[8px] font-bold uppercase tracking-[0.2em]"
-                    style={{
-                      color: cfg.palette.secondary,
-                      fontFamily: cfg.fonts.sans,
-                    }}
-                  >
-                    MEMPELAI PRIA
-                  </p>
-                  <p
-                    className={
-                      themeId === 'luxury-pink'
-                        ? 'mt-0.5 text-[22px] leading-tight'
-                        : 'mt-0.5 text-[15px] font-bold leading-tight'
-                    }
-                    style={{
-                      color: cfg.palette.primary,
-                      fontFamily: cfg.fonts.display,
-                    }}
-                  >
-                    {couple.groom}
-                  </p>
-                  <p
-                    className="mt-0.5 text-[9.5px] leading-snug line-clamp-2"
-                    style={{
-                      color: cfg.palette.muted,
-                      fontFamily: cfg.fonts.serif,
-                    }}
-                  >
-                    {couple.groomFull}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ampersand Connector */}
-            <div
-              className="flex h-7 w-7 items-center justify-center rounded-full shadow-md"
-              style={{
-                backgroundColor: cfg.palette.cardBg,
-                border: `1px solid ${cfg.palette.cardBorder}`,
-                color: cfg.palette.primary,
-                fontFamily: cfg.fonts.display,
-                opacity: brideCardIn,
-                transform: `scale(${lerp(0.6, 1, brideCardIn)})`,
-              }}
-            >
-              <span className="text-[14px] font-bold">&amp;</span>
-            </div>
-
-            {/* Bride Polaroid Keepsake */}
-            <div
-              className="w-[78%] max-w-[238px] rounded-[8px] p-2 pb-3 shadow-[0_18px_40px_rgba(0,0,0,0.34)]"
-              style={{
-                backgroundColor: '#FFFDF9',
-                border: `1px solid ${cfg.palette.cardBorder}66`,
-                opacity: brideCardIn,
-                transform: `translate3d(${lerp(28, 8, brideCardIn)}px, ${lerp(24, 0, brideCardIn)}px, 0) rotate(${lerp(9, 3.2, brideCardIn)}deg) scale(${lerp(0.88, 1, brideCardIn) + act2Dive * 0.14})`,
-              }}
-            >
-              <div className="flex flex-row-reverse items-center gap-2.5">
-                <div
-                  className={`h-[78px] w-[70px] shrink-0 overflow-hidden border ${
-                    themeId === 'luxury-pink'
-                      ? 'rounded-t-full rounded-b-md'
-                      : 'rounded-[4px]'
-                  }`}
-                  style={{ borderColor: `${cfg.palette.cardBorder}88` }}
-                >
-                  <img
-                    src={bridePhoto}
-                    alt={couple.bride}
-                    className="h-full w-full object-cover"
-                    style={{
-                      transform: `scale(${lerp(1.12, 1.02, act2Local)})`,
-                    }}
-                  />
-                </div>
-                <div className="min-w-0 flex-1 text-right">
-                  <p
-                    className="text-[8px] font-bold uppercase tracking-[0.2em]"
-                    style={{
-                      color: cfg.palette.secondary,
-                      fontFamily: cfg.fonts.sans,
-                    }}
-                  >
-                    MEMPELAI WANITA
-                  </p>
-                  <p
-                    className={
-                      themeId === 'luxury-pink'
-                        ? 'mt-0.5 text-[22px] leading-tight'
-                        : 'mt-0.5 text-[15px] font-bold leading-tight'
-                    }
-                    style={{
-                      color: cfg.palette.primary,
-                      fontFamily: cfg.fonts.display,
-                    }}
-                  >
-                    {couple.bride}
-                  </p>
-                  <p
-                    className="mt-0.5 text-[9.5px] leading-snug line-clamp-2"
-                    style={{
-                      color: cfg.palette.muted,
-                      fontFamily: cfg.fonts.serif,
-                    }}
-                  >
-                    {couple.brideFull}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================ */}
-      {/* ACT 3: COUPLE HERO FRAME + DIEGETIC PAPER INVITATION NOTE       */}
-      {/* ================================================================ */}
-      {act3Opacity > 0.005 && (
-        <div
-          className="absolute inset-0 z-10 overflow-hidden"
-          style={{
-            opacity: act3Opacity,
-            transform: `translateY(${-act3TiltUp}px)`,
-          }}
-        >
-          {/* Full-Bleed Softly Blurred Venue Backdrop */}
-          <img
-            src={cfg.scenes.hall}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{
-              transform: `scale(${act3CamScale + 0.08})`,
-              filter: 'blur(6px) brightness(0.76)',
-            }}
-          />
-
-          <div
-            className="relative flex h-full w-full flex-col items-center justify-center gap-3.5 px-4 py-8"
-            style={{ perspective: '1000px' }}
-          >
-            {/* Architectural Couple Hero Photo Frame (Ken Burns) */}
-            <div
-              className={`relative w-[82%] max-w-[244px] h-[146px] overflow-hidden shadow-[0_18px_36px_rgba(0,0,0,0.36)] ${
-                themeId === 'luxury-pink'
-                  ? 'rounded-t-[120px] rounded-b-[14px]'
-                  : themeId === 'grand-ballroom'
-                  ? 'rounded-[12px]'
-                  : 'rounded-[6px]'
-              }`}
-              style={{
-                border: `2px solid ${cfg.palette.cardBorder}`,
-                opacity: heroFrameIn,
-                transform: `translateY(${lerp(20, 0, heroFrameIn)}px) scale(${lerp(0.92, 1, heroFrameIn)})`,
-              }}
-            >
-              <img
-                src={heroPhoto}
-                alt={`${couple.groom} & ${couple.bride}`}
-                className="h-full w-full object-cover"
                 style={{
-                  transform: `scale(${lerp(1.16, 1.03, act3Local)})`,
+                  fontFamily: cfg.fonts.script,
+                  fontStyle: 'italic',
+                  fontSize: 34,
+                  color: pal.secondary,
+                  display: 'inline-block',
+                  transform: `scale(${anim(t, 1.15, 1.75, 0, 1, ease.outBack)}) rotate(${anim(t, 1.15, 1.75, -40, 0, ease.outBack)}deg)`,
                 }}
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-              <div className="absolute inset-x-3 bottom-2 text-center">
-                <p
-                  className="text-[11px] font-semibold tracking-[0.14em] text-white/95"
-                  style={{ fontFamily: cfg.fonts.display }}
-                >
-                  {couple.groom} &amp; {couple.bride}
-                </p>
-              </div>
+              >
+                &amp;
+              </span>
+              <span
+                style={{
+                  fontSize: 64,
+                  lineHeight: 1,
+                  display: 'inline-block',
+                  transform: `translateX(${anim(t, 0.9, 1.7, 26, 0, ease.outExpo)}px)`,
+                  opacity: anim(t, 0.9, 1.4, 0, 1),
+                  filter: `blur(${anim(t, 0.9, 1.5, 8, 0)}px)`,
+                }}
+              >
+                {iniB}
+              </span>
             </div>
 
-            {/* Diegetic Physical Paper Invitation Note (Tilts straight as camera pushes in) */}
-            <div
-              className={`relative w-[88%] max-w-[260px] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.34)] ${
-                themeId === 'luxury-pink'
-                  ? 'rounded-[22px]'
-                  : themeId === 'grand-ballroom'
-                  ? 'rounded-[14px]'
-                  : 'rounded-[8px]'
-              }`}
+            {/* Garis kiri-kanan + belah ketupat */}
+            <TrimPath
+              viewBox="0 0 120 2"
+              d="M120 1 L0 1"
+              length={120}
+              trim={anim(t, 1.3, 2.0, 0, 1, ease.outExpo)}
+              stroke={pal.secondary}
+              width={1}
+              style={{ left: cx - 132, top: 436, width: 120, height: 2 }}
+            />
+            <TrimPath
+              viewBox="0 0 120 2"
+              d="M0 1 L120 1"
+              length={120}
+              trim={anim(t, 1.3, 2.0, 0, 1, ease.outExpo)}
+              stroke={pal.secondary}
+              width={1}
+              style={{ left: cx + 12, top: 436, width: 120, height: 2 }}
+            />
+            <span
               style={{
-                backgroundColor: cfg.palette.cardBg,
-                border: `1.5px solid ${cfg.palette.cardBorder}`,
-                opacity: noteCardIn,
-                transform: `rotateX(${noteTiltX}deg) rotateZ(${noteTiltZ}deg) translateY(${lerp(24, 0, noteCardIn)}px) scale(${lerp(0.92, 1.02, noteCardIn)})`,
+                position: 'absolute',
+                left: cx - 4,
+                top: 433,
+                width: 8,
+                height: 8,
+                background: pal.secondary,
+                transform: `rotate(45deg) scale(${anim(t, 1.5, 1.9, 0, 1, ease.outBack)})`,
+              }}
+            />
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 456,
+                textAlign: 'center',
+                fontSize: 13,
+                fontWeight: 500,
+                color: pal.muted,
+                letterSpacing: '0.04em',
               }}
             >
-              {/* Javanese Authentic Corner L-Brackets */}
-              {themeId === 'javanese-classic' && (
+              <SplitText text={couple.dateRaw} t={t} start={1.7} stagger={0.018} mode="fade" />
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================
+            SCENE B — KINETIC TYPOGRAPHY NAMA
+           ============================================================ */}
+        {on(T.names) && (
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: pal.bg }}>
+            <Plate
+              src={cfg.plates.hall}
+              t={t}
+              range={T.names}
+              scaleFrom={1.22}
+              scaleTo={1.12}
+              xFrom={-3}
+              xTo={3}
+              blur={3}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 85% 60% at 50% 48%, ${pal.paper}F0 0%, ${pal.paper}C4 70%, ${pal.paper}99 100%)` }} />
+            {/* garis bingkai tipis yang ter-trim mengelilingi */}
+            <TrimPath
+              viewBox={`0 0 ${COL_W - 40} 500`}
+              d={`M${(COL_W - 40) / 2} 0 H${COL_W - 40} V500 H0 V0 Z`}
+              length={2 * (COL_W - 40) + 1000}
+              trim={anim(t, 3.9, 5.4, 0, 1, ease.inOutCubic) * anim(t, 7.0, 7.5, 1, 0, ease.inCubic)}
+              stroke={pal.secondary}
+              width={0.9}
+              style={{ left: colL + 20, top: 70, width: COL_W - 40, height: 500 }}
+            />
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 150,
+                textAlign: 'center',
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.34em',
+                textTransform: 'uppercase',
+                color: pal.primary,
+              }}
+            >
+              <SplitText text={cfg.copy.tag} t={t} start={4.0} stagger={0.02} mode="fade" exitAt={6.95} />
+            </div>
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 196,
+                textAlign: 'center',
+                fontSize: couple.groom.length > 8 ? 52 : 64,
+                lineHeight: 1,
+                ...display,
+                color: pal.text,
+              }}
+            >
+              <SplitText text={couple.groom} t={t} start={4.15} stagger={0.045} dur={0.7} exitAt={7.0} />
+            </div>
+
+            <div
+              style={{
+                position: 'absolute',
+                left: cx - 40,
+                top: 278,
+                width: 80,
+                textAlign: 'center',
+                fontFamily: cfg.fonts.script,
+                fontStyle: 'italic',
+                fontSize: 52,
+                lineHeight: 1,
+                color: pal.secondary,
+                transform: `scale(${anim(t, 4.65, 5.3, 0, 1, ease.outBack) * anim(t, 7.05, 7.35, 1, 0, ease.inCubic)}) rotate(${anim(t, 4.65, 5.3, -60, 0, ease.outBack)}deg)`,
+              }}
+            >
+              &amp;
+            </div>
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 340,
+                textAlign: 'center',
+                fontSize: couple.bride.length > 8 ? 52 : 64,
+                lineHeight: 1,
+                ...display,
+                color: pal.text,
+              }}
+            >
+              <SplitText text={couple.bride} t={t} start={4.95} stagger={0.045} dur={0.7} exitAt={7.05} />
+            </div>
+
+            <TrimPath
+              viewBox="0 0 140 12"
+              d="M2 6 C 35 0, 105 12, 138 6"
+              length={142}
+              trim={anim(t, 5.5, 6.2, 0, 1, ease.outExpo) * anim(t, 7.0, 7.3, 1, 0)}
+              stroke={pal.primary}
+              width={1.4}
+              style={{ left: cx - 70, top: 424, width: 140, height: 12 }}
+            />
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL + 40,
+                width: COL_W - 80,
+                top: 456,
+                textAlign: 'center',
+                fontFamily: cfg.fonts.serif,
+                fontStyle: 'italic',
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: pal.muted,
+                opacity: anim(t, 5.9, 6.6, 0, 1) * anim(t, 6.9, 7.2, 1, 0),
+                filter: `blur(${anim(t, 5.9, 6.6, 6, 0)}px)`,
+                transform: `translateY(${anim(t, 5.9, 6.6, 10, 0, ease.outExpo)}px)`,
+              }}
+            >
+              {cfg.copy.story}
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================
+            SCENE C — POTRET MEMPELAI (masuk lewat iris wipe)
+           ============================================================ */}
+        {on(T.couple) && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              background: pal.paper,
+              clipPath: t < 8.35 ? `circle(${irisReveal * 120}% at 50% 50%)` : undefined,
+              zIndex: 5,
+            }}
+          >
+            <Plate src={cfg.plates.sky} t={t} range={T.couple} scaleFrom={1.25} scaleTo={1.1} blur={10} style={{ opacity: 0.35 }} />
+            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${pal.paper}E6, ${pal.bg}D9)` }} />
+
+            {(
+              [
+                { who: 'groom', photo: groomPhoto, name: couple.groom, full: couple.groomFull, role: cfg.copy.groomRole, x: cx - 72, y: 176, start: 8.05, side: 'right' },
+                { who: 'bride', photo: bridePhoto, name: couple.bride, full: couple.brideFull, role: cfg.copy.brideRole, x: cx + 72, y: 400, start: 8.5, side: 'left' },
+              ] as const
+            ).map((pp) => {
+              const reveal = ease.inOutExpo(seg(t, pp.start, pp.start + 0.75));
+              const out = ease.inCubic(seg(t, 11.0, 11.5));
+              const R = 72;
+              const textLeft = pp.side === 'right' ? pp.x + R + 18 : colL + 8;
+              const textWidth = pp.side === 'right' ? colL + COL_W - (pp.x + R + 18) - 6 : pp.x - R - 18 - colL - 8;
+              return (
+                <React.Fragment key={pp.who}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: pp.x - R,
+                      top: pp.y - R,
+                      width: R * 2,
+                      height: R * 2,
+                      borderRadius: 999,
+                      overflow: 'hidden',
+                      clipPath: `circle(${reveal * 50}% at 50% 50%)`,
+                      transform: `scale(${1 - out * 0.25})`,
+                      opacity: 1 - out,
+                      boxShadow: '0 18px 40px -18px rgba(0,0,0,0.45)',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={pp.photo}
+                      alt=""
+                      draggable={false}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transform: `scale(${anim(t, pp.start, 11.5, 1.35, 1.05, ease.outCubic)})`,
+                      }}
+                    />
+                  </div>
+                  <TrimPath
+                    viewBox="0 0 172 172"
+                    d="M86 2 A84 84 0 1 1 85.99 2"
+                    length={528}
+                    trim={anim(t, pp.start + 0.3, pp.start + 1.2, 0, 1, ease.inOutCubic) * (1 - out)}
+                    stroke={pal.secondary}
+                    width={1.2}
+                    style={{ left: pp.x - 86, top: pp.y - 86, width: 172, height: 172, transform: `rotate(${pp.who === 'groom' ? -90 : 90}deg)` }}
+                  />
+
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: textLeft,
+                      width: textWidth,
+                      top: pp.y - 40,
+                      textAlign: pp.side === 'right' ? 'left' : 'right',
+                      opacity: 1 - out,
+                    }}
+                  >
+                    <div style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '0.28em', textTransform: 'uppercase', color: pal.primary }}>
+                      <SplitText text={pp.role} t={t} start={pp.start + 0.45} stagger={0.015} mode="fade" />
+                    </div>
+                    <div style={{ marginTop: 6, fontSize: 34, lineHeight: 1.05, ...display, color: pal.text }}>
+                      <SplitText text={pp.name} t={t} start={pp.start + 0.55} stagger={0.04} dur={0.6} />
+                    </div>
+                    <div
+                      style={{
+                        marginTop: 8,
+                        fontSize: 11.5,
+                        lineHeight: 1.45,
+                        color: pal.muted,
+                        opacity: anim(t, pp.start + 1.0, pp.start + 1.5, 0, 1),
+                        transform: `translateX(${anim(t, pp.start + 1.0, pp.start + 1.6, pp.side === 'right' ? -12 : 12, 0, ease.outExpo)}px)`,
+                      }}
+                    >
+                      {pp.full}
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+
+            {/* Garis penghubung + lencana & */}
+            <TrimPath
+              viewBox="0 0 160 240"
+              d="M20 0 C 20 120, 140 120, 140 240"
+              length={300}
+              trim={anim(t, 9.3, 10.1, 0, 1, ease.inOutCubic) * anim(t, 11.0, 11.4, 1, 0)}
+              stroke={pal.primary}
+              width={1}
+              dash={undefined}
+              style={{ left: cx - 92, top: 250, width: 160, height: 240, opacity: 0.6 }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: cx - 22,
+                top: 288 - 22 + 60 - 60,
+                width: 44,
+                height: 44,
+                borderRadius: 999,
+                background: pal.primary,
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: cfg.fonts.script,
+                fontStyle: 'italic',
+                fontSize: 22,
+                transform: `scale(${anim(t, 9.8, 10.3, 0, 1, ease.outBack) * anim(t, 11.0, 11.3, 1, 0)})`,
+                boxShadow: `0 0 0 ${anim(t, 9.9, 10.7, 0, 14)}px ${pal.secondary}${Math.round(anim(t, 9.9, 10.7, 90, 0)).toString(16).padStart(2, '0')}`,
+              }}
+            >
+              &amp;
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================
+            SCENE D — SAVE THE DATE: odometer + detail acara
+           ============================================================ */}
+        {on(T.date) && (
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: pal.bg, zIndex: 6 }}>
+            <Plate src={cfg.plates.sky} t={t} range={T.date} scaleFrom={1.3} scaleTo={1.08} yFrom={3} yTo={-2} />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: `linear-gradient(180deg, ${pal.paper}E0 0%, ${pal.paper}B8 45%, ${pal.paper}F0 100%)`,
+              }}
+            />
+
+            <div
+              style={{
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 120,
+                textAlign: 'center',
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.34em',
+                textTransform: 'uppercase',
+                color: pal.primary,
+              }}
+            >
+              <SplitText text={cfg.copy.dateTag} t={t} start={11.85} stagger={0.018} mode="fade" exitAt={15.0} />
+            </div>
+
+            {date ? (
+              <>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: colL,
+                    width: COL_W,
+                    top: 160,
+                    textAlign: 'center',
+                    fontSize: 15,
+                    ...display,
+                    fontStyle: 'italic',
+                    color: pal.muted,
+                    opacity: anim(t, 12.0, 12.5, 0, 1) * anim(t, 15.0, 15.3, 1, 0),
+                  }}
+                >
+                  {date.weekday}
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: colL,
+                    width: COL_W,
+                    top: 172,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    ...display,
+                    fontSize: 132,
+                    fontVariantNumeric: 'lining-nums',
+                    lineHeight: 1,
+                    color: pal.primary,
+                    opacity: anim(t, 11.9, 12.2, 0, 1) * anim(t, 15.0, 15.3, 1, 0),
+                    transform: `translateY(${anim(t, 15.0, 15.35, 0, -24, ease.inCubic)}px)`,
+                  }}
+                >
+                  <Odometer value={date.day} t={t} start={11.95} dur={1.1} style={{}} />
+                </div>
+                {/* Bulan & tahun bertemu dari dua sisi */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: colL,
+                    width: COL_W,
+                    top: 340,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 14,
+                    fontSize: 22,
+                    ...display,
+                    color: pal.text,
+                    opacity: anim(t, 15.0, 15.3, 1, 0),
+                  }}
+                >
+                  <span style={{ display: 'inline-block', transform: `translateX(${anim(t, 12.55, 13.2, -60, 0, ease.outExpo)}px)`, opacity: anim(t, 12.55, 12.9, 0, 1) }}>
+                    {date.month}
+                  </span>
+                  <span style={{ width: 1, height: 22, background: pal.secondary, transform: `scaleY(${anim(t, 12.8, 13.2, 0, 1, ease.outBack)})` }} />
+                  <span style={{ display: 'inline-block', transform: `translateX(${anim(t, 12.55, 13.2, 60, 0, ease.outExpo)}px)`, opacity: anim(t, 12.55, 12.9, 0, 1) }}>
+                    {date.year}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div style={{ position: 'absolute', left: colL, width: COL_W, top: 220, textAlign: 'center', fontSize: 30, ...display }}>
+                <SplitText text={couple.dateRaw} t={t} start={12.0} stagger={0.03} />
+              </div>
+            )}
+
+            {/* Detail acara */}
+            {[
+              { icon: 'clock', text: couple.timeRaw, start: 13.25 },
+              { icon: 'pin', text: couple.venue, start: 13.6 },
+            ].map((row, i) => {
+              const y = 404 + i * 58;
+              const out = anim(t, 15.0 + i * 0.06, 15.35 + i * 0.06, 0, 1, ease.inCubic);
+              return (
+                <div key={row.icon} style={{ position: 'absolute', left: colL + 34, width: COL_W - 68, top: y, opacity: 1 - out, transform: `translateX(${-out * 30}px)` }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <span
+                      style={{
+                        position: 'relative',
+                        flexShrink: 0,
+                        width: 30,
+                        height: 30,
+                        borderRadius: 999,
+                        background: pal.primary,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transform: `scale(${anim(t, row.start, row.start + 0.45, 0, 1, ease.outBack)})`,
+                      }}
+                    >
+                      {row.icon === 'pin' &&
+                        [0, 1].map((k) => {
+                          const cyc = ((t - 14.1 - k * 0.6) % 1.2 + 1.2) % 1.2;
+                          const rp = t > 14.1 ? cyc / 1.2 : 0;
+                          return (
+                            <span
+                              key={k}
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                borderRadius: 999,
+                                border: `1.5px solid ${pal.primary}`,
+                                transform: `scale(${1 + rp * 1.4})`,
+                                opacity: t > 14.1 ? (1 - rp) * 0.7 : 0,
+                              }}
+                            />
+                          );
+                        })}
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        {row.icon === 'clock' ? (
+                          <>
+                            <circle cx="12" cy="12" r="9" />
+                            <path d={`M12 7 V12 L${12 + 3.5 * Math.sin(anim(t, row.start, row.start + 1.2, 0, Math.PI * 2, ease.outCubic))} ${12 - 3.5 * Math.cos(anim(t, row.start, row.start + 1.2, 0, Math.PI * 2, ease.outCubic))}`} />
+                          </>
+                        ) : (
+                          <>
+                            <path d="M12 21s-6-5.5-6-11a6 6 0 1 1 12 0c0 5.5-6 11-6 11z" />
+                            <circle cx="12" cy="10" r="2.2" />
+                          </>
+                        )}
+                      </svg>
+                    </span>
+                    <div style={{ fontSize: 13, lineHeight: 1.45, fontWeight: 500, color: pal.text, paddingTop: 5, overflow: 'hidden' }}>
+                      <div style={{ transform: `translateY(${anim(t, row.start + 0.15, row.start + 0.75, 110, 0, ease.outExpo)}%)` }}>{row.text}</div>
+                    </div>
+                  </div>
+                  <TrimPath
+                    viewBox={`0 0 ${COL_W - 68} 2`}
+                    d={`M0 1 L${COL_W - 68} 1`}
+                    length={COL_W - 68}
+                    trim={anim(t, row.start + 0.3, row.start + 1.0, 0, 1, ease.outExpo)}
+                    stroke={pal.secondary}
+                    width={0.8}
+                    style={{ left: 0, top: i === 1 ? 50 : 42, width: COL_W - 68, height: 2 }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ============================================================
+            SCENE E — PENUTUP: foto dalam bingkai lengkung + URL
+           ============================================================ */}
+        {on(T.close) && (
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: pal.paper, zIndex: 7 }}>
+            <Plate src={cfg.plates.gate} t={t} range={T.close} scaleFrom={1.2} scaleTo={1.1} blur={12} style={{ opacity: 0.25 }} />
+            {(() => {
+              const W = 232;
+              const H = 300;
+              const top = 74;
+              const rev = ease.inOutExpo(seg(t, 15.75, 16.6));
+              return (
                 <>
-                  <span
-                    className="pointer-events-none absolute left-1.5 top-1.5 h-3 w-3 border-l-2 border-t-2"
-                    style={{ borderColor: cfg.palette.primary }}
-                  />
-                  <span
-                    className="pointer-events-none absolute right-1.5 top-1.5 h-3 w-3 border-r-2 border-t-2"
-                    style={{ borderColor: cfg.palette.primary }}
-                  />
-                  <span
-                    className="pointer-events-none absolute bottom-1.5 left-1.5 h-3 w-3 border-b-2 border-l-2"
-                    style={{ borderColor: cfg.palette.primary }}
-                  />
-                  <span
-                    className="pointer-events-none absolute bottom-1.5 right-1.5 h-3 w-3 border-b-2 border-r-2"
-                    style={{ borderColor: cfg.palette.primary }}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: cx - W / 2,
+                      top,
+                      width: W,
+                      height: H,
+                      borderRadius: `${W / 2}px ${W / 2}px 10px 10px`,
+                      overflow: 'hidden',
+                      clipPath: `inset(${(1 - rev) * 100}% 0 0 0)`,
+                      boxShadow: '0 30px 50px -30px rgba(0,0,0,0.55)',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={heroPhoto}
+                      alt=""
+                      draggable={false}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transform: `scale(${anim(t, 15.75, DUR, 1.35, 1.08, ease.outCubic)}) translateY(${anim(t, 15.75, DUR, 4, 0)}%)`,
+                      }}
+                    />
+                  </div>
+                  <TrimPath
+                    viewBox={`0 0 ${W + 20} ${H + 20}`}
+                    d={`M10 ${H + 10} V${W / 2 + 10} A${W / 2} ${W / 2} 0 0 1 ${W + 10} ${W / 2 + 10} V${H + 10} Z`}
+                    length={2 * (H - W / 2) + Math.PI * (W / 2) + W}
+                    trim={anim(t, 16.2, 17.1, 0, 1, ease.inOutCubic)}
+                    stroke={pal.secondary}
+                    width={1.2}
+                    style={{ left: cx - W / 2 - 10, top: top - 10, width: W + 20, height: H + 20 }}
                   />
                 </>
-              )}
+              );
+            })()}
 
-              {/* Ballroom Double Inset Hairline */}
-              {themeId === 'grand-ballroom' && (
-                <div
-                  className="pointer-events-none absolute inset-1.5 rounded-[10px] border"
-                  style={{ borderColor: `${cfg.palette.cardBorder}66` }}
-                />
-              )}
-
-              <div className="relative text-center">
-                <span
-                  className="inline-block rounded-full px-2.5 py-0.5 text-[7.5px] font-bold uppercase tracking-[0.2em]"
-                  style={{
-                    backgroundColor: `${cfg.palette.primary}18`,
-                    color: cfg.palette.primary,
-                    fontFamily: cfg.fonts.sans,
-                  }}
-                >
-                  {cfg.copy.eventTag}
-                </span>
-
-                <h3
-                  className={
-                    themeId === 'luxury-pink'
-                      ? 'mt-1 text-[24px] leading-tight'
-                      : 'mt-1 text-[17px] font-bold leading-tight'
-                  }
-                  style={{
-                    color: cfg.palette.text,
-                    fontFamily: cfg.fonts.display,
-                  }}
-                >
-                  {cfg.copy.eventHeading}
-                </h3>
-
-                <div
-                  className="mx-auto my-2 h-[1px] w-14"
-                  style={{ backgroundColor: `${cfg.palette.cardBorder}99` }}
-                />
-
-                <div
-                  className="space-y-1.5 text-left text-[10px]"
-                  style={{
-                    color: cfg.palette.text,
-                    fontFamily: cfg.fonts.sans,
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <Calendar
-                      size={12}
-                      className="shrink-0"
-                      style={{ color: cfg.palette.primary }}
-                    />
-                    <span className="font-semibold">{couple.dateRaw}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock
-                      size={12}
-                      className="shrink-0"
-                      style={{ color: cfg.palette.primary }}
-                    />
-                    <span>{couple.timeRaw} – Selesai</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <MapPin
-                      size={12}
-                      className="mt-0.5 shrink-0"
-                      style={{ color: cfg.palette.primary }}
-                    />
-                    <span className="leading-snug line-clamp-2">
-                      {couple.venue}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================ */}
-      {/* ACT 4: GOLDEN-HOUR SKY TILT-UP -> "SAMPAI JUMPA" -> MONOGRAM    */}
-      {/* ================================================================ */}
-      {act4In > 0.005 && (
-        <div
-          className="absolute inset-0 z-10 overflow-hidden"
-          style={{ opacity: act4In }}
-        >
-          {/* Full-Bleed Painterly Sunset / Twilight Sky */}
-          <img
-            src={cfg.scenes.sky}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover will-change-transform"
-            style={{
-              transform: `scale(${act4CamScale}) translate3d(0, ${act4CamY}%, 0)`,
-            }}
-          />
-
-          {/* Phase 4A: "Sampai Jumpa" Floating in Luminous Sky */}
-          {farewellOpacity > 0.01 && (
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
               style={{
-                opacity: farewellOpacity,
-                transform: `translateY(${lerp(12, -8, seg(p, 0.755, 0.885))}px) scale(${lerp(0.94, 1.05, seg(p, 0.755, 0.885))})`,
+                position: 'absolute',
+                left: colL,
+                width: COL_W,
+                top: 398,
+                textAlign: 'center',
+                fontFamily: cfg.fonts.script,
+                fontStyle: themeId === 'luxury-pink' ? 'normal' : 'italic',
+                fontSize: themeId === 'luxury-pink' ? 50 : 42,
+                lineHeight: 1.1,
+                color: pal.primary,
               }}
             >
-              <p
-                className={
-                  themeId === 'luxury-pink'
-                    ? 'text-[38px] leading-none'
-                    : 'text-[26px] italic font-medium tracking-[0.08em]'
-                }
-                style={{
-                  color: cfg.palette.skyTextColor,
-                  fontFamily:
-                    themeId === 'luxury-pink'
-                      ? cfg.fonts.display
-                      : cfg.fonts.serif,
-                  textShadow: cfg.palette.skyShadow,
-                }}
-              >
-                {cfg.copy.farewell}
-              </p>
+              <SplitText text={cfg.copy.farewell} t={t} start={16.45} stagger={0.04} dur={0.6} mode="fade" />
             </div>
-          )}
 
-          {/* Phase 4B: Radiant Sunburst Halo + Couple Monogram Finale */}
-          {finaleIn > 0.01 && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-              {/* Soft radiant sunlight bloom behind monogram */}
+            <div style={{ position: 'absolute', left: colL, width: COL_W, top: 466, textAlign: 'center', fontSize: 13, ...display, color: pal.text, opacity: anim(t, 16.7, 17.1, 0, 1) }}>
+              {couple.groom} &amp; {couple.bride}
+            </div>
+
+            {(() => {
+              const url = couple.slug || 'ruanghadir.net';
+              const n = Math.floor(anim(t, 17.0, 17.75, 0, url.length, ease.linear));
+              const caret = t > 16.95 && Math.floor(t * 2.5) % 2 === 0;
+              return (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: cx - 130,
+                    width: 260,
+                    top: 500,
+                    textAlign: 'center',
+                    opacity: anim(t, 16.9, 17.1, 0, 1),
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      padding: '7px 14px',
+                      borderRadius: 999,
+                      border: `1px solid ${pal.secondary}`,
+                      background: '#ffffffB3',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: pal.primary,
+                      transform: `scale(${anim(t, 16.9, 17.3, 0.8, 1, ease.outBack)})`,
+                    }}
+                  >
+                    {url.slice(0, n)}
+                    <span style={{ width: 1.5, height: 13, background: pal.primary, opacity: caret ? 1 : 0 }} />
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* ============================================================
+            TRANSISI
+           ============================================================ */}
+        {stripeVisible && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 30, pointerEvents: 'none' }}>
+            {[pal.secondary, pal.primary, pal.paper].map((c, i) => (
               <div
-                className="pointer-events-none absolute h-56 w-56 rounded-full"
+                key={i}
                 style={{
-                  opacity: finaleHalo * 0.72,
-                  background: `radial-gradient(circle, ${cfg.palette.flareInner} 0%, ${cfg.palette.flareOuter} 45%, transparent 72%)`,
-                  filter: 'blur(12px)',
+                  position: 'absolute',
+                  left: `${(i * 100) / 3}%`,
+                  width: `${100 / 3 + 0.5}%`,
+                  top: 0,
+                  bottom: 0,
+                  background: c,
+                  transform: `translate3d(0, ${stripe(i)}%, 0)`,
                 }}
               />
+            ))}
+          </div>
+        )}
 
-              <div
-                className="relative flex flex-col items-center"
-                style={{
-                  opacity: finaleIn,
-                  transform: `scale(${lerp(0.86, 1, finaleIn)}) translateY(${lerp(14, 0, finaleIn)}px)`,
-                }}
-              >
-                {themeId === 'javanese-classic' && (
-                  <img
-                    src="/assets/wayang/gunungan.png"
-                    alt=""
-                    className="mb-2 h-11 w-11 object-contain opacity-90 drop-shadow-sm"
-                  />
-                )}
+        {irisVisible && t < 7.75 && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 30,
+              pointerEvents: 'none',
+              background: pal.primary,
+              clipPath: `circle(${irisCover * 120}% at 50% 50%)`,
+            }}
+          />
+        )}
+        {irisVisible && t >= 7.75 && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 4, background: pal.primary }} />
+        )}
 
-                <p
-                  className="text-[46px] font-bold leading-none tracking-[0.06em]"
-                  style={{
-                    color: cfg.palette.skyTextColor,
-                    fontFamily: cfg.fonts.display,
-                    textShadow: cfg.palette.skyShadow,
-                  }}
-                >
-                  {couple.initials}
-                </p>
+        {diagVisible && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '-60%',
+              top: '-20%',
+              width: '220%',
+              height: '140%',
+              zIndex: 30,
+              pointerEvents: 'none',
+              transform: `translate3d(${diag}%, 0, 0) rotate(-18deg)`,
+              background: `linear-gradient(90deg, transparent 0%, ${pal.secondary} 6%, ${pal.primary} 18%, ${pal.primary} 82%, ${pal.secondary} 94%, transparent 100%)`,
+            }}
+          />
+        )}
 
-                <p
-                  className={
-                    themeId === 'luxury-pink'
-                      ? 'mt-1 text-[30px] leading-none'
-                      : 'mt-1.5 text-[18px] font-semibold tracking-[0.06em]'
-                  }
-                  style={{
-                    color: cfg.palette.primary,
-                    fontFamily: cfg.fonts.display,
-                    textShadow: cfg.palette.skyShadow,
-                  }}
-                >
-                  {couple.groom} &amp; {couple.bride}
-                </p>
-
-                <div
-                  className="mt-3 rounded-full px-3.5 py-1 text-[9.5px] font-semibold tracking-[0.12em] backdrop-blur-md"
-                  style={{
-                    backgroundColor: cfg.palette.cardBg,
-                    color: cfg.palette.text,
-                    border: `1px solid ${cfg.palette.cardBorder}99`,
-                    fontFamily: cfg.fonts.sans,
-                  }}
-                >
-                  {couple.dateRaw}
-                </div>
-
-                <p
-                  className="mt-2.5 text-[9.5px] font-medium tracking-[0.08em]"
-                  style={{
-                    color: cfg.palette.skyTextColor,
-                    fontFamily: cfg.fonts.sans,
-                    textShadow: cfg.palette.skyShadow,
-                  }}
-                >
-                  {couple.slug}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ================================================================ */}
-      {/* PERSISTENT CINEMA OVERLAYS: GOD RAYS, PARTICLES & SUN FLARES    */}
-      {/* ================================================================ */}
-      <VolumetricGodRays progress={p} themeId={themeId} />
-      <ThemeParticleOverlay themeId={themeId} isPlaying={isPlaying} />
-
-      {/* Seamless Volumetric Sunbeam Light-Leak Transition over Cut Points */}
-      {cutFlare > 0.01 && (
+        {/* Light leak: menyapu pelan + flash di titik potong */}
         <div
-          className="pointer-events-none absolute inset-0 z-40"
           style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 35,
+            pointerEvents: 'none',
             mixBlendMode: 'screen',
-            opacity: cutFlare * 0.85,
-            background: `radial-gradient(circle at 65% 28%, ${cfg.palette.flareInner} 0%, ${cfg.palette.flareOuter} 48%, transparent 82%)`,
+            background: `radial-gradient(ellipse 60% 45% at ${30 + Math.sin(t * 0.45) * 40}% ${20 + Math.cos(t * 0.35) * 15}%, ${pal.leak} 0%, transparent 70%)`,
+            opacity: 0.55 + flash * 0.45,
           }}
         />
-      )}
+        {flash > 0 && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 36, pointerEvents: 'none', background: '#FFFFFF', opacity: flash * 0.95 }} />
+        )}
 
-      {/* Subtle Cinema Vignette */}
-      <div
-        className="pointer-events-none absolute inset-0 z-30"
-        style={{
-          boxShadow: 'inset 0 0 42px rgba(15, 12, 10, 0.24)',
-        }}
-      />
+        <Particles kind={cfg.particle} t={t} color={pal.secondary} accent={cfg.particle === 'ember' ? '#F3C97A' : pal.primary} width={stageW} />
 
-      {/* Subtle Preview Watermark (Removed in Enterprise Export) */}
-      {showWatermark && (
-        <div className="pointer-events-none absolute bottom-3 inset-x-0 z-40 flex justify-center">
-          <span className="rounded-full bg-black/28 px-2.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.2em] text-white/85 backdrop-blur-sm">
-            RuangHadir Enterprise Preview
-          </span>
-        </div>
-      )}
+        {/* Vignette + grain film */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 41, pointerEvents: 'none', boxShadow: 'inset 0 0 120px rgba(0,0,0,0.22)' }} />
+        <div
+          style={{
+            position: 'absolute',
+            inset: '-40px',
+            zIndex: 42,
+            pointerEvents: 'none',
+            backgroundImage: GRAIN,
+            opacity: 0.09,
+            mixBlendMode: 'multiply',
+            transform: `translate(${(Math.floor(t * 24) * 37) % 40}px, ${(Math.floor(t * 24) * 53) % 40}px)`,
+          }}
+        />
+
+        {/* Fade in/out loop */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 45,
+            pointerEvents: 'none',
+            background: pal.paper,
+            opacity: Math.max(1 - seg(t, 0, 0.45), seg(t, DUR - 0.45, DUR)),
+          }}
+        />
+
+        {showWatermark && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 18,
+              right: 18,
+              zIndex: 50,
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: '0.08em',
+              color: pal.text,
+              opacity: 0.55,
+            }}
+          >
+            RuangHadir · Preview
+          </div>
+        )}
+      </div>
     </div>
   );
 }

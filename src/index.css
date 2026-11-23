@@ -4,7 +4,7 @@
    ============================================ */
 
 /* Google Fonts: Cormorant Garamond (elegant heading), Lora (body serif), Inter (UI), Great Vibes (script) */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Cinzel:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -1556,7 +1556,7 @@ body {
    Ivory   #F8F5F0  kanvas        Paper  #FFFFFF  permukaan
    Linen   #F1EBE2  permukaan 2   Ink    #2A1E21  teks utama (plum-hitam)
    Wine    #7A2E3B  aksi utama    Gold   #B8955A  aksen/ornamen
-   Display: Fraunces (variabel --font-display)  ·  UI: Plus Jakarta Sans
+   Display: Playfair Display (variabel --font-display)  ·  UI: Plus Jakarta Sans
    ========================================================================== */
 
 .saas-scope {
@@ -1615,11 +1615,10 @@ body {
 
 .saas-scope h1,
 .saas-scope h2 {
-  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-family: var(--font-display), "Playfair Display", Georgia, serif;
   font-weight: 400;
   letter-spacing: -0.015em;
   color: var(--rh-ink);
-  font-variation-settings: "opsz" 96, "SOFT" 50;
 }
 .saas-scope h3 {
   font-family: var(--font-ui), "Plus Jakarta Sans", system-ui, sans-serif;
@@ -1628,11 +1627,11 @@ body {
   color: var(--rh-ink);
 }
 .saas-scope .rh-display {
-  font-family: var(--font-display), "Fraunces", Georgia, serif;
-  font-variation-settings: "opsz" 144, "SOFT" 100;
+  font-family: var(--font-display), "Playfair Display", Georgia, serif;
+  letter-spacing: -0.02em;
 }
 .saas-scope .saas-serif-i {
-  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-family: var(--font-display), "Playfair Display", Georgia, serif;
   font-style: italic;
   font-weight: 400;
   color: inherit;
@@ -1640,7 +1639,7 @@ body {
   -webkit-text-fill-color: currentColor;
 }
 .saas-scope .saas-statnum {
-  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-family: var(--font-display), "Playfair Display", Georgia, serif;
   font-weight: 400;
   letter-spacing: -0.02em;
   font-variant-numeric: lining-nums tabular-nums;
@@ -1858,3 +1857,8 @@ body {
   font-variation-settings: normal;
 }
 .saas-scope h1, .saas-scope h2 { font-variation-settings: normal; font-optical-sizing: auto; }
+
+/* Scrubber video Enterprise */
+.rh-scrub::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(184, 149, 90, 0.35); }
+.rh-scrub::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 999px; background: #FFFFFF; }
+.rh-scrub:focus-visible { outline: 2px solid #B8955A; outline-offset: 6px; }

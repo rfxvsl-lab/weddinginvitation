@@ -77,7 +77,7 @@ Seluruh halaman marketing, autentikasi, dan dashboard berbagi satu bahasa visual
 - **Gold (aksen):** `#B8955A` (deep `#8C6B34`, soft `#F4ECDD`).
 - Token tersedia sebagai `var(--rh-*)` di dalam `.saas-scope`.
 - **Tipografi:**
-  - Display: `Fraunces` (`--font-display`, via next/font)
+  - Display: `Playfair Display` (`--font-display`, via next/font)
   - UI & Dashboard: `Plus Jakarta Sans` (`--font-ui`, via next/font)
   - Font template undangan tetap dimuat oleh masing-masing template.
 
