@@ -11,7 +11,7 @@ Hasil:
   /tmp/theme-qa/<id>/*.png               — sampul, setelah dibuka, dan halaman penuh
 Keluar dengan kode 1 bila ada error konsol / halaman gagal dibuka.
 """
-import asyncio, os, sys, urllib.request
+import asyncio, os, re, sys, urllib.request
 from pathlib import Path
 from playwright.async_api import async_playwright
 from PIL import Image
@@ -62,9 +62,11 @@ async def run(theme_id: str, qa_only: bool) -> int:
         # Undangan dirender di dalam iframe (srcdoc) → bekerja di frame tersebut
         fr = pg.frames[1] if len(pg.frames) > 1 else pg.main_frame
         btn = fr.locator('[data-kit-open]')
+        if not await btn.count():
+            btn = fr.get_by_role('button', name=re.compile('buka', re.I))  # tema lama
         if await btn.count():
             await btn.first.click()
-            await pg.wait_for_timeout(2200)
+            await pg.wait_for_timeout(3200)
         else:
             errors.append('missing: tombol buka sampul')
         await pg.wait_for_timeout(1500)

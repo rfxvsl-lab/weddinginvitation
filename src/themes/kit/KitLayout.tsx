@@ -161,6 +161,11 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     ? { position: 'relative', zIndex: 2, padding: '0 18px', textAlign: 'center' }
     : { position: 'relative', zIndex: 2, padding: '72px 24px', textAlign: 'center' };
   const ink = scene ? 'var(--ink)' : p.primary;
+  const darkBg = (() => {
+    const h = p.bg.replace('#', '');
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b < 110;
+  })();
   const inkSoft = scene ? 'var(--ink)' : p.muted;
   const titleStyle: React.CSSProperties = { fontFamily: script, fontSize: spec.fonts.script ? 46 : 34, fontWeight: 400, lineHeight: 1.1, color: ink, margin: 0 };
   const eyebrow: React.CSSProperties = { fontFamily: label, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: p.muted };
@@ -498,9 +503,9 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         <section key="gallery" style={{ ...sectionStyle, paddingLeft: spec.gallery === 'film' ? 0 : 16, paddingRight: spec.gallery === 'film' ? 0 : 16 }}>
           {Title({ text: c.galleryTitle || 'Galeri' })}
           {spec.gallery === 'film' ? (
-            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '10px 24px', background: p.text }}>
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '10px 24px', background: darkBg ? '#0B0A09' : p.text }}>
               {photos.map((src, i) => (
-                <button key={i} type="button" onClick={() => setLightbox(src)} style={{ flex: '0 0 62%', aspectRatio: '3/4', scrollSnapAlign: 'center', border: `4px solid ${p.surface}`, padding: 0, background: 'none', cursor: 'zoom-in', overflow: 'hidden' }}>
+                <button key={i} type="button" onClick={() => setLightbox(src)} style={{ flex: '0 0 62%', aspectRatio: '3/4', scrollSnapAlign: 'center', border: `4px solid ${darkBg ? p.text : p.surface}`, padding: 0, background: 'none', cursor: 'zoom-in', overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {M(<img src={src} alt={`Galeri ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />, { style: { height: '100%' }, y: [-24, 24], scale: [1.18, 1.18] })}
                 </button>
@@ -658,6 +663,12 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
 
   const Signature = spec.Signature;
   const Chapter = scene?.Chapter;
+  const chapterData = {
+    photos: [data.bgImageUrl, ...(data.gallery || [])].filter(Boolean).map((u) => img(u)),
+    groom: groom.nickname,
+    bride: bride.nickname,
+    dateShort: fmtDate(mainDate, { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' · '),
+  };
   const Backdrop = Chapter ? undefined : scene?.Backdrop;
 
   const page = (
@@ -691,6 +702,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           if (Chapter) {
             // Bab layar penuh: ilustrasi menempel (sticky) selama isinya digulir; lapisan depan menutupi teks
             const tone = scene.ink?.[id] || { color: p.text };
+            const cd = chapterData;
             const short = id === 'hero' || id === 'quote' || id === 'countdown' || id === 'closing';
             return (
               <div
@@ -708,12 +720,12 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                 }
               >
                 <div aria-hidden style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', zIndex: 0, overflow: 'hidden' }}>
-                  <Chapter id={id} layer="back" />
+                  <Chapter id={id} layer="back" data={cd} />
                 </div>
-                <div style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', padding: short ? '15vh 0 30vh' : '12vh 0 22vh' }}>{node}</div>
+                <div style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', padding: id === 'hero' && scene.heroAlign === 'bottom' ? '42vh 0 16vh' : short ? '15vh 0 30vh' : '12vh 0 22vh' }}>{node}</div>
                 <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
                   <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-                    <Chapter id={id} layer="front" />
+                    <Chapter id={id} layer="front" data={cd} />
                   </div>
                 </div>
               </div>

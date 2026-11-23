@@ -18,6 +18,8 @@ const OPEN_MS = 1100;
 /** Sampul undangan — 5 mekanik pembuka. Tamu menekan tombol, animasi berjalan, lalu konten tampil. */
 export default function Cover({ spec, groom, bride, dateText, guestName, photo, onOpen }: CoverProps) {
   const [opening, setOpening] = useState(false);
+  // hitung mundur pita film (sampul 'film')
+  const [leader, setLeader] = useState(3);
   const p = spec.palette;
   const coverBg = p.cover || p.bg;
   const onCover = p.onCover || p.text;
@@ -32,6 +34,14 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
   const open = () => {
     if (opening) return;
     setOpening(true);
+    if (spec.cover === 'film') {
+      setLeader(3);
+      window.setTimeout(() => setLeader(2), 520);
+      window.setTimeout(() => setLeader(1), 1040);
+      window.setTimeout(() => setLeader(0), 1560);
+      window.setTimeout(onOpen, 2150);
+      return;
+    }
     window.setTimeout(onOpen, spec.cover === 'scene' ? 700 : OPEN_MS);
   };
 
@@ -67,7 +77,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
           boxShadow: '0 12px 26px -14px rgba(0,0,0,.55)',
         }}
       >
-        ✉ {button}
+        {spec.cover === 'film' ? '▶' : '✉'} {button}
       </button>
     </div>
   );
@@ -219,6 +229,45 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
           </div>
           {inner}
         </div>
+      </div>
+    );
+  }
+
+  // ---------------- film: kartu judul → hitung mundur pita film 3-2-1 → layar hitam terbelah ----------------
+  if (spec.cover === 'film') {
+    const half = (top: boolean): React.CSSProperties => ({
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      [top ? 'top' : 'bottom']: 0,
+      height: '50.5%',
+      background: '#000',
+      transition: `transform 560ms ${ease}`,
+      transform: opening && leader === 0 ? `translateY(${top ? '-100%' : '100%'})` : 'none',
+    });
+    return (
+      <div style={{ ...base, background: 'transparent', color: onCover }}>
+        <div style={half(true)} />
+        <div style={half(false)} />
+        {!opening && (
+          <div style={{ position: 'relative', zIndex: 2, width: '100%' }}>
+            {Art && <Art palette={p} />}
+            {inner}
+          </div>
+        )}
+        {opening && leader > 0 && (
+          <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle, #3A342B 0%, #15120E 70%)' }}>
+            <style>{'@keyframes kit-leader { from { transform: rotate(0deg) } to { transform: rotate(360deg) } } @keyframes kit-flick { 0%,100% { opacity: .92 } 50% { opacity: 1 } }'}</style>
+            <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: 1, background: 'rgba(240,230,210,.35)' }} />
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, background: 'rgba(240,230,210,.35)' }} />
+            <div style={{ position: 'relative', width: 'min(62vw, 260px)', aspectRatio: '1', borderRadius: 999, border: '2px solid rgba(240,230,210,.7)', boxShadow: 'inset 0 0 0 14px rgba(0,0,0,.25), inset 0 0 0 16px rgba(240,230,210,.4)', overflow: 'hidden', animation: 'kit-flick .12s steps(2) infinite' }}>
+              <div key={leader} style={{ position: 'absolute', inset: 0, background: 'conic-gradient(rgba(240,230,210,.28) 0deg, rgba(240,230,210,.28) 0deg, transparent 0deg)', animation: 'kit-leader .52s linear', maskImage: 'conic-gradient(#000 0deg 360deg)' }}>
+                <div style={{ position: 'absolute', inset: 0, background: 'conic-gradient(from 0deg, rgba(240,230,210,.32) 0deg 90deg, transparent 90deg)' }} />
+              </div>
+              <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: display, fontSize: 'min(36vw, 150px)', lineHeight: 1, color: 'rgba(245,236,218,.95)' }}>{leader}</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

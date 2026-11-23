@@ -7,21 +7,7 @@ import { KIT_THEMES, toThemeConfig } from '../themes/catalog';
 import { ThemeConfig, WeddingData, Guest, RSVP, WeddingAnalytics } from '../types';
 
 const LEGACY_THEMES: ThemeConfig[] = [
-  {
-    id: 'rfx-dark',
-    pattern: 'modern',
-    layout: 'dark-luxury',
-    name: 'Dark Luxury Cinematic',
-    primary: 'indigo-300',
-    primaryHex: '#B9B5F2',
-    secondaryHex: '#D5D2FA',
-    bgHex: '#171622',
-    bgPatternHex: '#242235',
-    textHex: '#F2F0FA',
-    accentHex: '#B9B5F2',
-    fontSerif: 'font-serif',
-    fontSans: 'font-sans'
-  },
+  // 'rfx-dark' (Dark Luxury Cinematic) kini tema Theme Kit: src/themes/catalog/dark-luxury-cinematic.tsx
   {
     id: 'cremy-rose',
     name: 'Luxury Pink Elegant',
@@ -145,7 +131,13 @@ const LEGACY_THEMES: ThemeConfig[] = [
 ];
 
 /** Tema bawaan + tema Theme Kit (otomatis dari src/themes/catalog). */
-export const DEFAULT_THEMES: ThemeConfig[] = [...LEGACY_THEMES, ...KIT_THEMES.map(toThemeConfig)];
+const KIT_CONFIGS = KIT_THEMES.map(toThemeConfig);
+// 'rfx-dark' tetap di urutan pertama: tema bawaan undangan baru & fallback DEFAULT_THEMES[0]
+export const DEFAULT_THEMES: ThemeConfig[] = [
+  ...KIT_CONFIGS.filter((t) => t.id === 'rfx-dark'),
+  ...LEGACY_THEMES,
+  ...KIT_CONFIGS.filter((t) => t.id !== 'rfx-dark'),
+];
 
 
 export const DEFAULT_WEDDING_DATA: WeddingData = {

@@ -6,6 +6,13 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.5.0] — 2026-11-23 — Dark Luxury Cinematic dirombak
+
+- Tema `rfx-dark` dibangun ulang di Theme Kit sebagai tema Spesial bergaya film (ID tetap, jadi undangan yang sudah memakainya otomatis berubah).
+- Sampul baru `film`: kartu judul → hitung mundur pita film 3-2-1 → layar hitam terbelah.
+- 10 bab: foto layar penuh dengan Ken Burns, cahaya proyektor, bokeh & hujan emas, kebocoran cahaya, cincin hitung mundur, pita film berisi foto yang bergulir dengan kecepatan berbeda, butiran film, dan letterbox di pembuka & penutup. Palet hitam pekat + emas sampanye + gading; Italiana, Marcellus, Albert Sans.
+- Bab menerima data foto undangan (`ChapterData`); `heroAlign: 'bottom'` untuk judul gaya film.
+
 ## [3.4.0] — 2026-11-23 — Tema Spesial bab per bab
 
 - Tema Spesial dirombak ke gaya situs naratif paralaks: setiap bagian undangan adalah bab adegan layar penuh; teks berada di dalam adegan dengan lapisan di belakang dan di depannya; lapisan bergerak sesuai kedalaman saat bab masuk, ditahan (sticky), dan keluar.

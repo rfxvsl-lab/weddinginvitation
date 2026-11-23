@@ -45,7 +45,7 @@ export interface ThemeFonts {
   google: string;
 }
 
-export type CoverVariant = 'envelope' | 'curtain' | 'gate' | 'card' | 'photo' | 'scene';
+export type CoverVariant = 'envelope' | 'curtain' | 'gate' | 'card' | 'photo' | 'scene' | 'film';
 export type HeroVariant = 'photo' | 'frame' | 'type' | 'scene';
 export type FrameShape = 'arch' | 'circle' | 'oval' | 'rect' | 'polaroid';
 export type CoupleVariant = 'cards' | 'split';
@@ -78,6 +78,16 @@ export interface ThemeCopy {
   closingText?: string;
 }
 
+/** Data undangan yang boleh dipakai ilustrasi bab (mis. foto untuk tema sinematik). */
+export interface ChapterData {
+  /** foto latar + galeri, sudah dalam URL siap pakai */
+  photos: string[];
+  groom: string;
+  bride: string;
+  /** tanggal utama, mis. "08 · 08 · 2026" */
+  dateShort: string;
+}
+
 /** regular = tema satu halaman biasa; special = adegan 2D/2.5D paralaks (kandidat paket Enterprise) */
 export type ThemeTier = 'regular' | 'special';
 
@@ -93,7 +103,9 @@ export interface SceneConfig {
    * Dirender dua kali per bagian: layer 'back' (di belakang teks) dan 'front' (di depan teks).
    * Susun dari <ArtLayer depth> di kit/chapters.tsx. Bila ada, Backdrop tidak dipakai.
    */
-  Chapter?: React.ComponentType<{ id: SectionId; layer: 'back' | 'front' }>;
+  Chapter?: React.ComponentType<{ id: SectionId; layer: 'back' | 'front'; data: ChapterData }>;
+  /** posisi teks di bab pembuka: 'top' (default, di langit) atau 'bottom' (gaya judul film di atas foto) */
+  heroAlign?: 'top' | 'bottom';
   /** warna teks + bayangan teks yang berada langsung di atas ilustrasi setiap bab */
   ink?: Partial<Record<SectionId, { color: string; shadow?: string }>>;
   /** animasi kamera setelah sampul dibuka */
