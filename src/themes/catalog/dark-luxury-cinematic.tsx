@@ -37,6 +37,12 @@ export default defineTheme({
   divider: 'none',
   dividerSvg:
     '<svg viewBox="0 0 200 24" fill="none"><path d="M14 12H86M114 12H186" stroke="currentColor" stroke-width=".8"/><rect x="94" y="6" width="12" height="12" transform="rotate(45 100 12)" stroke="currentColor" stroke-width=".8"/><circle cx="100" cy="12" r="1.6" fill="currentColor"/></svg>',
+  variants: [
+    { id: 'gold', name: 'Emas Sampanye', palette: {} },
+    { id: 'rose-gold', name: 'Rose Gold', palette: { primary: '#D7A08F', secondary: '#8F6A61', muted: '#BFA8A1' } },
+    { id: 'platinum', name: 'Platinum', palette: { primary: '#C9CED6', secondary: '#7D848E', muted: '#AEB3BA', onPrimary: '#121417' } },
+    { id: 'emerald', name: 'Zamrud', palette: { primary: '#7FBF9E', secondary: '#4F7A64', muted: '#A9BFB2', onPrimary: '#0D1712' } },
+  ],
   frame: 'rect',
   radius: 4,
   cover: 'film',

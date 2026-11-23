@@ -138,6 +138,8 @@ const TIME: Record<SectionId, number> = {
   gallery: 0.72,
   gift: 0.82,
   rsvp: 0.9,
+  wishes: 0.93,
+  interlude: 0.35,
   closing: 1,
 };
 

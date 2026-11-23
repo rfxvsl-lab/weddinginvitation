@@ -70,6 +70,13 @@ export default defineTheme({
   divider: 'none',
   dividerSvg:
     '<svg viewBox="0 0 200 24" fill="none"><path d="M10 12H80M120 12H190" stroke="currentColor" stroke-width="1"/><path d="M100 2 C 94 8, 94 14, 100 22 C 106 14, 106 8, 100 2 Z" fill="currentColor"/><path d="M86 12 C 90 8, 94 8, 96 12 M114 12 C 110 8, 106 8, 104 12" stroke="currentColor" stroke-width="1"/></svg>',
+  flora: { colors: ['#F4EEE3', '#E9BFAE', '#FFFFFF', '#D8C7A2'], leaf: '#7C9472' },
+  variants: [
+    { id: 'sage', name: 'Sage', palette: {} },
+    { id: 'dusty-blue', name: 'Dusty Blue', palette: { primary: '#5D7389', secondary: '#A8B9C8', text: '#2C3A47', muted: '#667585', bg: '#F1F3F4', surface: '#FAFBFB', cover: '#E3E9EE', onCover: '#2C3A47' }, flora: ['#FFFFFF', '#C9D6E2', '#F3E3D3', '#A8B9C8'] },
+    { id: 'terracotta', name: 'Terracotta', palette: { primary: '#A65A3F', secondary: '#D9AE93', text: '#3E2A22', muted: '#7A6257', bg: '#F7F0E8', surface: '#FCF8F3', cover: '#F0E2D4', onCover: '#3E2A22' }, flora: ['#E7A587', '#F6D9C4', '#FFFFFF', '#C97F5F'] },
+    { id: 'mauve', name: 'Mauve', palette: { primary: '#86587A', secondary: '#C9AFC0', text: '#3B2836', muted: '#77636F', bg: '#F6F1F3', surface: '#FCF9FA', cover: '#EEE2E8', onCover: '#3B2836' }, flora: ['#D9A6C0', '#F2D7E2', '#FFFFFF', '#B07A9A'] },
+  ],
   frame: 'arch',
   radius: 18,
   cover: 'gate',

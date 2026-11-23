@@ -88,6 +88,8 @@ export interface WeddingData {
   enableLiveMoments?: boolean;
   liveStreamUrl?: string;
   liveStreamLabel?: string;
+  /** varian warna tema Theme Kit yang dipilih pemilik */
+  themeVariant?: string;
 }
 
 export interface Guest {

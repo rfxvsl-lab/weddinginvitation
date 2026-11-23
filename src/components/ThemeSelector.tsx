@@ -4,12 +4,15 @@ import React, { useState } from 'react';
 import { Check, Palette, Eye, BookOpen } from 'lucide-react';
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { themeShot } from '../themes/shots';
-import { isNewTheme } from '../themes/catalog';
+import { getKitTheme, isNewTheme } from '../themes/catalog';
 
 interface ThemeSelectorProps {
   currentThemeId: string;
   onSelectTheme: (themeId: string) => void;
   packageId?: string;
+  /** varian warna tema aktif (Theme Kit) */
+  currentVariant?: string;
+  onSelectVariant?: (variantId: string) => void;
 }
 
 
@@ -26,8 +29,13 @@ const PATTERN_LABELS: Record<string, string> = {
 export default function ThemeSelector({
   currentThemeId,
   onSelectTheme,
+  currentVariant,
+  onSelectVariant,
 }: ThemeSelectorProps) {
   const [filter, setFilter] = useState<string>('all');
+  const activeKit = getKitTheme(currentThemeId);
+  const variants = activeKit?.variants || [];
+  const activeVariant = variants.find((v) => v.id === currentVariant)?.id || variants[0]?.id;
 
   // Tema baru (14 hari) tampil paling depan
   const sorted = [...DEFAULT_THEMES].sort((a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || ''));
@@ -35,6 +43,37 @@ export default function ThemeSelector({
 
   return (
     <div className="space-y-6">
+      {/* Varian warna tema aktif */}
+      {variants.length > 1 && onSelectVariant && (
+        <div className="rounded-2xl border border-[#E8DFD4] bg-white p-4">
+          <p className="text-[13px] font-semibold text-[#2A1E21]">Warna tema {activeKit?.name}</p>
+          <p className="mt-0.5 text-[12px] text-[#6B5D54]">Pilih varian warna — tata letak dan animasi tetap sama.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {variants.map((v) => {
+              const pal = { ...activeKit!.palette, ...v.palette };
+              const on = v.id === activeVariant;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => onSelectVariant(v.id)}
+                  aria-pressed={on}
+                  className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-[12px] font-medium transition ${on ? 'border-[#7A2E3B] bg-[#7A2E3B]/5 text-[#7A2E3B]' : 'border-[#E8DFD4] text-[#54464A] hover:border-[#B8955A]'}`}
+                >
+                  <span className="flex overflow-hidden rounded-full border border-black/10">
+                    {[pal.primary, pal.secondary, pal.bg].map((c, i) => (
+                      <span key={i} className="h-5 w-3" style={{ background: c }} />
+                    ))}
+                  </span>
+                  {v.name}
+                  {on && <Check className="h-3.5 w-3.5" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Header + Filter Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

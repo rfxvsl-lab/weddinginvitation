@@ -11,6 +11,8 @@ export function Reveal({
   as: Tag = 'div',
   variant,
   className,
+  from,
+  when = true,
 }: {
   children: React.ReactNode;
   style?: React.CSSProperties;
@@ -18,6 +20,10 @@ export function Reveal({
   as?: keyof React.JSX.IntrinsicElements;
   variant: RevealStyle;
   className?: string;
+  /** arah masuk (menimpa gaya variant): kiri, kanan, atas, bawah */
+  from?: 'left' | 'right' | 'up' | 'down';
+  /** tunda sampai kondisi ini benar (mis. setelah animasi pembuka selesai) */
+  when?: boolean;
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
@@ -48,6 +54,13 @@ export function Reveal({
     blur: { opacity: 0, filter: 'blur(10px)', transform: 'translateY(10px)' },
     zoom: { opacity: 0, transform: 'scale(0.94)' },
   };
+  const dir: Record<string, React.CSSProperties> = {
+    left: { opacity: 0, transform: 'translateX(-70px)' },
+    right: { opacity: 0, transform: 'translateX(70px)' },
+    up: { opacity: 0, transform: 'translateY(50px)' },
+    down: { opacity: 0, transform: 'translateY(-50px)' },
+  };
+  const visible = shown && when;
   const T = Tag as React.ElementType;
   return (
     <T
@@ -55,7 +68,7 @@ export function Reveal({
       className={className}
       style={{
         transition: `opacity .9s cubic-bezier(.2,.7,.2,1) ${delay}s, transform .9s cubic-bezier(.2,.7,.2,1) ${delay}s, filter .9s ease ${delay}s`,
-        ...(shown ? { opacity: 1, transform: 'none', filter: 'none' } : hidden[variant]),
+        ...(visible ? { opacity: 1, transform: 'none', filter: 'none' } : from ? dir[from] : hidden[variant]),
         ...style,
       }}
     >

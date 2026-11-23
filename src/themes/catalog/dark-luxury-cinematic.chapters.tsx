@@ -177,7 +177,7 @@ function Letterbox({ left, right }: { left: string; right: string }) {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 20px',
+    padding: '0 72px 0 20px',
     fontFamily: "'Marcellus', serif",
     fontSize: 10,
     letterSpacing: '0.32em',

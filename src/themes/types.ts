@@ -56,7 +56,7 @@ export type DividerPreset = 'floral' | 'diamond' | 'dots' | 'wave' | 'line' | 'n
 export type AmbientPreset = 'petals' | 'sparkles' | 'leaves' | 'bubbles' | 'snow' | 'none';
 export type RevealStyle = 'rise' | 'fade' | 'blur' | 'zoom';
 
-export type SectionId = 'hero' | 'quote' | 'couple' | 'countdown' | 'events' | 'story' | 'gallery' | 'gift' | 'rsvp' | 'closing';
+export type SectionId = 'hero' | 'quote' | 'couple' | 'interlude' | 'countdown' | 'events' | 'story' | 'gallery' | 'gift' | 'rsvp' | 'wishes' | 'closing';
 
 export interface ThemeCopy {
   coverLabel?: string; // "Kepada Yth."
@@ -74,6 +74,7 @@ export interface ThemeCopy {
   giftTitle?: string;
   giftIntro?: string;
   rsvpTitle?: string;
+  wishesTitle?: string;
   closingTitle?: string;
   closingText?: string;
 }
@@ -109,7 +110,7 @@ export interface SceneConfig {
   /** warna teks + bayangan teks yang berada langsung di atas ilustrasi setiap bab */
   ink?: Partial<Record<SectionId, { color: string; shadow?: string }>>;
   /** animasi kamera setelah sampul dibuka */
-  intro: 'dolly' | 'popup' | 'rise';
+  intro: 'dolly' | 'popup' | 'rise' | 'descend';
   introMs?: number;
   /** warna teks yang tampil langsung di atas adegan: [awal halaman, akhir halaman] */
   heroText: string;
@@ -126,7 +127,29 @@ export interface SceneConfig {
   panel?: { background: string; blur?: number; border?: string };
 }
 
+/** Varian warna yang bisa dipilih pemilik undangan di dashboard. */
+export interface ThemeVariant {
+  id: string;
+  name: string;
+  palette: Partial<ThemePalette>;
+  /** warna bunga ornamen untuk varian ini */
+  flora?: string[];
+}
+
 export interface ThemeSpec {
+  /** varian warna; varian pertama = bawaan */
+  variants?: ThemeVariant[];
+  /**
+   * Warna bunga ornamen (mawar, kuncup) yang mengapit foto & panel. Default dari palet.
+   * leaf = warna daun.
+   */
+  flora?: { colors: string[]; leaf: string };
+  /**
+   * Panggung pembuka (hero) berlapis 2.5D: setelah sampul dibuka kamera turun dari langit
+   * dan lapisan naik satu per satu. Default: taman prosedural dari palet tema.
+   * Komponen kustom disusun dari <ArtLayer hero order> di kit/chapters.
+   */
+  Stage?: React.ComponentType<{ palette: ThemePalette; flora: { colors: string[]; leaf: string }; photo?: string }>;
   /** default 'regular' */
   tier?: ThemeTier;
   /** wajib untuk tier 'special' */

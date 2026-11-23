@@ -6,6 +6,17 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.6.0] — 2026-11-24 — Standar undangan untuk semua tema
+
+- Konsep standar (mengikuti template premium) di Theme Kit, berlaku untuk semua tema Kit dan tema harian:
+  - sampul dengan kartu tamu (Kepada Yth. / nama / Di Tempat);
+  - panggung pembuka 2.5D: kamera turun dari langit, lapisan taman naik satu per satu, kupu-kupu, lalu nama mempelai masuk dari kiri & kanan;
+  - rangkaian bunga (mawar vektor) yang mengapit foto & panel, masuk dari samping dan bergoyang mengikuti gulir;
+  - panel lengkung untuk mempelai & acara dengan buket di puncaknya, Save the Date, tayangan foto (slideshow), daftar ucapan dengan avatar & waktu, penutup "Terima kasih" di atas foto + keluarga besar;
+  - menu navigasi ☰ dan tombol musik piringan hitam.
+- Varian warna per tema yang bisa dipilih pemilik di dashboard (Pengaturan → tema): Sage Garden (Sage, Dusty Blue, Terracotta, Mauve), Dark Luxury Cinematic (Emas Sampanye, Rose Gold, Platinum, Zamrud).
+- Backlog: 8 tema lama dijadwalkan dimigrasi ke standar ini satu per satu oleh jadwal otomatis.
+
 ## [3.5.0] — 2026-11-23 — Dark Luxury Cinematic dirombak
 
 - Tema `rfx-dark` dibangun ulang di Theme Kit sebagai tema Spesial bergaya film (ID tetap, jadi undangan yang sudah memakainya otomatis berubah).

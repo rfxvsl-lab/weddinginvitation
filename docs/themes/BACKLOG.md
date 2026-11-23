@@ -1,6 +1,8 @@
 # Backlog tema undangan
 
-Sesi otomatis mengambil baris `todo` paling atas. Urutan sengaja diselang-seling
+Sesi otomatis mengambil baris `todo` paling atas. Baris **migrate** (8 tema lama) didahulukan,
+satu per run, agar semua tema memakai standar undangan yang sama. Cek id sebenarnya di
+`src/data/defaultData.ts` sebelum memulai. Urutan sengaja diselang-seling
 (adat ↔ modern ↔ floral ↔ minimalis) dan **setiap baris ketiga adalah tema Spesial**
 (adegan 2D/2.5D paralaks — ikuti bagian "Tema Spesial" di PLAYBOOK).
 Format: `status | id | Nama | tier/kategori | brief`
@@ -10,6 +12,14 @@ Format: `status | id | Nama | tier/kategori | brief`
 | done (2026-11-23) | sage-garden | Sage Garden | regular / minimalist | Taman botani tenang, sage + linen, sketsa daun, pintu taman. (pilot) |
 | done (2026-11-23) | lembayung | Lembayung | **special** / classic | 2.5D: gunung api, punggung bukit, candi, nyiur; senja → malam berlampion saat digulir; intro dolly. |
 | done (2026-11-23) | taman-kertas | Taman Kertas | **special** / storybook | 2D buku pop-up kertas potong: bukit, gapura bunga, pohon, daun; intro popup. |
+| todo | grand-ballroom | Grand Ballroom (migrate) | **migrate** / classic | Bangun ulang di Theme Kit dengan id sama: tirai panggung ballroom, mahkota, emas & navy. Stage kustom: tirai terbuka + lampu gantung. |
+| todo | cremy-rose | Luxury Pink Elegant (migrate) | **migrate** / floral | Id sama. Amplop bersegel lilin, pink & krem, mawar. Stage kustom: amplop terbuka + kelopak. |
+| todo | javanese-classic | Javanese Classic (migrate) | **migrate** / classic | Id sama (lihat DEFAULT_THEMES). Gunungan, blencong, batik sogan. Stage kustom: kelir + gunungan naik. |
+| todo | royal-arabian | Royal Arabian (migrate) | **migrate** / classic | Id sama. Lengkung mihrab, lentera, emas & zamrud. Stage kustom: gerbang mihrab berlapis. |
+| todo | netflix-luxury | Cinema Red (migrate) | **migrate** / modern | Id sama. Ganti nuansa merek streaming menjadi bioskop merah-hitam orisinal (tanpa nama/logo merek). |
+| todo | spotilove | Music Player (migrate) | **migrate** / modern | Id sama. Pemutar musik orisinal (tanpa merek), piringan & equalizer. |
+| todo | parallax-cinematic | Cinematic 2D Parallax (migrate) | **migrate** / modern | Id sama; jadikan tema Spesial bab per bab. |
+| todo | storybook-interactive | Storybook (migrate) | **migrate** / storybook | Id sama. Buku cerita: halaman terbuka per bab. |
 | todo | sunda-kujang | Pasundan | classic | Adat Sunda: hijau tua + emas pudar, motif kujang & bambu, sampul tirai, gamelan degung terasa lewat ornamen; font serif klasik. |
 | todo | noir-monogram | Noir Monogram | modern | Hitam pekat + krem + emas, monogram inisial besar, hero tipografi, galeri film, reveal zoom. |
 | todo | sawah-fajar | Sawah Fajar | **special** / classic | 2.5D terasering sawah Bali saat fajar: kabut berlapis, pura kecil, burung kuntul terbang; pagi → siang cerah saat digulir; intro dolly. |

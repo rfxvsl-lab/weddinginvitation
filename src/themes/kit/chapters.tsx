@@ -80,7 +80,12 @@ export function ArtLayer({ depth, children, order = 0, popup = false, hero = fal
     if (exitX) tx += exitX * s.vw * leave;
     if (hero) {
       const k = s.intro;
-      if (mode === 'popup') {
+      if (mode === 'descend') {
+        // kamera turun dari langit: lapisan naik satu per satu dari bawah dengan kedalaman
+        const e = easeInOut(clamp((k - order * 0.09) / 0.55));
+        ty += (1 - e) * s.vh * (0.3 + depth * 0.55);
+        extra += ` scale(${(1 + (1 - e) * (0.12 + depth * 0.18)).toFixed(4)})`;
+      } else if (mode === 'popup') {
         const e = easeOutBack(clamp((k - order * 0.1) / 0.45));
         extra += ` perspective(900px) rotateX(${((1 - e) * 86).toFixed(2)}deg)`;
       } else {

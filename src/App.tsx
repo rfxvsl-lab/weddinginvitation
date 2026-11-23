@@ -301,6 +301,8 @@ export default function App() {
                   wedding.setThemeId(id);
                 }}
                 packageId={auth.currentUser?.packageId || 'free'}
+                currentVariant={wedding.weddingData.themeVariant}
+                onSelectVariant={(variantId) => wedding.setWeddingData((prev) => ({ ...prev, themeVariant: variantId }))}
               />
             </div>
           )}

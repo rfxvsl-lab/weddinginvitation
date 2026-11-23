@@ -79,6 +79,8 @@ const SKIES: Record<SectionId, Sk> = {
   gallery: { top: '#ECE4F3', bot: '#FBF4EE', hills: ['#DCD3EA', '#C9DFC6', '#A9CBB0', '#8DB89C'] },
   gift: { top: '#F8DAD7', bot: '#FCEDE6', hills: ['#F3CFC9', '#EBA9AE', '#E07A8A', '#C9DFC6'] },
   rsvp: { top: '#E1E3F1', bot: '#F6EFEA', hills: ['#D5D9EC', '#C9DFC6', '#A9CBB0', '#8DB89C'] },
+  interlude: { top: '#FDE6E1', bot: '#FFF6EE', hills: ['#F3CFC9', '#EBA9AE', '#C9DFC6', '#A9CBB0'] },
+  wishes: { top: '#E1E3F1', bot: '#F6EFEA', hills: ['#D5D9EC', '#C9DFC6', '#A9CBB0', '#8DB89C'] },
   closing: { top: '#262C55', bot: '#45497A', hills: ['#3B4170', '#323862', '#2A2F55', '#22274A'] },
 };
 

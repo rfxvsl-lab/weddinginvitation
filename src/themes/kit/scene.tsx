@@ -35,7 +35,7 @@ export interface SceneState {
   reduced: boolean;
 }
 
-export type SceneIntro = 'dolly' | 'popup' | 'rise';
+export type SceneIntro = 'dolly' | 'popup' | 'rise' | 'descend';
 
 type Listener = (s: SceneState) => void;
 

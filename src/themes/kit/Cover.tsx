@@ -55,9 +55,12 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
         {groom} <span style={{ fontFamily: display, fontSize: '0.6em', fontStyle: 'italic', color: p.secondary }}>&amp;</span> {bride}
       </h1>
       <p style={{ fontFamily: spec.fonts.body, fontSize: 14, opacity: 0.85 }}>{dateText}</p>
-      <div style={{ width: 60, height: 1, background: p.secondary, margin: '26px 0 18px' }} />
-      <p style={{ fontFamily: labelFont, fontSize: 11, letterSpacing: '0.12em', opacity: 0.75 }}>{label}</p>
-      <p style={{ fontFamily: display, fontSize: 24, margin: '6px 0 26px' }}>{guestName}</p>
+      {/* kartu tamu standar */}
+      <div style={{ margin: '24px 0 22px', minWidth: 240, maxWidth: 320, padding: '14px 24px', borderRadius: 12, background: `${p.surface}F2`, color: p.text, boxShadow: '0 14px 30px -18px rgba(0,0,0,.6)', textShadow: 'none' }}>
+        <p style={{ fontFamily: labelFont, fontSize: 12, letterSpacing: '0.06em', opacity: 0.75, margin: 0 }}>{label}</p>
+        <p style={{ fontFamily: display, fontSize: 21, fontWeight: 600, margin: '4px 0 2px', lineHeight: 1.25 }}>{guestName}</p>
+        <p style={{ fontFamily: labelFont, fontSize: 12, opacity: 0.7, margin: 0 }}>Di Tempat</p>
+      </div>
       <button
         data-kit-open
         type="button"
