@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.0] — 2026-11-23 — Film undangan Enterprise 1:1 dengan template
+
+- Video contoh Enterprise dibangun ulang per tema dari aset, tipografi, dan mekanik template aslinya:
+  - **Javanese Classic** (`motion/JavaneseFilm.tsx`): gunungan di bawah cahaya blencong dengan bayangan di kelir, kayonan (gunungan diputar), aksara ꦥꦮꦶꦮꦲꦤ꧀ ditulis, tombol "Mlebet Undangan", bunga emas, Sang Penganten, Pahargyan, galeri, dan penutup *tancep kayon*.
+  - **Grand Ballroom** (`motion/BallroomFilm.tsx`): tirai slate, mahkota & plakat OPEN di tali, celah cahaya, tali swag, nama berjatuhan, bingkai berlapis, tanggal slot-machine, kartu mempelai berbalik 3D, Order of Events, tirai menutup.
+  - **Luxury Pink** (`motion/PinkFilm.tsx`): amplop bersegel lilin, tutup terbuka 3D, kartu naik, nama ditulis tangan, bingkai lengkung + sulur, hitung mundur dipercepat ke hari H, Mempelai, Rangkaian Acara, segel dicap sebagai penutup.
+- `motion/core.tsx`: time remapping (speed ramp) dengan transisi kecepatan halus, motion blur searah (SVG), efek echo, text animator per huruf, trim paths, spring, keyframe bezier.
+- Foto sampel memakai foto asli data demo template (Rian & Salsa); plate latar AI (`assets/video-scenes`) dihapus.
+- Dashboard meneruskan orang tua, dua acara, dan galeri ke pemutar video.
+
 ## [3.0.0] — 2026-11-23 — Keamanan server-side & Editorial Luxury
 
 ### Keamanan (breaking)

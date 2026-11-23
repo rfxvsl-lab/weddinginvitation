@@ -7,35 +7,29 @@ import EnterpriseMotionPlayer, { MotionPlayerCouple } from "@/components/Enterpr
 import { VIDEO_THEMES, VIDEO_FPS, VIDEO_TOTAL_FRAMES, VideoThemeId } from "@/lib/invitationVideoEngine";
 import { ENTERPRISE_CONTACT_EMAIL } from "@/lib/packageLimits";
 
-const BASE_COUPLE: MotionPlayerCouple = {
-  groom: "Kharis",
-  bride: "Lia",
-  groomFull: "Kharis Pratama, S.T.",
-  brideFull: "Lia Ayu Lestari, S.Ars.",
-  dateRaw: "Minggu, 18 Oktober 2026",
-  timeRaw: "09.00 WIB — selesai",
-  venue: "Pendopo Agung Royal Ambarrukmo, Yogyakarta",
-  slug: "ruanghadir.net/kharis-lia",
-  initials: "K & L",
-  heroPhoto: "/assets/kharis-lia/hero.jpg",
-  groomPhoto: "/assets/kharis-lia/groom.jpg",
-  bridePhoto: "/assets/kharis-lia/bride.jpg",
+// Data sampel = data demo template undangan (Rian & Salsa), foto asli.
+const SAMPLE: MotionPlayerCouple = {
+  groom: "Rian",
+  bride: "Salsa",
+  groomFull: "Rian Aditama, S.Kom",
+  brideFull: "Salsabila Putri, S.Ds",
+  groomParents: "Bapak Ir. H. Bambang Aditama & Ibu Hj. Endang Rahayu",
+  brideParents: "Bapak Dr. H. Ahmad Fauzi & Ibu Hj. Siti Aminah",
+  dateRaw: "2026-08-08",
+  timeRaw: "08.00 – 10.00 WIB",
+  venue: "Masjid Agung Al-Azhar, Kebayoran Baru",
+  events: [
+    { title: "Akad Nikah", date: "Sabtu, 8 Agustus 2026", time: "08.00 – 10.00 WIB", venue: "Masjid Agung Al-Azhar, Kebayoran Baru" },
+    { title: "Resepsi Pernikahan", date: "Sabtu, 8 Agustus 2026", time: "11.00 – 14.00 WIB", venue: "The Royal Ballroom, Hotel Mulia Senayan" },
+  ],
+  slug: "ruanghadir.net/rian-salsa",
+  initials: "R & S",
 };
 
 const SAMPLES: Record<VideoThemeId, MotionPlayerCouple> = {
-  "javanese-classic": BASE_COUPLE,
-  "grand-ballroom": {
-    ...BASE_COUPLE,
-    dateRaw: "Sabtu, 24 Oktober 2026",
-    timeRaw: "19.00 WIB — selesai",
-    venue: "Grand Ballroom Hotel Mulia, Jakarta",
-  },
-  "luxury-pink": {
-    ...BASE_COUPLE,
-    dateRaw: "Sabtu, 7 November 2026",
-    timeRaw: "11.00 WIB — selesai",
-    venue: "The Glasshouse Rose Garden, Bandung",
-  },
+  "javanese-classic": SAMPLE,
+  "grand-ballroom": SAMPLE,
+  "luxury-pink": SAMPLE,
 };
 
 const POINTS = [
@@ -85,8 +79,8 @@ export function SaasVideoStudio() {
             Video undangan yang bergerak seperti film pendek.
           </h2>
           <p className="mt-5 text-[16px] leading-[1.7] text-[#CDBFB8]">
-            Setiap tema punya video pembuka sendiri: monogram, nama mempelai, potret, tanggal, dan lokasi
-            dirangkai dengan animasi bergaya motion graphic.
+            Setiap video disusun dari elemen undangannya sendiri: tirai Grand Ballroom, gunungan Javanese,
+            amplop Luxury Pink. Lengkap dengan nama, foto, jadwal, dan lokasi acara Anda.
           </p>
 
           <ul className="mt-8 flex flex-col gap-3.5">

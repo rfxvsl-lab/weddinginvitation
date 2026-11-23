@@ -89,10 +89,32 @@ export default function VideoInvitationStudio({
     const venue = wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || 'Grand Ballroom Hotel Mulia, Jakarta';
     const displaySlug = slug ? `ruanghadir.net/${slug}` : 'ruanghadir.net/undangan-anda';
     const initials = `${groom.charAt(0).toUpperCase()} & ${bride.charAt(0).toUpperCase()}`;
-    const heroPhoto = wedding?.bgImageUrl || wedding?.gallery?.[0] || '/assets/kharis-lia/hero.jpg';
-    const groomPhoto = wedding?.couple?.groom?.photoUrl || '/assets/kharis-lia/groom.jpg';
-    const bridePhoto = wedding?.couple?.bride?.photoUrl || '/assets/kharis-lia/bride.jpg';
-    return { groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials, heroPhoto, groomPhoto, bridePhoto };
+    const heroPhoto = wedding?.bgImageUrl || wedding?.gallery?.[0] || undefined;
+    const groomPhoto = wedding?.couple?.groom?.photoUrl || undefined;
+    const bridePhoto = wedding?.couple?.bride?.photoUrl || undefined;
+    const parents = (p?: { fatherName?: string; motherName?: string }) =>
+      p?.fatherName || p?.motherName ? [p?.fatherName, p?.motherName].filter(Boolean).join(' & ') : undefined;
+    const fmtDate = (iso?: string) => {
+      if (!iso) return '';
+      const dt = new Date(iso);
+      return isNaN(dt.getTime()) ? iso : dt.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    };
+    const ev = (e?: { name?: string; date?: string; timeStart?: string; timeEnd?: string; venueName?: string }, fallback = '') =>
+      e && (e.date || e.venueName)
+        ? { title: e.name || fallback, date: fmtDate(e.date), time: [e.timeStart, e.timeEnd].filter(Boolean).join(' – ') + ' WIB', venue: e.venueName || '' }
+        : null;
+    const events = [ev(wedding?.events?.akad, 'Akad Nikah'), ev(wedding?.events?.resepsi, 'Resepsi Pernikahan')].filter(Boolean) as {
+      title: string; date: string; time: string; venue: string;
+    }[];
+    const gallery = (wedding?.gallery || []).filter(Boolean).slice(0, 6);
+    return {
+      groom, bride, groomFull, brideFull, dateRaw, timeRaw, venue, slug: displaySlug, initials,
+      heroPhoto, groomPhoto, bridePhoto,
+      groomParents: parents(wedding?.couple?.groom),
+      brideParents: parents(wedding?.couple?.bride),
+      events: events.length ? events : undefined,
+      gallery: gallery.length >= 4 ? gallery : undefined,
+    };
   }, [wedding, slug]);
 
   // Smooth 60fps interpolated timeline loop synced to 30fps video frames
