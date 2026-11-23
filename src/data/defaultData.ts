@@ -1,3 +1,4 @@
+import { KIT_THEMES, toThemeConfig } from '../themes/catalog';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -5,7 +6,7 @@
 
 import { ThemeConfig, WeddingData, Guest, RSVP, WeddingAnalytics } from '../types';
 
-export const DEFAULT_THEMES: ThemeConfig[] = [
+const LEGACY_THEMES: ThemeConfig[] = [
   {
     id: 'rfx-dark',
     pattern: 'modern',
@@ -142,6 +143,10 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
     layout: 'storybook-interactive'
   }
 ];
+
+/** Tema bawaan + tema Theme Kit (otomatis dari src/themes/catalog). */
+export const DEFAULT_THEMES: ThemeConfig[] = [...LEGACY_THEMES, ...KIT_THEMES.map(toThemeConfig)];
+
 
 export const DEFAULT_WEDDING_DATA: WeddingData = {
   showLoveStories: true,

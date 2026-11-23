@@ -49,7 +49,7 @@ const PUBLIC_DOMAINS = new Set([
 ]);
 
 const FREE_FEATURES = [
-  'Semua 9 koleksi tema interaktif & Storybook 3D',
+  'Semua koleksi tema, bertambah setiap hari',
   'Tamu & tautan personal tanpa batas',
   'QR Code check-in, amplop digital, & RSVP real-time',
   'Export CSV/PDF & statistik kunjungan',

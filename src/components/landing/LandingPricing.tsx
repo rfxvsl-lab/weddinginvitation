@@ -2,9 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
 import { ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits';
+import { DEFAULT_THEMES } from '@/data/defaultData';
 
 const FREE = [
-  'Semua 9 tema, termasuk Storybook 3D',
+  `Semua ${DEFAULT_THEMES.length} tema, termasuk tema baru setiap hari`,
   'Tamu dan nama personal tanpa batas',
   'RSVP, buku ucapan, dan amplop digital',
   'Check-in QR serta ekspor CSV/PDF',

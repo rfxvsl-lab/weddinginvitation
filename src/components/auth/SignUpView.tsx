@@ -198,7 +198,7 @@ function NavButtons({
 }
 
 const FREE_PERKS = [
-  'Semua 9 koleksi tema interaktif & Storybook 3D',
+  'Semua koleksi tema, bertambah setiap hari',
   'Tamu & nama undangan khusus tanpa batas',
   'QR Check-in, amplop digital & buku ucapan RSVP',
   'Publish langsung ke ruanghadir.net tanpa watermark',

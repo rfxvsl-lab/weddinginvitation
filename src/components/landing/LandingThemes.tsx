@@ -4,20 +4,28 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { DEFAULT_THEMES } from '@/data/defaultData';
-import { THEME_SHOTS, THEME_CATEGORY_LABEL } from './themeShots';
+import { THEME_CATEGORY_LABEL } from './themeShots';
+import { themeShot } from '@/themes/shots';
+import { isNewTheme } from '@/themes/catalog';
 
 const FILTERS: [string, string][] = [
   ['all', 'Semua'],
   ['classic', 'Klasik & adat'],
   ['modern', 'Modern'],
   ['floral', 'Floral'],
+  ['minimalist', 'Minimalis'],
   ['storybook', 'Interaktif'],
 ];
 
 export function LandingThemes() {
   const [filter, setFilter] = useState('all');
   const themes = useMemo(
-    () => (filter === 'all' ? DEFAULT_THEMES : DEFAULT_THEMES.filter((t) => t.pattern === filter)),
+    () => {
+      const sorted = [...DEFAULT_THEMES].sort(
+        (a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || '')
+      );
+      return filter === 'all' ? sorted : sorted.filter((t) => t.pattern === filter);
+    },
     [filter]
   );
 
@@ -61,15 +69,16 @@ export function LandingThemes() {
             <li key={t.id}>
               <Link href={`/preview/${t.id}`} className="group block focus-visible:outline-offset-4">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[var(--rh-line)] bg-[var(--rh-linen)]">
-                  {THEME_SHOTS[t.id] && (
-                    <Image
-                      src={THEME_SHOTS[t.id]}
-                      alt={`Pratinjau tema ${t.name}`}
-                      fill
-                      sizes="(max-width: 768px) 45vw, 380px"
-                      className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
-                    />
+                  {isNewTheme(t.addedAt) && (
+                    <span className="absolute left-3 top-3 z-10 rounded-full bg-[var(--rh-wine)] px-2.5 py-1 text-[11.5px] font-semibold text-white">Baru</span>
                   )}
+                  <Image
+                    src={themeShot(t.id)}
+                    alt={`Pratinjau tema ${t.name}`}
+                    fill
+                    sizes="(max-width: 768px) 45vw, 380px"
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
                 </div>
                 <div className="mt-3 flex items-baseline justify-between gap-3">
                   <h3 className="text-[15px] font-semibold text-[var(--rh-ink)] group-hover:text-[var(--rh-wine)]">{t.name}</h3>

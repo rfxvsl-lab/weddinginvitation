@@ -1,0 +1,123 @@
+/**
+ * Theme Kit — spesifikasi satu tema undangan.
+ *
+ * Satu tema = satu file di `src/themes/catalog/<id>.tsx` yang mengekspor
+ * `defineTheme({...})`. Semua fitur (sampul, musik, hitung mundur, acara,
+ * galeri, amplop, RSVP, kode tamu) disediakan oleh KitLayout; tema hanya
+ * menentukan karakter visual dan varian tiap bagian.
+ */
+
+import type React from 'react';
+
+export type ThemeCategory = 'classic' | 'modern' | 'floral' | 'minimalist' | 'storybook';
+
+export interface ThemePalette {
+  /** latar halaman */
+  bg: string;
+  /** latar kartu/panel */
+  surface: string;
+  /** warna utama: tombol, judul, aksen kuat */
+  primary: string;
+  /** warna kedua: garis, ornamen, border */
+  secondary: string;
+  /** teks utama */
+  text: string;
+  /** teks sekunder */
+  muted: string;
+  /** teks di atas `primary` */
+  onPrimary: string;
+  /** latar sampul/hero yang lebih gelap atau kontras (opsional) */
+  cover?: string;
+  /** teks di atas `cover` */
+  onCover?: string;
+}
+
+export interface ThemeFonts {
+  /** judul & nama (CSS font-family) */
+  display: string;
+  /** isi */
+  body: string;
+  /** huruf sambung untuk aksen (opsional) */
+  script?: string;
+  /** label kecil (opsional, default = body) */
+  label?: string;
+  /** query Google Fonts, mis. "Cormorant+Garamond:ital,wght@0,400;1,400&family=Jost:wght@300;400;500" */
+  google: string;
+}
+
+export type CoverVariant = 'envelope' | 'curtain' | 'gate' | 'card' | 'photo';
+export type HeroVariant = 'photo' | 'frame' | 'type';
+export type FrameShape = 'arch' | 'circle' | 'oval' | 'rect' | 'polaroid';
+export type CoupleVariant = 'cards' | 'split';
+export type EventsVariant = 'cards' | 'timeline' | 'ticket';
+export type GalleryVariant = 'masonry' | 'grid' | 'film';
+export type CountdownVariant = 'boxes' | 'inline';
+export type DividerPreset = 'floral' | 'diamond' | 'dots' | 'wave' | 'line' | 'none';
+export type AmbientPreset = 'petals' | 'sparkles' | 'leaves' | 'bubbles' | 'snow' | 'none';
+export type RevealStyle = 'rise' | 'fade' | 'blur' | 'zoom';
+
+export type SectionId = 'hero' | 'quote' | 'couple' | 'countdown' | 'events' | 'story' | 'gallery' | 'gift' | 'rsvp' | 'closing';
+
+export interface ThemeCopy {
+  coverLabel?: string; // "Kepada Yth."
+  coverTitle?: string; // "The Wedding of"
+  openButton?: string; // "Buka Undangan"
+  heroTitle?: string; // "The Wedding of"
+  coupleTitle?: string;
+  coupleIntro?: string;
+  groomLabel?: string; // "Putra dari"
+  brideLabel?: string; // "Putri dari"
+  countdownTitle?: string;
+  eventsTitle?: string;
+  storyTitle?: string;
+  galleryTitle?: string;
+  giftTitle?: string;
+  giftIntro?: string;
+  rsvpTitle?: string;
+  closingTitle?: string;
+  closingText?: string;
+}
+
+export interface ThemeSpec {
+  id: string;
+  name: string;
+  category: ThemeCategory;
+  /** satu kalimat karakter tema (dipakai di katalog) */
+  description: string;
+  /** tanggal rilis YYYY-MM-DD — tema 14 hari terakhir diberi label "Baru" */
+  addedAt: string;
+  palette: ThemePalette;
+  fonts: ThemeFonts;
+  /** pola latar CSS (background-image), mis. data-URI SVG; opsional */
+  pattern?: string;
+  patternOpacity?: number;
+  /** ornamen pemisah antar bagian */
+  divider: DividerPreset;
+  /** SVG pemisah kustom (menggantikan preset) — gunakan currentColor */
+  dividerSvg?: string;
+  /** ornamen sudut kustom untuk kartu (SVG, currentColor) */
+  cornerSvg?: string;
+  /** bentuk bingkai foto */
+  frame: FrameShape;
+  /** radius sudut kartu (px) */
+  radius: number;
+  cover: CoverVariant;
+  hero: HeroVariant;
+  couple: CoupleVariant;
+  countdown: CountdownVariant;
+  events: EventsVariant;
+  gallery: GalleryVariant;
+  ambient: AmbientPreset;
+  reveal: RevealStyle;
+  /** urutan bagian (default: semua bagian dalam urutan standar) */
+  sections?: SectionId[];
+  copy?: ThemeCopy;
+  /** lapisan dekorasi khas tema (opsional) — dirender di atas latar, di bawah konten */
+  Signature?: React.ComponentType<{ palette: ThemePalette }>;
+  /** ornamen khas di sampul (opsional) */
+  CoverArt?: React.ComponentType<{ palette: ThemePalette }>;
+}
+
+export function defineTheme(spec: ThemeSpec): ThemeSpec {
+  return spec;
+}

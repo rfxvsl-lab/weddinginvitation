@@ -38,6 +38,7 @@ import SpotiLoveLayout from './templates/SpotiLoveLayout';
 import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
 import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
 import StorybookInteractiveLayout from './templates/StorybookInteractiveLayout';
+import KitLayout from '../themes/kit/KitLayout';
 import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
 import GuestPassSection from './GuestPassSection';
 
@@ -294,7 +295,15 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   const goldenLineBorder = isRFX ? 'border-amber-950/40' : 'border-amber-100';
 
   // Section tambahan (live streaming + guest pass) ditempel setelah layout apa pun
-  const darkLayout = !['luxury-pink', 'grand-ballroom', 'storybook-interactive'].includes(currentTheme.layout || '');
+  const isDarkHex = (hex: string) => {
+    const h = (hex || '#fff').replace('#', '');
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 255);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
+  };
+  const darkLayout =
+    currentTheme.layout === 'kit'
+      ? isDarkHex(currentTheme.bgHex)
+      : !['luxury-pink', 'grand-ballroom', 'storybook-interactive'].includes(currentTheme.layout || '');
   const withExtras = (node: React.ReactNode) => (
     <>
       {node}
@@ -307,6 +316,20 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
       />
     </>
   );
+
+  if (currentTheme.layout === 'kit') {
+    return withExtras(
+      <KitLayout
+        data={data}
+        theme={currentTheme}
+        guest={guest}
+        onAddRSVP={onAddRSVP}
+        rsvps={rsvps}
+        embedded={embedded}
+        invitationId={invitationId}
+      />
+    );
+  }
 
   if (currentTheme.layout === 'javanese-classic') {
     return withExtras(

@@ -1,5 +1,16 @@
 # Changelog
 
+## Tema baru
+
+- 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
+
+## [3.2.0] — 2026-11-23 — Theme Kit
+
+- `src/themes/`: tema baru cukup satu file `catalog/<id>.tsx` (`defineTheme`). Semua fitur undangan disediakan `kit/KitLayout.tsx`; tampilan diatur lewat palet, font, ornamen SVG, dan varian (5 sampul, 3 hero, 5 bingkai foto, 3 gaya acara, 3 galeri, 5 ambient, 4 gaya reveal).
+- Tema Kit otomatis masuk daftar tema dashboard, landing, dan halaman pratinjau; label **Baru** 14 hari dan diurutkan paling depan. Jumlah tema di harga dihitung otomatis.
+- `scripts/theme_shots.py`: screenshot katalog + QA (sampul, setelah dibuka, lembar kontak, cek fitur wajib).
+- `docs/themes/PLAYBOOK.md` & `BACKLOG.md` untuk produksi tema terjadwal.
+
 ## [3.1.1] — 2026-11-23
 
 - Zoom kembali dikunci di seluruh aplikasi & pratinjau undangan (viewport `user-scalable=no`, `touch-action: pan-x pan-y`, pencegahan gesture pinch iOS, ctrl+scroll, ctrl +/-) lewat `components/system/ZoomLock.tsx`.

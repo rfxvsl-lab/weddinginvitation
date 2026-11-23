@@ -16,7 +16,10 @@ export interface ThemeConfig {
   fontSerif: string; // e.g. Playfair Display, Great Vibes
   fontSans: string; // e.g. Inter
   pattern: 'floral' | 'classic' | 'modern' | 'minimalist' | 'storybook';
-  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic' | 'storybook-interactive';
+  layout?: 'default' | 'dark-luxury' | 'luxury-pink' | 'netflix-luxury' | 'grand-ballroom' | 'royal-arabian' | 'spotilove' | 'javanese-classic' | 'parallax-cinematic' | 'storybook-interactive' | 'kit';
+  /** YYYY-MM-DD — untuk label "Baru" (tema Theme Kit) */
+  addedAt?: string;
+  description?: string;
 }
 
 export interface CoupleMember {

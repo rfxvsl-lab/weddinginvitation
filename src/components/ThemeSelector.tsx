@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { Check, Palette, Eye, BookOpen } from 'lucide-react';
 import { DEFAULT_THEMES } from '../data/defaultData';
+import { themeShot } from '../themes/shots';
+import { isNewTheme } from '../themes/catalog';
 
 interface ThemeSelectorProps {
   currentThemeId: string;
@@ -10,23 +12,13 @@ interface ThemeSelectorProps {
   packageId?: string;
 }
 
-const THEME_PREVIEW_IMAGES: Record<string, string> = {
-  'rfx-dark': '/assets/themes/shots/rfx-dark.webp',
-  'cremy-rose': '/assets/themes/shots/cremy-rose.webp',
-  'grand-ballroom': '/assets/themes/shots/grand-ballroom.webp',
-  'netflix-luxury': '/assets/themes/shots/netflix-luxury.webp',
-  'royal-arabian': '/assets/themes/shots/royal-arabian.webp',
-  spotilove: '/assets/themes/shots/spotilove.webp',
-  'javanese-classic': '/assets/themes/shots/javanese-classic.webp',
-  'parallax-cinematic': '/assets/themes/shots/parallax-cinematic.webp',
-  'storybook-interactive': '/assets/themes/shots/storybook-interactive.webp',
-};
 
 const PATTERN_LABELS: Record<string, string> = {
   all: 'Semua',
   modern: 'Modern',
   classic: 'Klasik & Adat',
   floral: 'Floral',
+  minimalist: 'Minimalis',
   storybook: 'Interaktif',
 };
 
@@ -36,10 +28,9 @@ export default function ThemeSelector({
 }: ThemeSelectorProps) {
   const [filter, setFilter] = useState<string>('all');
 
-  const filteredThemes =
-    filter === 'all'
-      ? DEFAULT_THEMES
-      : DEFAULT_THEMES.filter((t) => t.pattern === filter);
+  // Tema baru (14 hari) tampil paling depan
+  const sorted = [...DEFAULT_THEMES].sort((a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || ''));
+  const filteredThemes = filter === 'all' ? sorted : sorted.filter((t) => t.pattern === filter);
 
   return (
     <div className="space-y-6">
@@ -83,7 +74,8 @@ export default function ThemeSelector({
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filteredThemes.map((theme) => {
           const isSelected = theme.id === currentThemeId;
-          const imgSrc = THEME_PREVIEW_IMAGES[theme.id];
+          const imgSrc = themeShot(theme.id);
+          const fresh = isNewTheme(theme.addedAt);
 
           return (
             <button
@@ -103,11 +95,15 @@ export default function ThemeSelector({
                   background: `radial-gradient(130% 100% at 20% 0%, ${theme.bgPatternHex}, ${theme.bgHex} 72%)`,
                 }}
               >
+                {fresh && (
+                  <span className="absolute left-2 top-2 z-10 rounded-full bg-[#7A2E3B] px-2 py-0.5 text-[10.5px] font-semibold text-white">Baru</span>
+                )}
                 {imgSrc ? (
                   <img
                     src={imgSrc}
                     alt={theme.name}
                     loading="lazy"
+                    onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
                     className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 ) : (

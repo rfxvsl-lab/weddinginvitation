@@ -15,5 +15,6 @@ export const THEME_CATEGORY_LABEL: Record<string, string> = {
   modern: 'Modern',
   classic: 'Klasik & adat',
   floral: 'Floral',
+  minimalist: 'Minimalis',
   storybook: 'Interaktif',
 };
