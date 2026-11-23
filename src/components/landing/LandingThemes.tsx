@@ -10,6 +10,7 @@ import { isNewTheme } from '@/themes/catalog';
 
 const FILTERS: [string, string][] = [
   ['all', 'Semua'],
+  ['special', 'Spesial 2.5D'],
   ['classic', 'Klasik & adat'],
   ['modern', 'Modern'],
   ['floral', 'Floral'],
@@ -24,7 +25,7 @@ export function LandingThemes() {
       const sorted = [...DEFAULT_THEMES].sort(
         (a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || '')
       );
-      return filter === 'all' ? sorted : sorted.filter((t) => t.pattern === filter);
+      return filter === 'all' ? sorted : sorted.filter((t) => (filter === 'special' ? t.tier === 'special' : t.pattern === filter));
     },
     [filter]
   );
@@ -71,6 +72,9 @@ export function LandingThemes() {
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[var(--rh-line)] bg-[var(--rh-linen)]">
                   {isNewTheme(t.addedAt) && (
                     <span className="absolute left-3 top-3 z-10 rounded-full bg-[var(--rh-wine)] px-2.5 py-1 text-[11.5px] font-semibold text-white">Baru</span>
+                  )}
+                  {t.tier === 'special' && (
+                    <span className="absolute right-3 top-3 z-10 rounded-full bg-[var(--rh-ink)] px-2.5 py-1 text-[11.5px] font-semibold text-[#E9D3A6]">Spesial · 2.5D</span>
                   )}
                   <Image
                     src={themeShot(t.id)}

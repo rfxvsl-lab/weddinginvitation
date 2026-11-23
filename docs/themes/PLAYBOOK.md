@@ -21,7 +21,7 @@ Tugas tema hanya menentukan **rasa**: palet, font, ornamen, varian tiap bagian, 
 3. **Tulis** `src/themes/catalog/<id>.tsx` meniru `sage-garden.tsx`:
    `export default defineTheme({ ... addedAt: '<tanggal hari ini, Asia/Jakarta>' })`.
    - `id` kebab-case, unik. `category` salah satu: `classic` (adat), `modern`, `floral`,
-     `minimalist`, `storybook`.
+     `minimalist`, `storybook`. Brief bertanda **special** → baca bagian "Tema Spesial" di bawah.
    - Teks `copy` Bahasa Indonesia, hangat, sesuai tema. Sapaan Islami hanya bila temanya Islami/adat yang pas.
    - Tanpa gambar eksternal baru; foto berasal dari data pengguna.
 4. **Daftarkan** di `src/themes/catalog/index.ts`: impor dan letakkan **paling depan** `KIT_THEMES`.
@@ -42,6 +42,28 @@ Tugas tema hanya menentukan **rasa**: palet, font, ornamen, varian tiap bagian, 
    - Commit `feat(theme): <Nama Tema>` lalu `git push origin main` (Vercel deploy otomatis).
    - Jika gagal di langkah mana pun dan tidak bisa diperbaiki: **jangan push**; tulis
      alasannya di BACKLOG pada brief tsb (`blocked: ...`) dan commit hanya perubahan BACKLOG.
+
+## Tema Spesial (2D / 2.5D paralaks)
+
+Brief bertanda **special** dibuat sebagai adegan berlapis, bukan halaman satu lembar.
+Contoh lengkap: `catalog/lembayung.tsx` (2.5D, dolly, waktu berjalan) dan
+`catalog/taman-kertas.tsx` (2D pop-up kertas). Mesin: `src/themes/kit/scene.tsx`.
+
+- Set `tier: 'special'`, `cover: 'scene'`, `hero: 'scene'`, dan `scene: { Backdrop, intro, heroText, closingText, panel }`.
+- `Backdrop` disusun dari **5–9 `<Layer depth>`** (0 = jauh, 1 = dekat). Kedalaman harus
+  menyebar (mis. 0.05, 0.15, 0.3, 0.45, 0.6, 0.8, 1). Lapisan langit/matahari pakai `noIntro`.
+- Semua gambar adalah SVG yang digambar sendiri. Gunakan `ridgePath`/`ridgeY` untuk bukit,
+  ombak, bukit pasir; `seeded()` untuk posisi acak yang stabil. Tanpa gambar eksternal.
+- **Perspektif udara**: warna lapisan jauh dicampur ke warna cakrawala (`mix(near, horizon, haze)`).
+- **Cerita saat digulir**: minimal satu perubahan yang terikat progres gulir lewat `useScene`
+  + `keyframeColors` (waktu berganti, kabut menipis, lampu menyala, kedalaman laut, dsb.).
+- `intro`: `dolly` (kamera maju), `popup` (lapisan berdiri — cocok gaya kertas/wayang),
+  atau `rise` (lapisan naik bergantian). Jangan pakai intro yang sama dengan tema spesial sebelumnya.
+- Kontras: `heroText` harus terbaca di langit awal (progres 0), `closingText` di langit akhir (progres 1).
+- Kinerja: ≤ 9 lapisan, ≤ 1 `filter` per lapisan, animasi CSS hanya `transform`/`opacity`,
+  partikel ≤ 80. Dengan "kurangi gerakan", adegan tetap tampil tanpa gerak (sudah ditangani mesin).
+- QA tambahan: `4-sheet.png` harus menunjukkan perubahan adegan dari awal ke akhir; panel konten
+  tetap terbaca di atas adegan pada setiap titik.
 
 ## Checklist kualitas (wajib lolos semua)
 

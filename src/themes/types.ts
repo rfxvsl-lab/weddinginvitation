@@ -45,8 +45,8 @@ export interface ThemeFonts {
   google: string;
 }
 
-export type CoverVariant = 'envelope' | 'curtain' | 'gate' | 'card' | 'photo';
-export type HeroVariant = 'photo' | 'frame' | 'type';
+export type CoverVariant = 'envelope' | 'curtain' | 'gate' | 'card' | 'photo' | 'scene';
+export type HeroVariant = 'photo' | 'frame' | 'type' | 'scene';
 export type FrameShape = 'arch' | 'circle' | 'oval' | 'rect' | 'polaroid';
 export type CoupleVariant = 'cards' | 'split';
 export type EventsVariant = 'cards' | 'timeline' | 'ticket';
@@ -78,7 +78,33 @@ export interface ThemeCopy {
   closingText?: string;
 }
 
+/** regular = tema satu halaman biasa; special = adegan 2D/2.5D paralaks (kandidat paket Enterprise) */
+export type ThemeTier = 'regular' | 'special';
+
+/** Adegan paralaks untuk tema Spesial. Lihat src/themes/kit/scene.tsx. */
+export interface SceneConfig {
+  /**
+   * Latar adegan (fixed, memenuhi layar). Susun dari <Layer depth> dan gunakan
+   * useScene() untuk efek per frame (warna langit, matahari, lampion, dsb.).
+   */
+  Backdrop: React.ComponentType<{ palette: ThemePalette }>;
+  /** animasi kamera setelah sampul dibuka */
+  intro: 'dolly' | 'popup' | 'rise';
+  introMs?: number;
+  /** warna teks yang tampil langsung di atas adegan: [awal halaman, akhir halaman] */
+  heroText: string;
+  closingText: string;
+  /** bayangan teks penutup (default gelap untuk langit malam) */
+  closingShadow?: string;
+  /** panel konten: kaca buram di atas adegan */
+  panel?: { background: string; blur?: number; border?: string };
+}
+
 export interface ThemeSpec {
+  /** default 'regular' */
+  tier?: ThemeTier;
+  /** wajib untuk tier 'special' */
+  scene?: SceneConfig;
   id: string;
   name: string;
   category: ThemeCategory;

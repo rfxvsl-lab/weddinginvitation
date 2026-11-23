@@ -2,7 +2,15 @@
 
 ## Tema baru
 
+- 2026-11-23 — **Taman Kertas** (Spesial · 2D pop-up kertas)
+- 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
+
+## [3.3.0] — 2026-11-23 — Tema Spesial 2D/2.5D
+
+- `src/themes/kit/scene.tsx`: mesin adegan paralaks — lapisan berdasar kedalaman bergerak saat digulir, mengikuti giroskop/kursor, dan intro kamera (`dolly`, `popup`, `rise`) setelah sampul dibuka; utilitas bukit prosedural, campuran warna, keyframe warna per progres gulir. Menghormati "kurangi gerakan".
+- Tema **Lembayung** dan **Taman Kertas** (tier `special`), label **Spesial** + filter "Spesial 2.5D" di katalog landing & dashboard.
+- Semua tema Spesial gratis untuk sementara; `canUseSpecialTheme()` di `lib/packageLimits.ts` siap dipakai untuk membatasi ke Enterprise nanti.
 
 ## [3.2.0] — 2026-11-23 — Theme Kit
 

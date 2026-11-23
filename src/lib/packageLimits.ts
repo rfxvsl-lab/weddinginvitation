@@ -231,3 +231,13 @@ export function formatActiveDays(days: number): string {
   const months = Math.round(days / 30);
   return `${months} bulan`;
 }
+
+/**
+ * Tema Spesial (adegan 2D/2.5D paralaks) — saat ini GRATIS untuk semua paket.
+ * Untuk menjadikannya fitur Enterprise nanti, ubah menjadi ['enterprise'].
+ */
+export const SPECIAL_THEME_PACKAGES: PackageId[] | 'all' = 'all';
+
+export function canUseSpecialTheme(packageId: PackageId | string | undefined): boolean {
+  return SPECIAL_THEME_PACKAGES === 'all' || SPECIAL_THEME_PACKAGES.includes((packageId || 'free') as PackageId);
+}

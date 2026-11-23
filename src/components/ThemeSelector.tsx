@@ -15,6 +15,7 @@ interface ThemeSelectorProps {
 
 const PATTERN_LABELS: Record<string, string> = {
   all: 'Semua',
+  special: 'Spesial 2.5D',
   modern: 'Modern',
   classic: 'Klasik & Adat',
   floral: 'Floral',
@@ -30,7 +31,7 @@ export default function ThemeSelector({
 
   // Tema baru (14 hari) tampil paling depan
   const sorted = [...DEFAULT_THEMES].sort((a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || ''));
-  const filteredThemes = filter === 'all' ? sorted : sorted.filter((t) => t.pattern === filter);
+  const filteredThemes = filter === 'all' ? sorted : sorted.filter((t) => (filter === 'special' ? t.tier === 'special' : t.pattern === filter));
 
   return (
     <div className="space-y-6">
@@ -97,6 +98,9 @@ export default function ThemeSelector({
               >
                 {fresh && (
                   <span className="absolute left-2 top-2 z-10 rounded-full bg-[#7A2E3B] px-2 py-0.5 text-[10.5px] font-semibold text-white">Baru</span>
+                )}
+                {theme.tier === 'special' && (
+                  <span className="absolute right-2 top-2 z-10 rounded-full bg-[#2A1E21] px-2 py-0.5 text-[10.5px] font-semibold text-[#E9D3A6]">Spesial</span>
                 )}
                 {imgSrc ? (
                   <img

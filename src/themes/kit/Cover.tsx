@@ -32,7 +32,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
   const open = () => {
     if (opening) return;
     setOpening(true);
-    window.setTimeout(onOpen, OPEN_MS);
+    window.setTimeout(onOpen, spec.cover === 'scene' ? 700 : OPEN_MS);
   };
 
   const ease = 'cubic-bezier(.7,0,.2,1)';
@@ -219,6 +219,29 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
           </div>
           {inner}
         </div>
+      </div>
+    );
+  }
+
+  // ---------------- scene: tanpa latar — adegan paralaks di belakang yang menjadi sampul ----------------
+  if (spec.cover === 'scene') {
+    return (
+      <div
+        style={{
+          ...base,
+          background: 'transparent',
+          color: spec.scene?.heroText || onCover,
+          alignItems: 'flex-start',
+          paddingTop: '14vh',
+          textShadow: '0 2px 18px rgba(0,0,0,.15)',
+          transition: `opacity 650ms ease, transform 800ms ${ease}, filter 650ms ease`,
+          opacity: opening ? 0 : 1,
+          transform: opening ? 'translateY(-40px) scale(1.04)' : 'none',
+          filter: opening ? 'blur(6px)' : 'none',
+        }}
+      >
+        {Art && <Art palette={p} />}
+        {inner}
       </div>
     );
   }

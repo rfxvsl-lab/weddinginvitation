@@ -20,6 +20,8 @@ export interface ThemeConfig {
   /** YYYY-MM-DD — untuk label "Baru" (tema Theme Kit) */
   addedAt?: string;
   description?: string;
+  /** 'special' = tema adegan 2D/2.5D paralaks */
+  tier?: 'regular' | 'special';
 }
 
 export interface CoupleMember {

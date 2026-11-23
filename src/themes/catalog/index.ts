@@ -11,8 +11,10 @@
 import type { ThemeSpec } from '../types';
 import type { ThemeConfig } from '../../types';
 import sageGarden from './sage-garden';
+import lembayung from './lembayung';
+import tamanKertas from './taman-kertas';
 
-export const KIT_THEMES: ThemeSpec[] = [sageGarden];
+export const KIT_THEMES: ThemeSpec[] = [tamanKertas, lembayung, sageGarden];
 
 const byId = new Map(KIT_THEMES.map((t) => [t.id, t]));
 
@@ -38,6 +40,7 @@ export function toThemeConfig(t: ThemeSpec): ThemeConfig {
     fontSans: 'font-sans',
     addedAt: t.addedAt,
     description: t.description,
+    tier: t.tier || 'regular',
   };
 }
 

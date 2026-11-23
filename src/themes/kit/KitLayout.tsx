@@ -14,6 +14,7 @@ import { convertGoogleDriveUrl } from '../../utils/googleDrive';
 import Cover from './Cover';
 import { Ambient, Corner, Divider, Frame, Reveal, fontImport } from './primitives';
 import { getKitTheme } from '../catalog';
+import { SceneProvider, requestTiltPermission } from './scene';
 
 interface KitLayoutProps {
   data: WeddingData;
@@ -74,6 +75,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     return () => a.pause();
   }, [data.musicUrl, embedded]);
   const handleOpen = () => {
+    if (spec.scene) requestTiltPermission();
     setOpened(true);
     audioRef.current?.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
   };
@@ -153,7 +155,22 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   const label = spec.fonts.label || spec.fonts.body;
 
   // ---------- gaya dasar ----------
-  const sectionStyle: React.CSSProperties = { position: 'relative', zIndex: 2, padding: '72px 24px', textAlign: 'center' };
+  const scene = spec.scene;
+  const sectionStyle: React.CSSProperties = scene
+    ? {
+        position: 'relative',
+        zIndex: 2,
+        margin: '22px 14px',
+        padding: '56px 20px',
+        textAlign: 'center',
+        background: scene.panel?.background || `${p.surface}D9`,
+        backdropFilter: `blur(${scene.panel?.blur ?? 14}px) saturate(1.2)`,
+        WebkitBackdropFilter: `blur(${scene.panel?.blur ?? 14}px) saturate(1.2)`,
+        border: scene.panel?.border || `1px solid ${p.surface}88`,
+        borderRadius: Math.max(spec.radius, 22),
+        boxShadow: '0 30px 60px -40px rgba(0,0,0,.55)',
+      }
+    : { position: 'relative', zIndex: 2, padding: '72px 24px', textAlign: 'center' };
   const titleStyle: React.CSSProperties = { fontFamily: script, fontSize: spec.fonts.script ? 46 : 34, fontWeight: 400, lineHeight: 1.1, color: p.primary, margin: 0 };
   const eyebrow: React.CSSProperties = { fontFamily: label, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: p.muted };
   const card: React.CSSProperties = {
@@ -197,6 +214,25 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
 
   const sections: Record<SectionId, () => React.ReactNode> = {
     hero: () => {
+      if (spec.hero === 'scene') {
+        const col = scene?.heroText || p.text;
+        return (
+          <section key="hero" style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '16vh 24px 0', textAlign: 'center', color: col, textShadow: '0 2px 18px rgba(0,0,0,.12)' }}>
+            <Reveal variant={R}>
+              <p style={{ ...eyebrow, color: col, opacity: 0.8 }}>{c.heroTitle || 'The Wedding of'}</p>
+            </Reveal>
+            <Reveal variant={R} delay={0.15}>
+              <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 84px)', fontWeight: 400, lineHeight: 1, margin: '14px 0 4px' }}>{groom.nickname}</h1>
+              <p style={{ fontFamily: display, fontStyle: 'italic', fontSize: 26, margin: 0, opacity: 0.8 }}>&amp;</p>
+              <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 84px)', fontWeight: 400, lineHeight: 1, margin: '4px 0 18px' }}>{bride.nickname}</h1>
+            </Reveal>
+            <Reveal variant={R} delay={0.3}>
+              <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{dateText}</p>
+            </Reveal>
+            <div aria-hidden style={{ position: 'absolute', bottom: 28, left: '50%', width: 1, height: 46, background: col, opacity: 0.5, transformOrigin: 'top', animation: 'kit-cue 2.4s ease-in-out infinite' }} />
+          </section>
+        );
+      }
       if (spec.hero === 'photo') {
         return (
           <section key="hero" style={{ position: 'relative', zIndex: 2, minHeight: '92vh', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 24px 64px', textAlign: 'center', color: p.onCover || '#fff', overflow: 'hidden' }}>
@@ -573,14 +609,21 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     },
 
     closing: () => (
-      <section key="closing" style={{ ...sectionStyle, paddingBottom: 110 }}>
+      <section
+        key="closing"
+        style={
+          scene
+            ? { position: 'relative', zIndex: 2, minHeight: '96vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '30vh 26px 120px', textAlign: 'center', color: scene.closingText, textShadow: scene.closingShadow ?? '0 2px 16px rgba(0,0,0,.35)' }
+            : { ...sectionStyle, paddingBottom: 110 }
+        }
+      >
         <Reveal variant={R}>
-          <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: p.muted, maxWidth: 380, margin: '0 auto' }}>
+          <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: scene ? 'inherit' : p.muted, opacity: scene ? 0.85 : 1, maxWidth: 380, margin: '0 auto' }}>
             {c.closingText || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.'}
           </p>
-          <h2 style={{ ...titleStyle, marginTop: 26 }}>{c.closingTitle || 'Terima kasih'}</h2>
+          <h2 style={{ ...titleStyle, marginTop: 26, color: scene ? 'inherit' : p.primary }}>{c.closingTitle || 'Terima kasih'}</h2>
           <Divider spec={spec} />
-          <p style={{ fontFamily: display, fontSize: 24, color: p.text }}>
+          <p style={{ fontFamily: display, fontSize: 24, color: scene ? 'inherit' : p.text }}>
             {groom.nickname} &amp; {bride.nickname}
           </p>
         </Reveal>
@@ -589,8 +632,9 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   };
 
   const Signature = spec.Signature;
+  const Backdrop = scene?.Backdrop;
 
-  return (
+  const page = (
     <div
       style={{
         position: 'relative',
@@ -602,13 +646,18 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
       }}
     >
       <style>{fontImport(spec.fonts.google)}</style>
-      {spec.pattern && <div aria-hidden style={{ position: 'fixed', inset: 0, backgroundImage: spec.pattern, opacity: spec.patternOpacity ?? 0.5, pointerEvents: 'none', zIndex: 0 }} />}
+      {Backdrop && (
+        <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <Backdrop palette={p} />
+        </div>
+      )}
+      {spec.pattern && !scene && <div aria-hidden style={{ position: 'fixed', inset: 0, backgroundImage: spec.pattern, opacity: spec.patternOpacity ?? 0.5, pointerEvents: 'none', zIndex: 0 }} />}
       {Signature && <Signature palette={p} />}
       {opened && <Ambient preset={spec.ambient} palette={p} />}
 
       {!opened && <Cover spec={spec} groom={groom.nickname} bride={bride.nickname} dateText={dateText} guestName={guestName} photo={heroPhoto} onOpen={handleOpen} />}
 
-      <main style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto' }}>{order.map((id) => sections[id]?.())}</main>
+      <main style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', opacity: opened || !scene ? 1 : 0, transition: 'opacity 900ms ease 500ms' }}>{order.map((id) => sections[id]?.())}</main>
 
       {data.musicUrl && opened && !embedded && (
         <button
@@ -620,7 +669,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           ♫
         </button>
       )}
-      <style>{'@keyframes kit-spin { to { transform: rotate(360deg); } }'}</style>
+      <style>{'@keyframes kit-spin { to { transform: rotate(360deg); } } @keyframes kit-cue { 0%{transform:scaleY(0);opacity:0} 40%{transform:scaleY(1);opacity:.6} 100%{transform:scaleY(1) translateY(30px);opacity:0} }'}</style>
 
       {lightbox && (
         <div role="dialog" aria-label="Foto" onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(0,0,0,.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}>
@@ -629,5 +678,13 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         </div>
       )}
     </div>
+  );
+
+  return scene ? (
+    <SceneProvider opened={opened} intro={scene.intro} introMs={scene.introMs}>
+      {page}
+    </SceneProvider>
+  ) : (
+    page
   );
 }
