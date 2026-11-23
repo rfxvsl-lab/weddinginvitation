@@ -43,27 +43,31 @@ Tugas tema hanya menentukan **rasa**: palet, font, ornamen, varian tiap bagian, 
    - Jika gagal di langkah mana pun dan tidak bisa diperbaiki: **jangan push**; tulis
      alasannya di BACKLOG pada brief tsb (`blocked: ...`) dan commit hanya perubahan BACKLOG.
 
-## Tema Spesial (2D / 2.5D paralaks)
+## Tema Spesial (2D / 2.5D paralaks bab per bab)
 
-Brief bertanda **special** dibuat sebagai adegan berlapis, bukan halaman satu lembar.
-Contoh lengkap: `catalog/lembayung.tsx` (2.5D, dolly, waktu berjalan) dan
-`catalog/taman-kertas.tsx` (2D pop-up kertas). Mesin: `src/themes/kit/scene.tsx`.
+Tema Spesial **bukan** latar paralaks di belakang kartu. Gayanya seperti situs naratif
+paralaks: **setiap bagian undangan adalah satu bab adegan layar penuh**, teks berada di
+dalam adegan (ada lapisan di belakang DAN di depan teks), dan lapisan bergerak dengan
+kecepatan berbeda saat bab masuk, ditahan, lalu keluar. Tiap bab punya tempat/waktu/
+komposisi sendiri — jangan mengulang komposisi yang sama di semua bab.
 
-- Set `tier: 'special'`, `cover: 'scene'`, `hero: 'scene'`, dan `scene: { Backdrop, intro, heroText, closingText, panel }`.
-- `Backdrop` disusun dari **5–9 `<Layer depth>`** (0 = jauh, 1 = dekat). Kedalaman harus
-  menyebar (mis. 0.05, 0.15, 0.3, 0.45, 0.6, 0.8, 1). Lapisan langit/matahari pakai `noIntro`.
-- Semua gambar adalah SVG yang digambar sendiri. Gunakan `ridgePath`/`ridgeY` untuk bukit,
-  ombak, bukit pasir; `seeded()` untuk posisi acak yang stabil. Tanpa gambar eksternal.
-- **Perspektif udara**: warna lapisan jauh dicampur ke warna cakrawala (`mix(near, horizon, haze)`).
-- **Cerita saat digulir**: minimal satu perubahan yang terikat progres gulir lewat `useScene`
-  + `keyframeColors` (waktu berganti, kabut menipis, lampu menyala, kedalaman laut, dsb.).
-- `intro`: `dolly` (kamera maju), `popup` (lapisan berdiri — cocok gaya kertas/wayang),
-  atau `rise` (lapisan naik bergantian). Jangan pakai intro yang sama dengan tema spesial sebelumnya.
-- Kontras: `heroText` harus terbaca di langit awal (progres 0), `closingText` di langit akhir (progres 1).
-- Kinerja: ≤ 9 lapisan, ≤ 1 `filter` per lapisan, animasi CSS hanya `transform`/`opacity`,
-  partikel ≤ 80. Dengan "kurangi gerakan", adegan tetap tampil tanpa gerak (sudah ditangani mesin).
-- QA tambahan: `4-sheet.png` harus menunjukkan perubahan adegan dari awal ke akhir; panel konten
-  tetap terbaca di atas adegan pada setiap titik.
+Contoh lengkap: `catalog/lembayung.chapters.tsx` (2.5D, senja → malam, 10 bab) dan
+`catalog/taman-kertas.chapters.tsx` (2D pop-up kertas, 10 bab). Mesin: `kit/chapters.tsx`
+(+ `kit/scene.tsx` untuk `Px`, `ridgePath`, `mix`, dll.).
+
+- File tema `<id>.tsx` (tanpa hook) + `<id>.chapters.tsx` (`'use client'`) yang mengekspor
+  `default function Chapter({ id, layer })` dan objek `INK`.
+- `tier: 'special'`, `cover: 'scene'`, `hero: 'scene'`, `scene: { Chapter, ink, intro, heroText, closingText, panel }`.
+- Untuk tiap `SectionId`: `layer === 'back'` → `<Sky>` + 3–6 `<ArtLayer depth>` di belakang teks;
+  `layer === 'front'` → 1–3 `<ArtLayer>` di depan teks (bingkai, rumput, daun, partikel) yang
+  menutupi **tepi** saja — jangan menutupi nomor rekening, form, atau tombol.
+- Bab pembuka: lapisan pakai `hero order={n}` (ikut intro). Bab lain: `popup order={n}` untuk gaya
+  kertas/wayang, atau tanpa popup untuk gaya lanskap. `exitX` untuk lapisan yang membelah ke samping.
+- `ink[id]` = warna teks + bayangan teks di atas langit bab itu; cek kontras tiap bab.
+- Semua gambar SVG buatan sendiri (`ridgePath`, `ridgeY`, `seeded`); tanpa gambar eksternal.
+- Kinerja: ≤ 7 `ArtLayer` per bab, animasi CSS hanya `transform`/`opacity`, partikel ≤ 30 per bab.
+- QA: `5-chapters.png` (tiap bab saat sejajar layar) harus memperlihatkan 10 adegan yang berbeda,
+  teks terbaca, dan tidak ada ornamen depan yang menutupi isi penting.
 
 ## Checklist kualitas (wajib lolos semua)
 

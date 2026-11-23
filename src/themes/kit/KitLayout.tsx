@@ -14,7 +14,7 @@ import { convertGoogleDriveUrl } from '../../utils/googleDrive';
 import Cover from './Cover';
 import { Ambient, Corner, Divider, Frame, Reveal, fontImport } from './primitives';
 import { getKitTheme } from '../catalog';
-import { SceneProvider, requestTiltPermission } from './scene';
+import { Px, SceneProvider, requestTiltPermission } from './scene';
 
 interface KitLayoutProps {
   data: WeddingData;
@@ -156,31 +156,25 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
 
   // ---------- gaya dasar ----------
   const scene = spec.scene;
+  // Tema Spesial: tiap bagian adalah bab adegan; teks langsung di atas ilustrasi memakai --ink
   const sectionStyle: React.CSSProperties = scene
-    ? {
-        position: 'relative',
-        zIndex: 2,
-        margin: '22px 14px',
-        padding: '56px 20px',
-        textAlign: 'center',
-        background: scene.panel?.background || `${p.surface}D9`,
-        backdropFilter: `blur(${scene.panel?.blur ?? 14}px) saturate(1.2)`,
-        WebkitBackdropFilter: `blur(${scene.panel?.blur ?? 14}px) saturate(1.2)`,
-        border: scene.panel?.border || `1px solid ${p.surface}88`,
-        borderRadius: Math.max(spec.radius, 22),
-        boxShadow: '0 30px 60px -40px rgba(0,0,0,.55)',
-      }
+    ? { position: 'relative', zIndex: 2, padding: '0 18px', textAlign: 'center' }
     : { position: 'relative', zIndex: 2, padding: '72px 24px', textAlign: 'center' };
-  const titleStyle: React.CSSProperties = { fontFamily: script, fontSize: spec.fonts.script ? 46 : 34, fontWeight: 400, lineHeight: 1.1, color: p.primary, margin: 0 };
+  const ink = scene ? 'var(--ink)' : p.primary;
+  const inkSoft = scene ? 'var(--ink)' : p.muted;
+  const titleStyle: React.CSSProperties = { fontFamily: script, fontSize: spec.fonts.script ? 46 : 34, fontWeight: 400, lineHeight: 1.1, color: ink, margin: 0 };
   const eyebrow: React.CSSProperties = { fontFamily: label, fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: p.muted };
   const card: React.CSSProperties = {
     position: 'relative',
-    background: p.surface,
-    border: `1px solid ${p.secondary}55`,
+    background: scene?.panel?.background || p.surface,
+    border: scene?.panel?.border || `1px solid ${p.secondary}55`,
     borderRadius: spec.radius,
     padding: '28px 22px',
-    boxShadow: '0 18px 40px -30px rgba(0,0,0,.45)',
+    boxShadow: scene ? '0 30px 60px -36px rgba(0,0,0,.6)' : '0 18px 40px -30px rgba(0,0,0,.45)',
     textAlign: 'center',
+    ...(scene
+      ? { backdropFilter: `blur(${scene.panel?.blur ?? 12}px) saturate(1.15)`, WebkitBackdropFilter: `blur(${scene.panel?.blur ?? 12}px) saturate(1.15)`, textShadow: 'none', color: p.text }
+      : {}),
   };
   const btn: React.CSSProperties = {
     display: 'inline-flex',
@@ -203,33 +197,50 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   const corners = (color: string) =>
     spec.cornerSvg ? (['tl', 'tr', 'bl', 'br'] as const).map((pos) => <Corner key={pos} svg={spec.cornerSvg!} color={color} pos={pos} />) : null;
 
+  /** Paralaks elemen konten — aktif hanya di tema Spesial (adegan). */
+  const M = (node: React.ReactNode, props: React.ComponentProps<typeof Px>, key?: React.Key) =>
+    scene ? (
+      <Px key={key} {...props}>
+        {node}
+      </Px>
+    ) : (
+      <React.Fragment key={key}>{node}</React.Fragment>
+    );
+  const imgPx = scene ? (im: React.ReactNode) => <Px style={{ height: '100%' }} y={[-18, 18]} scale={[1.16, 1.16]}>{im}</Px> : undefined;
+
   // Fungsi (bukan komponen) agar Reveal tidak di-remount setiap detik saat hitung mundur berjalan
-  const Title = ({ text, sub }: { text: string; sub?: string }) => (
-    <Reveal variant={R} style={{ marginBottom: 28 }}>
-      {sub && <p style={eyebrow}>{sub}</p>}
-      <h2 style={{ ...titleStyle, marginTop: sub ? 8 : 0 }}>{text}</h2>
-      <Divider spec={spec} />
-    </Reveal>
-  );
+  const Title = ({ text, sub }: { text: string; sub?: string }) =>
+    M(
+      <Reveal variant={R} style={{ marginBottom: 28 }}>
+        {sub && <p style={eyebrow}>{sub}</p>}
+        <h2 style={{ ...titleStyle, marginTop: sub ? 8 : 0 }}>{text}</h2>
+        <Divider spec={spec} />
+      </Reveal>,
+      { y: [46, -46], range: [0, 1] }
+    );
 
   const sections: Record<SectionId, () => React.ReactNode> = {
     hero: () => {
       if (spec.hero === 'scene') {
-        const col = scene?.heroText || p.text;
+        const name: React.CSSProperties = { fontFamily: script, fontSize: 'clamp(56px, 17vw, 88px)', fontWeight: 400, lineHeight: 1, margin: 0 };
+        // Nama berada di dalam adegan (lapisan depan menutupi sebagian); saat bab keluar, teks berpisah
         return (
-          <section key="hero" style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '16vh 24px 0', textAlign: 'center', color: col, textShadow: '0 2px 18px rgba(0,0,0,.12)' }}>
-            <Reveal variant={R}>
-              <p style={{ ...eyebrow, color: col, opacity: 0.8 }}>{c.heroTitle || 'The Wedding of'}</p>
-            </Reveal>
-            <Reveal variant={R} delay={0.15}>
-              <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 84px)', fontWeight: 400, lineHeight: 1, margin: '14px 0 4px' }}>{groom.nickname}</h1>
-              <p style={{ fontFamily: display, fontStyle: 'italic', fontSize: 26, margin: 0, opacity: 0.8 }}>&amp;</p>
-              <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 84px)', fontWeight: 400, lineHeight: 1, margin: '4px 0 18px' }}>{bride.nickname}</h1>
-            </Reveal>
-            <Reveal variant={R} delay={0.3}>
+          <section key="hero" style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4vh 24px 0', textAlign: 'center', opacity: opened ? 1 : 0, transition: 'opacity 900ms ease 700ms' }}>
+            <Px source="chapter" y={[0, -220]} opacity={[1, 0]} range={[0.5, 0.8]}>
+              <p style={{ ...eyebrow, color: 'var(--ink)', opacity: 0.85 }}>{c.heroTitle || 'The Wedding of'}</p>
+            </Px>
+            <Px source="chapter" x={[0, -150]} y={[0, -140]} rotate={[0, -10]} range={[0.5, 0.86]} style={{ marginTop: 16 }}>
+              <h1 style={name}>{groom.nickname}</h1>
+            </Px>
+            <Px source="chapter" scale={[1, 2.6]} opacity={[0.85, 0]} range={[0.5, 0.76]}>
+              <p style={{ fontFamily: display, fontStyle: 'italic', fontSize: 26, margin: '2px 0' }}>&amp;</p>
+            </Px>
+            <Px source="chapter" x={[0, 150]} y={[0, -80]} rotate={[0, 10]} range={[0.5, 0.86]}>
+              <h1 style={{ ...name, marginBottom: 18 }}>{bride.nickname}</h1>
+            </Px>
+            <Px source="chapter" y={[0, 160]} opacity={[1, 0]} range={[0.5, 0.76]}>
               <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{dateText}</p>
-            </Reveal>
-            <div aria-hidden style={{ position: 'absolute', bottom: 28, left: '50%', width: 1, height: 46, background: col, opacity: 0.5, transformOrigin: 'top', animation: 'kit-cue 2.4s ease-in-out infinite' }} />
+            </Px>
           </section>
         );
       }
@@ -313,14 +324,15 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         <section key="couple" style={sectionStyle}>
           {Title({ text: c.coupleTitle || 'Mempelai' })}
           <Reveal variant={R}>
-            <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: p.muted, maxWidth: 380, margin: '-6px auto 30px' }}>
+            <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: inkSoft, maxWidth: 380, margin: '-6px auto 30px' }}>
               {c.coupleIntro || 'Dengan penuh sukacita dan memohon restu, kami mengundang Anda di hari pernikahan kami.'}
             </p>
           </Reveal>
           <div style={{ display: 'grid', gridTemplateColumns: spec.couple === 'split' ? '1fr 1fr' : '1fr', gap: spec.couple === 'split' ? 14 : 22, maxWidth: 440, margin: '0 auto' }}>
             {people.map(({ m, rel }, i) => (
               <React.Fragment key={m.fullName + i}>
-                <Reveal variant={R} delay={i * 0.12} style={spec.couple === 'split' ? { padding: '6px 0' } : card}>
+                {M(
+                <Reveal variant={R} delay={i * 0.12} style={spec.couple === 'split' ? (scene ? { ...card, padding: '16px 8px' } : { padding: '6px 0' }) : card}>
                   {spec.couple === 'cards' && corners(p.secondary)}
                   <Frame
                     src={img(m.photoUrl)}
@@ -330,6 +342,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                     width={spec.couple === 'split' ? 132 : 168}
                     height={spec.couple === 'split' ? (spec.frame === 'circle' ? 126 : 170) : spec.frame === 'circle' ? 160 : 214}
                     position="center 25%"
+                    wrapImg={imgPx}
                   />
                   <h3 style={{ fontFamily: display, fontSize: spec.couple === 'split' ? 19 : 24, fontWeight: 500, color: p.text, margin: '18px 0 6px', lineHeight: 1.25 }}>{m.fullName}</h3>
                   <p style={{ fontFamily: spec.fonts.body, fontSize: 12.5, lineHeight: 1.6, color: p.muted, margin: 0 }}>
@@ -342,7 +355,9 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                       @{m.instagram.replace('@', '')}
                     </a>
                   )}
-                </Reveal>
+                </Reveal>,
+                { x: [i === 0 ? -70 : 70, 0], rotate: [i === 0 ? -7 : 7, 0], opacity: [0.2, 1], range: [0.05, 0.42], ease: 'out' }
+                )}
                 {spec.couple === 'cards' && i === 0 && (
                   <Reveal variant={R} style={{ fontFamily: script, fontSize: 48, color: p.secondary, lineHeight: 1 }}>
                     &amp;
@@ -359,10 +374,10 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
       data.countdownDate ? (
         <section key="countdown" style={{ ...sectionStyle, paddingTop: 40, paddingBottom: 40 }}>
           <Reveal variant={R}>
-            <p style={eyebrow}>{c.countdownTitle || 'Menuju hari bahagia'}</p>
+            <p style={{ ...eyebrow, color: inkSoft }}>{c.countdownTitle || 'Menuju hari bahagia'}</p>
           </Reveal>
           {passed ? (
-            <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontStyle: 'italic', fontSize: 22, color: p.primary, marginTop: 12 }}>
+            <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontStyle: 'italic', fontSize: 22, color: ink, marginTop: 12 }}>
               Alhamdulillah, hari bahagia telah tiba
             </Reveal>
           ) : spec.countdown === 'boxes' ? (
@@ -382,7 +397,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
               ))}
             </Reveal>
           ) : (
-            <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontSize: 30, color: p.primary, marginTop: 14, fontVariantNumeric: 'tabular-nums' }}>
+            <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontSize: 30, color: ink, marginTop: 14, fontVariantNumeric: 'tabular-nums' }}>
               {left.d} <small style={{ fontSize: 13, color: p.muted }}>hari</small> · {String(left.h).padStart(2, '0')}:{String(left.m).padStart(2, '0')}:{String(left.s).padStart(2, '0')}
             </Reveal>
           )}
@@ -395,7 +410,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           {Title({ text: c.eventsTitle || 'Rangkaian Acara' })}
           <div style={{ position: 'relative', maxWidth: 440, margin: '0 auto', display: 'grid', gap: 18 }}>
             {spec.events === 'timeline' && <div style={{ position: 'absolute', left: 9, top: 8, bottom: 8, width: 1, background: p.secondary }} />}
-            {events.map(([key, ev], i) => {
+            {events.map(([key, ev], i) => M((() => {
               const body = (
                 <>
                   <h3 style={{ fontFamily: display, fontSize: 24, fontWeight: 500, color: p.primary, margin: '0 0 10px' }}>{ev.name || (key === 'akad' ? 'Akad Nikah' : 'Resepsi')}</h3>
@@ -445,7 +460,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                   {body}
                 </Reveal>
               );
-            })}
+            })(), { x: [i % 2 ? 90 : -90, 0], rotate: [i % 2 ? 5 : -5, 0], opacity: [0, 1], range: [0.04, 0.4], ease: 'out' }, key))}
           </div>
           {data.liveStreamUrl && (
             <Reveal variant={R} style={{ marginTop: 22 }}>
@@ -461,14 +476,16 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
       data.showLoveStories !== false && data.loveStories?.length ? (
         <section key="story" style={sectionStyle}>
           {Title({ text: c.storyTitle || 'Kisah Kami' })}
-          <div style={{ maxWidth: 420, margin: '0 auto', textAlign: 'left', borderLeft: `1px solid ${p.secondary}`, paddingLeft: 22 }}>
-            {data.loveStories.map((s, i) => (
-              <Reveal key={s.id || i} variant={R} delay={i * 0.08} style={{ position: 'relative', marginBottom: 28 }}>
-                <span style={{ position: 'absolute', left: -28, top: 4, width: 11, height: 11, borderRadius: 999, background: p.primary }} />
+          <div style={{ maxWidth: 420, margin: '0 auto', textAlign: 'left', borderLeft: `1px solid ${p.secondary}`, paddingLeft: 22, ...(scene ? { ...card, textAlign: 'left', paddingLeft: 40 } : {}) }}>
+            {data.loveStories.map((s, i) => M(
+              <Reveal variant={R} delay={i * 0.08} style={{ position: 'relative', marginBottom: 28 }}>
+                <span style={{ position: 'absolute', left: scene ? -24 : -28, top: 4, width: 11, height: 11, borderRadius: 999, background: p.primary }} />
                 <p style={{ ...eyebrow, color: p.primary }}>{s.year}</p>
                 <h3 style={{ fontFamily: display, fontSize: 20, fontWeight: 500, color: p.text, margin: '4px 0 6px' }}>{s.title}</h3>
                 <p style={{ fontFamily: spec.fonts.body, fontSize: 13.5, lineHeight: 1.7, color: p.muted, margin: 0 }}>{s.story}</p>
-              </Reveal>
+              </Reveal>,
+              { x: [60, 0], opacity: [0, 1], range: [0.02, 0.36], ease: 'out' },
+              s.id || i
             ))}
           </div>
         </section>
@@ -483,16 +500,16 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           {spec.gallery === 'film' ? (
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '10px 24px', background: p.text }}>
               {photos.map((src, i) => (
-                <button key={i} type="button" onClick={() => setLightbox(src)} style={{ flex: '0 0 62%', aspectRatio: '3/4', scrollSnapAlign: 'center', border: `4px solid ${p.surface}`, padding: 0, background: 'none', cursor: 'zoom-in' }}>
+                <button key={i} type="button" onClick={() => setLightbox(src)} style={{ flex: '0 0 62%', aspectRatio: '3/4', scrollSnapAlign: 'center', border: `4px solid ${p.surface}`, padding: 0, background: 'none', cursor: 'zoom-in', overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={`Galeri ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  {M(<img src={src} alt={`Galeri ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />, { style: { height: '100%' }, y: [-24, 24], scale: [1.18, 1.18] })}
                 </button>
               ))}
             </div>
           ) : (
             <div style={spec.gallery === 'masonry' ? { columnCount: 2, columnGap: 10, maxWidth: 480, margin: '0 auto' } : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, maxWidth: 480, margin: '0 auto' }}>
-              {photos.map((src, i) => (
-                <Reveal key={i} variant={R} delay={(i % 4) * 0.06} style={spec.gallery === 'masonry' ? { breakInside: 'avoid', marginBottom: 10 } : {}}>
+              {photos.map((src, i) => M(
+                <Reveal variant={R} delay={(i % 4) * 0.06}>
                   <button type="button" onClick={() => setLightbox(src)} style={{ display: 'block', width: '100%', padding: 0, border: 'none', background: 'none', cursor: 'zoom-in', borderRadius: Math.min(spec.radius, 14), overflow: 'hidden' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -502,7 +519,13 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                       style={{ width: '100%', display: 'block', objectFit: 'cover', aspectRatio: spec.gallery === 'grid' ? '1/1' : i % 3 === 0 ? '3/4' : '4/5' }}
                     />
                   </button>
-                </Reveal>
+                </Reveal>,
+                // kolom bergerak dengan kecepatan berbeda
+                {
+                  style: spec.gallery === 'masonry' ? { breakInside: 'avoid', marginBottom: 10 } : {},
+                  y: spec.gallery === 'grid' ? ([[40, -40], [90, -90], [20, -20]][i % 3] as [number, number]) : ([[30, -30], [80, -80]][i % 2] as [number, number]),
+                },
+                i
               ))}
             </div>
           )}
@@ -515,20 +538,22 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         <section key="gift" style={sectionStyle}>
           {Title({ text: c.giftTitle || 'Amplop Digital' })}
           <Reveal variant={R}>
-            <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: p.muted, maxWidth: 380, margin: '-6px auto 26px' }}>
+            <p style={{ fontFamily: spec.fonts.body, fontSize: 14, lineHeight: 1.8, color: inkSoft, maxWidth: 380, margin: '-6px auto 26px' }}>
               {c.giftIntro || 'Doa restu Anda adalah karunia terindah. Bila ingin memberi tanda kasih, dapat melalui:'}
             </p>
           </Reveal>
           <div style={{ display: 'grid', gap: 14, maxWidth: 400, margin: '0 auto' }}>
-            {data.gifts.map((g, i) => (
-              <Reveal key={g.id || i} variant={R} delay={i * 0.08} style={card}>
+            {data.gifts.map((g, i) => M(
+              <Reveal variant={R} delay={i * 0.08} style={card}>
                 <p style={{ ...eyebrow, color: p.primary }}>{g.name}</p>
                 <p style={{ fontFamily: display, fontSize: g.type === 'address' ? 15 : 24, color: p.text, margin: '10px 0 4px', letterSpacing: g.type === 'address' ? 0 : '0.04em', lineHeight: 1.4 }}>{g.accountNumber}</p>
                 {g.accountHolder && <p style={{ fontFamily: spec.fonts.body, fontSize: 13, color: p.muted, margin: 0 }}>a.n. {g.accountHolder}</p>}
                 <button type="button" onClick={() => copy(g.id || String(i), g.accountNumber)} style={{ ...btnGhost, marginTop: 16 }}>
                   {copied === (g.id || String(i)) ? 'Tersalin ✓' : g.type === 'address' ? 'Salin alamat' : 'Salin nomor'}
                 </button>
-              </Reveal>
+              </Reveal>,
+              { rotateX: [55, 0], y: [50, 0], opacity: [0, 1], range: [0.02, 0.34], ease: 'out', transformOrigin: '50% 100%' },
+              g.id || i
             ))}
           </div>
         </section>
@@ -613,7 +638,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         key="closing"
         style={
           scene
-            ? { position: 'relative', zIndex: 2, minHeight: '96vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '30vh 26px 120px', textAlign: 'center', color: scene.closingText, textShadow: scene.closingShadow ?? '0 2px 16px rgba(0,0,0,.35)' }
+            ? { position: 'relative', zIndex: 2, padding: '6vh 26px 0', textAlign: 'center', color: 'var(--ink)' }
             : { ...sectionStyle, paddingBottom: 110 }
         }
       >
@@ -632,7 +657,8 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   };
 
   const Signature = spec.Signature;
-  const Backdrop = scene?.Backdrop;
+  const Chapter = scene?.Chapter;
+  const Backdrop = Chapter ? undefined : scene?.Backdrop;
 
   const page = (
     <div
@@ -642,7 +668,8 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         background: p.bg,
         color: p.text,
         fontFamily: spec.fonts.body,
-        overflowX: 'hidden',
+        // 'clip' (bukan 'hidden') agar hero sticky tetap bekerja
+        overflowX: 'clip',
       }}
     >
       <style>{fontImport(spec.fonts.google)}</style>
@@ -657,7 +684,61 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
 
       {!opened && <Cover spec={spec} groom={groom.nickname} bride={bride.nickname} dateText={dateText} guestName={guestName} photo={heroPhoto} onOpen={handleOpen} />}
 
-      <main style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', opacity: opened || !scene ? 1 : 0, transition: 'opacity 900ms ease 500ms' }}>{order.map((id) => sections[id]?.())}</main>
+      <main style={{ position: 'relative', zIndex: 2, maxWidth: Chapter ? 'none' : 520, margin: '0 auto', opacity: opened || Chapter || !scene ? 1 : 0, transition: 'opacity 900ms ease 500ms' }}>
+        {order.map((id) => {
+          const node = sections[id]?.();
+          if (!node || !scene) return node;
+          if (Chapter) {
+            // Bab layar penuh: ilustrasi menempel (sticky) selama isinya digulir; lapisan depan menutupi teks
+            const tone = scene.ink?.[id] || { color: p.text };
+            const short = id === 'hero' || id === 'quote' || id === 'countdown' || id === 'closing';
+            return (
+              <div
+                key={id}
+                data-chapter={id}
+                style={
+                  {
+                    position: 'relative',
+                    minHeight: id === 'hero' ? '108vh' : '100vh',
+                    overflow: 'clip',
+                    color: tone.color,
+                    textShadow: tone.shadow || 'none',
+                    '--ink': tone.color,
+                  } as React.CSSProperties
+                }
+              >
+                <div aria-hidden style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', zIndex: 0, overflow: 'hidden' }}>
+                  <Chapter id={id} layer="back" />
+                </div>
+                <div style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', padding: short ? '15vh 0 30vh' : '12vh 0 22vh' }}>{node}</div>
+                <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+                  <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+                    <Chapter id={id} layer="front" />
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          if (id === 'hero') return node;
+          const Decor = scene.SectionDecor;
+          // Bagian tema Spesial: ornamen di belakang panel, panel, ornamen di depan panel
+          return (
+            <div key={id} style={{ position: 'relative', margin: id === 'closing' ? 0 : '26px 14px' }}>
+              {Decor && (
+                <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
+                  <Decor id={id} layer="back" palette={p} />
+                </div>
+              )}
+              {node}
+              {Decor && (
+                <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+                  <Decor id={id} layer="front" palette={p} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </main>
 
       {data.musicUrl && opened && !embedded && (
         <button

@@ -112,7 +112,10 @@ export function Frame({
   width,
   height,
   position = 'center',
+  wrapImg,
 }: {
+  /** pembungkus gambar (mis. paralaks di dalam bingkai) */
+  wrapImg?: (img: React.ReactNode) => React.ReactNode;
   src: string;
   alt: string;
   shape: FrameShape;
@@ -134,16 +137,17 @@ export function Frame({
   ) : (
     <div style={{ width: '100%', height: '100%', background: palette.surface }} />
   );
+  const media = wrapImg ? wrapImg(img) : img;
   if (shape === 'polaroid') {
     return (
       <div style={{ width, background: '#fff', padding: '10px 10px 34px', boxShadow: '0 14px 30px -18px rgba(0,0,0,.45)', transform: 'rotate(-1.5deg)', margin: '0 auto' }}>
-        <div style={{ height, overflow: 'hidden' }}>{img}</div>
+        <div style={{ height, overflow: 'hidden' }}>{media}</div>
       </div>
     );
   }
   return (
     <div style={{ width, height, margin: '0 auto', padding: 6, borderRadius: radius[shape], border: `1.5px solid ${palette.secondary}` }}>
-      <div style={{ width: '100%', height: '100%', borderRadius: radius[shape], overflow: 'hidden' }}>{img}</div>
+      <div style={{ width: '100%', height: '100%', borderRadius: radius[shape], overflow: 'hidden' }}>{media}</div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineTheme } from '../types';
-import PaperBackdrop from './taman-kertas.scene';
+import TamanChapter, { TAMAN_INK } from './taman-kertas.chapters';
 
 /**
  * Taman Kertas — tema Spesial 2D paralaks bergaya buku pop-up.
@@ -85,7 +85,8 @@ export default defineTheme({
   },
   CoverArt: FoldedPages,
   scene: {
-    Backdrop: PaperBackdrop,
+    Chapter: TamanChapter,
+    ink: TAMAN_INK,
     intro: 'popup',
     introMs: 2000,
     heroText: '#4E3742',

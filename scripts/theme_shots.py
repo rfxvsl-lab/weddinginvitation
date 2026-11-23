@@ -93,7 +93,7 @@ async def run(theme_id: str, qa_only: bool) -> int:
         y, i = 0, 0
         while True:
             await fr.evaluate(f'window.__sc.scrollTo(0,{y})')
-            await pg.wait_for_timeout(1100)
+            await pg.wait_for_timeout(1800)
             path = qa / f'3-part-{i:02d}.png'
             await pg.screenshot(path=str(path))
             parts.append(path)
@@ -111,6 +111,25 @@ async def run(theme_id: str, qa_only: bool) -> int:
         for k, im in enumerate(ims):
             sheet.paste(im.resize((w // 2, hh // 2)), ((k % cols) * w // 2, (k // cols) * hh // 2))
         sheet.save(qa / '4-sheet.png')
+
+        # tema Spesial: potret tiap bab saat tepi atasnya sejajar layar
+        chapters = await fr.evaluate("[...document.querySelectorAll('[data-chapter]')].map(e => e.dataset.chapter)")
+        if chapters:
+            shots = []
+            for ch in chapters:
+                await fr.evaluate(f"document.querySelector('[data-chapter={ch}]').scrollIntoView()")
+                await pg.wait_for_timeout(1500)
+                path = qa / f'5-ch-{ch}.png'
+                await pg.screenshot(path=str(path))
+                shots.append(path)
+            ims = [Image.open(x) for x in shots]
+            w, hh = ims[0].size
+            cols = 5
+            rows = (len(ims) + cols - 1) // cols
+            sheet = Image.new('RGB', (cols * w // 2, rows * hh // 2), 'white')
+            for k, im in enumerate(ims):
+                sheet.paste(im.resize((w // 2, hh // 2)), ((k % cols) * w // 2, (k // cols) * hh // 2))
+            sheet.save(qa / '5-chapters.png')
 
         # cek fitur wajib
         checks = {

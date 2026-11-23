@@ -1,5 +1,5 @@
 import { defineTheme } from '../types';
-import LembayungBackdrop from './lembayung.scene';
+import LembayungChapter, { LEMBAYUNG_INK } from './lembayung.chapters';
 
 /**
  * Lembayung — tema Spesial 2.5D.
@@ -61,7 +61,8 @@ export default defineTheme({
     closingTitle: 'Sampai jumpa di bawah lampion',
   },
   scene: {
-    Backdrop: LembayungBackdrop,
+    Chapter: LembayungChapter,
+    ink: LEMBAYUNG_INK,
     intro: 'dolly',
     introMs: 2200,
     heroText: '#3A1F33',

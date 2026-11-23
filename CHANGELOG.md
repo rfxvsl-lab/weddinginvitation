@@ -6,6 +6,14 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.4.0] — 2026-11-23 — Tema Spesial bab per bab
+
+- Tema Spesial dirombak ke gaya situs naratif paralaks: setiap bagian undangan adalah bab adegan layar penuh; teks berada di dalam adegan dengan lapisan di belakang dan di depannya; lapisan bergerak sesuai kedalaman saat bab masuk, ditahan (sticky), dan keluar.
+- `kit/chapters.tsx` (`ArtLayer`, `ArtSvg`, `Sky`), `Px` untuk judul/foto/kartu yang ikut bergerak, nama mempelai berpisah saat bab pembuka ditinggalkan.
+- **Lembayung**: 10 bab — kaki gunung, candi, telaga, sawah terasering, laut & perahu, jalan pulang, hutan kunang-kunang, telaga berlampion, desa malam, penutup di bawah bulan.
+- **Taman Kertas**: 10 halaman pop-up — gapura bunga, rumah kecil, pelangi, balon udara, tenda pesta, jalan setapak, padang bunga, kado & konfeti, pesawat kertas, bintang & bulan gantung.
+- Lapisan bab yang jauh dari layar disembunyikan agar ringan di ponsel.
+
 ## [3.3.0] — 2026-11-23 — Tema Spesial 2D/2.5D
 
 - `src/themes/kit/scene.tsx`: mesin adegan paralaks — lapisan berdasar kedalaman bergerak saat digulir, mengikuti giroskop/kursor, dan intro kamera (`dolly`, `popup`, `rise`) setelah sampul dibuka; utilitas bukit prosedural, campuran warna, keyframe warna per progres gulir. Menghormati "kurangi gerakan".

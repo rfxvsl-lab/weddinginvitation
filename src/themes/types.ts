@@ -87,7 +87,15 @@ export interface SceneConfig {
    * Latar adegan (fixed, memenuhi layar). Susun dari <Layer depth> dan gunakan
    * useScene() untuk efek per frame (warna langit, matahari, lampion, dsb.).
    */
-  Backdrop: React.ComponentType<{ palette: ThemePalette }>;
+  Backdrop?: React.ComponentType<{ palette: ThemePalette }>;
+  /**
+   * Bab adegan layar penuh untuk setiap bagian (gaya situs naratif paralaks).
+   * Dirender dua kali per bagian: layer 'back' (di belakang teks) dan 'front' (di depan teks).
+   * Susun dari <ArtLayer depth> di kit/chapters.tsx. Bila ada, Backdrop tidak dipakai.
+   */
+  Chapter?: React.ComponentType<{ id: SectionId; layer: 'back' | 'front' }>;
+  /** warna teks + bayangan teks yang berada langsung di atas ilustrasi setiap bab */
+  ink?: Partial<Record<SectionId, { color: string; shadow?: string }>>;
   /** animasi kamera setelah sampul dibuka */
   intro: 'dolly' | 'popup' | 'rise';
   introMs?: number;
@@ -96,6 +104,12 @@ export interface SceneConfig {
   closingText: string;
   /** bayangan teks penutup (default gelap untuk langit malam) */
   closingShadow?: string;
+  /**
+   * Ornamen paralaks per bagian. Dirender dua kali di setiap bagian:
+   * layer 'back' di belakang panel dan 'front' di depan panel/teks.
+   * Gunakan <Px> dari kit/scene agar bergerak terhadap posisi bagian di layar.
+   */
+  SectionDecor?: React.ComponentType<{ id: SectionId; layer: 'back' | 'front'; palette: ThemePalette }>;
   /** panel konten: kaca buram di atas adegan */
   panel?: { background: string; blur?: number; border?: string };
 }
