@@ -15,8 +15,14 @@ menyediakan semuanya — tema hanya mengisi rasa. Jangan menghapus bagian standa
    lapisan naik satu per satu (intro `descend`), kupu-kupu terbang, lalu nama mempelai masuk dari
    kiri/kanan, `&` membesar, tanggal dari bawah. Default `GardenStage` (taman prosedural dari palet);
    tema boleh memberi `Stage` sendiri dari `<ArtLayer hero order>` — sangat dianjurkan agar khas.
-3. **Rangkaian bunga paralaks** (`flora`): mengapit foto & panel, masuk dari samping lalu bergoyang
-   mengikuti gulir. Isi `flora: { colors, leaf }` sesuai tema.
+3. **Rangkaian bunga paralaks**: mengapit foto & panel, masuk dari samping lalu bergoyang
+   mengikuti gulir. WAJIB lukisan, bukan SVG generik: pilih `floraArt` (blush, ivory, burgundy,
+   peach, lavender, dustyblue, coral, rose, gold) dari `public/assets/art/`.
+3b. **Seni harus artistik.** Dilarang bentuk SVG generik (lingkaran-bunga, bukit datar polos).
+   Gunakan lukisan di `public/assets/art/` (buket, cat air `wc-*`, `gunungan`, `leaves`) untuk
+   panggung/ornamen, atau gambar SVG yang benar-benar dirancang (gradien, lipatan, cahaya,
+   tekstur) seperti `grand-ballroom.stage.tsx` dan `royal-arabian.stage.tsx`. Aset baru dapat
+   ditambahkan lewat `scripts/build_art.py` (mis. buket dengan warna baru).
 4. **Urutan bagian**: hero → kutipan (foto + nama + ayat) → mempelai (panel lengkung) → tayangan foto
    (slideshow) → Save the Date (hitung mundur) → acara (panel lengkung + buket) → tanda kasih →
    galeri → kisah → RSVP → ucapan (daftar dengan avatar & waktu) → terima kasih (foto penuh +

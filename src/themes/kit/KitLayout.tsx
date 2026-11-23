@@ -16,7 +16,7 @@ import { Ambient, Corner, Divider, Frame, Reveal, fontImport } from './primitive
 import { getKitTheme } from '../catalog';
 import { Px, SceneProvider, requestTiltPermission } from './scene';
 import { ArtLayer } from './chapters';
-import { Bloom, Bouquet, GardenStage, NavMenu, Slideshow, StageFront, Vinyl, defaultFlora, relTime, type Flora } from './standard';
+import { Bloom, Bouquet, NavMenu, PaintedStage, Slideshow, StageFront, Vinyl, defaultFlora, relTime, type Flora } from './standard';
 
 interface KitLayoutProps {
   data: WeddingData;
@@ -70,9 +70,8 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   const variant = baseSpec.variants?.find((v) => v.id === data.themeVariant);
   const spec: ThemeSpec = variant ? { ...baseSpec, palette: { ...baseSpec.palette, ...variant.palette } } : baseSpec;
   const p = spec.palette;
-  const flora: Flora = variant?.flora
-    ? { colors: variant.flora, leaf: baseSpec.flora?.leaf || defaultFlora(p).leaf }
-    : baseSpec.flora || defaultFlora(p);
+  const fallbackFlora = defaultFlora(p, variant?.floraArt || baseSpec.floraArt);
+  const flora: Flora = { ...fallbackFlora, ...(baseSpec.flora || {}), art: fallbackFlora.art };
   const introMs = spec.scene?.introMs || 3400;
   const c = spec.copy || {};
   const [opened, setOpened] = useState(embedded);
@@ -322,12 +321,12 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
       }
       // Standar: nama berada di langit panggung pembuka, masuk dari arah berbeda setelah kamera turun
       const onPhoto = spec.hero === 'photo';
-      const col = onPhoto ? p.onCover || '#fff' : p.text;
-      const glow = onPhoto ? '0 2px 18px rgba(0,0,0,.45)' : `0 1px 0 ${p.bg}, 0 0 24px ${p.bg}`;
+      const col = onPhoto ? p.onCover || '#fff' : spec.heroInk || p.text;
+      const glow = onPhoto || spec.heroInk ? '0 2px 18px rgba(0,0,0,.55)' : `0 1px 0 ${p.bg}, 0 0 24px ${p.bg}`;
       const big = spec.hero === 'type';
       const nameSt: React.CSSProperties = big
-        ? { fontFamily: display, fontSize: 'clamp(60px, 19vw, 104px)', fontWeight: 400, lineHeight: 0.92, margin: 0, color: onPhoto ? col : p.primary, letterSpacing: '-0.02em' }
-        : { fontFamily: script, fontSize: 'clamp(52px, 15vw, 78px)', fontWeight: 400, lineHeight: 1.02, margin: 0, color: onPhoto ? col : p.primary };
+        ? { fontFamily: display, fontSize: 'clamp(60px, 19vw, 104px)', fontWeight: 400, lineHeight: 0.92, margin: 0, color: onPhoto || spec.heroInk ? col : p.primary, letterSpacing: '-0.02em' }
+        : { fontFamily: script, fontSize: 'clamp(52px, 15vw, 78px)', fontWeight: 400, lineHeight: 1.02, margin: 0, color: onPhoto || spec.heroInk ? col : p.primary };
       return (
         <section key="hero" style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: onPhoto ? 'flex-end' : 'flex-start', padding: onPhoto ? '0 24px 18vh' : '13vh 24px 0', textAlign: 'center', color: col, textShadow: glow }}>
           <Reveal variant={R} when={introDone} from="down">
@@ -808,7 +807,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           if (!scene) {
             if (id !== 'hero') return <div key={id} data-section={id}>{node}</div>;
             // Panggung pembuka 2.5D standar: lapisan di belakang nama + rangkaian bunga & kupu-kupu di depan
-            const Stage = spec.Stage || GardenStage;
+            const Stage = spec.Stage || PaintedStage;
             return (
               <div key="hero" data-chapter="hero" data-section="hero" style={{ position: 'relative', minHeight: '100vh', overflow: 'clip' }}>
                 <div aria-hidden style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', overflow: 'hidden' }}>
@@ -822,7 +821,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                       </ArtLayer>
                     </>
                   ) : (
-                    <Stage palette={p} flora={flora} photo={spec.hero === 'frame' ? heroPhoto : undefined} />
+                    spec.Stage ? <Stage palette={p} flora={flora} photo={spec.hero === 'frame' ? heroPhoto : undefined} /> : <PaintedStage palette={p} flora={flora} photo={spec.hero === 'frame' ? heroPhoto : undefined} scene={spec.stageArt} />
                   )}
                 </div>
                 {node}
@@ -852,13 +851,14 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                     color: tone.color,
                     textShadow: tone.shadow || 'none',
                     '--ink': tone.color,
+                    '--accent': p.primary,
                   } as React.CSSProperties
                 }
               >
                 <div aria-hidden style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', zIndex: 0, overflow: 'hidden' }}>
                   <Chapter id={id} layer="back" data={cd} />
                 </div>
-                <div style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', padding: id === 'hero' && scene.heroAlign === 'bottom' ? '42vh 0 16vh' : short ? '15vh 0 30vh' : '12vh 0 22vh' }}>{node}</div>
+                <div style={{ position: 'relative', zIndex: 2, maxWidth: 520, margin: '0 auto', padding: id === 'hero' && scene.heroAlign === 'bottom' ? '42vh 0 16vh' : id !== 'hero' && scene.contentTop ? `${scene.contentTop} 0 22vh` : short ? '15vh 0 30vh' : '12vh 0 22vh' }}>{node}</div>
                 <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
                   <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
                     <Chapter id={id} layer="front" data={cd} />

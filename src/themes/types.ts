@@ -107,6 +107,8 @@ export interface SceneConfig {
   Chapter?: React.ComponentType<{ id: SectionId; layer: 'back' | 'front'; data: ChapterData }>;
   /** posisi teks di bab pembuka: 'top' (default, di langit) atau 'bottom' (gaya judul film di atas foto) */
   heroAlign?: 'top' | 'bottom';
+  /** jarak atas isi bab selain pembuka (mis. '50vh' bila ilustrasi menempati bagian atas) */
+  contentTop?: string;
   /** warna teks + bayangan teks yang berada langsung di atas ilustrasi setiap bab */
   ink?: Partial<Record<SectionId, { color: string; shadow?: string }>>;
   /** animasi kamera setelah sampul dibuka */
@@ -132,8 +134,8 @@ export interface ThemeVariant {
   id: string;
   name: string;
   palette: Partial<ThemePalette>;
-  /** warna bunga ornamen untuk varian ini */
-  flora?: string[];
+  /** lukisan buket untuk varian ini (lihat FLORA_ART) */
+  floraArt?: string;
 }
 
 export interface ThemeSpec {
@@ -145,11 +147,24 @@ export interface ThemeSpec {
    */
   flora?: { colors: string[]; leaf: string };
   /**
+   * Lukisan buket bunga (PNG/WebP transparan) yang mengapit foto & panel — WAJIB lukisan,
+   * bukan SVG generik. Pilihan siap pakai: blush, ivory, burgundy, peach, lavender,
+   * dustyblue, coral, rose (campur), gold (putih-emas). Atau URL sendiri.
+   */
+  floraArt?: string;
+  /**
+   * Lukisan cat air untuk panggung pembuka bawaan: meadow | house | village | night.
+   * Diabaikan bila tema memberi Stage sendiri.
+   */
+  stageArt?: 'meadow' | 'house' | 'village' | 'night';
+  /** warna nama & teks di panggung pembuka bila panggungnya gelap (default: palet) */
+  heroInk?: string;
+  /**
    * Panggung pembuka (hero) berlapis 2.5D: setelah sampul dibuka kamera turun dari langit
    * dan lapisan naik satu per satu. Default: taman prosedural dari palet tema.
    * Komponen kustom disusun dari <ArtLayer hero order> di kit/chapters.
    */
-  Stage?: React.ComponentType<{ palette: ThemePalette; flora: { colors: string[]; leaf: string }; photo?: string }>;
+  Stage?: React.ComponentType<{ palette: ThemePalette; flora: { colors: string[]; leaf: string; art: string }; photo?: string }>;
   /** default 'regular' */
   tier?: ThemeTier;
   /** wajib untuk tier 'special' */

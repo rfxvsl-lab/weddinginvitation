@@ -14,8 +14,29 @@ import sageGarden from './sage-garden';
 import lembayung from './lembayung';
 import tamanKertas from './taman-kertas';
 import darkLuxuryCinematic from './dark-luxury-cinematic';
+import luxuryPink from './luxury-pink';
+import grandBallroom from './grand-ballroom';
+import royalArabian from './royal-arabian';
+import javaneseClassic from './javanese-classic';
+import playlist from './playlist';
+import cinemaRouge from './cinema-rouge';
+import parallaxCinematic from './parallax-cinematic';
+import storybook from './storybook';
 
-export const KIT_THEMES: ThemeSpec[] = [tamanKertas, lembayung, sageGarden, darkLuxuryCinematic];
+export const KIT_THEMES: ThemeSpec[] = [
+  tamanKertas,
+  lembayung,
+  sageGarden,
+  darkLuxuryCinematic,
+  luxuryPink,
+  grandBallroom,
+  cinemaRouge,
+  royalArabian,
+  playlist,
+  javaneseClassic,
+  parallaxCinematic,
+  storybook,
+];
 
 const byId = new Map(KIT_THEMES.map((t) => [t.id, t]));
 

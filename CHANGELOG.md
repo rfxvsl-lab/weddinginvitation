@@ -6,6 +6,20 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.7.0] — 2026-11-24 — 12/12 tema memakai standar + seni lukisan
+
+- Ornamen bunga & panggung pembuka kini lukisan, bukan SVG generik: buket mawar lukisan diwarnai ulang (blush, ivory, burgundy, peach, lavender, dusty blue, coral, campur) + buket putih-emas, daun, gunungan, dan lukisan cat air berlapis (padang, pondok, desa, langit, malam) — `scripts/build_art.py` → `public/assets/art/`.
+- 8 tema lama dimigrasi ke Theme Kit dengan id sama (undangan yang sudah ada ikut berubah):
+  - **Luxury Pink Elegant** — amplop bersegel, pondok bunga cat air, mawar blush (+ varian Peach, Lilac, Marun)
+  - **Grand Ballroom** — tirai beludru berlipit yang terbelah, lampu kristal berayun, jendela lengkung, lantai marmer, mawar putih (+ Burgundy, Emerald)
+  - **Royal Arabian Night** — gerbang mihrab emas berpola bintang, lentera berayun, langit malam cat air (+ Biru Malam, Marun)
+  - **Javanese Classic** — kelir berlampu blencong, bayangan gunungan yang digerakkan, batik kawung, bunga putih-emas (+ Hijau Pupus, Indigo)
+  - **Lagu Kita** (dulu SpotiLove) — piringan hitam berlabel foto, equalizer, kanopi daun; tanpa merek (+ Sunset, Lilac)
+  - **Cinema Rouge** (dulu Netflix Luxury) — premiere bioskop merah-hitam orisinal, hitung mundur pita film; tanpa merek
+  - **Cinematic 2D Parallax** — perjalanan lukisan cat air bab per bab
+  - **Heirloom Storybook** — buku bersampul kulit, halaman berilustrasi yang dibalik masuk
+- Warna cahaya tema sinematik mengikuti warna utama (varian Rose Gold/Platinum/Zamrud ikut berubah).
+
 ## [3.6.0] — 2026-11-24 — Standar undangan untuk semua tema
 
 - Konsep standar (mengikuti template premium) di Theme Kit, berlaku untuk semua tema Kit dan tema harian:

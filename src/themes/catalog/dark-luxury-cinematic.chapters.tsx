@@ -12,7 +12,6 @@ import type { ChapterData, SectionId } from '../types';
 import { seeded } from '../kit/scene';
 import { ArtLayer } from '../kit/chapters';
 
-const GOLD = '#C9A96E';
 const BLACK = '#060507';
 
 const NOISE =
@@ -61,7 +60,7 @@ function Bokeh({ n = 18, seed = 1, warm = false }: { n?: number; seed?: number; 
               width: s,
               height: s,
               borderRadius: 999,
-              background: warm ? 'radial-gradient(circle, rgba(255,214,150,.55), rgba(255,180,90,0) 70%)' : `radial-gradient(circle, ${GOLD}88, ${GOLD}00 70%)`,
+              background: warm ? 'radial-gradient(circle, rgba(255,214,150,.55), rgba(255,180,90,0) 70%)' : 'radial-gradient(circle, color-mix(in srgb, var(--accent, #C9A96E) 55%, transparent), transparent 70%)',
               filter: `blur(${s > 26 ? 2 : 0.5}px)`,
               animation: `dlc-float ${dur}s ease-in-out ${-r() * dur}s infinite alternate, dlc-pulse ${3 + r() * 4}s ease-in-out ${-r() * 4}s infinite`,
             }}
@@ -100,7 +99,7 @@ function Beams() {
     [left ? 'left' : 'right']: '-10%',
     width: '60%',
     height: '140%',
-    background: `linear-gradient(180deg, ${GOLD}55, ${GOLD}00 75%)`,
+    background: 'linear-gradient(180deg, color-mix(in srgb, var(--accent, #C9A96E) 33%, transparent), transparent 75%)',
     clipPath: 'polygon(46% 0, 54% 0, 100% 100%, 0 100%)',
     transformOrigin: '50% 0',
     filter: 'blur(14px)',
@@ -198,10 +197,10 @@ function Rings() {
   return (
     <svg viewBox="-100 -100 200 200" style={{ position: 'absolute', left: '50%', top: '42%', width: '150vmin', height: '150vmin', transform: 'translate(-50%, -50%)', opacity: 0.22, animation: 'dlc-rotate 60s linear infinite' }}>
       {[92, 80, 66].map((r, i) => (
-        <circle key={r} r={r} fill="none" stroke={GOLD} strokeWidth={i === 1 ? 0.6 : 0.3} strokeDasharray={i === 1 ? '1 3' : undefined} />
+        <circle key={r} r={r} fill="none" style={{ stroke: 'var(--accent, #C9A96E)' }} strokeWidth={i === 1 ? 0.6 : 0.3} strokeDasharray={i === 1 ? '1 3' : undefined} />
       ))}
       {Array.from({ length: 60 }, (_, i) => (
-        <line key={i} x1={0} y1={-92} x2={0} y2={i % 5 ? -88 : -84} stroke={GOLD} strokeWidth={0.4} transform={`rotate(${i * 6})`} />
+        <line key={i} x1={0} y1={-92} x2={0} y2={i % 5 ? -88 : -84} style={{ stroke: 'var(--accent, #C9A96E)' }} strokeWidth={0.4} transform={`rotate(${i * 6})`} />
       ))}
     </svg>
   );

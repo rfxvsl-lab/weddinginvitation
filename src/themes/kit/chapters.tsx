@@ -36,6 +36,8 @@ interface ArtLayerProps {
   /** urutan berdiri untuk popup (0 = paling belakang, muncul pertama) */
   order?: number;
   popup?: boolean;
+  /** halaman buku dibalik masuk (rotateY dari kiri) saat bab mulai tampil */
+  turn?: boolean;
   /** lapisan bab pembuka: ikut animasi intro kamera */
   hero?: boolean;
   /** pergeseran tambahan ke samping saat bab keluar (proporsi lebar layar), mis. nyiur membelah */
@@ -46,7 +48,7 @@ interface ArtLayerProps {
   origin?: string;
 }
 
-export function ArtLayer({ depth, children, order = 0, popup = false, hero = false, exitX = 0, strength = 0.55, style, origin = '50% 100%' }: ArtLayerProps) {
+export function ArtLayer({ depth, children, order = 0, popup = false, turn = false, hero = false, exitX = 0, strength = 0.55, style, origin = '50% 100%' }: ArtLayerProps) {
   const ref = useRef<HTMLDivElement>(null);
   const mode = useSceneIntro();
   useScene((s) => {
@@ -94,6 +96,9 @@ export function ArtLayer({ depth, children, order = 0, popup = false, hero = fal
         ty += (1 - e) * depth * s.vh * 0.45;
         extra += ` scale(${(1 + (1 - e) * depth * 0.25).toFixed(4)})`;
       }
+    } else if (turn) {
+      const e = easeInOut(clamp((c.p - 0.03 - order * 0.03) / 0.2));
+      extra += ` perspective(1400px) rotateY(${((1 - e) * -100).toFixed(2)}deg)`;
     } else if (popup) {
       // halaman pop-up: berdiri saat bab mulai masuk layar
       const start = 0.04 + order * 0.035;
