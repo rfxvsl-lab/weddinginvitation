@@ -5,30 +5,28 @@ Semua fitur (sampul, musik, hitung mundur, acara + peta + kalender, kisah, galer
 amplop digital, RSVP, tiket tamu) sudah disediakan `src/themes/kit/KitLayout.tsx`.
 Tugas tema hanya menentukan **rasa**: palet, font, ornamen, varian tiap bagian, dan teks.
 
-## Standar undangan (WAJIB untuk semua tema)
+## Standar kualitas (gaya & teknik — BUKAN struktur yang sama)
 
-Konsep mengikuti template premium (acuan: Vitopia "Royal Garden"). Mesin KitLayout sudah
-menyediakan semuanya — tema hanya mengisi rasa. Jangan menghapus bagian standar.
+Acuan kualitas: template premium (mis. Vitopia "Royal Garden"). Yang ditiru adalah **tekniknya**,
+diterapkan **sesuai konsep masing-masing tema**. Setiap tema WAJIB punya alur dan tampilan
+bagian sendiri — jangan membuat semua tema menjadi satu halaman dengan urutan bagian yang sama.
 
-1. **Sampul**: nama, tanggal, **kartu tamu** (Kepada Yth. / nama / Di Tempat), tombol buka.
-2. **Panggung pembuka 2.5D** (bab `hero`): setelah sampul dibuka kamera turun dari langit dan
-   lapisan naik satu per satu (intro `descend`), kupu-kupu terbang, lalu nama mempelai masuk dari
-   kiri/kanan, `&` membesar, tanggal dari bawah. Default `GardenStage` (taman prosedural dari palet);
-   tema boleh memberi `Stage` sendiri dari `<ArtLayer hero order>` — sangat dianjurkan agar khas.
-3. **Rangkaian bunga paralaks**: mengapit foto & panel, masuk dari samping lalu bergoyang
-   mengikuti gulir. WAJIB lukisan, bukan SVG generik: pilih `floraArt` (blush, ivory, burgundy,
-   peach, lavender, dustyblue, coral, rose, gold) dari `public/assets/art/`.
-3b. **Seni harus artistik.** Dilarang bentuk SVG generik (lingkaran-bunga, bukit datar polos).
-   Gunakan lukisan di `public/assets/art/` (buket, cat air `wc-*`, `gunungan`, `leaves`) untuk
-   panggung/ornamen, atau gambar SVG yang benar-benar dirancang (gradien, lipatan, cahaya,
-   tekstur) seperti `grand-ballroom.stage.tsx` dan `royal-arabian.stage.tsx`. Aset baru dapat
-   ditambahkan lewat `scripts/build_art.py` (mis. buket dengan warna baru).
-4. **Urutan bagian**: hero → kutipan (foto + nama + ayat) → mempelai (panel lengkung) → tayangan foto
-   (slideshow) → Save the Date (hitung mundur) → acara (panel lengkung + buket) → tanda kasih →
-   galeri → kisah → RSVP → ucapan (daftar dengan avatar & waktu) → terima kasih (foto penuh +
-   keluarga besar kedua mempelai).
-5. **Menu navigasi** (☰ kanan atas) dan **piringan musik** (kiri bawah) — otomatis.
-6. **Varian warna**: isi `variants` (3–4 varian) agar pemilik bisa memilih di dashboard.
+Teknik yang wajib ada (wujudnya menyesuaikan tema):
+1. **Pembuka berlapis 2.5D** setelah sampul dibuka (kamera bergerak, lapisan masuk dengan
+   kedalaman berbeda), lalu nama mempelai masuk bertahap.
+2. **Ornamen yang digerakkan gulir** (masuk dari samping, bergoyang/bergeser mengikuti posisi
+   gulir) — ornamennya khas tema (bunga, gunungan, lentera, pita film, dll.).
+3. **Animasi masuk per elemen** dari arah berbeda, bukan semua fade yang sama.
+4. **Seni artistik**: lukisan di `public/assets/art/` atau SVG yang benar-benar dirancang
+   (gradien, lipatan, cahaya, tekstur). Dilarang bentuk SVG generik.
+5. Fitur wajib tetap lengkap (mempelai, acara + peta + kalender, hitung mundur, galeri,
+   tanda kasih, RSVP + ucapan, penutup), tetapi **urutan, bentuk, dan jumlah layar bebas**
+   sesuai konsep (bab layar penuh, halaman buku, slide, tiket, playlist, dsb.). Atur lewat
+   `sections`, `scene.Chapter`, varian bagian, atau komponen kustom.
+6. Menu navigasi & tombol musik disediakan mesin.
+
+Sebelum menulis kode, tulis 3 kalimat konsep: alur bagian, bentuk tampilan utama, dan apa yang
+membuat tema ini berbeda dari 5 tema terakhir.
 
 ## Langkah
 
@@ -50,11 +48,6 @@ menyediakan semuanya — tema hanya mengisi rasa. Jangan menghapus bagian standa
    - Teks `copy` Bahasa Indonesia, hangat, sesuai tema. Sapaan Islami hanya bila temanya Islami/adat yang pas.
    - Tanpa gambar eksternal baru; foto berasal dari data pengguna.
 4. **Daftarkan** di `src/themes/catalog/index.ts`: impor dan letakkan **paling depan** `KIT_THEMES`.
-4b. **Migrasi tema lama** (brief bertanda `migrate`): bangun ulang tema lama di Theme Kit dengan
-   **id yang sama** (agar undangan yang sudah memakainya ikut berubah), pertahankan karakter
-   aslinya (warna, font, motif), tambahkan standar di atas, lalu hapus entrinya dari `LEGACY_THEMES`
-   di `src/data/defaultData.ts` dan cabangnya di `InvitationPreview.tsx` hanya bila tidak dipakai lagi.
-   Contoh: `catalog/dark-luxury-cinematic.tsx` (id `rfx-dark`).
 5. **Verifikasi**
    ```bash
    npx tsc --noEmit

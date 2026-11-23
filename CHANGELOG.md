@@ -6,6 +6,11 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.7.1] — 2026-11-24 — Konsep asli 8 tema dikembalikan
+
+- 8 tema lama (Luxury Pink, Grand Ballroom, Netflix Luxury, Royal Arabian, SpotiLove, Javanese Classic, Cinematic 2D Parallax, Storybook) dikembalikan ke tata letak & konsep aslinya; migrasi ke tampilan seragam di 3.7.0 dibatalkan.
+- Playbook: yang distandarkan adalah teknik (pembuka berlapis, ornamen yang digerakkan gulir, animasi masuk, seni artistik), bukan struktur bagian — tiap tema wajib punya alur sendiri.
+
 ## [3.7.0] — 2026-11-24 — 12/12 tema memakai standar + seni lukisan
 
 - Ornamen bunga & panggung pembuka kini lukisan, bukan SVG generik: buket mawar lukisan diwarnai ulang (blush, ivory, burgundy, peach, lavender, dusty blue, coral, campur) + buket putih-emas, daun, gunungan, dan lukisan cat air berlapis (padang, pondok, desa, langit, malam) — `scripts/build_art.py` → `public/assets/art/`.
