@@ -7,12 +7,11 @@ import { LandingFeatures } from '@/components/landing/LandingFeatures';
 import { LandingPricing } from '@/components/landing/LandingPricing';
 import { LandingFaq } from '@/components/landing/LandingFaq';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { LandingTagline } from '@/components/landing/LandingTagline';
 import { SaasVideoStudio } from '@/components/saas/SaasVideoStudio';
 
 export default function LandingPage() {
   return (
-    <div className="saas-scope min-h-screen">
+    <div className="saas-scope rh-product rh-marketing min-h-screen">
       <a
         href="#konten"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-2"
@@ -25,7 +24,6 @@ export default function LandingPage() {
         <LandingThemes />
         <LandingSteps />
         <LandingFeatures />
-        <LandingTagline />
         <SaasVideoStudio />
         <LandingPricing />
         <LandingFaq />

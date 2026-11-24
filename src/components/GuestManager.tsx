@@ -268,16 +268,15 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-lg font-bold text-zinc-800 flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            Manajemen Daftar Tamu Undangan
+          <h3 className="text-lg font-bold text-zinc-800">
+            Daftar tamu
           </h3>
           <p className="text-xs text-zinc-500">
             Kelola data tamu, atur jumlah porsi reservasi (pax limit), serta bagikan tautan kustom WhatsApp.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => {
@@ -289,7 +288,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             }}
             className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
               canAccess(packageId, 'canQR')
-                ? 'bg-[#7A2E3B] hover:bg-[#63232F] text-white cursor-pointer'
+                ? 'bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white cursor-pointer'
                 : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
             }`}
           >
@@ -300,6 +299,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           <button
             type="button"
             disabled={isGuestLimitReached}
+            aria-expanded={showAddForm}
+            aria-controls="guest-add-form"
             onClick={() => {
               if (isGuestLimitReached) {
                 alertModal.upgrade('Batas Tamu Tercapai', `Batas maksimal tamu (${formatLimit(limits.maxGuests)}) untuk paket ${tierName} telah tercapai. Silakan Upgrade Paket.`);
@@ -320,10 +321,11 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
       {/* FORM TAMBAH GUEST */}
       {showAddForm && (
-        <form onSubmit={handleSubmit} className="p-4 border border-zinc-200 bg-white rounded-xl hover:shadow-xl hover:border-zinc-300 transition-all duration-200 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fadeIn">
+        <form id="guest-add-form" onSubmit={handleSubmit} className="p-4 border border-zinc-200 bg-white rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nama Lengkap Tamu</label>
+            <label htmlFor="guest-name" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nama lengkap tamu</label>
             <input
+              id="guest-name"
               type="text"
               required
               value={newName}
@@ -334,8 +336,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Grup / Kategori</label>
+            <label htmlFor="guest-group" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Grup / kategori</label>
             <select
+              id="guest-group"
               value={newGroup}
               onChange={(e) => setNewGroup(e.target.value)}
               className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-outline-variant)] bg-white"
@@ -349,8 +352,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nomor WhatsApp (Phone)</label>
+            <label htmlFor="guest-phone" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nomor WhatsApp</label>
             <input
+              id="guest-phone"
               type="text"
               value={newPhone}
               onChange={(e) => setNewPhone(e.target.value)}
@@ -360,8 +364,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">URL Gambar Denah / Meja (opsional)</label>
+            <label htmlFor="guest-seat" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">URL gambar denah / meja (opsional)</label>
             <input
+              id="guest-seat"
               type="url"
               value={newSeatImage}
               onChange={(e) => setNewSeatImage(e.target.value)}
@@ -372,8 +377,9 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <label className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Porsi Pax Maksimal</label>
+              <label htmlFor="guest-pax" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Jumlah orang maksimal</label>
               <input
+                id="guest-pax"
                 type="number"
                 min={1}
                 max={10}
@@ -401,6 +407,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Cari nama tamu atau nomor telepon..."
+            aria-label="Cari nama tamu atau nomor telepon"
             className="w-full text-xs pl-10 pr-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-zinc-800 placeholder:text-zinc-400"
           />
         </div>
@@ -431,7 +438,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               setExportScope('filtered');
               setIsExportModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#7A2E3B] hover:bg-[#63232F] text-white rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Cetak PDF / Absensi</span>
@@ -440,7 +447,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           <button
             type="button"
             onClick={() => handleExportCSV('filtered')}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#D6C9BA] hover:border-[#2A1E21] text-[#2A1E21] rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[var(--rh-line-strong)] hover:border-[var(--rh-ink)] text-[var(--rh-ink)] rounded-[10px] text-[12px] font-semibold transition-colors cursor-pointer"
             title="Ekspor daftar tamu aktif saat ini sebagai dokumen file .csv"
           >
             <Download className="w-3.5 h-3.5" />
@@ -833,7 +840,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <button
                   type="button"
                   onClick={() => handleExportCSV(exportScope)}
-                  className="w-full py-2.5 bg-[#7A2E3B] hover:bg-[#63232F] text-white border border-[#7A2E3B] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full py-2.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white border border-[var(--rh-primary)] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <Download className="w-4 h-4" />
                   <span>Ekspor File CSV (Excel)</span>

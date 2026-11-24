@@ -6,6 +6,7 @@ import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
 import { AlertModalProvider } from '../hooks/useAlertModal';
 import '../index.css';
+import '../styles/product.css';
 import { Toaster } from "../components/ui/toaster";
 
 const dmSerif = DM_Serif_Display({

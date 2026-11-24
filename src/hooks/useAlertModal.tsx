@@ -43,41 +43,31 @@ interface AlertModalContextType {
 
 const AlertModalContext = createContext<AlertModalContextType | undefined>(undefined);
 
-const THEME: Record<AlertType, { icon: React.ReactNode; gradient: string; iconBg: string; buttonBg: string; accentColor: string }> = {
+const THEME: Record<AlertType, { icon: React.ReactNode; iconBg: string; buttonBg: string }> = {
   success: {
     icon: <CheckCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-emerald-500 to-teal-500',
-    iconBg: 'bg-gradient-to-br from-emerald-500 to-teal-500',
-    buttonBg: 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600',
-    accentColor: 'emerald',
+    iconBg: 'bg-emerald-700',
+    buttonBg: 'bg-emerald-700 hover:bg-emerald-800',
   },
   error: {
     icon: <XCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-red-500 to-rose-500',
-    iconBg: 'bg-gradient-to-br from-red-500 to-rose-500',
-    buttonBg: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600',
-    accentColor: 'red',
+    iconBg: 'bg-red-700',
+    buttonBg: 'bg-red-700 hover:bg-red-800',
   },
   warning: {
     icon: <WarningCircle className="w-7 h-7 text-white" />,
-    gradient: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-gradient-to-br from-amber-500 to-orange-500',
-    buttonBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
-    accentColor: 'amber',
+    iconBg: 'bg-amber-700',
+    buttonBg: 'bg-amber-700 hover:bg-amber-800',
   },
   info: {
     icon: <Info className="w-7 h-7 text-white" />,
-    gradient: 'from-blue-500 to-indigo-500',
-    iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-500',
-    buttonBg: 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
-    accentColor: 'blue',
+    iconBg: 'bg-blue-700',
+    buttonBg: 'bg-blue-700 hover:bg-blue-800',
   },
   upgrade: {
     icon: <Lock className="w-7 h-7 text-white" />,
-    gradient: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500',
-    buttonBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
-    accentColor: 'amber',
+    iconBg: 'bg-amber-700',
+    buttonBg: 'bg-amber-700 hover:bg-amber-800',
   },
 };
 
@@ -103,7 +93,7 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
 
   return (
     <div
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+      className="saas-scope rh-product rh-alert fixed inset-0 z-[99999] flex items-center justify-center p-4"
       onClick={handleBackdropClick}
       style={{ animation: 'alertFadeIn 0.2s ease-out' }}
     >
@@ -113,28 +103,28 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
       {/* Modal */}
       <div
         ref={modalRef}
-        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="rh-alert-title"
+        aria-describedby={alert.message ? 'rh-alert-message' : undefined}
+        className="relative bg-white rounded-xl border border-[var(--rh-line)] w-full max-w-sm overflow-hidden"
         style={{ animation: 'alertScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
-        {/* Top gradient accent bar */}
-        <div className={`h-1.5 bg-gradient-to-r ${theme.gradient}`} />
-
         {/* Content */}
-        <div className="px-7 pt-7 pb-6 text-center space-y-4">
+        <div className="px-7 pt-7 pb-6 text-left space-y-4">
           {/* Icon circle */}
-          <div className={`w-16 h-16 rounded-2xl ${theme.iconBg} flex items-center justify-center mx-auto shadow-lg`}
-            style={{ boxShadow: `0 8px 24px rgba(0,0,0,0.15)` }}
+          <div className={`w-9 h-9 rounded-lg ${theme.iconBg} flex items-center justify-center`}
           >
             {theme.icon}
           </div>
 
           {/* Text */}
           <div className="space-y-1.5">
-            <h3 className="text-lg font-bold text-zinc-900 tracking-tight">
+            <h3 id="rh-alert-title" className="text-lg font-semibold text-[var(--rh-ink)] tracking-tight">
               {alert.title}
             </h3>
             {alert.message && (
-              <p className="text-sm text-zinc-500 leading-relaxed">
+              <p id="rh-alert-message" className="text-sm text-[var(--rh-ink-2)] leading-relaxed">
                 {alert.message}
               </p>
             )}
@@ -152,7 +142,7 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
                 </button>
                 <button
                   onClick={() => { alert.onAction?.(); onClose(); }}
-                  className={`flex-[1.5] py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5`}
+                  className={`flex-[1.5] py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5`}
                 >
                   <ArrowUp className="w-3.5 h-3.5" />
                   Upgrade Sekarang
@@ -162,7 +152,7 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
               <button
                 onClick={() => { alert.onAction?.(); onClose(); }}
                 autoFocus
-                className={`w-full py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer`}
+                className={`w-full py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-lg transition-all cursor-pointer`}
               >
                 {alert.buttonText || 'Mengerti'}
               </button>

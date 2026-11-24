@@ -576,21 +576,21 @@ export default function SignUpView({
           </div>
 
           {/* Ringkasan Full Gratis */}
-          <div className="rounded-2xl border border-[#E6DDD2] bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-[var(--rh-line)] bg-white p-5 space-y-4">
             <div className="flex items-start justify-between gap-4 border-b border-[#EFE8DC] pb-4">
               <div>
                 <span className="inline-flex items-center rounded-full bg-[#E9F2EA] px-2.5 py-0.5 text-[12px] font-medium text-[#3F7A52]">
                   Full Gratis
                 </span>
-                <h3 className="mt-1.5 text-[17px] font-bold text-[#2A1E21]">
+                <h3 className="mt-1.5 text-[17px] font-bold text-[var(--rh-ink)]">
                   {groomName || '—'} &amp; {brideName || '—'}
                 </h3>
               </div>
               <div className="text-right">
-                <span className="block text-[12px] font-medium text-[#7D6F71]">
+                <span className="block text-[12px] font-medium text-[var(--rh-muted)]">
                   Total Biaya
                 </span>
-                <span className="text-[24px] font-extrabold text-[#2A1E21]">Rp 0</span>
+                <span className="text-[24px] font-extrabold text-[var(--rh-ink)]">Rp 0</span>
               </div>
             </div>
 
@@ -603,18 +603,18 @@ export default function SignUpView({
               ))}
             </ul>
 
-            <p className="flex items-center gap-2 text-[11.5px] text-[#6B5D54] pt-1">
+            <p className="flex items-center gap-2 text-[11.5px] text-[var(--rh-ink-2)] pt-1">
               <ShieldCheck className="h-4 w-4 shrink-0 text-[#B89047]" aria-hidden />
               Langsung aktif tanpa pembayaran. Tidak perlu kartu kredit.
             </p>
           </div>
 
           {/* Enterprise hint */}
-          <div className="rounded-xl border border-[#E6DDD2] bg-[#F8F5F0] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#6B5D54]">
+          <div className="rounded-xl border border-[var(--rh-line)] bg-[var(--rh-ivory)] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[var(--rh-ink-2)]">
             <span className="flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-[#7A2E3B]" />
+              <Building2 className="h-3.5 w-3.5 text-[var(--rh-primary)]" />
               Untuk WO / Perusahaan? Hubungi{' '}
-              <a href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`} className="font-bold text-[#7A2E3B] hover:underline">
+              <a href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`} className="font-bold text-[var(--rh-primary)] hover:underline">
                 {ENTERPRISE_CONTACT_EMAIL}
               </a>
             </span>
@@ -622,7 +622,7 @@ export default function SignUpView({
               <button
                 type="button"
                 onClick={onGotoEnterprise}
-                className="font-bold text-[#2A1E21] hover:underline cursor-pointer"
+                className="font-bold text-[var(--rh-ink)] hover:underline cursor-pointer"
               >
                 Portal Enterprise →
               </button>

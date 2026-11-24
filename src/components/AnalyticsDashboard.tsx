@@ -54,7 +54,7 @@ export default function AnalyticsDashboard({
             value: `${analytics?.viewsCount || 0}`,
             sub: 'Halaman undangan dibuka',
             icon: Eye,
-            accent: '#7A2E3B',
+            accent: 'var(--rh-primary)',
           },
           {
             label: 'Konfirmasi Hadir',
@@ -75,7 +75,7 @@ export default function AnalyticsDashboard({
             value: `${countAbsen} / ${countRagu}`,
             sub: 'Tidak hadir / belum pasti',
             icon: HelpCircle,
-            accent: '#6B5D54',
+            accent: 'var(--rh-ink-2)',
           },
         ].map((stat) => {
           const Icon = stat.icon;
@@ -85,15 +85,15 @@ export default function AnalyticsDashboard({
               className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-4"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[12px] font-semibold text-[#6B5D54]">
+                <span className="text-[12px] font-semibold text-[var(--rh-ink-2)]">
                   {stat.label}
                 </span>
                 <Icon className="h-4 w-4" style={{ color: stat.accent }} />
               </div>
-              <p className="mt-2.5 text-[26px] font-bold tracking-tight text-[#2A1E21] tabular-nums">
+              <p className="mt-2.5 text-[26px] font-bold tracking-tight text-[var(--rh-ink)] tabular-nums">
                 {stat.value}
               </p>
-              <p className="mt-0.5 text-[11.5px] text-[#7D6F71]">{stat.sub}</p>
+              <p className="mt-0.5 text-[11.5px] text-[var(--rh-muted)]">{stat.sub}</p>
             </div>
           );
         })}
@@ -103,8 +103,8 @@ export default function AnalyticsDashboard({
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         <div className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-5 lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-[13px] font-bold text-[#2A1E21]">
-              <BarChart3 className="h-4 w-4 text-[#7A2E3B]" />
+            <h3 className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
+              <BarChart3 className="h-4 w-4 text-[var(--rh-primary)]" />
               Trafik Kunjungan (7 Hari Terakhir)
             </h3>
             <span className="rounded-full bg-[#E9F2EA] px-2.5 py-0.5 text-[10.5px] font-bold text-[#3F7A52]">
@@ -132,7 +132,7 @@ export default function AnalyticsDashboard({
                 y1={chartHeight}
                 x2={chartWidth}
                 y2={chartHeight}
-                stroke="#E6DDD2"
+                stroke="var(--rh-line)"
                 strokeWidth="1"
               />
 
@@ -158,7 +158,7 @@ export default function AnalyticsDashboard({
                     <path
                       d={linePath}
                       fill="none"
-                      stroke="#7A2E3B"
+                      stroke="var(--rh-primary)"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     />
@@ -168,7 +168,7 @@ export default function AnalyticsDashboard({
                         cx={p.x}
                         cy={p.y}
                         r="3.5"
-                        fill="#7A2E3B"
+                        fill="var(--rh-primary)"
                         stroke="#FFFFFF"
                         strokeWidth="2"
                       />
@@ -179,14 +179,14 @@ export default function AnalyticsDashboard({
 
               <defs>
                 <linearGradient id="rh-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7A2E3B" />
-                  <stop offset="100%" stopColor="#7A2E3B" stopOpacity="0" />
+                  <stop offset="0%" stopColor="var(--rh-primary)" />
+                  <stop offset="100%" stopColor="var(--rh-primary)" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>
           </div>
 
-          <div className="flex justify-between px-1 font-mono text-[10px] font-semibold text-[#7D6F71]">
+          <div className="flex justify-between px-1 font-mono text-[10px] font-semibold text-[var(--rh-muted)]">
             {(analytics?.dailyTraffic || []).map((d, index) => (
               <span key={index}>{d.date}</span>
             ))}
@@ -195,13 +195,13 @@ export default function AnalyticsDashboard({
 
         {/* Visitor Logs */}
         <div className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-5 lg:col-span-4 space-y-4">
-          <h3 className="flex items-center gap-2 border-b border-[#F0E9DE] pb-3 text-[13px] font-bold text-[#2A1E21]">
-            <Clock className="h-4 w-4 text-[#7A2E3B]" />
+          <h3 className="flex items-center gap-2 border-b border-[#F0E9DE] pb-3 text-[13px] font-bold text-[var(--rh-ink)]">
+            <Clock className="h-4 w-4 text-[var(--rh-primary)]" />
             Aktivitas Pengunjung
           </h3>
 
           {!analytics?.visitorLogs || analytics.visitorLogs.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#DFD6C7] bg-[#F8F5F0] p-5 text-center text-[12px] text-[#6B5D54]">
+            <div className="rounded-xl border border-dashed border-[#DFD6C7] bg-[var(--rh-ivory)] p-5 text-center text-[12px] text-[var(--rh-ink-2)]">
               Belum ada aktivitas kunjungan tercatat.
             </div>
           ) : (
@@ -214,7 +214,7 @@ export default function AnalyticsDashboard({
                     className="flex items-start justify-between gap-2 rounded-xl border border-[#F2ECE2] bg-[#FCFBF8] p-2.5 text-[12px]"
                   >
                     <div className="flex items-start gap-2 min-w-0">
-                      <span className="mt-0.5 text-[#7D6F71]">
+                      <span className="mt-0.5 text-[var(--rh-muted)]">
                         {isMobile ? (
                           <Smartphone className="h-3.5 w-3.5" />
                         ) : (
@@ -222,15 +222,15 @@ export default function AnalyticsDashboard({
                         )}
                       </span>
                       <div className="min-w-0">
-                        <span className="block truncate font-semibold text-[#2A1E21]">
+                        <span className="block truncate font-semibold text-[var(--rh-ink)]">
                           {log.guestName || 'Tamu Umum'}
                         </span>
-                        <span className="text-[10.5px] text-[#7D6F71]">
+                        <span className="text-[10.5px] text-[var(--rh-muted)]">
                           {log.browser} · {log.device}
                         </span>
                       </div>
                     </div>
-                    <span className="shrink-0 font-mono text-[10px] text-[#7D6F71]">
+                    <span className="shrink-0 font-mono text-[10px] text-[var(--rh-muted)]">
                       {log.timestamp}
                     </span>
                   </div>
@@ -244,8 +244,8 @@ export default function AnalyticsDashboard({
       {/* ── RSVP & Wishes Table ── */}
       <div className="rounded-2xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_10px_30px_-16px_rgba(15,23,42,0.12)] p-5 space-y-4">
         <div className="flex items-center justify-between border-b border-[#F0E9DE] pb-3">
-          <h3 className="flex items-center gap-2 text-[13.5px] font-bold text-[#2A1E21]">
-            <MessageSquare className="h-4 w-4 text-[#7A2E3B]" />
+          <h3 className="flex items-center gap-2 text-[13.5px] font-bold text-[var(--rh-ink)]">
+            <MessageSquare className="h-4 w-4 text-[var(--rh-primary)]" />
             Konfirmasi RSVP &amp; Buku Ucapan ({rsvps.length})
           </h3>
         </div>
@@ -253,7 +253,7 @@ export default function AnalyticsDashboard({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-[#E6DDD2] bg-[#F8F5F0] text-[12px] font-medium text-[#6B5D54]">
+              <tr className="border-b border-[var(--rh-line)] bg-[var(--rh-ivory)] text-[12px] font-medium text-[var(--rh-ink-2)]">
                 <th className="px-4 py-2.5">Nama Tamu</th>
                 <th className="px-4 py-2.5">Status</th>
                 <th className="px-4 py-2.5 text-center">Pax</th>
@@ -264,8 +264,8 @@ export default function AnalyticsDashboard({
             <tbody className="divide-y divide-[#F0E9DE] text-[13px]">
               {rsvps.length > 0 ? (
                 rsvps.map((entry) => (
-                  <tr key={entry.id} className="transition hover:bg-[#F8F5F0]/70">
-                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-[#2A1E21]">
+                  <tr key={entry.id} className="transition hover:bg-[var(--rh-ivory)]/70">
+                    <td className="whitespace-nowrap px-4 py-3 font-semibold text-[var(--rh-ink)]">
                       {entry.guestName}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
@@ -288,17 +288,17 @@ export default function AnalyticsDashboard({
                         {entry.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center font-semibold text-[#2A1E21] tabular-nums">
+                    <td className="px-4 py-3 text-center font-semibold text-[var(--rh-ink)] tabular-nums">
                       {entry.paxCount}
                     </td>
-                    <td className="max-w-md px-4 py-3 text-[#54464A] leading-relaxed">
+                    <td className="max-w-md px-4 py-3 text-[var(--rh-ink-2)] leading-relaxed">
                       {entry.wishes || '—'}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         type="button"
                         onClick={() => onDeleteRSVP(entry.id)}
-                        className="inline-flex items-center justify-center rounded-lg border border-[#E6DDD2] p-1.5 text-[#7D6F71] transition hover:border-[#B03A3A]/30 hover:bg-[#F9E9E7] hover:text-[#B03A3A] cursor-pointer"
+                        className="inline-flex items-center justify-center rounded-lg border border-[var(--rh-line)] p-1.5 text-[var(--rh-muted)] transition hover:border-[#B03A3A]/30 hover:bg-[#F9E9E7] hover:text-[#B03A3A] cursor-pointer"
                         title="Hapus ucapan"
                         aria-label="Hapus ucapan"
                       >
@@ -309,7 +309,7 @@ export default function AnalyticsDashboard({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-[13px] text-[#7D6F71]">
+                  <td colSpan={5} className="px-4 py-10 text-center text-[13px] text-[var(--rh-muted)]">
                     Belum ada konfirmasi RSVP masuk. Bagikan tautan undangan Anda untuk mulai menerima ucapan.
                   </td>
                 </tr>

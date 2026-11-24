@@ -49,10 +49,10 @@ export default function SignInView({
           <Logo isLink={false} className="w-44" />
         </div>
         <span className="saas-kicker inline-flex">Workspace RuangHadir</span>
-        <h2 className="text-[30px] font-serif leading-tight text-[#2A1E21]">
+        <h2 className="text-[30px] font-serif leading-tight text-[var(--rh-ink)]">
           Selamat Datang Kembali
         </h2>
-        <p className="text-[13.5px] text-[#6B5D54]">
+        <p className="text-[13.5px] text-[var(--rh-ink-2)]">
           Masuk untuk mengelola undangan digital gratis Anda.
         </p>
       </div>
@@ -75,7 +75,7 @@ export default function SignInView({
           <button
             type="button"
             onClick={onGotoEnterprise}
-            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[#2A1E21] cursor-pointer"
+            className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[var(--rh-ink)] cursor-pointer"
             style={{ color: 'var(--saas-muted)' }}
           >
             <Building2 size={13} /> Enterprise
@@ -95,6 +95,7 @@ export default function SignInView({
               type="email"
               required
               id="signin-email"
+              autoComplete="email"
               value={loginEmail}
               onChange={(e) => onEmailChange(e.target.value)}
               className="saas-input pl-10"
@@ -113,6 +114,7 @@ export default function SignInView({
               type="password"
               required
               id="signin-password"
+              autoComplete="current-password"
               value={loginPassword}
               onChange={(e) => onPasswordChange(e.target.value)}
               className="saas-input pl-10"
@@ -122,7 +124,7 @@ export default function SignInView({
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-xs text-[#7A2E3B] bg-[#7A2E3B]/8 p-3.5 border border-[#7A2E3B]/25 rounded-xl">
+          <div role="alert" className="flex items-center gap-2 text-xs text-red-800 bg-red-50 p-3.5 border border-red-200 rounded-xl">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -162,13 +164,13 @@ export default function SignInView({
       </div>
 
       <div className="pt-1 text-center">
-        <p className="text-[13.5px] text-[#6B5D54]">
+        <p className="text-[13.5px] text-[var(--rh-ink-2)]">
           Belum memiliki akun?{' '}
           <button
             type="button"
             id="goto-signup"
             onClick={onGotoSignUp}
-            className="text-[#7A2E3B] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
+            className="text-[var(--rh-primary)] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
           >
             Daftar Gratis
           </button>
