@@ -26,3 +26,4 @@ desktop.ini
 scratch_*.html
 patch_*.cjs
 replace_*.cjs.artlab/
+.artlab/
