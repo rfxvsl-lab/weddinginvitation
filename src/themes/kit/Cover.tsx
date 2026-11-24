@@ -95,6 +95,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    pointerEvents: 'auto',
   };
 
   // ---------------- photo: foto penuh, sampul naik ke atas ----------------

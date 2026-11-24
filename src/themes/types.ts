@@ -181,6 +181,12 @@ export interface ThemeSpec {
   /** pola latar CSS (background-image), mis. data-URI SVG; opsional */
   pattern?: string;
   patternOpacity?: number;
+  /**
+   * Ornamen tepi tiap bagian (standar): 'flora' = lukisan bunga di sudut bagian,
+   * 'line' = cornerSvg di sudut bagian, 'none'. Default: flora bila floraArt diisi,
+   * line bila cornerSvg diisi.
+   */
+  ornament?: 'flora' | 'line' | 'none';
   /** ornamen pemisah antar bagian */
   divider: DividerPreset;
   /** SVG pemisah kustom (menggantikan preset) — gunakan currentColor */
