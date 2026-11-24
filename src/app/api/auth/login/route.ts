@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyUserPassword, checkBannedIp, updateUserIp } from '@/lib/db';
-import { attachSession, toClientUser } from '@/lib/server/auth';
+import { accountStatusResponse, attachSession, canEnter, toClientUser } from '@/lib/server/auth';
 import { handleRouteError, jsonError, limitOr429 } from '@/lib/server/http';
 import { getClientIp } from '@/lib/rateLimit';
 
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
 
     const user = await verifyUserPassword(email, password);
     if (!user) return jsonError('Email atau password salah.', 401);
+    if (!canEnter(user)) return accountStatusResponse(user);
 
     if (ip !== 'unknown') updateUserIp(user.id, ip).catch(() => {});
 

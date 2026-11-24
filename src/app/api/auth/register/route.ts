@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 import { createUser, checkSlugExists, checkEmailExists, checkBannedIp, updateUserAvatar } from '@/lib/db';
-import { attachSession, toClientUser } from '@/lib/server/auth';
+import { clearSession } from '@/lib/server/auth';
+import { notifyAdmin } from '@/lib/server/notify';
 import { verifyData } from '@/lib/server/session';
 import { validatePasswordStrength } from '@/lib/server/password';
 import { EMAIL_RE, RESERVED_SLUGS, handleRouteError, jsonError, limitOr429, normalizeSlug } from '@/lib/server/http';
@@ -22,6 +23,14 @@ export async function POST(req: Request) {
     const noWa = clean(body?.noWa, 20).replace(/[^\d+]/g, '');
     const sosmed = clean(body?.sosmed, 80);
     const activeSlug = normalizeSlug(body?.activeSlug || `${coupleGroom}-${coupleBride}`);
+    // Formulir Akses Awal (ditinjau admin). eventDate boleh kosong; city & referralSource wajib.
+    const eventDateRaw = clean(body?.eventDate, 10);
+    const application = {
+      eventDate: /^\d{4}-\d{2}-\d{2}$/.test(eventDateRaw) ? eventDateRaw : undefined,
+      city: clean(body?.city, 80) || undefined,
+      referralSource: clean(body?.referralSource, 80) || undefined,
+      note: clean(body?.note, 500) || undefined,
+    };
 
     // Identitas: Google (token dari server) atau email + password
     let email = clean(body?.email, 160).toLowerCase();
@@ -49,6 +58,9 @@ export async function POST(req: Request) {
     }
 
     if (!coupleGroom || !coupleBride) return jsonError('Nama panggilan kedua mempelai wajib diisi.');
+    if (eventDateRaw && !application.eventDate) return jsonError('Format tanggal acara tidak valid.');
+    if (!application.city) return jsonError('Kota acara wajib diisi.');
+    if (!application.referralSource) return jsonError('Mohon pilih dari mana Anda mengetahui RuangHadir.');
     if (!fullName) fullName = `${coupleGroom} & ${coupleBride}`;
     if (noWa.replace(/\D/g, '').length < 9) return jsonError('Nomor WhatsApp tidak valid.');
     if (activeSlug.length < 3) return jsonError('Tautan undangan minimal 3 karakter.');
@@ -80,14 +92,21 @@ export async function POST(req: Request) {
       ipAddress: ip === 'unknown' ? '' : ip,
       authProvider,
       avatarUrl,
+      accountStatus: 'pending',
+      application,
     } as any);
     if (avatarUrl) {
       await updateUserAvatar(user.id, avatarUrl).catch(() => {});
-      user.avatarUrl = avatarUrl;
     }
 
-    const res = NextResponse.json({ ok: true, user: toClientUser(user) }, { status: 201 });
-    return attachSession(res, user);
+    notifyAdmin('Pendaftar Akses Awal baru', `${fullName} (${email}) menunggu persetujuan.`, { userId: user.id }).catch(() => {});
+
+    // Kontrak A–B: 202 tanpa sesi dashboard; pendaftar menunggu persetujuan admin.
+    const res = NextResponse.json(
+      { success: true, accountStatus: 'pending', application: { fullName, email } },
+      { status: 202 }
+    );
+    return clearSession(res);
   } catch (err) {
     return handleRouteError('auth/register', err);
   }

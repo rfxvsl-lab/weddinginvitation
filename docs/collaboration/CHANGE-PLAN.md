@@ -1,5 +1,7 @@
 # Rencana perubahan — kontributor A dan B
 
+> Status terbaru 25 November: main59be0ad tetap; PR#3 draft codex/marketing-refinement. Marketing/Akses Awal/palet editor head6155f0c lulus QA A (room40). B mulai tahap dashboard pada alur berbagi tamu, scope room41–42; lihat B-DASHBOARD-GUESTS.md. Patch tamu6e6cdf0 dan koreksi ringkasan berikutnya (B-DASHBOARD-OVERVIEW.md) belum QA visual baru. Ringkasan memperbaiki tanggal sesi nonaktif dan feedback salin lintas proyek. Analitik berikutnya memperbaiki klaim live/rentang, istilah balasan/orang, palet dan akses data grafik (B-DASHBOARD-ANALYTICS.md); QA visual masih pending. Pemilih proyek memakai tokenpalet dan guard daftar kosong terisolasi (B-PROJECT-SWITCHER.md); parent sidebar sudah punya guard, bukan crash produksi terkonfirmasi. Belum merge/deploy.
+
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan
 dibedakan dari perubahan yang sudah diterapkan. Pemilik menjadi penghubung A–B.
@@ -64,7 +66,7 @@ hasilnya tidak boleh disebut pengujian akun produksi.
 | D-04 | Daftar tamu/analitik/paket konsisten | Draft token/presentasi; tambah/cari tamu fixture teruji | Tangani status distribusi, nomor kosong dan kontrak API pada pekerjaan terpisah |
 | D-05 | Perlindungan preview/font/harga dan scope CSS | Script batas lulus | Review silang diff sebelum merge |
 
-Semua kolom kontribusi A adalah **usulan B**, belum penugasan yang disepakati Claude. Jika A
+Kolom kontribusi A di atas merupakan rencana awal. Penugasan aktual: A backend whitelist/admin dan QA, B marketing/frontend auth serta dashboard frontend; lihat room terbaru. Jika A
 sudah mengerjakan area tertentu, pemilik meneruskan branch/commit dan file yang disentuh;
 B memeriksa diff sebelum melanjutkan di file yang sama.
 
@@ -73,7 +75,7 @@ B memeriksa diff sebelum melanjutkan di file yang sama.
 Catat ID pekerjaan, kontributor, sumber keputusan, baseline/branch/commit, bukti dan URL,
 alasan perubahan, file, status rencana/implementasi, hasil QA dan batasnya, serta pekerjaan
 lanjutan. Bedakan “dilarang pemilik”, “arahan A yang diteruskan pemilik”, dan “usulan B”.
-Tidak ada instruksi khusus A yang diterima saat dokumen ini ditulis.
+Catatan historis awal; usulan dan review A terbaru ada di ROOM-2026-11-25.md.
 
 ## Batas yang tetap berlaku
 

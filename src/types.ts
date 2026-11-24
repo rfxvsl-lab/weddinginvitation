@@ -179,6 +179,17 @@ export type UserPackageId =
   | 'premium'
   | 'luxury';
 
+/** Status akun Akses Awal: pendaftar baru menunggu persetujuan admin. */
+export type AccountStatus = 'pending' | 'approved' | 'rejected';
+
+/** Data formulir pendaftaran Akses Awal (disimpan untuk ditinjau admin). */
+export interface AccessApplication {
+  eventDate?: string;
+  city?: string;
+  referralSource?: string;
+  note?: string;
+}
+
 export interface SaaSUser {
   id: string;
   fullName: string;
@@ -201,6 +212,11 @@ export interface SaaSUser {
   companyDomain?: string;
   /** Password disimpan sebagai hash di server (Turso), tidak pernah di client */
   password?: string;
+  /** default 'approved' untuk akun lama */
+  accountStatus?: AccountStatus;
+  application?: AccessApplication;
+  reviewedAt?: string;
+  reviewNote?: string;
 }
 
 export interface EnterpriseAccessRecord {

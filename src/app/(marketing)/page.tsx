@@ -1,13 +1,27 @@
-import React from 'react';
-import { LandingNav } from '@/components/landing/LandingNav';
-import { LandingHero } from '@/components/landing/LandingHero';
-import { LandingThemes } from '@/components/landing/LandingThemes';
-import { LandingSteps } from '@/components/landing/LandingSteps';
-import { LandingFeatures } from '@/components/landing/LandingFeatures';
-import { LandingPricing } from '@/components/landing/LandingPricing';
-import { LandingFaq } from '@/components/landing/LandingFaq';
-import { LandingFooter } from '@/components/landing/LandingFooter';
-import { SaasVideoStudio } from '@/components/saas/SaasVideoStudio';
+import React from "react";
+import type { Metadata } from "next";
+import { LandingNav } from "@/components/landing/LandingNav";
+import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingThemes } from "@/components/landing/LandingThemes";
+import { LandingSteps } from "@/components/landing/LandingSteps";
+import { LandingFeatures } from "@/components/landing/LandingFeatures";
+import { LandingPricing } from "@/components/landing/LandingPricing";
+import { LandingFaq } from "@/components/landing/LandingFaq";
+import { LandingFooter } from "@/components/landing/LandingFooter";
+import { SaasVideoStudio } from "@/components/saas/SaasVideoStudio";
+import "@/components/landing/marketing.css";
+
+export const metadata: Metadata = {
+  title: "RuangHadir — Undangan pernikahan untuk cerita kalian",
+  description:
+    "Buat undangan pernikahan gratis dengan tema pilihan, tautan bernama tamu, RSVP, dan amplop digital. Siapkan undangan, bagikan, lalu sambut tamu di hari bahagia.",
+  openGraph: {
+    title: "RuangHadir — Undangan pernikahan untuk cerita kalian",
+    description:
+      "Lihat contoh tema, buat undangan gratis, dan kelola konfirmasi kehadiran dalam satu tempat.",
+    type: "website",
+  },
+};
 
 export default function LandingPage() {
   return (
@@ -19,7 +33,7 @@ export default function LandingPage() {
         Lewati ke konten
       </a>
       <LandingNav />
-      <main id="konten">
+      <div id="konten" tabIndex={-1}>
         <LandingHero />
         <LandingThemes />
         <LandingSteps />
@@ -27,7 +41,7 @@ export default function LandingPage() {
         <SaasVideoStudio />
         <LandingPricing />
         <LandingFaq />
-      </main>
+      </div>
       <LandingFooter />
     </div>
   );

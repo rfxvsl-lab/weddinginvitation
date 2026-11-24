@@ -6,38 +6,37 @@ import { THEME_SHOTS } from "./themeShots";
 
 export function LandingHero() {
   return (
-    <section className="rh-marketing-hero">
+    <section className="rh-marketing-hero" aria-labelledby="marketing-title">
       <div className="rh-hero-copy">
-        <p className="rh-eyebrow">Ada hari baik yang ingin dibagikan.</p>
-        <h1>
-          Undang orang tersayang.
+        <p className="rh-eyebrow">UNDANGAN PERNIKAHAN DIGITAL</p>
+        <h1 id="marketing-title">
+          Hari bahagia kalian,
           <br />
-          <span>Rayakan cerita kalian.</span>
+          <span>dimulai dari sini.</span>
         </h1>
         <p>
-          Pilih tema yang terasa seperti kalian, tulis cerita dan jadwalnya,
-          lalu kirim undangan dengan nama setiap tamu. Dari kabar bahagia sampai
-          hari H, siapkan di RuangHadir.
+          Daftar Akses Awal yang terasa seperti kalian. Pilih tema, lengkapi
+          cerita dan acara, lalu bagikan tautan dengan nama setiap tamu.
         </p>
         <div className="rh-hero-actions">
           <Link
             href="/auth?mode=register"
             className="rh-action rh-action-primary"
           >
-            Buat undangan gratis
+            Daftar Akses Awal
             <ArrowRight size={17} aria-hidden />
           </Link>
-          <Link href="/preview" className="rh-text-link">
-            Lihat semua tema
-          </Link>
+          <a href="#tema" className="rh-text-link">
+            Lihat pilihan tema
+          </a>
         </div>
         <p className="rh-hero-footnote">
-          Rp0 untuk pasangan · Semua tema · Tanpa watermark
+          Rp0 · Pendaftaran ditinjau sebelum akun diaktifkan
         </p>
       </div>
       <div className="rh-hero-showcase">
         <div className="rh-showcase-caption">
-          <span>Koleksi undangan</span>
+          <span>Sepotong cerita kalian</span>
           <span>01 / Sage Garden</span>
         </div>
         <Link
@@ -49,18 +48,18 @@ export function LandingHero() {
             src={THEME_SHOTS["sage-garden"]}
             alt="Tampilan asli tema Sage Garden dari RuangHadir"
             fill
-            sizes="(max-width: 640px) 260px, 300px"
+            sizes="240px"
             priority
             className="object-cover object-top"
           />
         </Link>
         <div className="rh-showcase-note">
-          <span>Untuk setiap tamu,</span>
-          <strong>sapaan yang lebih personal.</strong>
-          <p>Satu tautan, lengkap dengan nama mereka.</p>
+          <span>Dari koleksi RuangHadir</span>
+          <strong>Sage Garden</strong>
+          <p>Nuansa taman untuk kabar bahagia.</p>
         </div>
-        <Link href="/preview" className="rh-showcase-link">
-          Temukan tema kalian
+        <Link href="/preview/sage-garden" className="rh-showcase-link">
+          Buka contoh undangan
           <ArrowRight size={16} aria-hidden />
         </Link>
       </div>

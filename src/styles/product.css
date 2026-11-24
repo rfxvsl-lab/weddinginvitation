@@ -781,3 +781,9 @@
     animation: none !important;
   }
 }
+
+/* Programmatic auth headings keep focus semantics without a decorative ring.
+   Keep this unlayered to override the existing unlayered global focus rule. */
+.rh-product.rh-auth :is(h1, h2)[tabindex="-1"]:focus-visible {
+  outline: none;
+}

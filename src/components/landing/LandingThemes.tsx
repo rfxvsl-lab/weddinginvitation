@@ -1,97 +1,132 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { DEFAULT_THEMES } from '@/data/defaultData';
-import { THEME_CATEGORY_LABEL } from './themeShots';
-import { themeShot } from '@/themes/shots';
-import { isNewTheme } from '@/themes/catalog';
+import React, { useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+import { DEFAULT_THEMES } from "@/data/defaultData";
+import { THEME_CATEGORY_LABEL } from "./themeShots";
+import { themeShot } from "@/themes/shots";
+import { isNewTheme } from "@/themes/catalog";
 
-const FILTERS: [string, string][] = [
-  ['all', 'Semua'],
-  ['special', 'Spesial 2.5D'],
-  ['classic', 'Klasik & adat'],
-  ['modern', 'Modern'],
-  ['floral', 'Floral'],
-  ['minimalist', 'Minimalis'],
-  ['storybook', 'Interaktif'],
+const FILTERS = [
+  ["all", "Pilihan awal"],
+  ["special", "Spesial 2.5D"],
+  ["classic", "Klasik & adat"],
+  ["modern", "Modern"],
+  ["floral", "Floral"],
+  ["minimalist", "Minimalis"],
+  ["storybook", "Interaktif"],
+] as const;
+const FEATURED = [
+  "sage-garden",
+  "javanese-classic",
+  "royal-arabian",
+  "grand-ballroom",
+  "storybook",
+  "rfx-dark",
 ];
 
 export function LandingThemes() {
-  const [filter, setFilter] = useState('all');
-  const themes = useMemo(
-    () => {
-      const sorted = [...DEFAULT_THEMES].sort(
-        (a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || '')
+  const [filter, setFilter] = useState<string>("all");
+  const matching = useMemo(() => {
+    const sorted = [...DEFAULT_THEMES].sort(
+      (a, b) =>
+        Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) ||
+        (b.addedAt || "").localeCompare(a.addedAt || ""),
+    );
+    if (filter !== "all")
+      return sorted.filter((theme) =>
+        filter === "special"
+          ? theme.tier === "special"
+          : theme.pattern === filter,
       );
-      return filter === 'all' ? sorted : sorted.filter((t) => (filter === 'special' ? t.tier === 'special' : t.pattern === filter));
-    },
-    [filter]
-  );
+    const picks = FEATURED.flatMap(
+      (id) => DEFAULT_THEMES.find((theme) => theme.id === id) || [],
+    );
+    return [
+      ...picks,
+      ...sorted.filter((theme) => !FEATURED.includes(theme.id)),
+    ];
+  }, [filter]);
+  const shown = matching.slice(0, 6);
 
   return (
-    <section id="tema" className="scroll-mt-20 border-t border-[var(--rh-line)] bg-[var(--rh-paper)]">
-      <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-24">
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-[560px]">
-            <h2 className="text-[36px] leading-[1.08] sm:text-[44px]">
-              {DEFAULT_THEMES.length} tema, semuanya gratis dipakai.
-            </h2>
-            <p className="mt-4 text-[16px] leading-[1.65] text-[var(--rh-ink-2)]">
-              Buka setiap tema dalam ukuran penuh sebelum memilih. Tema bisa diganti kapan saja tanpa mengetik ulang data acara.
-            </p>
+    <section
+      id="tema"
+      className="rh-theme-section"
+      aria-labelledby="themes-heading"
+    >
+      <div className="rh-marketing-container">
+        <div className="rh-marketing-section-heading">
+          <div>
+            <p className="rh-eyebrow">TEMA UNTUK CERITA KALIAN</p>
+            <h2 id="themes-heading">Temukan yang terasa pas.</h2>
           </div>
-
-          <div role="tablist" aria-label="Filter kategori tema" className="flex flex-wrap gap-2">
-            {FILTERS.map(([key, label]) => {
-              const active = filter === key;
-              return (
-                <button
-                  key={key}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setFilter(key)}
-                  className={`rounded-full border px-4 py-2 text-[13.5px] font-medium transition-colors ${
-                    active
-                      ? 'border-[var(--rh-ink)] bg-[var(--rh-ink)] text-white'
-                      : 'border-[var(--rh-line-strong)] bg-white text-[var(--rh-ink-2)] hover:border-[var(--rh-ink)]'
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <p>
+            Dari nuansa adat sampai taman yang hangat. Buka contoh undangannya,
+            rasakan setiap detailnya.
+          </p>
         </div>
-
-        <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:gap-x-8">
-          {themes.map((t) => (
-            <li key={t.id}>
-              <Link href={`/preview/${t.id}`} className="group block focus-visible:outline-offset-4">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[var(--rh-line)] bg-[var(--rh-linen)]">
-                  {isNewTheme(t.addedAt) && (
-                    <span className="absolute left-3 top-3 z-10 rounded-full bg-[var(--rh-wine)] px-2.5 py-1 text-[11.5px] font-semibold text-white">Baru</span>
-                  )}
-                  {t.tier === 'special' && (
-                    <span className="absolute right-3 top-3 z-10 rounded-full bg-[var(--rh-ink)] px-2.5 py-1 text-[11.5px] font-semibold text-[#E9D3A6]">Spesial · 2.5D</span>
-                  )}
+        <div
+          role="group"
+          aria-label="Filter kategori tema"
+          className="rh-theme-filters"
+        >
+          {FILTERS.map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={filter === key}
+              aria-controls="marketing-theme-list"
+              onClick={() => setFilter(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <p className="rh-theme-count" role="status">
+          {filter === "all"
+            ? `${shown.length} pilihan dari ${DEFAULT_THEMES.length} tema`
+            : `${shown.length} dari ${matching.length} tema ${FILTERS.find(([key]) => key === filter)?.[1]}`}
+          {" · Semua tersedia dalam Akses Awal"}
+        </p>
+        <ul id="marketing-theme-list" className="rh-theme-grid">
+          {shown.map((theme) => (
+            <li key={theme.id}>
+              <Link href={`/preview/${theme.id}`} className="rh-theme-card">
+                <div className="rh-theme-image">
                   <Image
-                    src={themeShot(t.id)}
-                    alt={`Pratinjau tema ${t.name}`}
+                    src={themeShot(theme.id)}
+                    alt={`Contoh tema ${theme.name}`}
                     fill
-                    sizes="(max-width: 768px) 45vw, 380px"
-                    className="object-cover object-top transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                    sizes="(max-width: 599px) 85vw, (max-width: 899px) 44vw, 350px"
+                    className="object-cover object-top"
                   />
+                  <span className="rh-theme-open">
+                    Buka contoh <ArrowRight size={15} aria-hidden />
+                  </span>
                 </div>
-                <div className="mt-3 flex items-baseline justify-between gap-3">
-                  <h3 className="text-[15px] font-semibold text-[var(--rh-ink)] group-hover:text-[var(--rh-wine)]">{t.name}</h3>
-                  <span className="shrink-0 text-[12.5px] text-[var(--rh-muted)]">{THEME_CATEGORY_LABEL[t.pattern] || 'Tema'}</span>
+                <div className="rh-theme-caption">
+                  <h3>{theme.name}</h3>
+                  <span>{THEME_CATEGORY_LABEL[theme.pattern] || "Tema"}</span>
                 </div>
               </Link>
             </li>
           ))}
         </ul>
+        {shown.length === 0 && (
+          <p className="rh-theme-empty">
+            Belum ada tema di kategori ini. Coba kategori lainnya.
+          </p>
+        )}
+        <div className="rh-theme-footer">
+          <p>Data acara tetap tersimpan saat kalian mengganti tema.</p>
+          <Link href="/preview" className="rh-action">
+            Jelajahi semua {DEFAULT_THEMES.length} tema{" "}
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+        </div>
       </div>
     </section>
   );

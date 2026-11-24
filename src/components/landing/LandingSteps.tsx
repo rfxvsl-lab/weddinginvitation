@@ -1,36 +1,44 @@
-import React from 'react';
+import React from "react";
 
 const STEPS = [
   {
-    title: 'Daftar dan pilih tema',
-    body: 'Buat akun dengan email atau Google. Tautan undangan langsung jadi, misalnya ruanghadir.net/rian-salsa.',
+    title: "Siapkan undangannya",
+    body: "Setelah Akses Awal disetujui, pilih tema dan lengkapi nama, jadwal, lokasi, serta foto. Lihat hasilnya sambil mengisi.",
   },
   {
-    title: 'Isi data acara',
-    body: 'Nama mempelai, jadwal akad dan resepsi, lokasi Google Maps, foto, musik, dan rekening amplop. Pratinjau berubah saat Anda mengetik.',
+    title: "Bagikan kabar baiknya",
+    body: "Tambahkan nama tamu, terbitkan undangan, lalu salin tautan personal atau buka pesan pengantarnya di WhatsApp.",
   },
   {
-    title: 'Kirim ke setiap tamu',
-    body: 'Masukkan daftar tamu, lalu kirim tautan bernama lewat WhatsApp. Konfirmasi kehadiran masuk ke dashboard secara langsung.',
+    title: "Sambut orang tersayang",
+    body: "Baca konfirmasi kehadiran dan ucapan dari tamu. Di hari H, gunakan check in QR untuk mencatat kedatangan.",
   },
 ];
 
 export function LandingSteps() {
   return (
-    <section id="cara-kerja" className="scroll-mt-20">
-      <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-24">
-        <h2 className="max-w-[640px] text-[36px] leading-[1.08] sm:text-[44px]">
-          Siap dibagikan dalam satu sore.
-        </h2>
-
-        <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="border-t border-[var(--rh-ink)] pt-6">
-              <span className="rh-display block text-[44px] leading-none text-[var(--rh-gold)]" aria-hidden>
-                {i + 1}
-              </span>
-              <h3 className="mt-5 text-[18px]">{s.title}</h3>
-              <p className="mt-2.5 text-[15px] leading-[1.65] text-[var(--rh-ink-2)]">{s.body}</p>
+    <section
+      id="cara-kerja"
+      className="rh-steps-section"
+      aria-labelledby="steps-heading"
+    >
+      <div className="rh-marketing-container">
+        <div className="rh-marketing-section-heading">
+          <div>
+            <p className="rh-eyebrow">DARI PERSIAPAN SAMPAI HARI H</p>
+            <h2 id="steps-heading">Satu tempat, tiga langkah.</h2>
+          </div>
+          <p>
+            Agar kabar bahagia sampai ke setiap tamu, dan kalian punya lebih
+            banyak waktu untuk menyiapkan harinya.
+          </p>
+        </div>
+        <ol className="rh-steps-list">
+          {STEPS.map((step, index) => (
+            <li key={step.title}>
+              <span aria-hidden>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
             </li>
           ))}
         </ol>

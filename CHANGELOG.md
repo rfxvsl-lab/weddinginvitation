@@ -7,6 +7,13 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [Belum dirilis] — Akses Awal (whitelist pendaftaran)
+
+- Pendaftaran baru masuk daftar tunggu (`account_status = pending`) dan tidak langsung ke dashboard. Akun lama otomatis disetujui.
+- Login/Google untuk akun yang belum disetujui mengembalikan 403 berisi status; `/api/auth/me` 401.
+- Admin meninjau di `/admin/akses-awal` (API `/api/admin/applications`) lalu mengabari lewat WhatsApp atau email.
+- Kontrak lengkap: `docs/collaboration/A-AKSES-AWAL.md`.
+
 ## [3.8.0] — 2026-11-24 — Standar kompetitor untuk semua tema + sistem visual aplikasi
 
 - **Standar tema** (`docs/themes/STANDARD.md`): semua tema reguler memakai alur yang lazim di template premium (Katsudoto, Satu Momen, Viding/Invitato): kutipan berfoto → mempelai → save the date di atas foto → acara dengan baris tanggal klasik → kisah bergaris waktu → galeri + lightbox → kartu rekening → RSVP → ringkasan & daftar ucapan → penutup berfoto. Bunga tidak lagi ditempel di setiap kartu; ornamen hanya di tepi bagian (`ornament`: flora / line / none).
