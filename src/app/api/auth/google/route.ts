@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getUserByEmail, checkBannedIp, updateUserIp } from '@/lib/db';
-import { attachSession, toClientUser } from '@/lib/server/auth';
+import { accountStatusResponse, attachSession, canEnter, toClientUser } from '@/lib/server/auth';
 import { verifyGoogleCredential } from '@/lib/server/google';
 import { signData } from '@/lib/server/session';
 import { handleRouteError, jsonError, limitOr429 } from '@/lib/server/http';
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
 
     const user = await getUserByEmail(identity.email);
     if (user) {
+      if (!canEnter(user)) return accountStatusResponse(user);
       if (ip !== 'unknown') updateUserIp(user.id, ip).catch(() => {});
       return attachSession(NextResponse.json({ ok: true, user: toClientUser(user) }), user);
     }
