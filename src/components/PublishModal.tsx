@@ -69,8 +69,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   // If publish not allowed (demo), show upgrade prompt
   if (!publishAllowed) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-xl flex items-center justify-center p-4 z-[300] animate-fadeIn">
-        <div className="bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
+      <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
+        <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
           <button
             onClick={onClose}
             className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
@@ -95,8 +95,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-xl flex items-center justify-center p-4 z-[300] animate-fadeIn overflow-y-auto">
-      <div className="bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative my-8 border border-white/50">
+    <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
+      <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative border border-white/50">
         
         {/* Close Button */}
         <button
