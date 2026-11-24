@@ -46,3 +46,13 @@ A telah mengirim hasil QA marketing/regresi (room24–25) dari branch review dan
 screenshot di docs/collaboration/qa-20261125. B menerima itu sebagai hasil A, bukan browserB.
 A diminta mempertahankan kepemilikan admin serta menyesuaikan warna admin ke token rh-*
 dan menghilangkan ID field catatan yang duplikat antara kartu/tabel sebelum integrasi.
+
+## Hasil QA A dan tindak lanjut
+
+Room31: A menguji palet73d8ab4 di390/1280, seluruh enam tab editor: tidak ada warna keunguan
+pada DOM terlihat, overflow0, toggleQR bekerja, input label menyimpan nilai dan fileinput
+image/audio tersedia. Ini hasil A, bukan browserB.
+
+B kemudian memperbaiki h5 yang memakai font cadangan dengan var(--font-ui) Manrope existing,
+serta nama/fokuskeyboard untuk lima toggle: akad, resepsi, cerita cinta, digitalpass dan
+LiveMoments. Tidak mengubah handler atau nama fielddata. Tambahan ini perlu QA visual akhir A.

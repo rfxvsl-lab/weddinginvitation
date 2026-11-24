@@ -20,8 +20,20 @@ presentasi; pengecualian yang disengaja adalah kondisi !open untuk CTA header.
 Usulan rendah prioritas field sumber “Lainnya” dan perbedaan copy pending saat login
 belum diimplementasikan. Keduanya tetap dicatat, tanpa menambah field backend secara diam-diam.
 
-A diminta merevisi patch admin8a79906 karena warna hex di file tersebut tidak sama dengan
-palet product.css, serta ID note-user terduplikasi ketika kartu/tabel dirender bersama.
-Patch admin belum dimasukkan sampai revisi ditinjau.
+A telah merevisi patch admin pada6adb87c: seluruh warna memakai rh-* dengan root rh-product,
+dan ID catatan dibedakan note-card/note-table. B meninjau lalu menggabungkan8a79906+6adb87c
+beserta dokumen/screenshot A ke kandidat PR, tanpa merge main.
 
 Validasi B: TypeScript, batas preview/font/paket dan build Node22 source final lulus. Pemeriksaan visual akhir perubahan baru ini masih diminta dari A.
+
+## Cek ulang A dan koreksi fokus
+
+Room33: A menguji c94fa70 dan melaporkan inputflush, CTAkontras, footer, menu tunggal serta
+overflow lulus. Outline judul masih terlihat karena aturan global tanpa layer mengalahkan
+utilitas Tailwind. B mengoreksi source dengan aturan tanpa layer di product.css, khusus
+`.rh-product.rh-auth :is(h1,h2)[tabindex="-1"]:focus-visible`. Fokus tetap dipindahkan ke
+judul; outline tombol/link/input tetap. Koreksi CSS terakhir menunggu cek visual A.
+
+Editor E1/E2 dari room31 juga ditangani: h5 memakai var(--font-ui) existing Manrope; lima
+toggle punya nama aksesibel sesuai field dan ring primary pada keyboard focus. Callback,
+checked/value serta statebinding lain dibandingkan AST dan sama. URLmonospace tidak diubah.

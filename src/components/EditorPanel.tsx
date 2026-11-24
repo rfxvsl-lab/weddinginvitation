@@ -378,7 +378,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
                 <div className="flex items-center gap-2 border-b border-[var(--rh-line)] pb-2.5">
                   <span className="bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
-                  <h5 className="font-bold text-[var(--rh-ink)] text-sm">Mempelai Pria (Groom)</h5>
+                  <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-sm">Mempelai Pria (Groom)</h5>
                 </div>
 
                 <div className="space-y-3">
@@ -496,7 +496,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
                 <div className="flex items-center gap-2 border-b border-[var(--rh-line)] pb-2.5">
                   <span className="bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] text-[10px] font-bold px-2 py-0.5 rounded-full">Wanita</span>
-                  <h5 className="font-bold text-[var(--rh-ink)] text-sm">Mempelai Wanita (Bride)</h5>
+                  <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-sm">Mempelai Wanita (Bride)</h5>
                 </div>
 
                 <div className="space-y-3">
@@ -630,18 +630,18 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
 
                 <div className="flex items-center justify-between border-b border-[var(--rh-line)] pb-2.5">
-                  <h5 className="font-bold text-[var(--rh-ink-2)] font-bold text-xs flex items-center gap-1.5">
+                  <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink-2)] font-bold text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 1: Akad Nikah
                   </h5>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
-                      type="checkbox"
+                      type="checkbox" aria-label="Tampilkan akad nikah"
                       className="sr-only peer"
                       checked={data?.events?.akad?.enabled !== false}
                       onChange={(e) => updateAkad('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
@@ -716,18 +716,18 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
 
                 <div className="flex items-center justify-between border-b border-[var(--rh-line)] pb-2.5">
-                  <h5 className="font-bold text-[var(--rh-ink-2)] text-xs flex items-center gap-1.5">
+                  <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink-2)] text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 2: Resepsi Pernikahan
                   </h5>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
-                      type="checkbox"
+                      type="checkbox" aria-label="Tampilkan resepsi pernikahan"
                       className="sr-only peer"
                       checked={data?.events?.resepsi?.enabled !== false}
                       onChange={(e) => updateResepsi('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
@@ -811,12 +811,12 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
-                  type="checkbox"
+                  type="checkbox" aria-label="Tampilkan cerita cinta"
                   checked={data?.showLoveStories !== false}
                   onChange={(e) => onChange({ ...data, showLoveStories: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
@@ -964,12 +964,12 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
-                  type="checkbox"
+                  type="checkbox" aria-label="Tampilkan kode QR tamu"
                   checked={data.enableDigitalPass !== false}
                   onChange={(e) => onChange({ ...data, enableDigitalPass: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
@@ -1004,17 +1004,17 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
-                  type="checkbox"
+                  type="checkbox" aria-label="Aktifkan Live Moments"
                   checked={data.enableLiveMoments !== false}
                   onChange={(e) => onChange({ ...data, enableLiveMoments: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
             <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
 
-              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
+              <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                 <ImageSquare className="w-4 h-4 text-[var(--rh-primary)]" /> Gambar Sampul & Latar Belakang (OG & BG Image)
               </h5>
               
@@ -1122,7 +1122,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             {/* MUSIC SECTION WITH CUSTOM AUDIO FILE UPLOADER */}
             <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
 
-              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
+              <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Musik Pengiring Pernikahan (Audio MP3/WAV)
               </h5>
 
@@ -1203,7 +1203,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             {/* ITUNES / APPLE MUSIC SEARCH */}
             <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
 
-              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
+              <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Cari Lagu dari Apple Music / iTunes
               </h5>
               <p className="text-[10px] text-[var(--rh-muted)] leading-relaxed">
@@ -1288,7 +1288,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             {/* NOVELTY GRID GALLERY DETAILS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
+                <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                   <Image className="w-4 h-4" /> Daftar Foto Prewedding (Tautan URL)
                 </h5>
                 <button
@@ -1521,7 +1521,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
 
               <div className="border-t border-[var(--rh-line)] pt-4">
-                <h5 className="font-bold text-[var(--rh-ink)] text-xs mb-3 flex items-center gap-1.5">
+                <h5 className="font-[family-name:var(--font-ui)] font-bold text-[var(--rh-ink)] text-xs mb-3 flex items-center gap-1.5">
                   <Timer className="w-3.5 h-3.5 text-[var(--rh-ink-2)]" />
                   Waktu Hitung Mundur (Countdown Target)
                 </h5>
