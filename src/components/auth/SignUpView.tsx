@@ -169,7 +169,7 @@ export default function SignUpView(props: SignUpViewProps) {
               <input
                 id="signup-city"
                 required
-                maxLength={100}
+                maxLength={80}
                 autoComplete="address-level2"
                 value={props.city}
                 onChange={(e) => props.onCityChange(e.target.value)}
@@ -346,7 +346,7 @@ export default function SignUpView(props: SignUpViewProps) {
               <p className="mt-2 text-[var(--rh-ink-2)]">
                 Semua tema, tamu tanpa batas, RSVP, amplop digital, dan check in
                 QR. Hingga {PACKAGE_LIMITS.free.maxProjects} undangan, aktif{" "}
-                {PACKAGE_LIMITS.free.activeDays} hari sejak persetujuan.
+                {PACKAGE_LIMITS.free.activeDays} hari sejak undangan diaktifkan.
               </p>
               <p className="mt-3 text-[var(--rh-ink-2)]">
                 Tim meninjau pendaftaran terlebih dahulu. Kami akan mengabari

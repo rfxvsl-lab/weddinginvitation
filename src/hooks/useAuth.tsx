@@ -1,20 +1,29 @@
-'use client';
+"use client";
 
 /**
  * useAuth — state autentikasi di client.
  *
  * Sumber kebenaran adalah cookie sesi httpOnly yang ditandatangani server
- * (`/api/auth/*`). localStorage hanya dipakai sebagai cache tampilan agar
- * dashboard tidak berkedip saat refresh — selalu diverifikasi ulang ke `/api/auth/me`.
+ * (`/api/auth/*`). Dashboard baru dibuka setelah identitas server diverifikasi.
+ * Cache lama tidak dipakai untuk memberi akses pada akun yang belum disetujui.
  */
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import type { SaaSUser, TransactionReport } from '../types';
-import * as api from '../lib/api';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
+import type { SaaSUser, TransactionReport } from "../types";
+import * as api from "../lib/api";
 
-const CACHE_KEY = 'saas_current_user';
+const CACHE_KEY = "saas_current_user";
 
-export type ClientUser = SaaSUser & { isAdmin?: boolean };
+export type ClientUser = SaaSUser & {
+  isAdmin?: boolean;
+  accountStatus?: "pending" | "approved" | "rejected";
+};
 
 export interface GoogleSignupInfo {
   unverifiedEmail: string;
@@ -23,13 +32,23 @@ export interface GoogleSignupInfo {
   signupToken: string;
 }
 
-export type RegisterInput = Omit<SaaSUser, 'id' | 'registeredAt'> & {
+export interface AccountApplication {
+  accountStatus: "pending" | "rejected";
+  application?: { fullName?: string; email?: string };
+}
+
+export type RegisterInput = Omit<SaaSUser, "id" | "registeredAt"> & {
+  eventDate?: string;
+  city?: string;
+  referralSource?: string;
   password?: string;
   googleSignupToken?: string;
 };
 
 interface AuthContextType {
   currentUser: ClientUser | null;
+  application: AccountApplication | null;
+  clearApplication: () => void;
   isLoading: boolean;
   /** true setelah sesi server selesai diverifikasi */
   isReady: boolean;
@@ -37,7 +56,9 @@ interface AuthContextType {
   allUsers: SaaSUser[];
   allTransactions: TransactionReport[];
   login: (email: string, password: string) => Promise<ClientUser | null>;
-  loginWithGoogle: (credential: string) => Promise<ClientUser | GoogleSignupInfo | null>;
+  loginWithGoogle: (
+    credential: string,
+  ) => Promise<ClientUser | GoogleSignupInfo | null>;
   register: (userData: RegisterInput) => Promise<ClientUser | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<ClientUser | null>;
@@ -54,34 +75,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function postJson<T = any>(url: string, body?: unknown): Promise<{ ok: boolean; status: number; data: T }> {
+async function postJson<T = any>(
+  url: string,
+  body?: unknown,
+): Promise<{ ok: boolean; status: number; data: T }> {
   const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'same-origin',
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, data };
 }
 
-function readCache(): ClientUser | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const parsed = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    return parsed?.id ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<ClientUser | null>(() => readCache());
+  const [currentUser, setCurrentUserState] = useState<ClientUser | null>(null);
+  const [application, setApplication] = useState<AccountApplication | null>(
+    null,
+  );
+  const clearApplication = useCallback(() => setApplication(null), []);
   const [isLoading, setIsLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState<SaaSUser[]>([]);
-  const [allTransactions, setAllTransactions] = useState<TransactionReport[]>([]);
+  const [allTransactions, setAllTransactions] = useState<TransactionReport[]>(
+    [],
+  );
 
   const setCurrentUser = useCallback((user: ClientUser | null) => {
     setCurrentUserState(user);
@@ -95,20 +115,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const res = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
-      if (res.status === 401) {
+      const res = await fetch("/api/auth/me", {
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      if (res.status === 401 || res.status === 403) {
         setCurrentUser(null);
         return null;
       }
       const data = await res.json();
-      if (data?.user) {
+      if (
+        data?.user &&
+        (!data.user.accountStatus ||
+          data.user.accountStatus === "approved" ||
+          data.user.isAdmin === true)
+      ) {
         setCurrentUser(data.user);
         return data.user as ClientUser;
       }
+      setCurrentUser(null);
       return null;
     } catch {
-      // Offline: pertahankan cache tampilan, server tetap menolak aksi tanpa sesi.
-      return readCache();
+      // Never enter the dashboard from an unverified local cache.
+      setCurrentUser(null);
+      return null;
     } finally {
       setIsReady(true);
     }
@@ -119,75 +149,139 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void refreshUser();
   }, [refreshUser]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { ok, data } = await postJson('/api/auth/login', { email, password });
-      if (!ok || !data?.user) {
-        setError(data?.error || 'Email atau password salah.');
+  const login = useCallback(
+    async (email: string, password: string) => {
+      setIsLoading(true);
+      setError(null);
+      setApplication(null);
+      try {
+        const { ok, data } = await postJson("/api/auth/login", {
+          email,
+          password,
+        });
+        if (
+          data?.accountStatus === "pending" ||
+          data?.accountStatus === "rejected"
+        ) {
+          setApplication({
+            accountStatus: data.accountStatus,
+            application: data.application,
+          });
+          setCurrentUser(null);
+          return null;
+        }
+        if (
+          !ok ||
+          !data?.user ||
+          (data.user.accountStatus &&
+            data.user.accountStatus !== "approved" &&
+            data.user.isAdmin !== true)
+        ) {
+          setCurrentUser(null);
+          setError(data?.error || "Email atau password salah.");
+          return null;
+        }
+        setCurrentUser(data.user);
+        return data.user as ClientUser;
+      } catch {
+        setError("Gagal terhubung. Periksa koneksi internet Anda.");
         return null;
+      } finally {
+        setIsLoading(false);
       }
-      setCurrentUser(data.user);
-      return data.user as ClientUser;
-    } catch {
-      setError('Gagal terhubung. Periksa koneksi internet Anda.');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [setCurrentUser]);
+    },
+    [setCurrentUser],
+  );
 
-  const loginWithGoogle = useCallback(async (credential: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { ok, data } = await postJson('/api/auth/google', { credential });
-      if (!ok) {
-        setError(data?.error || 'Masuk dengan Google gagal.');
+  const loginWithGoogle = useCallback(
+    async (credential: string) => {
+      setIsLoading(true);
+      setError(null);
+      setApplication(null);
+      try {
+        const { ok, data } = await postJson("/api/auth/google", { credential });
+        if (
+          data?.accountStatus === "pending" ||
+          data?.accountStatus === "rejected"
+        ) {
+          setApplication({
+            accountStatus: data.accountStatus,
+            application: data.application,
+          });
+          setCurrentUser(null);
+          return null;
+        }
+        if (!ok) {
+          setError(data?.error || "Masuk dengan Google gagal.");
+          return null;
+        }
+        if (data?.needsSignup) {
+          return {
+            unverifiedEmail: data.email,
+            name: data.name,
+            avatarUrl: data.avatarUrl,
+            signupToken: data.signupToken,
+          } as GoogleSignupInfo;
+        }
+        if (
+          !data?.user ||
+          (data.user.accountStatus &&
+            data.user.accountStatus !== "approved" &&
+            data.user.isAdmin !== true)
+        ) {
+          setCurrentUser(null);
+          setError(
+            "Akun belum dapat digunakan. Silakan periksa status pendaftaran.",
+          );
+          return null;
+        }
+        setCurrentUser(data.user);
+        return data.user as ClientUser;
+      } catch {
+        setError("Gagal terhubung. Periksa koneksi internet Anda.");
         return null;
+      } finally {
+        setIsLoading(false);
       }
-      if (data?.needsSignup) {
-        return {
-          unverifiedEmail: data.email,
-          name: data.name,
-          avatarUrl: data.avatarUrl,
-          signupToken: data.signupToken,
-        } as GoogleSignupInfo;
-      }
-      setCurrentUser(data.user);
-      return data.user as ClientUser;
-    } catch {
-      setError('Gagal terhubung. Periksa koneksi internet Anda.');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [setCurrentUser]);
+    },
+    [setCurrentUser],
+  );
 
-  const register = useCallback(async (userData: RegisterInput) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { ok, data } = await postJson('/api/auth/register', userData);
-      if (!ok || !data?.user) {
-        setError(data?.error || 'Pendaftaran gagal. Silakan coba lagi.');
+  const register = useCallback(
+    async (userData: RegisterInput) => {
+      setIsLoading(true);
+      setError(null);
+      setApplication(null);
+      try {
+        const { ok, data } = await postJson("/api/auth/register", userData);
+        if (ok && data?.accountStatus === "pending") {
+          setApplication({
+            accountStatus: "pending",
+            application: data.application,
+          });
+          setCurrentUser(null);
+          return null;
+        }
+        // Registration never activates a dashboard session; approval is a server action.
+        setCurrentUser(null);
+        setError(
+          data?.error || "Pendaftaran belum dapat diproses. Silakan coba lagi.",
+        );
         return null;
+      } catch {
+        setError("Gagal terhubung. Periksa koneksi internet Anda.");
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-      setCurrentUser(data.user);
-      return data.user as ClientUser;
-    } catch {
-      setError('Gagal terhubung. Periksa koneksi internet Anda.');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [setCurrentUser]);
+    },
+    [setCurrentUser],
+  );
 
   const logout = useCallback(async () => {
     setCurrentUser(null);
     try {
-      await postJson('/api/auth/logout');
+      await postJson("/api/auth/logout");
     } catch {
       /* ignore */
     }
@@ -211,39 +305,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ---------- Admin (semua dijaga requireAdmin di server) ----------
 
-  const approveTransaction = useCallback(async (txId: string, userId: string) => {
-    await api.updateTransactionStatus(txId, 'success');
-    await api.updateUserPaymentStatus(userId, 'success');
-    setAllTransactions(prev => prev.map(t => (t.id === txId ? { ...t, status: 'success' as const } : t)));
-    setAllUsers(prev => prev.map(u => (u.id === userId ? { ...u, paymentStatus: 'success' as const } : u)));
-  }, []);
+  const approveTransaction = useCallback(
+    async (txId: string, userId: string) => {
+      await api.updateTransactionStatus(txId, "success");
+      await api.updateUserPaymentStatus(userId, "success");
+      setAllTransactions((prev) =>
+        prev.map((t) =>
+          t.id === txId ? { ...t, status: "success" as const } : t,
+        ),
+      );
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, paymentStatus: "success" as const } : u,
+        ),
+      );
+    },
+    [],
+  );
 
-  const rejectTransaction = useCallback(async (txId: string, userId: string) => {
-    await api.updateTransactionStatus(txId, 'failed');
-    await api.updateUserPaymentStatus(userId, 'failed');
-    setAllTransactions(prev => prev.map(t => (t.id === txId ? { ...t, status: 'failed' as const } : t)));
-    setAllUsers(prev => prev.map(u => (u.id === userId ? { ...u, paymentStatus: 'failed' as const } : u)));
-  }, []);
+  const rejectTransaction = useCallback(
+    async (txId: string, userId: string) => {
+      await api.updateTransactionStatus(txId, "failed");
+      await api.updateUserPaymentStatus(userId, "failed");
+      setAllTransactions((prev) =>
+        prev.map((t) =>
+          t.id === txId ? { ...t, status: "failed" as const } : t,
+        ),
+      );
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, paymentStatus: "failed" as const } : u,
+        ),
+      );
+    },
+    [],
+  );
 
-  const upgradePackage = useCallback(async (userId: string, newPackageId: string) => {
-    await api.updateUserPackage(userId, newPackageId);
-    setAllUsers(prev => prev.map(u => (u.id === userId ? { ...u, packageId: newPackageId as any } : u)));
-  }, []);
+  const upgradePackage = useCallback(
+    async (userId: string, newPackageId: string) => {
+      await api.updateUserPackage(userId, newPackageId);
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, packageId: newPackageId as any } : u,
+        ),
+      );
+    },
+    [],
+  );
 
   const deleteUserAction = useCallback(async (userId: string) => {
     await api.deleteUser(userId);
-    setAllUsers(prev => prev.filter(u => u.id !== userId));
-    setAllTransactions(prev => prev.filter(t => t.userId !== userId));
+    setAllUsers((prev) => prev.filter((u) => u.id !== userId));
+    setAllTransactions((prev) => prev.filter((t) => t.userId !== userId));
   }, []);
 
   const fetchAdminData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [users, transactions] = await Promise.all([api.getAllUsers(), api.getAllTransactions()]);
+      const [users, transactions] = await Promise.all([
+        api.getAllUsers(),
+        api.getAllTransactions(),
+      ]);
       setAllUsers(users);
       setAllTransactions(transactions);
     } catch (err) {
-      console.error('Failed to fetch admin data:', err);
+      console.error("Failed to fetch admin data:", err);
     } finally {
       setIsLoading(false);
     }
@@ -255,6 +381,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         currentUser,
+        application,
+        clearApplication,
         isLoading,
         isReady,
         error,
@@ -284,7 +412,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

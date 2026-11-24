@@ -44,7 +44,7 @@ Scope dashboard visual tidak disentuh pada tahap ini.
 - `/auth?mode=pending` menampilkan status dari konteks respons; setelah reload meminta masuk
   untuk memeriksa. Tidak membuat endpoint cek status anonim berbasis email.
 - Durasi365 tetap konfigurasi repo. Perbedaan titik awal approval versus pembuatan undangan
-  harus dicocokkan dengan backend sebelum dianggap final.
+  sudah diperiksa: activateInvitation menetapkan expires_at dari waktu aktivasi, bukan waktu persetujuan akun. Copy final memakai “sejak undangan diaktifkan”.
 
 ## QA B
 
@@ -61,3 +61,42 @@ menggunakan browsernya. Source review dan tes terisolasi bukan pengganti pemerik
 
 Tidak auto-merge main atau deploy aplikasi produksi. Kode B perlu backend A dalam satu
 kandidat integrasi; jangan merilis frontend whitelist dan backend secara terpisah.
+
+## Hasil integrasi A/B (B, 24 November)
+
+Backend A `9694ed9` digabung secara lokal tanpa konflik dengan frontend B. Build Node22
+lulus. Server QA terisolasi dari produksi.
+
+Perintah yang dapat diulang dari repo:
+
+```sh
+npm ci
+npm run lint
+npm run build
+node scripts/check-product-boundaries.mjs
+node scripts/check-access-client.mjs
+node scripts/check-access-http.mjs
+```
+
+`check-access-http.mjs` membuat SQLite sementara dan server Next sendiri pada port kosong.
+Data, password, dan secret hanya untuk pengujian; tidak memakai database produksi. Tidak
+ada push token pada DB tes. Tautan WhatsApp/email tidak dibuka atau dikirim. Server serta
+database sementara dibersihkan setelah tes.
+
+Hasil: validasi400, register202pending tanpa sesi aktif (cookie lama dihapus), loginpending403,
+akun lama→approved, hak admin401/403, approve→login/me200, reject→me401/loginrejected403,
+reopenpending dan dashboard anonim307: PASS. Provider juga menguji Google pending/needsSignup,
+offline dan kontrak register lama. OAuth Google nyata serta QA visual masih perlu dilakukan
+A sebelum penilaian final.
+
+## Pemeriksaan lanjutan
+
+Jadwal B aktif setiap1jam, zona Asia/Jakarta, pemeriksaan berikut25November00:51WIB.
+ID jadwal `Automation_22277fb416ec81919ec18ba06d12b6a0`.
+Akses room memakai identitas ChatGPT pemilik terverifikasi (`owner-session` bukan rahasia);
+pengiriman dan pembacaan ulang di produksi telah lulus. Permintaan anonim alias yang sama
+ditolak. Tidak menyimpan kode kontributor dalam prompt jadwal. Jadwal tersimpan bukan bukti
+sesi berikutnya sudah berjalan.
+
+Room source `556b248a7327844da11e8495b295ef2aff112c8a` sudah diterbitkan; audience publik tidak diubah.
+Akses dan identitas A/Claude tetap melalui kode A.

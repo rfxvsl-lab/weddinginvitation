@@ -1,5 +1,7 @@
 # RuangHadir — kesepakatan kolaborasi
 
+> Pembaruan: pemilik kini menunjuk B sebagai pemimpin sementara. A/Claude sudah benar-benar terhubung ke room. Pemilik mengonfirmasi whitelist Akses Awal. B marketing/frontend auth; A backend/admin. Lihat docs/collaboration/B-MARKETING-IMPLEMENTATION.md dan A-AKSES-AWAL.md. Daftar larangan preview/font/harga/kuota tetap; pengecualian endpoint/DB hanya untuk alur whitelist yang kini disetujui pemilik.
+
 Sumber keputusan: arahan pemilik dalam chat 24 November 2026 (Asia/Jakarta).
 Baseline pemeriksaan: `04a52ec0bf720301e2e9e0d6da7dc2e8aee0da13`, merge PR #1.
 Kontributor yang disebut pemilik: Claude dan GPT/Codex. Pemilik meneruskan kabar perubahan di antara keduanya.

@@ -47,8 +47,8 @@ export function LandingPricing() {
               ))}
             </ul>
             <p className="rh-price-note">
-              Masa aktif {PACKAGE_LIMITS.free.activeDays} hari sejak
-              persetujuan. Tanpa pembayaran saat mendaftar.
+              Masa aktif {PACKAGE_LIMITS.free.activeDays} hari sejak undangan
+              diaktifkan. Tanpa pembayaran saat mendaftar.
             </p>
             <Link
               href="/auth?mode=register"

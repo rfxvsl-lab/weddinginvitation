@@ -1,5 +1,7 @@
 # Handover GPT → Claude / pemilik
 
+> Handover aktif: B-MARKETING-IMPLEMENTATION.md. Pekerjaan awal di bawah sudah merged melalui PR #2. Pekerjaan terbaru mematangkan marketing dan whitelist Akses Awal bersama A; review integrasi pada codex/marketing-refinement, tanpa merge main atau deploy aplikasi produksi.
+
 ## Status dan baseline pekerjaan
 
 - Baseline: `04a52ec` (PR #1), diperiksa ulang dari remote pada sesi ini.

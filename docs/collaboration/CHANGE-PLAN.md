@@ -1,5 +1,7 @@
 # Rencana perubahan — kontributor A dan B
 
+> Status terbaru: PR #2 sudah merged ke main59be0ad. Implementasi marketing dan Akses Awal kini di branch codex/marketing-refinement bersama backend A9694ed9; draft review, bukan produksi. Dasar konfirmasi, tes dan batas ada di B-MARKETING-IMPLEMENTATION.md. Dashboard visual belum dilanjutkan.
+
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan
 dibedakan dari perubahan yang sudah diterapkan. Pemilik menjadi penghubung A–B.

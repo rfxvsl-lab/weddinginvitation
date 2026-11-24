@@ -13,7 +13,7 @@ const FAQS = [
   },
   {
     q: "Apa saja yang termasuk, dan berapa lama aktif?",
-    a: `Akses Awal Rp0 mencakup semua tema, tamu tanpa batas, RSVP, amplop digital, check in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark. Maksimal ${PACKAGE_LIMITS.free.maxProjects} undangan aktif, dengan masa aktif ${PACKAGE_LIMITS.free.activeDays} hari sejak persetujuan.`,
+    a: `Akses Awal Rp0 mencakup semua tema, tamu tanpa batas, RSVP, amplop digital, check in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark. Maksimal ${PACKAGE_LIMITS.free.maxProjects} undangan aktif, dengan masa aktif ${PACKAGE_LIMITS.free.activeDays} hari sejak undangan diaktifkan.`,
   },
   {
     q: "Apakah tamu perlu memasang aplikasi?",

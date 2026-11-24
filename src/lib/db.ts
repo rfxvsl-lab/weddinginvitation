@@ -26,16 +26,49 @@ import type {
 // USERS
 // ============================================
 
+/**
+ * Skema Akses Awal (idempoten). Kolom baru default 'approved' sehingga semua akun lama
+ * tetap aktif; pendaftar baru ditulis eksplisit 'pending'.
+ */
+let accountSchemaReady: Promise<void> | null = null;
+export function ensureAccountSchema(): Promise<void> {
+  if (!accountSchemaReady) {
+    accountSchemaReady = (async () => {
+      const cols = [
+        `ALTER TABLE users ADD COLUMN account_status TEXT DEFAULT 'approved'`,
+        `ALTER TABLE users ADD COLUMN application_json TEXT DEFAULT ''`,
+        `ALTER TABLE users ADD COLUMN reviewed_at TEXT DEFAULT ''`,
+        `ALTER TABLE users ADD COLUMN review_note TEXT DEFAULT ''`,
+        `ALTER TABLE users ADD COLUMN applied_at TEXT DEFAULT ''`,
+      ];
+      for (const sql of cols) {
+        try {
+          await dbExecute(sql);
+        } catch (err) {
+          if (!/duplicate column|already exists/i.test(String((err as Error)?.message || err))) throw err;
+        }
+      }
+    })().catch((err) => {
+      accountSchemaReady = null;
+      throw err;
+    });
+  }
+  return accountSchemaReady;
+}
+
 export async function createUser(
   userData: Omit<SaaSUser, 'id' | 'registeredAt'> & { password: string }
 ): Promise<SaaSUser> {
   const id = genId('user');
   const registeredAt = new Date().toLocaleDateString('id-ID');
   const passwordHash = await hashPassword(userData.password);
+  await ensureAccountSchema();
+  const accountStatus = userData.accountStatus || 'approved';
+  const appliedAt = new Date().toISOString();
 
   await dbExecute(
-    `INSERT INTO users (id, full_name, couple_groom, couple_bride, active_slug, email, password_hash, no_wa, sosmed, package_id, is_custom_by_rfx, payment_status, registered_at, ip_address, auth_provider)
-     VALUES (:id, :fullName, :groom, :bride, :slug, :email, :pwHash, :noWa, :sosmed, :packageId, :isRfx, :payStatus, :regAt, :ipAddress, :authProvider)`,
+    `INSERT INTO users (id, full_name, couple_groom, couple_bride, active_slug, email, password_hash, no_wa, sosmed, package_id, is_custom_by_rfx, payment_status, registered_at, ip_address, auth_provider, account_status, application_json, applied_at)
+     VALUES (:id, :fullName, :groom, :bride, :slug, :email, :pwHash, :noWa, :sosmed, :packageId, :isRfx, :payStatus, :regAt, :ipAddress, :authProvider, :accountStatus, :application, :appliedAt)`,
     {
       id,
       fullName: userData.fullName,
@@ -52,6 +85,9 @@ export async function createUser(
       regAt: registeredAt,
       ipAddress: userData.ipAddress || '',
       authProvider: userData.authProvider || 'local',
+      accountStatus,
+      application: userData.application ? JSON.stringify(userData.application) : '',
+      appliedAt,
     }
   );
 
@@ -70,6 +106,8 @@ export async function createUser(
     registeredAt,
     ipAddress: userData.ipAddress || '',
     authProvider: userData.authProvider || 'local',
+    accountStatus,
+    application: userData.application,
   };
 }
 
@@ -216,8 +254,49 @@ function rowToUser(row: any): SaaSUser {
     warningCount: Number(row.warning_count || 0),
     ipAddress: row.ip_address as string,
     avatarUrl: row.avatar_url as string,
-    authProvider: row.auth_provider as 'local' | 'google' | 'enterprise'
+    authProvider: row.auth_provider as 'local' | 'google' | 'enterprise',
+    // kolom belum ada (skema lama) → akun lama dianggap disetujui
+    accountStatus: (['pending', 'rejected'].includes(row.account_status) ? row.account_status : 'approved') as SaaSUser['accountStatus'],
+    application: parseApplication(row.application_json),
+    reviewedAt: (row.reviewed_at as string) || undefined,
+    reviewNote: (row.review_note as string) || undefined,
   };
+}
+
+function parseApplication(raw: unknown): SaaSUser['application'] {
+  if (!raw || typeof raw !== 'string') return undefined;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+}
+
+/** Status akun saja (dipakai pengecekan sesi). Null bila user tidak ada. */
+export async function getAccountStatus(userId: string): Promise<SaaSUser['accountStatus'] | null> {
+  await ensureAccountSchema();
+  const r = await dbExecute('SELECT account_status FROM users WHERE id = :id LIMIT 1', { id: userId });
+  if (!r.rows.length) return null;
+  const st = (r.rows[0] as any).account_status;
+  return st === 'pending' || st === 'rejected' ? st : 'approved';
+}
+
+/** Daftar pendaftar Akses Awal untuk admin. */
+export async function listAccessApplications(status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending'): Promise<SaaSUser[]> {
+  await ensureAccountSchema();
+  const where = status === 'all' ? `account_status IN ('pending','approved','rejected') AND applied_at != ''` : 'account_status = :status';
+  const r = await dbExecute(`SELECT * FROM users WHERE ${where} ORDER BY applied_at DESC, created_at DESC LIMIT 500`, status === 'all' ? {} : { status });
+  return r.rows.map(rowToUser);
+}
+
+export async function setAccountStatus(userId: string, status: 'approved' | 'rejected' | 'pending', note = ''): Promise<void> {
+  await ensureAccountSchema();
+  await dbExecute('UPDATE users SET account_status = :status, review_note = :note, reviewed_at = :at WHERE id = :id', {
+    status,
+    note: note.slice(0, 500),
+    at: new Date().toISOString(),
+    id: userId,
+  });
 }
 
 export async function updateUserPackage(userId: string, newPackageId: string): Promise<void> {
