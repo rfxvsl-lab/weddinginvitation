@@ -300,17 +300,9 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
   };
 
   return (
-    <div className="overflow-hidden flex flex-col h-full relative">
-      {/* Animated gradient mesh background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-pink-50" />
-        {/* Floating decorative orbs */}
-        {/* Subtle dot pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-      </div>
-
+    <div className="overflow-hidden flex flex-col h-full relative bg-[var(--rh-ivory)]">
       {/* Unified Pro SaaS Sticky Tab Bar */}
-      <div className="sticky top-0 z-20 border-b border-[var(--rh-line)] bg-white px-4 sm:px-6">
+      <div className="sticky top-0 z-20 border-b border-[var(--rh-line)] bg-[var(--rh-paper)] px-4 sm:px-6">
         <div
           role="tablist"
           aria-label="Bagian Editor Undangan"
@@ -335,7 +327,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 onClick={() => setActiveTab(tab.id)}
                 className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-[var(--rh-primary)]/10 text-[var(--rh-primary)]'
+                    ? 'bg-[var(--rh-primary-soft)] text-[var(--rh-primary)]'
                     : 'text-[var(--rh-ink-2)] hover:bg-[var(--rh-ivory)] hover:text-[var(--rh-ink)]'
                 }`}
               >
@@ -361,19 +353,19 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'couple' && (
           <div className="space-y-5 animate-fadeIn">
             {/* Section Header */}
-            <div className="flex items-center justify-between bg-white border border-[var(--rh-line)] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl p-4 border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[var(--rh-linen)] flex items-center justify-center">
                   <Users className="w-5 h-5 text-[var(--rh-primary)]" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-zinc-800 text-sm">Informasi Mempelai</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5">Atur biodata kedua calon mempelai</p>
+                  <h4 className="font-bold text-[var(--rh-ink)] text-sm">Informasi Mempelai</h4>
+                  <p className="text-xs text-[var(--rh-muted)] mt-0.5">Atur biodata kedua calon mempelai</p>
                 </div>
               </div>
               <button
                 onClick={resetToTamuSampel}
-                className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700 hover:bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 transition-all"
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--rh-ink-2)] hover:bg-[var(--rh-paper)] px-3 py-2 rounded-lg border border-[var(--rh-line)] transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Ganti Foto Sampel
               </button>
@@ -381,69 +373,69 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* GROOM PANEL */}
-              <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
-                {/* Aksen garis gradasi atas Groom */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--rh-primary)]" />
-                <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
-                  <span className="bg-[var(--rh-primary)]/10 text-[var(--rh-primary)] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
-                  <h5 className="font-bold text-zinc-800 text-sm">Mempelai Pria (Groom)</h5>
+              <div className="group/bento space-y-4 p-5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)] relative overflow-hidden">
+
+
+                <div className="flex items-center gap-2 border-b border-[var(--rh-line)] pb-2.5">
+                  <span className="bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] text-[10px] font-bold px-2 py-0.5 rounded-full">Pria</span>
+                  <h5 className="font-bold text-[var(--rh-ink)] text-sm">Mempelai Pria (Groom)</h5>
                 </div>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Lengkap & Gelar</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Lengkap & Gelar</label>
                     <input
                       type="text"
                       value={data?.couple?.groom.fullName}
                       onChange={(e) => updateGroom('fullName', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                       placeholder="e.g. Budi Hartono, S.T."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Panggilan</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Panggilan</label>
                     <input
                       type="text"
                       value={data?.couple?.groom.nickname}
                       onChange={(e) => updateGroom('nickname', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                       placeholder="e.g. Budi"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Ayah</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Ayah</label>
                       <input
                         type="text"
                         value={data?.couple?.groom.fatherName.replace('Bapak ', '')}
                         onChange={(e) => updateGroom('fatherName', `Bapak ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                         placeholder="Nama Ayah"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Ibu</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Ibu</label>
                       <input
                         type="text"
                         value={data?.couple?.groom.motherName.replace('Ibu ', '')}
                         onChange={(e) => updateGroom('motherName', `Ibu ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                         placeholder="Nama Ibu"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Foto Mempelai (URL)</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Foto Mempelai (URL)</label>
                     <input
                       type="text"
                       value={data?.couple?.groom.photoUrl}
                       onChange={(e) => updateGroom('photoUrl', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all font-mono text-[var(--rh-muted)] placeholder:text-[var(--rh-muted)]"
                       placeholder="https://drive.google.com/file/d/... (atau unggah lewat tombol)"
                     />
                     {/* Slick Photo Uploader for Groom */}
                     <div className="flex items-center gap-2 mt-1.5">
-                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 hover:bg-zinc-500 text-zinc-700 hover:text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-[var(--rh-paper)] hover:bg-[var(--rh-primary)] text-[var(--rh-ink-2)] hover:text-[var(--rh-paper)] rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-[var(--rh-line)] hover:border-[var(--rh-line-strong)] shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                         <Upload className="w-3 h-3" />
                         <span>{isUploading ? 'Mengunggah...' : 'Unggah Foto'}</span>
                         <input
@@ -467,101 +459,101 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {data?.couple?.groom.photoUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-[var(--rh-ink-2)] font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Akun Instagram</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Akun Instagram</label>
                     <div className="relative">
-                      <Instagram className="absolute left-3 top-3.5 w-3.5 h-3.5 text-zinc-400" />
+                      <Instagram className="absolute left-3 top-3.5 w-3.5 h-3.5 text-[var(--rh-muted)]" />
                       <input
                         type="text"
                         value={data?.couple?.groom.instagram}
                         onChange={(e) => updateGroom('instagram', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                         placeholder="@username"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Deskripsi Singkat</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Deskripsi Singkat</label>
                     <textarea
                       value={data?.couple?.groom.about}
                       onChange={(e) => updateGroom('about', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-muted)] resize-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* BRIDE PANEL */}
-              <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
-                {/* Aksen garis gradasi atas Bride */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
-                <div className="flex items-center gap-2 border-b border-zinc-200 pb-2.5">
-                  <span className="bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Wanita</span>
-                  <h5 className="font-bold text-zinc-800 text-sm">Mempelai Wanita (Bride)</h5>
+              <div className="group/bento space-y-4 p-5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)] relative overflow-hidden">
+
+
+                <div className="flex items-center gap-2 border-b border-[var(--rh-line)] pb-2.5">
+                  <span className="bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] text-[10px] font-bold px-2 py-0.5 rounded-full">Wanita</span>
+                  <h5 className="font-bold text-[var(--rh-ink)] text-sm">Mempelai Wanita (Bride)</h5>
                 </div>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Lengkap & Gelar</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Lengkap & Gelar</label>
                     <input
                       type="text"
                       value={data?.couple?.bride.fullName}
                       onChange={(e) => updateBride('fullName', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                       placeholder="e.g. Salsabila Cantika, M.Ds"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Panggilan</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Panggilan</label>
                     <input
                       type="text"
                       value={data?.couple?.bride.nickname}
                       onChange={(e) => updateBride('nickname', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                       placeholder="e.g. Salsa"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Ayah</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Ayah</label>
                       <input
                         type="text"
                         value={data?.couple?.bride.fatherName.replace('Bapak ', '')}
                         onChange={(e) => updateBride('fatherName', `Bapak ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                         placeholder="Nama Ayah"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Ibu</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Ibu</label>
                       <input
                         type="text"
                         value={data?.couple?.bride.motherName.replace('Ibu ', '')}
                         onChange={(e) => updateBride('motherName', `Ibu ${e.target.value}`)}
-                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
+                        className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)]"
                         placeholder="Nama Ibu"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Foto Mempelai (URL)</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Foto Mempelai (URL)</label>
                     <input
                       type="text"
                       value={data?.couple?.bride.photoUrl}
                       onChange={(e) => updateBride('photoUrl', e.target.value)}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-400 bg-zinc-50/50 hover:bg-white transition-all font-mono text-zinc-500 placeholder:text-zinc-400"
+                      className="w-full text-sm px-4 py-2.5 rounded-lg border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-muted)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] transition-all font-mono text-[var(--rh-muted)] placeholder:text-[var(--rh-muted)]"
                       placeholder="https://drive.google.com/file/d/... (atau unggah lewat tombol)"
                     />
                     {/* Slick Photo Uploader for Bride */}
                     <div className="flex items-center gap-2 mt-1.5">
-                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-accent-light hover:bg-accent text-accent hover:text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-accent/20 hover:border-accent shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-[var(--rh-primary-soft)] hover:bg-[var(--rh-primary)] text-[var(--rh-primary)] hover:text-[var(--rh-paper)] rounded-xl text-[11px] font-bold cursor-pointer transition-all duration-200 active:scale-95 border border-[var(--rh-line-strong)] hover:border-[var(--rh-primary)] shadow-sm hover:shadow-md ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                         <Upload className="w-3 h-3" />
                         <span>{isUploading ? 'Mengunggah...' : 'Unggah Foto'}</span>
                         <input
@@ -585,32 +577,32 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {data?.couple?.bride.photoUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-[var(--rh-ink-2)] font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Akun Instagram</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Akun Instagram</label>
                     <div className="relative">
-                      <Instagram className="absolute left-3 top-3.5 w-3.5 h-3.5 text-zinc-400" />
+                      <Instagram className="absolute left-3 top-3.5 w-3.5 h-3.5 text-[var(--rh-muted)]" />
                       <input
                         type="text"
                         value={data?.couple?.bride.instagram}
                         onChange={(e) => updateBride('instagram', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                         placeholder="@username"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Deskripsi Singkat</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Deskripsi Singkat</label>
                     <textarea
                       value={data?.couple?.bride.about}
                       onChange={(e) => updateBride('about', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-muted)] resize-none"
                     />
                   </div>
                 </div>
@@ -622,24 +614,24 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 2: DETIL ACARA */}
         {activeTab === 'events' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white border border-[var(--rh-line)] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl p-4 border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)]">
               <div className="w-10 h-10 rounded-xl bg-[var(--rh-ivory)] border border-[var(--rh-line)] flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-amber-600" />
+                <Calendar className="w-5 h-5 text-[var(--rh-gold-deep)]" />
               </div>
               <div>
-                <h4 className="font-bold text-zinc-800 text-sm">Waktu & Tempat Acara</h4>
-                <p className="text-xs text-zinc-400 mt-0.5">Isi waktu akad dan resepsi dengan benar</p>
+                <h4 className="font-bold text-[var(--rh-ink)] text-sm">Waktu & Tempat Acara</h4>
+                <p className="text-xs text-[var(--rh-muted)] mt-0.5">Isi waktu akad dan resepsi dengan benar</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* AKAD */}
-              <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
-                {/* Aksen garis gradasi atas Akad */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--rh-primary)]" />
-                <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-                  <h5 className="font-bold text-zinc-700 font-bold text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-zinc-500" />
+              <div className="group/bento space-y-4 p-5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)] relative overflow-hidden">
+
+
+                <div className="flex items-center justify-between border-b border-[var(--rh-line)] pb-2.5">
+                  <h5 className="font-bold text-[var(--rh-ink-2)] font-bold text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 1: Akad Nikah
                   </h5>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -649,69 +641,69 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       checked={data?.events?.akad?.enabled !== false}
                       onChange={(e) => updateAkad('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-zinc-500"></div>
+                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
                 <div className={`space-y-3 transition-opacity ${data?.events?.akad?.enabled === false ? 'opacity-40 pointer-events-none' : ''}`}>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tanggal Akad</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tanggal Akad</label>
                     <input
                       type="date"
                       value={data?.events?.akad?.date}
                       onChange={(e) => updateAkad('date', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Waktu Mulai</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Waktu Mulai</label>
                       <input
                         type="time"
                         value={data?.events?.akad?.timeStart}
                         onChange={(e) => updateAkad('timeStart', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 focus:outline-none bg-white text-zinc-800"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Waktu Selesai</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Waktu Selesai</label>
                       <input
                         type="type"
                         value={data?.events?.akad?.timeEnd}
                         onChange={(e) => updateAkad('timeEnd', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 focus:outline-none bg-white text-zinc-800"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                         placeholder="e.g. Selesai"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Tempat / Gedung</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Tempat / Gedung</label>
                     <input
                       type="text"
                       value={data?.events?.akad?.venueName}
                       onChange={(e) => updateAkad('venueName', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                       placeholder="Masjid Agung..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Alamat Lengkap</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Alamat Lengkap</label>
                     <textarea
                       value={data?.events?.akad?.address}
                       onChange={(e) => updateAkad('address', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-muted)] resize-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tautan Google Maps</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tautan Google Maps</label>
                     <div className="relative">
-                      <MapPin className="absolute left-3 top-3 w-3.5 h-3.5 text-zinc-400" />
+                      <MapPin className="absolute left-3 top-3 w-3.5 h-3.5 text-[var(--rh-muted)]" />
                       <input
                         type="text"
                         value={data?.events?.akad?.googleMapsUrl}
                         onChange={(e) => updateAkad('googleMapsUrl', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none font-mono text-zinc-500"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none font-mono text-[var(--rh-muted)]"
                         placeholder="https://maps.app.goo.gl/..."
                       />
                     </div>
@@ -720,12 +712,12 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               </div>
 
               {/* RESEPSI */}
-              <div className="group/bento space-y-4 p-5 rounded-xl border border-zinc-200 bg-white transition duration-200 hover:shadow-xl hover:border-zinc-300 relative overflow-hidden">
-                {/* Aksen garis gradasi atas Resepsi */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary/30 via-secondary to-secondary/30" />
-                <div className="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-                  <h5 className="font-bold text-zinc-700 text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-secondary" />
+              <div className="group/bento space-y-4 p-5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)] relative overflow-hidden">
+
+
+                <div className="flex items-center justify-between border-b border-[var(--rh-line)] pb-2.5">
+                  <h5 className="font-bold text-[var(--rh-ink-2)] text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 2: Resepsi Pernikahan
                   </h5>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -735,69 +727,69 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       checked={data?.events?.resepsi?.enabled !== false}
                       onChange={(e) => updateResepsi('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-secondary"></div>
+                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
                 <div className={`space-y-3 transition-opacity ${data?.events?.resepsi?.enabled === false ? 'opacity-40 pointer-events-none' : ''}`}>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tanggal Resepsi</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tanggal Resepsi</label>
                     <input
                       type="date"
                       value={data?.events?.resepsi?.date}
                       onChange={(e) => updateResepsi('date', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Waktu Mulai</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Waktu Mulai</label>
                       <input
                         type="time"
                         value={data?.events?.resepsi?.timeStart}
                         onChange={(e) => updateResepsi('timeStart', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 focus:outline-none bg-white text-zinc-800"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Waktu Selesai</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Waktu Selesai</label>
                       <input
                         type="text"
                         value={data?.events?.resepsi?.timeEnd}
                         onChange={(e) => updateResepsi('timeEnd', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 focus:outline-none bg-white text-zinc-800"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                         placeholder="e.g. Selesai"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Tempat / Gedung</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Tempat / Gedung</label>
                     <input
                       type="text"
                       value={data?.events?.resepsi?.venueName}
                       onChange={(e) => updateResepsi('venueName', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                       placeholder="Ballroom Hotel..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Alamat Lengkap</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Alamat Lengkap</label>
                     <textarea
                       value={data?.events?.resepsi?.address}
                       onChange={(e) => updateResepsi('address', e.target.value)}
                       rows={2}
-                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 bg-white text-zinc-500 resize-none"
+                      className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] bg-[var(--rh-paper)] text-[var(--rh-muted)] resize-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tautan Google Maps</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tautan Google Maps</label>
                     <div className="relative">
-                      <MapPin className="absolute left-3 top-3 w-3.5 h-3.5 text-zinc-400" />
+                      <MapPin className="absolute left-3 top-3 w-3.5 h-3.5 text-[var(--rh-muted)]" />
                       <input
                         type="text"
                         value={data?.events?.resepsi?.googleMapsUrl}
                         onChange={(e) => updateResepsi('googleMapsUrl', e.target.value)}
-                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-zinc-300 focus:outline-none font-mono text-zinc-500"
+                        className="w-full text-xs pl-8.5 pr-3.5 py-2.5 rounded-xl border border-[var(--rh-line-strong)] focus:outline-none font-mono text-[var(--rh-muted)]"
                         placeholder="https://maps.app.goo.gl/..."
                       />
                     </div>
@@ -812,10 +804,10 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'stories' && (
           <div className="space-y-6">
             {/* Show/Hide Toggle */}
-            <div className="flex items-center justify-between p-4 bg-white border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300 rounded-2xl">
+            <div className="flex items-center justify-between p-4 bg-[var(--rh-paper)] border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)] rounded-2xl">
               <div>
-                <span className="font-bold text-zinc-800 text-xs block">Tampilkan Bagian Cerita Cinta</span>
-                <span className="text-[10px] text-zinc-400">Aktifkan atau sembunyikan seluruh bagian perjalanan kisah cinta pada halaman undangan.</span>
+                <span className="font-bold text-[var(--rh-ink)] text-xs block">Tampilkan Bagian Cerita Cinta</span>
+                <span className="text-[10px] text-[var(--rh-muted)]">Aktifkan atau sembunyikan seluruh bagian perjalanan kisah cinta pada halaman undangan.</span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -824,46 +816,46 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   onChange={(e) => onChange({ ...data, showLoveStories: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-zinc-800 text-sm">Garis Waktu Perjalanan Kisah Cinta</h4>
-                <p className="text-xs text-zinc-500 mt-1">Ceritakan momen pertama kali bertemu hingga memutuskan membina keluarga.</p>
+                <h4 className="font-bold text-[var(--rh-ink)] text-sm">Garis Waktu Perjalanan Kisah Cinta</h4>
+                <p className="text-xs text-[var(--rh-muted)] mt-1">Ceritakan momen pertama kali bertemu hingga memutuskan membina keluarga.</p>
               </div>
               <button
                 type="button"
                 onClick={addStory}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-500 text-white rounded-full text-xs font-bold hover:bg-zinc-500/90 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[var(--rh-primary)] text-[var(--rh-paper)] rounded-full text-xs font-bold hover:bg-[var(--rh-primary)] transition"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah Momen
               </button>
             </div>
 
             {data?.showLoveStories === false && (
-              <div className="p-3.5 bg-white border border-zinc-300 text-zinc-800 rounded-2xl text-[11.5px] font-medium leading-relaxed animate-fade-in flex gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-zinc-700 mt-0.5" />
+              <div className="p-3.5 bg-[var(--rh-paper)] border border-[var(--rh-line-strong)] text-[var(--rh-ink)] rounded-2xl text-[11.5px] font-medium leading-relaxed animate-fade-in flex gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-[var(--rh-ink-2)] mt-0.5" />
                 <span>Bagian <strong>Perjalanan Kisah Cinta</strong> saat ini dinonaktifkan (disembunyikan) pada halaman web undangan. Pengunjung tidak akan melihat kisah cinta ini di pratinjau utama, tetapi Anda masih bisa menyimpan dan mengedit data momen di bawah ini.</span>
               </div>
             )}
 
             <div className={`space-y-4 ${data?.showLoveStories === false ? 'opacity-65 transition-opacity' : ''}`}>
               {data?.loveStories?.map((story, index) => (
-                <details key={story.id} className="rounded-[1.5rem] border border-zinc-200/50 bg-white/50 backdrop-blur-md shadow-sm relative group overflow-hidden transition-all duration-300">
-                  <summary className="cursor-pointer px-5 py-4 bg-zinc-50/50 hover:bg-white text-sm font-bold text-zinc-800 flex items-center justify-between border-b border-transparent group-open:border-zinc-200/50 transition-colors">
+                <details key={story.id} className="rounded-[1.5rem] border border-[var(--rh-line)] bg-[var(--rh-paper)] backdrop-blur-md shadow-sm relative group overflow-hidden transition-all duration-300">
+                  <summary className="cursor-pointer px-5 py-4 bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] text-sm font-bold text-[var(--rh-ink)] flex items-center justify-between border-b border-transparent group-open:border-[var(--rh-line)] transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="bg-zinc-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-[11px] font-mono shadow-sm">{index + 1}</span>
+                      <span className="bg-[var(--rh-primary)] text-[var(--rh-paper)] w-6 h-6 flex items-center justify-center rounded-full text-[11px] font-mono shadow-sm">{index + 1}</span>
                       <span>{story.title || "Kisah Baru"}</span>
                     </div>
-                    <span className="text-[10px] text-zinc-400 font-normal group-open:hidden">Edit ▼</span>
+                    <span className="text-[10px] text-[var(--rh-muted)] font-normal group-open:hidden">Edit ▼</span>
                   </summary>
-                  <div className="p-5 space-y-4 bg-white/40 relative">
+                  <div className="p-5 space-y-4 bg-[var(--rh-paper)] relative">
                     <button
                       type="button"
                       onClick={() => removeStory(story.id)}
-                      className="absolute top-2 right-2 p-1.5 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 rounded-lg transition-colors"
+                      className="absolute top-2 right-2 p-1.5 bg-[var(--rh-linen)] text-[var(--rh-ink-2)] hover:bg-[var(--rh-line)] rounded-lg transition-colors"
                       title="Hapus Momen"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -871,50 +863,50 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-2">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tahun Kejadian</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tahun Kejadian</label>
                       <input
                         type="text"
                         value={story.year}
                         onChange={(e) => updateStory(story.id, 'year', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-mono"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)] font-mono"
                         placeholder="e.g. 2021"
                       />
                     </div>
                     <div className="sm:col-span-3">
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Judul Kejadian</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Judul Kejadian</label>
                       <input
                         type="text"
                         value={story.title}
                         onChange={(e) => updateStory(story.id, 'title', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                         placeholder="e.g. Pertama Bertemu"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Isi Cerita</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Isi Cerita</label>
                     <textarea
                       value={story.story}
                       onChange={(e) => updateStory(story.id, 'story', e.target.value)}
                       rows={3}
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white text-zinc-500"
+                      className="w-full text-xs px-3 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-muted)]"
                       placeholder="Tulis penjelasan mendalam..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Foto Ilustrasi (URL)</label>
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Foto Ilustrasi (URL)</label>
                     <input
                       type="text"
                       value={story.imageUrl || ''}
                       onChange={(e) => updateStory(story.id, 'imageUrl', e.target.value)}
-                      className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-400"
+                      className="w-full text-xs px-3 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] font-mono text-[var(--rh-muted)]"
                       placeholder="https://drive.google.com/file/d/... (atau unggah lewat tombol)"
                     />
                     {/* Slick Photo Uploader for Story Moment */}
                     <div className="flex items-center gap-2 mt-1.5">
-                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-white text-zinc-700 font-bold rounded-xl text-[11px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <label className={`flex items-center gap-1.5 px-3 py-1.5 bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] text-[var(--rh-ink-2)] font-bold rounded-xl text-[11px] font-bold cursor-pointer transition active:scale-95 border border-[var(--rh-line)] ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                         <Upload className="w-3 h-3" />
                         <span>{isUploading ? 'Mengunggah...' : 'Unggah Foto'}</span>
                         <input
@@ -938,7 +930,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         />
                       </label>
                       {story.imageUrl?.startsWith('https://res.cloudinary.com') && (
-                        <span className="text-[10px] text-zinc-700 font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-[var(--rh-ink-2)] font-bold flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Cloud
                         </span>
                       )}
@@ -955,20 +947,20 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {activeTab === 'gallery' && (
           <div className="space-y-5">
             {/* Section Header */}
-            <div className="flex items-center gap-3 bg-white border border-[var(--rh-line)] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center gap-3 bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl p-4 border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)]">
               <div className="w-10 h-10 rounded-xl bg-[var(--rh-ivory)] border border-[var(--rh-line)] flex items-center justify-center">
-                <Image className="w-5 h-5 text-zinc-700" />
+                <Image className="w-5 h-5 text-[var(--rh-ink-2)]" />
               </div>
               <div>
-                <h4 className="font-bold text-zinc-800 text-sm">Galeri & Musik</h4>
-                <p className="text-xs text-zinc-400 mt-0.5">Foto, musik, dan digital pass</p>
+                <h4 className="font-bold text-[var(--rh-ink)] text-sm">Galeri & Musik</h4>
+                <p className="text-xs text-[var(--rh-muted)] mt-0.5">Foto, musik, dan digital pass</p>
               </div>
             </div>
             {/* Show/Hide Digital Pass Toggle */}
-            <div className="flex items-center justify-between p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm">
+            <div className="flex items-center justify-between p-4 bg-[var(--rh-paper)] border border-[var(--rh-line-strong)] rounded-2xl shadow-sm">
               <div>
-                <span className="font-bold text-zinc-800 text-xs block">Digital Entry Pass (QR Check-in)</span>
-                <span className="text-[10px] text-zinc-400">Aktifkan tiket QR check-in untuk tamu undangan</span>
+                <span className="font-bold text-[var(--rh-ink)] text-xs block">Digital Entry Pass (QR Check-in)</span>
+                <span className="text-[10px] text-[var(--rh-muted)]">Aktifkan tiket QR check-in untuk tamu undangan</span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -977,38 +969,38 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   onChange={(e) => onChange({ ...data, enableDigitalPass: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
             <div>
-              <h4 className="font-bold text-zinc-800 text-sm">Media & Musik Latar</h4>
-              <p className="text-xs text-zinc-500 mt-1">Masukkan tautan foto dan musik romantis untuk melengkapi kemeriahan atmosfer undangan digital.</p>
+              <h4 className="font-bold text-[var(--rh-ink)] text-sm">Media & Musik Latar</h4>
+              <p className="text-xs text-[var(--rh-muted)] mt-1">Masukkan tautan foto dan musik romantis untuk melengkapi kemeriahan atmosfer undangan digital.</p>
             </div>
 
             {/* Live Streaming */}
-            <div className="p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm space-y-2">
-              <span className="font-bold text-zinc-800 text-xs block">Live Streaming</span>
-              <span className="text-[10px] text-zinc-400 block">Tautan YouTube/Instagram Live. Kosongkan bila tidak dipakai.</span>
+            <div className="p-4 bg-[var(--rh-paper)] border border-[var(--rh-line-strong)] rounded-2xl shadow-sm space-y-2">
+              <span className="font-bold text-[var(--rh-ink)] text-xs block">Live Streaming</span>
+              <span className="text-[10px] text-[var(--rh-muted)] block">Tautan YouTube/Instagram Live. Kosongkan bila tidak dipakai.</span>
               <input
                 value={data.liveStreamUrl || ''}
                 onChange={(e) => onChange({ ...data, liveStreamUrl: e.target.value })}
                 placeholder="https://youtube.com/watch?v=... atau https://instagram.com/..."
-                className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 bg-white"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] bg-[var(--rh-paper)]"
               />
               <input
                 value={data.liveStreamLabel || ''}
                 onChange={(e) => onChange({ ...data, liveStreamLabel: e.target.value })}
                 placeholder="Label tombol (opsional)"
-                className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-300 bg-white"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line-strong)] bg-[var(--rh-paper)]"
               />
             </div>
 
             {/* Show/Hide Live Moments (Guest Camera + Voice Wishes) */}
-            <div className="flex items-center justify-between p-4 bg-white border border-zinc-300 rounded-2xl shadow-sm">
+            <div className="flex items-center justify-between p-4 bg-[var(--rh-paper)] border border-[var(--rh-line-strong)] rounded-2xl shadow-sm">
               <div>
-                <span className="font-bold text-zinc-800 text-xs block">Live Moments (Kamera Tamu & Ucapan Suara)</span>
-                <span className="text-[10px] text-zinc-400">Tamu bisa mengirim foto ke dinding momen dan merekam ucapan suara</span>
+                <span className="font-bold text-[var(--rh-ink)] text-xs block">Live Moments (Kamera Tamu & Ucapan Suara)</span>
+                <span className="text-[10px] text-[var(--rh-muted)]">Tamu bisa mengirim foto ke dinding momen dan merekam ucapan suara</span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -1017,33 +1009,33 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   onChange={(e) => onChange({ ...data, enableLiveMoments: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-500"></div>
+                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
-            <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-300/30 via-emerald-500 to-emerald-300/30" />
-              <h5 className="font-bold text-emerald-700 text-xs flex items-center gap-1.5">
-                <ImageSquare className="w-4 h-4 text-emerald-500" /> Gambar Sampul & Latar Belakang (OG & BG Image)
+            <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
+
+              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
+                <ImageSquare className="w-4 h-4 text-[var(--rh-primary)]" /> Gambar Sampul & Latar Belakang (OG & BG Image)
               </h5>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* OG Image / Cover */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-zinc-500">OG Image Halaman Awal (Sampul/Gate)</label>
+                  <label className="block text-xs font-bold text-[var(--rh-muted)]">OG Image Halaman Awal (Sampul/Gate)</label>
                   <input
                     type="text"
                     value={data?.ogImageUrl || ''}
                     onChange={(e) => onChange({ ...data, ogImageUrl: convertGoogleDriveUrl(e.target.value) })}
-                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300"
+                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] font-mono text-[var(--rh-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)]"
                     placeholder="Tautan URL gambar sampul halaman awal..."
                   />
                   {data?.ogImageUrl && (
-                    <div className="h-24 w-full rounded-xl overflow-hidden border border-zinc-200">
+                    <div className="h-24 w-full rounded-xl overflow-hidden border border-[var(--rh-line)]">
                       <img src={getImageUrl(data?.ogImageUrl)} alt="OG Preview" className="w-full h-full object-cover animate-fade-in" />
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[var(--rh-primary)] shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-[var(--rh-paper)] font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-[var(--rh-line)] border-[var(--rh-primary)] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1069,7 +1061,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     <button
                       type="button"
                       onClick={() => onChange({ ...data, ogImageUrl: 'https://lh3.googleusercontent.com/d/1EhkWZdyR3SGNE8bXdrxDFTrNzN9RHx0r' })}
-                      className="text-[9.5px] px-2 py-1 bg-white border border-zinc-200 rounded-lg text-zinc-500 font-bold hover:bg-white transition"
+                      className="text-[9.5px] px-2 py-1 bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-lg text-[var(--rh-muted)] font-bold hover:bg-[var(--rh-paper)] transition"
                     >
                       Atur Ulang Sampul Bawaan
                     </button>
@@ -1078,21 +1070,21 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
                 {/* BG Image / Web Background */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-zinc-500">BG Image Setelah Masuk Undangan</label>
+                  <label className="block text-xs font-bold text-[var(--rh-muted)]">BG Image Setelah Masuk Undangan</label>
                   <input
                     type="text"
                     value={data?.bgImageUrl || ''}
                     onChange={(e) => onChange({ ...data, bgImageUrl: convertGoogleDriveUrl(e.target.value) })}
-                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300"
+                    className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] font-mono text-[var(--rh-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)]"
                     placeholder="Tautan URL gambar latar belakang undangan..."
                   />
                   {data?.bgImageUrl && (
-                    <div className="h-24 w-full rounded-xl overflow-hidden border border-zinc-200">
+                    <div className="h-24 w-full rounded-xl overflow-hidden border border-[var(--rh-line)]">
                       <img src={getImageUrl(data?.bgImageUrl)} alt="BG Preview" className="w-full h-full object-cover animate-fade-in" />
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-zinc-200 border-[var(--rh-primary)] shadow-sm">
+                    <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-[var(--rh-paper)] font-bold rounded-lg text-[10px] cursor-pointer transition-all duration-200 active:scale-95 border border-[var(--rh-line)] border-[var(--rh-primary)] shadow-sm">
                       <Upload className="w-3 h-3" />
                       <span>Unggah</span>
                       <input
@@ -1118,7 +1110,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     <button
                       type="button"
                       onClick={() => onChange({ ...data, bgImageUrl: 'https://lh3.googleusercontent.com/d/1UoKVxvP08iYb7tS91UU6iwkLXvigkwVE' })}
-                      className="text-[9.5px] px-2 py-1 bg-white border border-zinc-200 rounded-lg text-zinc-500 font-bold hover:bg-white transition"
+                      className="text-[9.5px] px-2 py-1 bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-lg text-[var(--rh-muted)] font-bold hover:bg-[var(--rh-paper)] transition"
                     >
                       Atur Ulang BG Bawaan
                     </button>
@@ -1128,43 +1120,43 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             </div>
 
             {/* MUSIC SECTION WITH CUSTOM AUDIO FILE UPLOADER */}
-            <div className="p-5 border border-zinc-200 rounded-2xl bg-violet-50/15 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-300/30 via-violet-500 to-violet-300/30" />
-              <h5 className="font-bold text-violet-700 text-xs flex items-center gap-1.5">
+            <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
+
+              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Musik Pengiring Pernikahan (Audio MP3/WAV)
               </h5>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Judul Lagu</label>
+                  <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Judul Lagu</label>
                   <input
                     type="text"
                     value={data?.musicTitle}
                     onChange={(e) => onChange({ ...data, musicTitle: e.target.value })}
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-medium"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)] font-medium"
                     placeholder="Judul Lagu / Musik Instrument"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tautan MP3 (URL)</label>
+                  <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tautan MP3 (URL)</label>
                   <input
                     type="text"
                     value={data?.musicUrl}
                     onChange={(e) => onChange({ ...data, musicUrl: e.target.value })}
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-500 font-mono text-[11px]"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-muted)] font-mono text-[11px]"
                     placeholder="https://domain.com/music.mp3"
                   />
                 </div>
               </div>
 
               {/* SLICK AUDIO FILE UPLOADER */}
-              <div className="border border-dashed border-violet-200 p-4 rounded-xl bg-violet-50/5 flex flex-col sm:flex-row items-center gap-4 justify-between">
+              <div className="border border-dashed border-[var(--rh-line-strong)] p-4 rounded-xl bg-[var(--rh-ivory)] flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <div className="text-left">
-                  <p className="text-xs font-bold text-violet-800">Unggah File Musik Kustom Anda</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">Mendukung file .mp3, .wav, atau audio sejenis (disimpan di Cloudinary cloud storage).</p>
+                  <p className="text-xs font-bold text-[var(--rh-ink)]">Unggah File Musik Kustom Anda</p>
+                  <p className="text-[10px] text-[var(--rh-muted)] mt-0.5">Mendukung file .mp3, .wav, atau audio sejenis (disimpan di Cloudinary cloud storage).</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
-                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-[var(--rh-primary)] active:scale-95">
+                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-[var(--rh-paper)] rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md border border-[var(--rh-primary)] active:scale-95">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Pilih File Audio</span>
                     <input
@@ -1200,7 +1192,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         musicTitle: 'Beautiful Piano - Canon in D'
                       });
                     }}
-                    className="px-3.5 py-2 border border-zinc-200 text-zinc-500 hover:bg-white hover:text-zinc-800 bg-white border border-[var(--rh-line)] rounded-xl text-xs font-bold transition active:scale-95"
+                    className="px-3.5 py-2 border border-[var(--rh-line)] text-[var(--rh-muted)] hover:bg-[var(--rh-paper)] hover:text-[var(--rh-ink)] bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl text-xs font-bold transition active:scale-95"
                   >
                     Atur Ulang
                   </button>
@@ -1209,27 +1201,27 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             </div>
 
             {/* ITUNES / APPLE MUSIC SEARCH */}
-            <div className="p-5 border border-zinc-200 rounded-2xl bg-zinc-50/10 space-y-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-300/30 via-rose-400 to-rose-300/30" />
-              <h5 className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
+            <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
+
+              <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                 <Music className="w-4 h-4" /> Cari Lagu dari Apple Music / iTunes
               </h5>
-              <p className="text-[10px] text-zinc-500 leading-relaxed">
+              <p className="text-[10px] text-[var(--rh-muted)] leading-relaxed">
                 Ketik judul atau artis lagu untuk mencari musik pengiring pernikahan. Klik tombol <strong>Gunakan</strong> untuk langsung memasang lagu sebagai musik latar undangan.
               </p>
 
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-500" />
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-[var(--rh-muted)]" />
                 <input
                   type="text"
                   value={itunesQuery}
                   onChange={(e) => setItunesQuery(e.target.value)}
-                  className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-100 focus:border-zinc-300 transition-all"
+                  className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--rh-primary-soft)] focus:border-[var(--rh-line-strong)] transition-all"
                   placeholder="Cari lagu, misal: Perfect Ed Sheeran, A Thousand Years..."
                 />
                 {itunesLoading && (
                   <div className="absolute right-3 top-2.5">
-                    <div className="w-4 h-4 border-2 border-zinc-300/30 border-t-primary rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-[var(--rh-line-strong)] border-t-[var(--rh-primary)] rounded-full animate-spin" />
                   </div>
                 )}
               </div>
@@ -1239,20 +1231,20 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   {itunesResults.map((track: any) => (
                     <div
                       key={track.trackId}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-white hover:border-zinc-300/30 transition-all duration-200 group"
+                      className="flex items-center gap-3 p-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] hover:border-[var(--rh-line-strong)] transition-all duration-200 group"
                     >
                       {/* Album Art */}
                       <img
                         src={track.artworkUrl100}
                         alt={track.trackName}
-                        className="w-12 h-12 rounded-lg object-cover shadow-sm shrink-0 border border-zinc-200"
+                        className="w-12 h-12 rounded-lg object-cover shadow-sm shrink-0 border border-[var(--rh-line)]"
                       />
 
                       {/* Track Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-zinc-800 truncate">{track.trackName}</p>
-                        <p className="text-[10px] text-zinc-500 truncate">{track.artistName}</p>
-                        <p className="text-[9px] text-zinc-500/60 truncate">{track.collectionName}</p>
+                        <p className="text-xs font-bold text-[var(--rh-ink)] truncate">{track.trackName}</p>
+                        <p className="text-[10px] text-[var(--rh-muted)] truncate">{track.artistName}</p>
+                        <p className="text-[9px] text-[var(--rh-muted)] truncate">{track.collectionName}</p>
                       </div>
 
                       {/* Action Buttons */}
@@ -1264,8 +1256,8 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                             onClick={() => handleItunesPreview(track.trackId, track.previewUrl)}
                             className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
                               itunesPlayingId === track.trackId
-                                ? 'bg-zinc-500 text-white border-zinc-300 shadow-md'
-                                : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-500/10 hover:text-zinc-700 hover:border-zinc-300/30'
+                                ? 'bg-[var(--rh-primary)] text-[var(--rh-paper)] border-[var(--rh-line-strong)] shadow-md'
+                                : 'bg-[var(--rh-paper)] text-[var(--rh-muted)] border-[var(--rh-line)] hover:bg-[var(--rh-primary)] hover:text-[var(--rh-ink-2)] hover:border-[var(--rh-line-strong)]'
                             }`}
                             title={itunesPlayingId === track.trackId ? 'Hentikan pratinjau' : 'Dengarkan pratinjau 30 detik'}
                           >
@@ -1277,7 +1269,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         <button
                           type="button"
                           onClick={() => handleSelectItunesTrack(track)}
-                          className="px-3 py-2 bg-zinc-50 hover:bg-zinc-500 text-zinc-700 hover:text-white rounded-lg text-[10px] font-bold border border-zinc-200 hover:border-zinc-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                          className="px-3 py-2 bg-[var(--rh-paper)] hover:bg-[var(--rh-primary)] text-[var(--rh-ink-2)] hover:text-[var(--rh-paper)] rounded-lg text-[10px] font-bold border border-[var(--rh-line)] hover:border-[var(--rh-line-strong)] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
                         >
                           Gunakan
                         </button>
@@ -1288,7 +1280,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
               )}
 
               {itunesQuery.trim().length >= 2 && !itunesLoading && itunesResults.length === 0 && (
-                <p className="text-[11px] text-zinc-500 text-center py-4">
+                <p className="text-[11px] text-[var(--rh-muted)] text-center py-4">
                   Tidak ditemukan lagu untuk pencarian "{itunesQuery}". Coba kata kunci lain.
                 </p>
               )}
@@ -1296,13 +1288,13 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
             {/* NOVELTY GRID GALLERY DETAILS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h5 className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
+                <h5 className="font-bold text-[var(--rh-ink)] text-xs flex items-center gap-1.5">
                   <Image className="w-4 h-4" /> Daftar Foto Prewedding (Tautan URL)
                 </h5>
                 <button
                   type="button"
                   onClick={addGalleryItem}
-                  className="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 rounded-full text-xs font-medium text-zinc-500 hover:bg-white hover:text-zinc-800 transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--rh-line)] rounded-full text-xs font-medium text-[var(--rh-muted)] hover:bg-[var(--rh-paper)] hover:text-[var(--rh-ink)] transition"
                 >
                   <Plus className="w-3.5 h-3.5" /> Tambah Foto
                 </button>
@@ -1310,26 +1302,26 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
               <div className="space-y-2">
                 {data?.gallery?.map((img, idx) => (
-                  <details key={idx} className="group border border-zinc-200/50 rounded-2xl bg-white/50 backdrop-blur-sm overflow-hidden transition-all shadow-sm">
-                    <summary className="cursor-pointer px-4 py-3 bg-zinc-50/50 hover:bg-white text-xs font-bold text-zinc-800 flex items-center justify-between border-b border-transparent group-open:border-zinc-200/50 transition-colors">
+                  <details key={idx} className="group border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] backdrop-blur-sm overflow-hidden transition-all shadow-sm">
+                    <summary className="cursor-pointer px-4 py-3 bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] text-xs font-bold text-[var(--rh-ink)] flex items-center justify-between border-b border-transparent group-open:border-[var(--rh-line)] transition-colors">
                       <div className="flex items-center gap-2">
-                        <span className="bg-zinc-800 text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px]">{idx + 1}</span>
+                        <span className="bg-[var(--rh-primary)] text-[var(--rh-paper)] w-5 h-5 flex items-center justify-center rounded-full text-[10px]">{idx + 1}</span>
                         <span>Foto {idx + 1}</span>
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-normal">Edit ▼</span>
+                      <span className="text-[10px] text-[var(--rh-muted)] font-normal">Edit ▼</span>
                     </summary>
-                    <div className="p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white/40">
+                    <div className="p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-[var(--rh-paper)]">
                       <div className="flex items-center gap-2 w-full">
                         <input
                           type="text"
                           value={img}
                           onChange={(e) => updateGalleryItem(idx, e.target.value)}
-                          className="flex-1 text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white font-mono text-zinc-500"
+                          className="flex-1 text-xs px-3 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] font-mono text-[var(--rh-muted)]"
                           placeholder="Masukkan URL foto..."
                         />
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto pl-7 sm:pl-0">
-                      <label className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-white text-zinc-700 font-bold rounded-lg text-[10px] font-bold cursor-pointer transition active:scale-95 border border-zinc-200">
+                      <label className="flex items-center gap-1 px-2.5 py-1.5 bg-[var(--rh-paper)] hover:bg-[var(--rh-paper)] text-[var(--rh-ink-2)] font-bold rounded-lg text-[10px] font-bold cursor-pointer transition active:scale-95 border border-[var(--rh-line)]">
                         <Upload className="w-3 h-3" />
                         <span>Unggah</span>
                         <input
@@ -1355,7 +1347,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                       <button
                         type="button"
                         onClick={() => removeGalleryItem(idx)}
-                        className="p-1.5 text-zinc-700 hover:bg-white rounded-lg transition"
+                        className="p-1.5 text-[var(--rh-ink-2)] hover:bg-[var(--rh-paper)] rounded-lg transition"
                         title="Hapus Foto"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1372,20 +1364,20 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 5: DIGITAL GIFT */}
         {activeTab === 'gifts' && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between bg-white border border-[var(--rh-line)] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
+            <div className="flex items-center justify-between bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl p-4 border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[var(--rh-ivory)] border border-[var(--rh-line)] flex items-center justify-center">
-                  <Gift className="w-5 h-5 text-zinc-700" />
+                  <Gift className="w-5 h-5 text-[var(--rh-ink-2)]" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-zinc-800 text-sm">Kado Digital</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5">Rekening bank atau e-wallet untuk hadiah</p>
+                  <h4 className="font-bold text-[var(--rh-ink)] text-sm">Kado Digital</h4>
+                  <p className="text-xs text-[var(--rh-muted)] mt-0.5">Rekening bank atau e-wallet untuk hadiah</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={addGiftItem}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[var(--rh-primary)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--rh-primary-hover)] transition shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[var(--rh-primary)] text-[var(--rh-paper)] rounded-lg text-xs font-semibold hover:bg-[var(--rh-primary-hover)] transition shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah
               </button>
@@ -1393,24 +1385,24 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
 
             <div className="space-y-4">
               {data?.gifts?.map((gift) => (
-                <div key={gift.id} className="p-4 border border-zinc-200 rounded-2xl bg-white/10 space-y-3 relative group shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                  {/* Aksen garis gradasi atas Kado */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/20 via-accent/50 to-accent/20" />
+                <div key={gift.id} className="p-4 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-3 relative group shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+
+
                   <button
                     type="button"
                     onClick={() => removeGiftItem(gift.id)}
-                    className="absolute top-4 right-4 p-1 rounded-lg bg-white text-zinc-700 hover:bg-white text-zinc-700"
+                    className="absolute top-4 right-4 p-1 rounded-lg bg-[var(--rh-paper)] text-[var(--rh-ink-2)] hover:bg-[var(--rh-paper)] text-[var(--rh-ink-2)]"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Tipe Metode</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Tipe Metode</label>
                       <select
                         value={gift.type}
                         onChange={(e) => updateGiftItem(gift.id, 'type', e.target.value as any)}
-                        className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-200 bg-white"
+                        className="w-full text-xs px-3 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)]"
                       >
                         <option value="bank">Rekening Bank</option>
                         <option value="e-wallet">Dompet Digital (E-Wallet)</option>
@@ -1419,37 +1411,37 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Layanan (BCA, Mandiri, Gopey, dll)</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Layanan (BCA, Mandiri, Gopey, dll)</label>
                       <input
                         type="text"
                         value={gift.name}
                         onChange={(e) => updateGiftItem(gift.id, 'name', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-200 bg-white"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)]"
                         placeholder="e.g. Bank Mandiri"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Nama Pemilik Rekening</label>
+                      <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Nama Pemilik Rekening</label>
                       <input
                         type="text"
                         value={gift.accountHolder}
                         onChange={(e) => updateGiftItem(gift.id, 'accountHolder', e.target.value)}
-                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-zinc-200 bg-white"
+                        className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)]"
                         placeholder="e.g. Rian Aditama"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">
+                    <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">
                       {gift.type === 'address' ? 'Alamat Detail Pengiriman' : 'Nomor Rekening / No. HP'}
                     </label>
                     <input
                       type="text"
                       value={gift.accountNumber}
                       onChange={(e) => updateGiftItem(gift.id, 'accountNumber', e.target.value)}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                       placeholder={gift.type === 'address' ? 'Lokasi lengkap pengiriman kado fisik...' : '8415XXXX'}
                     />
                   </div>
@@ -1462,21 +1454,21 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
         {/* TAB 6: QUOTE & COUNTDOWN */}
         {activeTab === 'quote' && (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 bg-white border border-[var(--rh-line)] rounded-xl p-4 border border-zinc-200 transition duration-200 hover:shadow-xl hover:border-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Quote className="w-5 h-5 text-purple-600" />
+            <div className="flex items-center gap-3 bg-[var(--rh-paper)] border border-[var(--rh-line)] rounded-xl p-4 border border-[var(--rh-line)] transition duration-200 hover:shadow-xl hover:border-[var(--rh-line-strong)]">
+              <div className="w-10 h-10 rounded-xl bg-[var(--rh-primary-soft)] flex items-center justify-center">
+                <Quote className="w-5 h-5 text-[var(--rh-primary)]" />
               </div>
               <div>
-                <h4 className="font-bold text-zinc-800 text-sm">Kutipan & Countdown</h4>
-                <p className="text-xs text-zinc-400 mt-0.5">Kata mutiara dan hitung mundur ke hari H</p>
+                <h4 className="font-bold text-[var(--rh-ink)] text-sm">Kutipan & Countdown</h4>
+                <p className="text-xs text-[var(--rh-muted)] mt-0.5">Kata mutiara dan hitung mundur ke hari H</p>
               </div>
             </div>
 
-            <div className="space-y-4 p-5 border border-zinc-300 rounded-2xl bg-white shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-300 via-purple-500 to-purple-300" />
+            <div className="space-y-4 p-5 border border-[var(--rh-line-strong)] rounded-2xl bg-[var(--rh-paper)] shadow-sm relative overflow-hidden">
+
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-semibold text-zinc-600 tracking-wide">Kata Mutiara / Quote Undangan</label>
+                  <label className="block text-xs font-semibold text-[var(--rh-ink-2)] tracking-wide">Kata Mutiara / Quote Undangan</label>
                   <button
                     type="button"
                     onClick={async () => {
@@ -1503,7 +1495,7 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                         console.error('Gagal generate quote AI:', err);
                       }
                     }}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-2 py-0.5 rounded-md transition"
+                    className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--rh-primary)] hover:text-[var(--rh-primary-hover)] bg-[var(--rh-primary-soft)] hover:bg-[var(--rh-primary-soft)] px-2 py-0.5 rounded-md transition"
                   >
                     <Wand2 className="w-3 h-3" /> Susun Otomatis
                   </button>
@@ -1512,37 +1504,37 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                   value={data?.quoteText}
                   onChange={(e) => onChange({ ...data, quoteText: e.target.value })}
                   rows={3}
-                  className="w-full text-xs px-3.5 py-2 rounded-xl border border-zinc-200 bg-white text-zinc-500"
+                  className="w-full text-xs px-3.5 py-2 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-muted)]"
                   placeholder="Isi kutipan suci pernikahan..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Sumber Kutipan (Akar Sunnah/Alkitab/Tokoh)</label>
+                <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Sumber Kutipan (Akar Sunnah/Alkitab/Tokoh)</label>
                 <input
                   type="text"
                   value={data?.quoteSource}
                   onChange={(e) => onChange({ ...data, quoteSource: e.target.value })}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800"
+                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)]"
                   placeholder="e.g. QS. Ar-Rum: 21, Kolose 3:14, dll"
                 />
               </div>
 
-              <div className="border-t border-zinc-200 pt-4">
-                <h5 className="font-bold text-zinc-800 text-xs mb-3 flex items-center gap-1.5">
-                  <Timer className="w-3.5 h-3.5 text-zinc-700" />
+              <div className="border-t border-[var(--rh-line)] pt-4">
+                <h5 className="font-bold text-[var(--rh-ink)] text-xs mb-3 flex items-center gap-1.5">
+                  <Timer className="w-3.5 h-3.5 text-[var(--rh-ink-2)]" />
                   Waktu Hitung Mundur (Countdown Target)
                 </h5>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5 tracking-wide">Hari & Jam Mulai Akad</label>
+                  <label className="block text-xs font-semibold text-[var(--rh-ink-2)] mb-1.5 tracking-wide">Hari & Jam Mulai Akad</label>
                   <input
                     type="datetime-local"
                     value={data?.countdownDate?.substring(0, 16) || ''}
                     onChange={(e) => onChange({ ...data, countdownDate: e.target.value })}
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-mono"
+                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-paper)] text-[var(--rh-ink)] font-mono"
                   />
-                  <span className="text-[10px] text-zinc-500 block mt-1.5">Format waktu: standar waktu lokal setempat. Hitung mundur akan dipicu berakhir tepat sewaktu akad nikah berlangsung.</span>
+                  <span className="text-[10px] text-[var(--rh-muted)] block mt-1.5">Format waktu: standar waktu lokal setempat. Hitung mundur akan dipicu berakhir tepat sewaktu akad nikah berlangsung.</span>
                 </div>
               </div>
             </div>
