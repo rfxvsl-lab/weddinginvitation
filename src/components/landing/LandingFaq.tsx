@@ -1,51 +1,61 @@
-import React from 'react';
-import { Plus } from 'lucide-react';
-import { ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits';
+import React from "react";
+import { Plus } from "lucide-react";
+import { ENTERPRISE_CONTACT_EMAIL, PACKAGE_LIMITS } from "@/lib/packageLimits";
 
 const FAQS = [
   {
-    q: 'Benarkah semua fitur gratis?',
-    a: 'Ya. Akun gratis mencakup seluruh tema, tamu tanpa batas, RSVP, amplop digital, check in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark, untuk hingga 3 undangan aktif.',
+    q: "Apa itu Akses Awal?",
+    a: "Akses Awal adalah pendaftaran untuk mencoba RuangHadir secara gratis. Isi formulir, lalu tim kami meninjau pendaftaran. Akun belum bisa membuka dashboard sebelum disetujui.",
   },
   {
-    q: 'Apakah tamu perlu memasang aplikasi?',
-    a: 'Tidak. Tamu cukup membuka tautan dari WhatsApp di browser HP atau komputer.',
+    q: "Kapan akun saya dapat digunakan?",
+    a: `Setelah disetujui, tim kami akan mengabari melalui kontak yang kalian daftarkan. Waktu peninjauan belum ditetapkan. Kalian juga bisa mencoba masuk kembali untuk melihat status, atau menghubungi ${ENTERPRISE_CONTACT_EMAIL}.`,
   },
   {
-    q: 'Bisakah data diubah setelah undangan dibagikan?',
-    a: 'Bisa kapan saja dari dashboard. Jadwal, foto, musik, bahkan tema bisa diganti dan langsung tampil di tautan yang sama.',
+    q: "Apa saja yang termasuk, dan berapa lama aktif?",
+    a: `Akses Awal Rp0 mencakup semua tema, tamu tanpa batas, RSVP, amplop digital, check in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark. Maksimal ${PACKAGE_LIMITS.free.maxProjects} undangan aktif, dengan masa aktif ${PACKAGE_LIMITS.free.activeDays} hari sejak persetujuan.`,
   },
   {
-    q: 'Siapa yang bisa melihat daftar tamu dan nomor HP?',
-    a: 'Hanya Anda sebagai pemilik undangan. Tamu hanya melihat nama mereka sendiri, dan undangan yang belum dipublikasikan tidak bisa dibuka orang lain.',
+    q: "Apakah tamu perlu memasang aplikasi?",
+    a: "Tidak. Tamu cukup membuka tautan undangan di browser HP atau komputer. Nama mereka dapat ditampilkan melalui tautan personal yang kalian siapkan.",
   },
   {
-    q: 'Amplop digital mendukung metode apa saja?',
-    a: 'Rekening bank (BCA, Mandiri, BRI, BNI, dan lainnya), dompet digital, QRIS, serta alamat pengiriman kado fisik.',
+    q: "Bisa mengganti tema atau jadwal setelah dibagikan?",
+    a: "Bisa. Ubah data dari dashboard lalu simpan perubahan. Kalian dapat memakai tema lain tanpa mengetik ulang cerita dan data acara. Tamu tetap membuka tautan undangan yang sama.",
   },
   {
-    q: 'Bagaimana cara mendapatkan akses Enterprise?',
-    a: `Kirim email ke ${ENTERPRISE_CONTACT_EMAIL}. Setelah disetujui, kami menerbitkan kode akses yang terikat pada domain email perusahaan Anda untuk masuk lewat portal Enterprise.`,
+    q: "Bagaimana amplop digital bekerja?",
+    a: "Kalian menampilkan informasi rekening, dompet digital, QRIS, atau alamat pengiriman kado. Tamu melakukan transfer melalui layanan pembayaran mereka sendiri; RuangHadir tidak menampung dana hadiah.",
+  },
+  {
+    q: "Bagaimana mendapat akses Enterprise?",
+    a: `Hubungi ${ENTERPRISE_CONTACT_EMAIL} untuk mendiskusikan kebutuhan. Setelah disetujui, tim menerbitkan kode akses yang terikat dengan domain email perusahaan.`,
   },
 ];
 
 export function LandingFaq() {
   return (
-    <section id="faq" className="scroll-mt-20 border-t border-[var(--rh-line)]">
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:py-24">
-        <h2 className="text-[36px] leading-[1.08] sm:text-[44px]">Pertanyaan yang sering diajukan</h2>
-        <div className="border-b border-[var(--rh-line)]">
+    <section id="faq" className="rh-faq-section" aria-labelledby="faq-heading">
+      <div className="rh-marketing-container rh-faq-layout">
+        <div>
+          <p className="rh-eyebrow">SEBELUM MULAI</p>
+          <h2 id="faq-heading">Masih ada yang ingin ditanyakan?</h2>
+          <p className="rh-faq-contact">
+            Kami bisa bantu melalui{" "}
+            <a href={`mailto:${ENTERPRISE_CONTACT_EMAIL}`}>
+              {ENTERPRISE_CONTACT_EMAIL}
+            </a>
+            .
+          </p>
+        </div>
+        <div className="rh-faq-list">
           {FAQS.map(({ q, a }) => (
-            <details key={q} className="group border-t border-[var(--rh-line)]">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[16.5px] font-semibold text-[var(--rh-ink)] [&::-webkit-details-marker]:hidden">
+            <details key={q}>
+              <summary>
                 {q}
-                <Plus
-                  size={18}
-                  className="shrink-0 text-[var(--rh-wine)] transition-transform duration-200 group-open:rotate-45"
-                  aria-hidden
-                />
+                <Plus size={18} aria-hidden />
               </summary>
-              <p className="max-w-[640px] pb-6 text-[15px] leading-[1.7] text-[var(--rh-ink-2)]">{a}</p>
+              <p>{a}</p>
             </details>
           ))}
         </div>

@@ -46,22 +46,27 @@ assert.equal(
   before,
   "Root layout changed beyond the scoped stylesheet import",
 );
-const css = postcss.parse(
-  fs.readFileSync(path.join(root, "src/styles/product.css"), "utf8"),
-);
-css.walkRules((rule) =>
-  assert.ok(
-    rule.selector.includes(".rh-product"),
-    `Unscoped product selector: ${rule.selector}`,
-  ),
-);
-css.walkDecls((decl) =>
-  assert.notEqual(
-    decl.prop,
-    "font-family",
-    "Do not replace the established font",
-  ),
-);
+for (const stylesheet of [
+  "src/styles/product.css",
+  "src/components/landing/marketing.css",
+]) {
+  const css = postcss.parse(
+    fs.readFileSync(path.join(root, stylesheet), "utf8"),
+  );
+  css.walkRules((rule) =>
+    assert.ok(
+      rule.selector.includes(".rh-product"),
+      `Unscoped selector in ${stylesheet}: ${rule.selector}`,
+    ),
+  );
+  css.walkDecls((decl) =>
+    assert.notEqual(
+      decl.prop,
+      "font-family",
+      "Do not replace the established font",
+    ),
+  );
+}
 
 const compiled = buildSync({
   entryPoints: [path.join(root, "src/components/system/ZoomLock.tsx")],

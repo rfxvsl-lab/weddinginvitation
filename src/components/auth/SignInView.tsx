@@ -1,20 +1,14 @@
-'use client';
+"use client";
 
 /**
  * SignInView — Form login akun gratis (email/password + Google OAuth)
  * dilengkapi tombol masuk ke Portal Enterprise.
  */
 
-import React from 'react';
-import { GoogleLogin } from '@react-oauth/google';
-import { Logo } from '@/components/ui/Logo';
-import {
-  Building2,
-  Mail,
-  Lock,
-  AlertCircle,
-  ChevronRight,
-} from 'lucide-react';
+import React from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { Logo } from "@/components/ui/Logo";
+import { Building2, Mail, Lock, AlertCircle, ChevronRight } from "lucide-react";
 
 interface SignInViewProps {
   loginEmail: string;
@@ -53,7 +47,7 @@ export default function SignInView({
           Selamat Datang Kembali
         </h2>
         <p className="text-[13.5px] text-[var(--rh-ink-2)]">
-          Masuk untuk mengelola undangan digital gratis Anda.
+          Masuk ke akun kalian atau periksa status pendaftaran Akses Awal.
         </p>
       </div>
 
@@ -62,13 +56,13 @@ export default function SignInView({
         <div
           className="grid grid-cols-2 gap-1 rounded-full border p-1"
           style={{
-            borderColor: 'var(--saas-line)',
-            background: 'var(--saas-bg)',
+            borderColor: "var(--saas-line)",
+            background: "var(--saas-bg)",
           }}
         >
           <span
             className="rounded-full py-2 text-center text-[12px] font-bold shadow-sm"
-            style={{ background: '#FFFFFF', color: 'var(--saas-ink)' }}
+            style={{ background: "#FFFFFF", color: "var(--saas-ink)" }}
           >
             Akun Gratis
           </span>
@@ -76,7 +70,7 @@ export default function SignInView({
             type="button"
             onClick={onGotoEnterprise}
             className="flex items-center justify-center gap-1.5 rounded-full py-2 text-[12px] font-bold transition-colors hover:text-[var(--rh-ink)] cursor-pointer"
-            style={{ color: 'var(--saas-muted)' }}
+            style={{ color: "var(--saas-muted)" }}
           >
             <Building2 size={13} /> Enterprise
           </button>
@@ -124,7 +118,10 @@ export default function SignInView({
         </div>
 
         {error && (
-          <div role="alert" className="flex items-center gap-2 text-xs text-red-800 bg-red-50 p-3.5 border border-red-200 rounded-xl">
+          <div
+            role="alert"
+            className="flex items-center gap-2 text-xs text-red-800 bg-red-50 p-3.5 border border-red-200 rounded-xl"
+          >
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -136,7 +133,7 @@ export default function SignInView({
           disabled={isLoading}
           className="saas-btn-primary w-full !mt-2"
         >
-          <span>{isLoading ? 'Memproses...' : 'Masuk'}</span>
+          <span>{isLoading ? "Memproses..." : "Masuk"}</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </form>
@@ -155,7 +152,7 @@ export default function SignInView({
       <div className="flex justify-center w-full">
         <GoogleLogin
           onSuccess={onGoogleSuccess}
-          onError={() => console.error('Google Login Failed')}
+          onError={() => console.error("Google Login Failed")}
           theme="outline"
           shape="pill"
           text="continue_with"
@@ -165,14 +162,14 @@ export default function SignInView({
 
       <div className="pt-1 text-center">
         <p className="text-[13.5px] text-[var(--rh-ink-2)]">
-          Belum memiliki akun?{' '}
+          Belum memiliki akun?{" "}
           <button
             type="button"
             id="goto-signup"
             onClick={onGotoSignUp}
             className="text-[var(--rh-primary)] hover:underline font-bold transition-all focus:outline-none cursor-pointer"
           >
-            Daftar Gratis
+            Daftar Akses Awal
           </button>
         </p>
       </div>

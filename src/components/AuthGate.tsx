@@ -1,20 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useAuth, type GoogleSignupInfo } from '../hooks/useAuth';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import {
-  CheckCircle2 as CheckCircle,
-  ChevronRight,
-} from 'lucide-react';
-import { SaaSUser, UserPackageId } from '../types';
-import { useToast } from '../hooks/useToast';
-import { ErrorBoundary } from './ErrorBoundary';
-import SignInView from './auth/SignInView';
-import SignUpView from './auth/SignUpView';
-import EnterpriseSignInView from './auth/EnterpriseSignInView';
-import AdminPanelView from './auth/AdminPanelView';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { useAuth, type GoogleSignupInfo } from "../hooks/useAuth";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { SaaSUser, UserPackageId } from "../types";
+import { useToast } from "../hooks/useToast";
+import { ErrorBoundary } from "./ErrorBoundary";
+import SignInView from "./auth/SignInView";
+import SignUpView from "./auth/SignUpView";
+import EnterpriseSignInView from "./auth/EnterpriseSignInView";
+import AdminPanelView from "./auth/AdminPanelView";
+import ApplicationStatusView from "./auth/ApplicationStatusView";
 
 interface AuthGateProps {
   onLoginSuccess: (user: SaaSUser) => void;
@@ -23,48 +20,62 @@ interface AuthGateProps {
 
 function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const toast = useToast();
-  const [mode, setMode] = useState<'signin' | 'signup' | 'enterprise' | 'admin'>('signin');
+  const [mode, setMode] = useState<
+    "signin" | "signup" | "enterprise" | "admin" | "pending"
+  >("signin");
 
   // Route automatically to Admin Panel if /admin or #admin or ?admin=true
   useEffect(() => {
     const handleCheckRoute = () => {
       const pName = window.location.pathname.toLowerCase();
       const hashVal = window.location.hash.toLowerCase();
-      const hasAdminQuery = window.location.search.toLowerCase().includes('admin=true');
+      const hasAdminQuery = window.location.search
+        .toLowerCase()
+        .includes("admin=true");
 
       if (
-        pName === '/admin' ||
-        pName.endsWith('/admin') ||
-        hashVal === '#admin' ||
-        hashVal === '#/admin' ||
+        pName === "/admin" ||
+        pName.endsWith("/admin") ||
+        hashVal === "#admin" ||
+        hashVal === "#/admin" ||
         hasAdminQuery
       ) {
-        setMode('admin');
+        setMode("admin");
       } else {
-        setMode((prev) => (prev === 'admin' ? 'signin' : prev));
+        setMode((prev) => (prev === "admin" ? "signin" : prev));
       }
     };
 
     handleCheckRoute();
-    window.addEventListener('popstate', handleCheckRoute);
-    window.addEventListener('hashchange', handleCheckRoute);
+    window.addEventListener("popstate", handleCheckRoute);
+    window.addEventListener("hashchange", handleCheckRoute);
     return () => {
-      window.removeEventListener('popstate', handleCheckRoute);
-      window.removeEventListener('hashchange', handleCheckRoute);
+      window.removeEventListener("popstate", handleCheckRoute);
+      window.removeEventListener("hashchange", handleCheckRoute);
     };
   }, []);
 
   // Honor landing page query params: /auth?mode=register|enterprise&slug=...&email=...
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const intent = (params.get('mode') || '').toLowerCase();
-    const prefillEmail = params.get('email');
-    const prefillSlug = params.get('slug');
+    const intent = (params.get("mode") || "").toLowerCase();
+    const prefillEmail = params.get("email");
+    const prefillSlug = params.get("slug");
 
-    if (intent === 'enterprise' || intent === 'corporate' || intent === 'company') {
-      setMode('enterprise');
-    } else if (intent === 'register' || intent === 'signup' || intent === 'daftar') {
-      setMode('signup');
+    if (intent === "pending") {
+      setMode("pending");
+    } else if (
+      intent === "enterprise" ||
+      intent === "corporate" ||
+      intent === "company"
+    ) {
+      setMode("enterprise");
+    } else if (
+      intent === "register" ||
+      intent === "signup" ||
+      intent === "daftar"
+    ) {
+      setMode("signup");
       setStep(1);
     }
 
@@ -73,7 +84,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       setLoginEmail(prefillEmail);
     }
     if (prefillSlug) {
-      const clean = prefillSlug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      const clean = prefillSlug.toLowerCase().replace(/[^a-z0-9-]/g, "");
       if (clean) setSlug(clean);
     }
   }, []);
@@ -87,47 +98,57 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Registration Inputs
-  const [fullName, setFullName] = useState('');
-  const [groomName, setGroomName] = useState('');
-  const [brideName, setBrideName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [noWa, setNoWa] = useState('');
-  const [sosmed, setSosmed] = useState('');
-  const [packageId, setPackageId] = useState<UserPackageId>('free');
+  const [fullName, setFullName] = useState("");
+  const [groomName, setGroomName] = useState("");
+  const [brideName, setBrideName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [noWa, setNoWa] = useState("");
+  const [sosmed, setSosmed] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [city, setCity] = useState("");
+  const [referralSource, setReferralSource] = useState("");
+  const [packageId, setPackageId] = useState<UserPackageId>("free");
   const [googleUser, setGoogleUser] = useState<GoogleSignupInfo | null>(null);
 
   // Login Inputs
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
   // Active Slug Checking for uniqueness
-  const [slugError, setSlugError] = useState('');
+  const [slugError, setSlugError] = useState("");
 
-  // Welcome greeting for new users
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeUser, setWelcomeUser] = useState<SaaSUser | null>(null);
+  // A receipt is shown only after an authenticated API response, never from a query alone.
+  useEffect(() => {
+    if (!auth.application) return;
+    setPassword("");
+    setLoginPassword("");
+    setMode("pending");
+    const url = new URL(window.location.href);
+    url.search = "?mode=pending";
+    window.history.replaceState(null, "", url.pathname + url.search);
+  }, [auth.application]);
 
   // Load admin data when entering admin mode
   useEffect(() => {
-    if (mode === 'admin') {
+    if (mode === "admin") {
       auth.fetchAdminData();
     }
   }, [mode]);
 
-  // Auto-enter dashboard whenever activeUser is present (all free & enterprise accounts are instant)
+  // Only verified approved users are exposed by the auth hook.
   useEffect(() => {
-    if (activeUser && mode !== 'admin' && !showWelcome) {
+    if (activeUser && auth.isReady && mode !== "admin") {
       onLoginSuccess(activeUser);
     }
-  }, [activeUser, mode, showWelcome]);
+  }, [activeUser, auth.isReady, mode]);
 
   // Autogenerate slug from Groom/Bride names if user hasn't manually set a prefill slug
   useEffect(() => {
     if (groomName || brideName) {
-      const cleanGroom = groomName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const cleanBride = brideName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanGroom = groomName.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cleanBride = brideName.toLowerCase().replace(/[^a-z0-9]/g, "");
       if (cleanGroom && cleanBride) {
         setSlug(`${cleanGroom}-${cleanBride}`);
       } else if (cleanGroom) {
@@ -141,10 +162,10 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   // Validate Slug in Realtime (async via Turso)
   useEffect(() => {
     if (!slug) {
-      setSlugError('');
+      setSlugError("");
       return;
     }
-    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, "");
     if (slug !== cleanSlug) {
       setSlug(cleanSlug);
     }
@@ -152,9 +173,11 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     const timer = setTimeout(async () => {
       const available = await auth.checkSlugAvailable(cleanSlug);
       if (!available) {
-        setSlugError('Tautan ini sudah digunakan. Silakan tambahkan angka atau variasi lain.');
+        setSlugError(
+          "Tautan ini sudah digunakan. Silakan tambahkan angka atau variasi lain.",
+        );
       } else {
-        setSlugError('');
+        setSlugError("");
       }
     }, 450);
 
@@ -168,7 +191,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
     const user = await auth.login(loginEmail, loginPassword);
     if (!user && auth.error) {
-      toast.error('Login gagal', auth.error);
+      toast.error("Login gagal", auth.error);
       auth.clearError();
     }
   };
@@ -178,25 +201,33 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     try {
       const result = await auth.loginWithGoogle(credentialResponse.credential);
       if (result) {
-        if ('unverifiedEmail' in result) {
+        if ("unverifiedEmail" in result) {
           setGoogleUser(result);
           setEmail(result.unverifiedEmail);
           setFullName(result.name);
-          setMode('signup');
+          setMode("signup");
           setStep(1);
         } else {
           onLoginSuccess(result);
         }
       }
     } catch (err) {
-      console.error('Failed to decode Google JWT', err);
+      console.error("Failed to decode Google JWT", err);
     }
   };
 
   // Step 1 Click Handler (Groom, Bride, FullName)
   const handleNextStep1 = () => {
-    if ((!googleUser && !fullName.trim()) || !groomName.trim() || !brideName.trim()) {
-      toast.warning('Form tidak lengkap', 'Harap lengkapi nama pemesan dan nama panggilan pasangan.');
+    if (
+      !fullName.trim() ||
+      !groomName.trim() ||
+      !brideName.trim() ||
+      !city.trim()
+    ) {
+      toast.warning(
+        "Form tidak lengkap",
+        "Lengkapi nama, nama pasangan, dan kota acara.",
+      );
       return;
     }
     setStep(2);
@@ -204,44 +235,61 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
   // Step 2 Click Handler (Email, Password, Wa, Sosmed verification)
   const handleNextStep2 = async () => {
-    if (!noWa.trim() || !sosmed.trim()) {
-      toast.warning('Form tidak lengkap', 'Harap lengkapi nomor WhatsApp dan sosial media Anda.');
+    if (!noWa.trim() || !referralSource) {
+      toast.warning(
+        "Form tidak lengkap",
+        "Lengkapi nomor WhatsApp dan sumber informasi RuangHadir.",
+      );
       return;
     }
     if (!googleUser) {
       if (!email.trim() || !password) {
-        toast.warning('Form tidak lengkap', 'Harap lengkapi email dan password akun Anda.');
+        toast.warning(
+          "Form tidak lengkap",
+          "Harap lengkapi email dan password akun Anda.",
+        );
         return;
       }
       if (password.length < 8) {
-        toast.warning('Password terlalu pendek', 'Password minimal 8 karakter.');
+        toast.warning(
+          "Password terlalu pendek",
+          "Password minimal 8 karakter.",
+        );
         return;
       }
 
       const emailAvailable = await auth.checkEmailAvailable(email);
       if (!emailAvailable) {
-        toast.error('Email sudah terdaftar', 'Email ini sudah memiliki akun. Silakan masuk melalui menu Sign In.');
+        toast.error(
+          "Email sudah terdaftar",
+          "Email ini sudah memiliki akun. Silakan masuk melalui menu Sign In.",
+        );
         return;
       }
     }
     setStep(3);
   };
 
-  // Complete Registration — Full Gratis (Rp 0), instant activation
+  // Send an Early Access application. The server owns approval and session issuance.
   const handleSignUpComplete = async () => {
     const finalSlug =
       slug.trim() ||
-      `${groomName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'undangan'}-${
-        brideName.toLowerCase().replace(/[^a-z0-9]/g, '') || Math.random().toString(36).slice(2, 6)
+      `${groomName.toLowerCase().replace(/[^a-z0-9]/g, "") || "undangan"}-${
+        brideName.toLowerCase().replace(/[^a-z0-9]/g, "") ||
+        Math.random().toString(36).slice(2, 6)
       }`;
 
     if (slugError) {
-      toast.error('Slug sudah digunakan', 'Silakan ubah sedikit tautan undangan Anda agar unik.');
+      toast.error(
+        "Slug sudah digunakan",
+        "Silakan ubah sedikit tautan undangan Anda agar unik.",
+      );
       return;
     }
 
-    const newUser = await auth.register({
-      fullName: fullName.trim() || googleUser?.name || `${groomName} & ${brideName}`,
+    await auth.register({
+      fullName:
+        fullName.trim() || googleUser?.name || `${groomName} & ${brideName}`,
       coupleGroom: groomName.trim(),
       coupleBride: brideName.trim(),
       activeSlug: finalSlug,
@@ -250,23 +298,15 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       googleSignupToken: googleUser?.signupToken,
       noWa: noWa.trim(),
       sosmed: sosmed.trim(),
-      packageId: 'free',
+      eventDate,
+      city: city.trim(),
+      referralSource,
+      packageId: "free",
       isCustomByRfx: false,
-      paymentStatus: 'success',
-      authProvider: googleUser ? 'google' : 'local',
+      paymentStatus: "success",
+      authProvider: googleUser ? "google" : "local",
       avatarUrl: googleUser?.avatarUrl,
     });
-
-    if (!newUser) {
-      if (auth.error) {
-        toast.error('Registrasi gagal', auth.error);
-        auth.clearError();
-      }
-      return;
-    }
-
-    setWelcomeUser(newUser);
-    setShowWelcome(true);
   };
 
   // Admin Override Actions — via Turso
@@ -286,7 +326,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
     <div className="saas-scope rh-product rh-auth min-h-screen lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
       <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
         {/* ==================== SIGN IN VIEW ==================== */}
-        {mode === 'signin' && !showWelcome && (
+        {mode === "signin" && (
           <ErrorBoundary name="SignIn">
             <SignInView
               loginEmail={loginEmail}
@@ -298,29 +338,29 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               onSubmit={handleLogin}
               onGoogleSuccess={handleGoogleSuccess}
               onGotoSignUp={() => {
-                setMode('signup');
+                setMode("signup");
                 setStep(1);
               }}
-              onGotoEnterprise={() => setMode('enterprise')}
+              onGotoEnterprise={() => setMode("enterprise")}
             />
           </ErrorBoundary>
         )}
 
         {/* ==================== ENTERPRISE SIGN IN VIEW ==================== */}
-        {mode === 'enterprise' && !showWelcome && (
+        {mode === "enterprise" && (
           <ErrorBoundary name="EnterpriseSignIn">
             <EnterpriseSignInView
               onSuccess={(user) => {
                 auth.setCurrentUser(user);
                 onLoginSuccess(user);
               }}
-              onBackToPersonal={() => setMode('signin')}
+              onBackToPersonal={() => setMode("signin")}
             />
           </ErrorBoundary>
         )}
 
         {/* ==================== SIGN UP VIEW (3-STEP FREE WIZARD) ==================== */}
-        {mode === 'signup' && !showWelcome && (
+        {mode === "signup" && (
           <ErrorBoundary name="SignUp">
             <SignUpView
               step={step}
@@ -331,6 +371,9 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               password={password}
               noWa={noWa}
               sosmed={sosmed}
+              eventDate={eventDate}
+              city={city}
+              referralSource={referralSource}
               slug={slug}
               packageId={packageId}
               slugError={slugError}
@@ -344,11 +387,14 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               onPasswordChange={setPassword}
               onNoWaChange={setNoWa}
               onSosmedChange={setSosmed}
+              onEventDateChange={setEventDate}
+              onCityChange={setCity}
+              onReferralSourceChange={setReferralSource}
               onSlugChange={setSlug}
               onPackageChange={setPackageId}
-              onGotoEnterprise={() => setMode('enterprise')}
+              onGotoEnterprise={() => setMode("enterprise")}
               onBack={() => {
-                if (step === 1) setMode('signin');
+                if (step === 1) setMode("signin");
                 else setStep((prev) => (prev - 1) as 1 | 2 | 3);
               }}
               onNext1={handleNextStep1}
@@ -358,53 +404,23 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
           </ErrorBoundary>
         )}
 
-        {/* ==================== WELCOME GREETING ==================== */}
-        {showWelcome && welcomeUser && (
-          <div className="w-full max-w-md saas-card p-8 sm:p-10 text-center space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#E9F2EA] border border-[#3F7A52]/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-[#3F7A52]" />
-            </div>
-
-            <div className="space-y-2">
-              <span className="saas-kicker">Akun Aktif · Full Gratis</span>
-              <h2 className="text-[28px] font-serif text-[var(--rh-ink)] leading-tight">
-                Selamat Datang, {welcomeUser.fullName}
-              </h2>
-              <p className="text-[13.5px] text-[var(--rh-ink-2)] leading-relaxed">
-                Workspace undangan Anda sudah siap digunakan dengan seluruh fitur inti terbuka tanpa biaya.
-              </p>
-            </div>
-
-            <div className="bg-[var(--rh-ivory)] border border-[var(--rh-line)] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
-              <div className="flex justify-between items-center">
-                <span className="text-[var(--rh-ink-2)]">Paket Aktif</span>
-                <span className="font-bold text-[#3F7A52] bg-[#E9F2EA] px-2.5 py-0.5 rounded-full text-[12px] font-medium">
-                  Full Gratis · Rp 0
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-3">
-                <span className="text-[var(--rh-ink-2)]">Tautan Undangan</span>
-                <span className="font-mono text-[12px] font-semibold text-[var(--rh-ink)] truncate">
-                  ruanghadir.net/{welcomeUser.activeSlug}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setShowWelcome(false);
-                onLoginSuccess(welcomeUser);
-              }}
-              className="w-full saas-btn-primary !py-3.5 cursor-pointer"
-            >
-              <span>Buka Dashboard Workspace</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+        {mode === "pending" && (
+          <ApplicationStatusView
+            application={auth.application}
+            onCheckAgain={() => {
+              setLoginEmail(
+                auth.application?.application?.email || email || loginEmail,
+              );
+              auth.clearApplication();
+              auth.clearError();
+              setMode("signin");
+              window.history.replaceState(null, "", "/auth");
+            }}
+          />
         )}
 
         {/* ==================== PORTAL ADMIN VIEW ==================== */}
-        {mode === 'admin' && (
+        {mode === "admin" && (
           <ErrorBoundary name="AdminPanel">
             <AdminPanelView
               usersList={usersList}
@@ -413,7 +429,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
               onReject={handleRejectTransaction}
               onDeleteUser={async (userId) => {
                 await auth.deleteUser(userId);
-                if (activeUser?.id === userId) setMode('signin');
+                if (activeUser?.id === userId) setMode("signin");
               }}
             />
           </ErrorBoundary>
@@ -421,20 +437,34 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
       </div>
 
       {/* Panel visual (desktop): tiga tampilan undangan asli, latar datar (tanpa gradasi) */}
-      <aside className="relative hidden flex-col justify-center gap-12 overflow-hidden bg-[#1F1F1F] px-12 py-16 lg:flex" aria-hidden>
+      <aside
+        className="relative hidden flex-col justify-center gap-12 overflow-hidden bg-[#1F1F1F] px-12 py-16 lg:flex"
+        aria-hidden
+      >
         <div className="flex items-end justify-center gap-4">
-          {['royal-arabian', 'sage-garden', 'cremy-rose'].map((id, i) => (
+          {["royal-arabian", "sage-garden", "cremy-rose"].map((id, i) => (
             <div
               key={id}
-              className={`relative aspect-[9/19.5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl ${i === 1 ? 'w-[200px] -translate-y-6' : 'w-[160px] opacity-80'}`}
+              className={`relative aspect-[9/19.5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl ${i === 1 ? "w-[200px] -translate-y-6" : "w-[160px] opacity-80"}`}
             >
-              <Image src={`/assets/themes/shots/${id}.webp`} alt="" fill sizes="200px" className="object-cover object-top" />
+              <Image
+                src={`/assets/themes/shots/${id}.webp`}
+                alt=""
+                fill
+                sizes="200px"
+                className="object-cover object-top"
+              />
             </div>
           ))}
         </div>
         <div className="mx-auto max-w-[460px] text-center text-[#F6EFE6]">
-          <p className="rh-display text-3xl font-semibold">Satu tautan untuk seluruh tamu, lengkap dengan nama mereka.</p>
-          <p className="mt-4 text-base text-[#C9C2BC]">Tema, RSVP, amplop digital, dan check in QR. Gratis untuk setiap pasangan.</p>
+          <p className="rh-display text-3xl font-semibold">
+            Satu tautan untuk seluruh tamu, lengkap dengan nama mereka.
+          </p>
+          <p className="mt-4 text-base text-[#C9C2BC]">
+            Tema, RSVP, amplop digital, dan check in QR. Tersedia melalui Akses
+            Awal setelah pendaftaran disetujui.
+          </p>
         </div>
       </aside>
     </div>
@@ -442,7 +472,8 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 }
 
 export default function AuthGate(props: AuthGateProps) {
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'placeholder-client-id';
+  const clientId =
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "placeholder-client-id";
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <AuthGateInner {...props} />

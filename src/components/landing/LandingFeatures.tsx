@@ -1,54 +1,89 @@
-import React from 'react';
+import React from "react";
 
 const FEATURES = [
   {
-    title: 'Nama tamu di setiap tautan',
-    body: 'Sampul undangan menyapa tamu dengan namanya. Pesan WhatsApp pengantar disiapkan otomatis untuk setiap orang.',
+    phase: "Saat menyiapkan",
+    title: "Cerita kalian, lengkap dengan detailnya.",
+    items: [
+      [
+        "Galeri, cerita, dan musik",
+        "Lengkapi undangan dengan foto, perjalanan berdua, dan lagu pilihan kalian.",
+      ],
+      [
+        "Jadwal dan lokasi acara",
+        "Satukan informasi akad dan resepsi, petunjuk arah, serta pengingat kalender.",
+      ],
+    ],
   },
   {
-    title: 'Jadwal, peta, dan pengingat',
-    body: 'Hitung mundur acara, petunjuk arah Google Maps, dan tombol simpan ke kalender untuk akad maupun resepsi.',
+    phase: "Saat membagikan",
+    title: "Satu undangan, sapaan yang personal.",
+    items: [
+      [
+        "Nama tamu di tautan",
+        "Siapkan tautan untuk setiap nama dan pesan pengantar yang bisa kalian kirim lewat WhatsApp.",
+      ],
+      [
+        "RSVP dan amplop digital",
+        "Tamu dapat mengisi konfirmasi, meninggalkan ucapan, dan melihat informasi rekening atau alamat kado.",
+      ],
+    ],
   },
   {
-    title: 'Amplop digital',
-    body: 'Tampilkan rekening bank, dompet digital, QRIS, dan alamat kirim kado dengan tombol salin.',
-  },
-  {
-    title: 'Galeri, kisah, dan musik',
-    body: 'Foto prewedding, linimasa perjalanan berdua, dan lagu latar yang diputar saat undangan dibuka.',
-  },
-  {
-    title: 'Check in QR di lokasi',
-    body: 'Tamu yang sudah konfirmasi mendapat kode QR. Penerima tamu memindainya dari HP untuk mencatat kehadiran dan jumlah orang.',
-  },
-  {
-    title: 'Rekap kehadiran',
-    body: 'Lihat siapa yang sudah membuka undangan, siapa yang hadir, dan ucapan yang masuk. Ekspor daftar ke CSV atau PDF.',
+    phase: "Saat hari H tiba",
+    title: "Lebih mudah menyambut yang hadir.",
+    items: [
+      [
+        "Check in dengan QR",
+        "Pindai kode tamu melalui kamera HP untuk mencatat kehadiran di lokasi acara.",
+      ],
+      [
+        "Rekap yang bisa dibawa",
+        "Lihat konfirmasi dan catatan check in. Unduh daftar tamu dalam format CSV atau PDF.",
+      ],
+    ],
   },
 ];
 
 export function LandingFeatures() {
   return (
-    <section id="fitur" className="scroll-mt-20 border-t border-[var(--rh-line)]">
-      <div className="mx-auto grid max-w-[1200px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:py-24">
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <h2 className="text-[36px] leading-[1.08] sm:text-[44px]">Semua yang dibutuhkan dari undangan sampai hari H.</h2>
-          <p className="mt-4 max-w-[420px] text-[16px] leading-[1.65] text-[var(--rh-ink-2)]">
-            Tidak ada fitur yang dikunci. Mempelai mengelola semuanya dari HP; tamu cukup membuka tautan tanpa memasang aplikasi.
+    <section
+      id="fitur"
+      className="rh-features-section"
+      aria-labelledby="features-heading"
+    >
+      <div className="rh-marketing-container">
+        <div className="rh-marketing-section-heading">
+          <div>
+            <p className="rh-eyebrow">DETAIL KECIL, BANYAK MEMBANTU</p>
+            <h2 id="features-heading">Bukan hanya cantik saat dibuka.</h2>
+          </div>
+          <p>
+            Kalian mengelola undangannya. Tamu cukup membuka tautan di browser,
+            tanpa memasang aplikasi.
           </p>
         </div>
-
-        <dl className="grid gap-x-10 sm:grid-cols-2">
-          {FEATURES.map(({ title, body }, index) => (
-            <div key={title} className="border-t border-[var(--rh-line)] py-7">
-              <dt className="flex items-center gap-3">
-                <span className="rh-feature-index" aria-hidden>{String(index + 1).padStart(2, '0')}</span>
-                <span className="text-[16.5px] font-semibold text-[var(--rh-ink)]">{title}</span>
-              </dt>
-              <dd className="mt-2.5 text-[15px] leading-[1.65] text-[var(--rh-ink-2)]">{body}</dd>
-            </div>
+        <div className="rh-feature-phases">
+          {FEATURES.map((phase, index) => (
+            <article key={phase.phase}>
+              <div className="rh-feature-phase-heading">
+                <p>
+                  <span aria-hidden>0{index + 1}</span>
+                  {phase.phase}
+                </p>
+                <h3>{phase.title}</h3>
+              </div>
+              <dl>
+                {phase.items.map(([title, body]) => (
+                  <div key={title}>
+                    <dt>{title}</dt>
+                    <dd>{body}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
           ))}
-        </dl>
+        </div>
       </div>
     </section>
   );
