@@ -14,8 +14,9 @@ import sageGarden from './sage-garden';
 import lembayung from './lembayung';
 import tamanKertas from './taman-kertas';
 import darkLuxuryCinematic from './dark-luxury-cinematic';
+import sundaKujang from './sunda-kujang';
 
-export const KIT_THEMES: ThemeSpec[] = [tamanKertas, lembayung, sageGarden, darkLuxuryCinematic];
+export const KIT_THEMES: ThemeSpec[] = [sundaKujang, tamanKertas, lembayung, sageGarden, darkLuxuryCinematic];
 
 const byId = new Map(KIT_THEMES.map((t) => [t.id, t]));
 

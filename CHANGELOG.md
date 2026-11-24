@@ -2,6 +2,7 @@
 
 ## Tema baru
 
+- 2026-11-24 — **Pasundan** (adat Sunda · sampul tirai bilik, kujang & goong, fajar Priangan)
 - 2026-11-23 — **Taman Kertas** (Spesial · 2D pop-up kertas)
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit

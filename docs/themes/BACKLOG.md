@@ -11,7 +11,7 @@ Format: `status | id | Nama | tier/kategori | brief`
 | done (2026-11-23) | sage-garden | Sage Garden | regular / minimalist | Taman botani tenang, sage + linen, sketsa daun, pintu taman. (pilot) |
 | done (2026-11-23) | lembayung | Lembayung | **special** / classic | 2.5D: gunung api, punggung bukit, candi, nyiur; senja → malam berlampion saat digulir; intro dolly. |
 | done (2026-11-23) | taman-kertas | Taman Kertas | **special** / storybook | 2D buku pop-up kertas potong: bukit, gapura bunga, pohon, daun; intro popup. |
-| todo | sunda-kujang | Pasundan | classic | Adat Sunda: hijau tua + emas pudar, motif kujang & bambu, sampul tirai, gamelan degung terasa lewat ornamen; font serif klasik. |
+| done (2026-11-24) | sunda-kujang | Pasundan | classic | Adat Sunda: hijau tua + emas pudar, motif kujang & bambu, sampul tirai, gamelan degung terasa lewat ornamen; font serif klasik. |
 | todo | noir-monogram | Noir Monogram | modern | Hitam pekat + krem + emas, monogram inisial besar, hero tipografi, galeri film, reveal zoom. |
 | todo | sawah-fajar | Sawah Fajar | **special** / classic | 2.5D terasering sawah Bali saat fajar: kabut berlapis, pura kecil, burung kuntul terbang; pagi → siang cerah saat digulir; intro dolly. |
 | todo | peony-blush | Peony Blush | floral | Peony merah muda cat air, krem hangat, sampul amplop bersegel lilin, bingkai oval, kelopak jatuh. |
@@ -61,3 +61,4 @@ Format: `status | id | Nama | tier/kategori | brief`
 | sage-garden | gate | frame | arch | cards | timeline | masonry | leaves | blur | Cormorant Garamond |
 | lembayung | scene (dolly) | scene | arch | cards | ticket | film | none | rise | Bodoni Moda + Pinyon Script |
 | taman-kertas | scene (popup) | scene | circle | split | cards | grid | none | zoom | Young Serif |
+| sunda-kujang | curtain | type (Stage fajar Priangan) | oval | cards | cards | grid | leaves | rise | Gilda Display + Cinzel (label) + Lora |
