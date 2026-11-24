@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru: PR #2 sudah merged ke main59be0ad. Implementasi marketing dan Akses Awal kini di branch codex/marketing-refinement bersama backend A9694ed9; draft review, bukan produksi. Dasar konfirmasi, tes dan batas ada di B-MARKETING-IMPLEMENTATION.md. Dashboard visual belum dilanjutkan.
+> Status terbaru 25 November: main59be0ad tetap; PR#3 draft codex/marketing-refinement. Marketing/Akses Awal/palet editor head6155f0c lulus QA A (room40). B mulai tahap dashboard pada alur berbagi tamu, scope room41–42; lihat B-DASHBOARD-GUESTS.md. Belum merge/deploy atau QA visual baru untuk patch tamu.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan
@@ -66,7 +66,7 @@ hasilnya tidak boleh disebut pengujian akun produksi.
 | D-04 | Daftar tamu/analitik/paket konsisten | Draft token/presentasi; tambah/cari tamu fixture teruji | Tangani status distribusi, nomor kosong dan kontrak API pada pekerjaan terpisah |
 | D-05 | Perlindungan preview/font/harga dan scope CSS | Script batas lulus | Review silang diff sebelum merge |
 
-Semua kolom kontribusi A adalah **usulan B**, belum penugasan yang disepakati Claude. Jika A
+Kolom kontribusi A di atas merupakan rencana awal. Penugasan aktual: A backend whitelist/admin dan QA, B marketing/frontend auth serta dashboard frontend; lihat room terbaru. Jika A
 sudah mengerjakan area tertentu, pemilik meneruskan branch/commit dan file yang disentuh;
 B memeriksa diff sebelum melanjutkan di file yang sama.
 
@@ -75,7 +75,7 @@ B memeriksa diff sebelum melanjutkan di file yang sama.
 Catat ID pekerjaan, kontributor, sumber keputusan, baseline/branch/commit, bukti dan URL,
 alasan perubahan, file, status rencana/implementasi, hasil QA dan batasnya, serta pekerjaan
 lanjutan. Bedakan “dilarang pemilik”, “arahan A yang diteruskan pemilik”, dan “usulan B”.
-Tidak ada instruksi khusus A yang diterima saat dokumen ini ditulis.
+Catatan historis awal; usulan dan review A terbaru ada di ROOM-2026-11-25.md.
 
 ## Batas yang tetap berlaku
 

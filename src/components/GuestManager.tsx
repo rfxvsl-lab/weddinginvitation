@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Users,
   Plus,
@@ -31,6 +31,7 @@ import { getLimits, canAccess, isLimitReached, formatLimit, PACKAGE_NAMES, type 
 import { useAlertModal } from '../hooks/useAlertModal';
 import { checkInGuest } from '../lib/api';
 import QrCheckInScanner from './QrCheckInScanner';
+import { normalizeWhatsAppPhone, guestRecordLabel } from '../lib/guestSharing';
 
 interface GuestManagerProps {
   guests: Guest[];
@@ -46,6 +47,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string>('Semua');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const shareOperation = useRef(0);
+  const [shareFeedback, setShareFeedback] = useState<{ guestId: string; message: string; error: boolean } | null>(null);
 
   const auth = useAuth();
   const packageId = (auth.currentUser?.packageId || 'demo') as string;
@@ -147,7 +150,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
     onAddGuest({
       name: newName.trim(),
       group: newGroup,
-      phoneNumber: newPhone.trim() || '081234567890',
+      phoneNumber: newPhone.trim(),
       paxLimit: Number(newPaxLimit),
       status: 'Draft',
       seatImageUrl: newSeatImage.trim(),
@@ -168,24 +171,35 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
     return `${baseUrl}/${slug}?to=${encodeURIComponent(guest.name)}&code=${guest.invitationCode}`;
   };
 
-  const handleCopyLink = (guest: Guest) => {
-    const link = generateInvitationLink(guest);
-    navigator.clipboard.writeText(link).then(() => {
+  const handleCopyLink = async (guest: Guest) => {
+    const operation = ++shareOperation.current;
+    setCopiedId(null);
+    setShareFeedback(null);
+    try {
+      await navigator.clipboard.writeText(generateInvitationLink(guest));
+      if (operation !== shareOperation.current) return;
       setCopiedId(guest.id);
-      onUpdateGuestStatus(guest.id, 'Sent');
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+      setShareFeedback({ guestId: guest.id, message: `Tautan untuk ${guest.name} tersalin. Bagikan melalui aplikasi pilihan kalian.`, error: false });
+    } catch {
+      if (operation !== shareOperation.current) return;
+      setShareFeedback({ guestId: guest.id, message: `Tautan untuk ${guest.name} belum bisa disalin otomatis. Pilih dan salin tautan di bawah.`, error: true });
+    }
   };
 
-  const handleSimulateWhatsApp = (guest: Guest) => {
+  const handleOpenWhatsApp = (guest: Guest) => {
+    ++shareOperation.current;
+    setCopiedId(null);
+    const phone = normalizeWhatsAppPhone(guest.phoneNumber);
+    if (!phone) {
+      setShareFeedback({ guestId: guest.id, message: `Nomor WhatsApp ${guest.name} belum diisi atau formatnya belum sesuai. Salin tautan untuk membagikannya secara manual.`, error: true });
+      return;
+    }
     const link = generateInvitationLink(guest);
     const textMsg = `Halo *${guest.name}*, Kami mengundang Anda untuk hadir di acara pernikahan ${coupleNames}. Silakan buka tautan undangan digital berikut untuk detail acara dan konfirmasi RSVP: ${link}`;
-    const waUrl = `https://api.whatsapp.com/send?phone=${guest.phoneNumber}&text=${encodeURIComponent(textMsg)}`;
-
-    onUpdateGuestStatus(guest.id, 'Opened');
-    window.open(waUrl, '_blank');
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMsg)}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    setShareFeedback({ guestId: guest.id, message: `Lanjutkan pengiriman untuk ${guest.name} di WhatsApp. Jika jendela tidak muncul, izinkan pop-up atau salin tautan. RuangHadir belum dapat memverifikasi pesan terkirim atau dibaca.`, error: false });
   };
-
 
   // Perform standard UTF-8 CSV downloads with BOM preamble for Microsoft Excel compliance
   const handleExportCSV = (scope: 'all' | 'filtered') => {
@@ -203,7 +217,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
       'Batas Pax',
       'Kode Undangan Unik',
       'Link Undangan Digital',
-      'Status Undangan'
+      'Catatan status'
     ];
 
     const rows = listToExport.map((guest, idx) => {
@@ -216,7 +230,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         guest.paxLimit,
         `"${guest.invitationCode}"`,
         `"${link}"`,
-        guest.status === 'Opened' ? 'Dibuka (Hadir)' : guest.status === 'Sent' ? 'Terkirim' : 'Draf'
+        guestRecordLabel(guest.status)
       ];
     });
 
@@ -352,15 +366,18 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
 
           <div>
-            <label htmlFor="guest-phone" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nomor WhatsApp</label>
+            <label htmlFor="guest-phone" className="block text-[11px] font-bold text-[var(--color-on-surface-variant)] mb-1">Nomor WhatsApp (opsional)</label>
             <input
               id="guest-phone"
-              type="text"
+              type="tel"
+              autoComplete="tel"
+              aria-describedby="guest-phone-hint"
               value={newPhone}
               onChange={(e) => setNewPhone(e.target.value)}
               placeholder="e.g. 081234567890"
               className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-outline-variant)] bg-white"
             />
+            <p id="guest-phone-hint" className="mt-1 text-xs text-[var(--rh-muted)]">Gunakan 08…, +62…, atau kode negara lain. Boleh dikosongkan untuk berbagi tautan manual.</p>
           </div>
 
           <div>
@@ -415,6 +432,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-zinc-400 flex-shrink-0" />
           <select
+            aria-label="Filter grup tamu"
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
             className="w-full text-xs px-3 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all cursor-pointer"
@@ -468,6 +486,21 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         </div>
       </div>
 
+      {shareFeedback && (
+        <div className="p-4 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-ivory)] text-sm text-[var(--rh-ink)]">
+          <p role={shareFeedback.error ? 'alert' : 'status'}>{shareFeedback.message}</p>
+          {shareFeedback.error && guests.find(guest => guest.id === shareFeedback.guestId) && (
+            <div className="mt-2">
+              <label htmlFor="guest-share-link" className="block text-xs text-[var(--rh-muted)] mb-1">Tautan undangan untuk disalin manual</label>
+              <input id="guest-share-link" readOnly value={generateInvitationLink(guests.find(guest => guest.id === shareFeedback.guestId)!)} onFocus={event => event.currentTarget.select()} className="w-full min-h-11 px-3 text-base border border-[var(--rh-line-strong)] rounded-lg bg-[var(--rh-paper)]" />
+            </div>
+          )}
+        </div>
+      )}
+      <p className="text-xs text-[var(--rh-muted)]">
+        Salin tautan dan buka WhatsApp tidak membuktikan pesan terkirim atau dibaca. Catatan status tidak memastikan kehadiran; kehadiran di lokasi mengikuti kolom Check-in.
+      </p>
+
       {/* GUEST LIST CONTAINER */}
       <div className="bg-white rounded-2xl border border-zinc-200/60 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
@@ -478,7 +511,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <th className="px-4 py-3">Kode Unik</th>
                 <th className="px-4 py-3">No. Telp</th>
                 <th className="px-4 py-3 text-center">Pax limit</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Catatan status</th>
                 <th className="px-4 py-3">Check-in</th>
                 <th className="px-5 py-3 text-right">Aksi Undangan</th>
               </tr>
@@ -499,19 +532,19 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                       </code>
                     </td>
                     <td className="px-4 py-3.5 text-xs text-zinc-500 font-mono">
-                      {guest.phoneNumber}
+                      {guest.phoneNumber || 'Belum diisi'}
                     </td>
                     <td className="px-4 py-3.5 text-center text-xs font-bold text-zinc-800">
                       {guest.paxLimit} Pax
                     </td>
                     <td className="px-4 py-3.5">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold ${guest.status === 'Opened'
-                          ? 'bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] border border-[var(--rh-line)]'
                           : guest.status === 'Sent'
-                            ? 'bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200'
+                            ? 'bg-[var(--rh-gold-soft)] text-[var(--rh-ink)] border border-[var(--rh-line)]'
                             : 'bg-zinc-100 text-zinc-500 border border-zinc-200'
                         }`}>
-                        {guest.status === 'Opened' ? '✓ Dibuka' : guest.status === 'Sent' ? '↗ Terkirim' : '○ Draf'}
+                        {guestRecordLabel(guest.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
@@ -537,21 +570,23 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                       <button
                         type="button"
                         onClick={() => handleCopyLink(guest)}
-                        className={`p-1.5 rounded-lg border transition-all ${copiedId === guest.id
-                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                            : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50 hover:text-zinc-700'
+                        className={`min-h-11 min-w-11 flex items-center justify-center rounded-lg border transition-colors ${copiedId === guest.id
+                            ? 'bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] border-[var(--rh-primary)]'
+                            : 'bg-[var(--rh-paper)] text-[var(--rh-ink-2)] border-[var(--rh-line)] hover:bg-[var(--rh-ivory)]'
                           }`}
-                        title="Salin Tautan Undangan Kustom"
+                        aria-label={`Salin tautan untuk ${guest.name}`}
+                        title="Salin tautan undangan"
                       >
                         {copiedId === guest.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
 
-                      {/* WA Simulation */}
+                      {/* Open a manual WhatsApp draft; no delivery/read receipt. */}
                       <button
                         type="button"
-                        onClick={() => handleSimulateWhatsApp(guest)}
-                        className="p-1.5 bg-white text-emerald-600 border border-zinc-200 hover:bg-emerald-50 hover:border-emerald-200 rounded-lg transition-all flex items-center justify-center"
-                        title="Simulasikan Kirim WhatsApp"
+                        onClick={() => handleOpenWhatsApp(guest)}
+                        className="min-h-11 min-w-11 bg-[var(--rh-paper)] text-[var(--rh-primary)] border border-[var(--rh-line)] hover:bg-[var(--rh-primary-soft)] rounded-lg transition-colors flex items-center justify-center"
+                        aria-label={`Buka WhatsApp untuk ${guest.name}`}
+                        title="Buka draf pesan WhatsApp"
                       >
                         <Send className="w-3.5 h-3.5" />
                       </button>
@@ -610,8 +645,11 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         <Users className="w-6 h-6 text-zinc-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-zinc-600">Belum ada data tamu</p>
-                        <p className="text-[11px] text-zinc-400 mt-0.5">Klik "Tambah Tamu Baru" untuk memulai menambahkan daftar tamu undangan.</p>
+                        <p className="text-sm font-semibold text-[var(--rh-ink)]">{guests.length ? 'Tidak ada tamu yang cocok' : 'Belum ada data tamu'}</p>
+                        <p className="text-xs text-[var(--rh-muted)] mt-1">{guests.length ? 'Coba nama, nomor, atau grup yang lain.' : 'Tambahkan tamu untuk menyiapkan tautan undangan bernama.'}</p>
+                        {guests.length > 0 && (
+                          <button type="button" onClick={() => { setSearchTerm(''); setSelectedGroup('Semua'); }} className="mt-3 min-h-11 px-4 rounded-lg border border-[var(--rh-line-strong)] text-[var(--rh-primary)] text-sm">Hapus pencarian dan filter</button>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -910,7 +948,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                           {includePhoneColumn && <th className="px-2 py-1.5 border-r border-[var(--color-outline-variant)] w-24">WhatsApp</th>}
                           <th className="px-1 py-1.5 border-r border-[var(--color-outline-variant)] w-10 text-center">Pax</th>
                           <th className="px-2 py-1.5 border-r border-[var(--color-outline-variant)] w-14">Kode</th>
-                          {includeStatusColumn && <th className="px-2 py-1.5 border-r border-[var(--color-outline-variant)] w-16">Status</th>}
+                          {includeStatusColumn && <th className="px-2 py-1.5 border-r border-[var(--color-outline-variant)] w-16">Catatan status</th>}
                           {includeSignatureColumn && <th className="px-2 py-1.5">Tanda Tangan</th>}
                         </tr>
                       </thead>
@@ -927,7 +965,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                               <td className="px-1.5 py-2 border-r border-[var(--color-outline-variant)] text-center text-[9px]">
                                 <span className={`inline-block px-1.5 py-0.5 rounded text-[var(--color-outline)] font-bold ${guest.status === 'Opened' ? 'bg-surface-container-low text-emerald-800' : guest.status === 'Sent' ? 'bg-amber-50 text-amber-800' : 'bg-surface-container-low text-[var(--color-outline)]'
                                   }`}>
-                                  {guest.status === 'Opened' ? <span className="flex items-center gap-1 justify-center"><Check className="w-3 h-3" /> Hadir</span> : guest.status === 'Sent' ? 'Terkirim' : 'Draf'}
+                                  {guestRecordLabel(guest.status)}
                                 </span>
                               </td>
                             )}
@@ -1117,6 +1155,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
           </div>
         </div>
 
+        {includeStatusColumn && <p className="text-xs mb-3">Catatan status bukan bukti pesan terkirim, dibaca, atau kehadiran tamu.</p>}
         <div className="grid grid-cols-3 gap-4 mb-6 text-xs bg-gray-50 border border-gray-300 p-3 rounded-lg font-mono">
           <div>
             <span className="text-gray-500 block">Kriteria/Grup Data:</span>
@@ -1141,7 +1180,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               {includePhoneColumn && <th className="border border-gray-400 px-2 py-1.5 text-center w-28">No. WhatsApp</th>}
               <th className="border border-gray-400 px-2 py-1.5 text-center w-12">Porsi</th>
               <th className="border border-gray-400 px-2 py-1.5 text-center w-16">Kode</th>
-              {includeStatusColumn && <th className="border border-gray-400 px-2 py-1.5 text-center w-16">Status</th>}
+              {includeStatusColumn && <th className="border border-gray-400 px-2 py-1.5 text-center w-16">Catatan status</th>}
               {includeSignatureColumn && <th className="border border-gray-400 px-2 py-1.5 text-left w-40 font-bold">Tanda Tangan / Kehadiran</th>}
             </tr>
           </thead>
@@ -1157,7 +1196,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 {includeStatusColumn && (
                   <td className="border border-slate-300 px-2 py-1.5 text-center">
                     <span>
-                      {guest.status === 'Opened' ? <span className="flex items-center gap-1 justify-center"><Check className="w-3 h-3" /> Hadir</span> : guest.status === 'Sent' ? 'Terkirim' : 'Draf'}
+                      {guestRecordLabel(guest.status)}
                     </span>
                   </td>
                 )}
