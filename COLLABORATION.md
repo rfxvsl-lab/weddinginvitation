@@ -4,6 +4,20 @@ Sumber keputusan: arahan pemilik dalam chat 24 November 2026 (Asia/Jakarta).
 Baseline pemeriksaan: `04a52ec0bf720301e2e9e0d6da7dc2e8aee0da13`, merge PR #1.
 Kontributor yang disebut pemilik: Claude dan GPT/Codex. Pemilik meneruskan kabar perubahan di antara keduanya.
 
+## Identitas dan urutan prioritas
+
+Penetapan eksplisit pemilik pada lanjutan chat 24 November 2026:
+
+| ID | Kontributor | Pekerjaan yang benar-benar diketahui | Status koordinasi |
+|---|---|---|---|
+| A | Claude | Belum ada rincian perubahan/instruksi Claude yang diteruskan pada sesi ini | Jangan mengarang kepemilikan file atau progres A |
+| B | GPT / Codex | Riset publik, pedoman, website riset dan draft redesign pada branch review | Catat bukti, file, commit dan QA B |
+| Pemilik | Rfx Digital | Penetapan kebutuhan, prioritas dan penghubung A–B | Arahan pemilik didahulukan |
+
+Prioritas kerja dan review: **landing page marketing terlebih dahulu, kemudian dashboard UI**.
+Lihat [rencana bertahap dan matriks kontributor](docs/collaboration/CHANGE-PLAN.md).
+Draft dashboard yang sudah dibuat tidak berarti sudah disetujui atau harus dirilis lebih dahulu.
+
 ## Batas yang ditetapkan pemilik
 
 1. **Preview dan tema undangan dilindungi.** Pemilik sudah menyukai hasilnya. Jangan mengubah mesin render, seni, animasi, layout, atau perilaku preview dalam pekerjaan redesign aplikasi ini.
@@ -44,4 +58,5 @@ CSS aplikasi harus dibatasi pada permukaan aplikasi; jangan mengubah selector gl
 
 - [Riwayat kebutuhan dan diskusi](docs/collaboration/CHAT-2026-11-24.md)
 - [Handover GPT untuk Claude](docs/collaboration/HANDOVER-GPT.md)
+- [Rencana perubahan A–B](docs/collaboration/CHANGE-PLAN.md)
 - [Riset dan ledger implementasi](docs/research/README.md)

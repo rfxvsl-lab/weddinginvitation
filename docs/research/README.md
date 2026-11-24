@@ -23,6 +23,11 @@ Tanggal: 24 November 2026, Asia/Jakarta. Baseline produk: `04a52ec`.
 
 Lanjutkan ke [sintesis dan ledger implementasi](06-SYNTHESIS.md), bukan hanya daftar referensi.
 
+Prioritas terbaru pemilik: marketing lebih dahulu, lalu dashboard. Lihat
+[rencana perubahan A = Claude / B = GPT](../collaboration/CHANGE-PLAN.md) dan
+[pendalaman marketing pertama: Wedew](08-WEDEW-MARKETING.md). Laporan 01–05 adalah bukti
+awal per website; jangan menyamakan cakupan publik itu dengan audit dashboard privat.
+
 ## Kebutuhan yang sudah disepakati
 
 Lihat [COLLABORATION.md](../../COLLABORATION.md). Harga, font, serta preview/tema dilindungi. Fokus redesign aplikasi: marketing, auth, dan dashboard. Website riset privat diminta terpisah dari aplikasi produksi RuangHadir.

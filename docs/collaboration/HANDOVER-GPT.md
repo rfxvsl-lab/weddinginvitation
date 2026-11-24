@@ -10,13 +10,17 @@
 
 ## Bacaan pertama
 
+Prioritas terbaru pemilik: **marketing dahulu, dashboard UI sesudahnya**. Identitas kontributor:
+**A = Claude, B = GPT/Codex**. Lihat [CHANGE-PLAN.md](CHANGE-PLAN.md) untuk rencana, status
+aktual B, calon kontribusi A dan urutan review. Pekerjaan A belum diketahui pada sesi ini.
+
 1. [Kesepakatan kolaborasi](../../COLLABORATION.md)
 2. [Riwayat chat](CHAT-2026-11-24.md)
 3. [Indeks riset](../research/README.md)
 
 ## Rencana area yang dapat disentuh GPT
 
-Rencana implementasi konkret setelah riset: `src/styles/product.css` (scope aplikasi), import stylesheet pada `src/index.css`, root scope di `src/App.tsx`, `src/components/AuthGate.tsx`, `src/app/(marketing)/page.tsx`; struktur baru `LandingHero`, `LandingFeatures`, `DashboardOverview`, serta presentasi `DashboardSidebar` dan komponen UI aplikasi yang masih hardcode warna wine. Handler bisnis, harga dan file preview tetap dilindungi. Palet teal/kuning/koral adalah usulan GPT yang direalisasikan dalam branch review, belum keputusan brand permanen pemilik.
+Rencana implementasi konkret setelah riset: `src/styles/product.css` (scope aplikasi), import stylesheet pada root layout setelah `src/index.css`, root scope di `src/App.tsx`, `src/components/AuthGate.tsx`, `src/app/(marketing)/page.tsx`; struktur baru `LandingHero`, `LandingFeatures`, `DashboardOverview`, serta presentasi `DashboardSidebar` dan komponen UI aplikasi yang masih hardcode warna wine. Handler bisnis, harga dan file preview tetap dilindungi. Palet teal/kuning/koral adalah usulan GPT yang direalisasikan dalam branch review, belum keputusan brand permanen pemilik.
 
 `src/components/landing/*`, shell `src/App.tsx`, `DashboardSidebar`, `DashboardOverview`, presentasi form auth/editor/profil/tamu/analitik/paket, serta stylesheet **khusus aplikasi**. Pertahankan handler bisnis dan props preview. Jangan ubah `src/app/layout.tsx` untuk mengganti font.
 
