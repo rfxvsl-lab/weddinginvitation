@@ -185,6 +185,164 @@ await act(async () => {
   await auth.refreshUser();
 });
 assert.equal(auth.currentUser, null);
+// A stale session refresh must never resurrect the old approved account.
+const reply = (status, body) => ({
+  status,
+  ok: status >= 200 && status < 300,
+  json: async () => body,
+});
+let finishRefresh;
+let refreshPending;
+globalThis.fetch = async (url) =>
+  url === "/api/auth/me"
+    ? new Promise((resolve) => {
+        finishRefresh = resolve;
+      })
+    : reply(403, {
+        accountStatus: "pending",
+        application: { email: "new-applicant@example.test" },
+      });
+await act(async () => {
+  refreshPending = auth.refreshUser();
+});
+await act(async () => {
+  await auth.login("new-applicant@example.test", "test-password");
+});
+await act(async () => {
+  finishRefresh(
+    reply(200, {
+      user: { id: "old-approved-account", accountStatus: "approved" },
+    }),
+  );
+  await refreshPending;
+});
+assert.equal(
+  auth.currentUser,
+  null,
+  "late /me response must not restore an account after a pending login",
+);
+assert.equal(auth.application.accountStatus, "pending");
+
+// A login already on the wire must settle before logout clears its cookie.
+function deferred() {
+  let resolve, reject;
+  const promise = new Promise((yes, no) => {
+    resolve = yes;
+    reject = no;
+  });
+  return { promise, resolve, reject };
+}
+let calls = [];
+let first = deferred(),
+  last = deferred();
+globalThis.fetch = (url) => {
+  calls.push(url);
+  return url === "/api/auth/logout" ? last.promise : first.promise;
+};
+let oldLogin, logout;
+await act(async () => {
+  oldLogin = auth.login("old@example.test", "test-password");
+});
+await act(async () => {
+  logout = auth.logout();
+});
+assert.deepEqual(
+  calls,
+  ["/api/auth/login"],
+  "logout must not overtake a pending Set-Cookie response",
+);
+let obsoleteUser;
+await act(async () => {
+  first.resolve(
+    reply(200, { user: { id: "late-login", accountStatus: "approved" } }),
+  );
+  obsoleteUser = await oldLogin;
+});
+assert.equal(obsoleteUser, null);
+assert.equal(auth.currentUser, null);
+assert.deepEqual(calls, ["/api/auth/login", "/api/auth/logout"]);
+await act(async () => {
+  last.resolve(reply(200, { ok: true }));
+  await logout;
+});
+assert.equal(auth.currentUser, null);
+assert.equal(auth.application, null);
+
+// Two login intents keep the newer pending result and its loading state.
+calls = [];
+first = deferred();
+last = deferred();
+globalThis.fetch = (url) => {
+  calls.push(url);
+  return calls.length === 1 ? first.promise : last.promise;
+};
+let latestLogin;
+await act(async () => {
+  oldLogin = auth.login("old@example.test", "test-password");
+});
+await act(async () => {
+  latestLogin = auth.login("new@example.test", "test-password");
+});
+assert.equal(calls.length, 1);
+await act(async () => {
+  first.resolve(
+    reply(200, { user: { id: "old-login", accountStatus: "approved" } }),
+  );
+  await oldLogin;
+});
+assert.equal(auth.currentUser, null);
+assert.equal(
+  auth.isLoading,
+  true,
+  "old completion must not stop the newer loading state",
+);
+await act(async () => {
+  last.resolve(
+    reply(403, {
+      accountStatus: "pending",
+      application: { email: "new@example.test" },
+    }),
+  );
+  await latestLogin;
+});
+assert.equal(auth.currentUser, null);
+assert.equal(auth.application.application.email, "new@example.test");
+assert.equal(auth.isLoading, false);
+
+// A rejected stale request must not poison the queue or show an error after the next success.
+calls = [];
+first = deferred();
+last = deferred();
+globalThis.fetch = (url) => {
+  calls.push(url);
+  return calls.length === 1 ? first.promise : last.promise;
+};
+await act(async () => {
+  oldLogin = auth.login("old@example.test", "test-password");
+});
+await act(async () => {
+  latestLogin = auth.loginWithGoogle("test-only-credential");
+});
+await act(async () => {
+  first.reject(Error("old request offline"));
+  await oldLogin;
+});
+assert.equal(auth.error, null);
+assert.deepEqual(calls, ["/api/auth/login", "/api/auth/google"]);
+await act(async () => {
+  last.resolve(
+    reply(200, { user: { id: "new-approved", accountStatus: "approved" } }),
+  );
+  await latestLogin;
+});
+assert.equal(auth.currentUser.id, "new-approved");
+assert.equal(auth.error, null);
+assert.equal(auth.isReady, true);
+assert.equal(auth.isLoading, false);
+console.log(
+  "PASS: stale refresh ignored; login/logout mutations ordered; newest login/loading wins; failed stale requests do not poison the queue.",
+);
+
 await act(async () => {
   renderer.unmount();
 });

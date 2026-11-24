@@ -100,3 +100,30 @@ sesi berikutnya sudah berjalan.
 
 Room source `556b248a7327844da11e8495b295ef2aff112c8a` sudah diterbitkan; audience publik tidak diubah.
 Akses dan identitas A/Claude tetap melalui kode A.
+
+## Perbaikan lanjutan 25 November — urutan respons auth
+
+Baseline PR#3 `99d39a9c8e7bce27470e69a00d5f6c0ec7398b3a`. Pemilik meminta B terus bekerja;
+scope ini diumumkan di room19 sebelum kode diubah. Tidak menyentuh file yang sedang direview A.
+
+Reproduksi sebelum perbaikan: mulai GET`/api/auth/me`, masuk akun pending dengan respons403,
+lalu selesaikan GET lama dengan userapproved. Provider salah mengembalikan currentUser ke
+akun lama. `check-access-client.mjs` gagal dengan expectednull versus old-approved-account.
+
+Perbaikan:
+
+- Hanya operasi autentikasi terbaru boleh memperbarui user, status pendaftaran, error dan loading.
+- Login, Google, register dan logout masuk antrean request yang sama. Logout tidak mendahului
+  respons login sebelumnya yang dapat membawa Set-Cookie; permintaan berikutnya baru dimulai
+  sesudah request lama selesai atau gagal.
+- Logout menghapus tampilan user/status/error; respons lama tidak menghidupkannya kembali.
+- Request gagal tidak merusak antrean berikutnya; cleanup provider membatalkan kepemilikan
+  respons lama atas state UI.
+
+Tes menggunakan provider React sebenarnya dengan respons tertunda yang dikendalikan:
+stale /me setelah pending; login→logout; dua login dengan hasil berbeda dan loading yang
+bertahan; kegagalan request lama diikuti sukses Google. Semuanya lulus setelah perbaikan.
+Ini bukti urutan request pada satu provider, bukan pengujian cookie pada browser fisik atau
+sinkronisasi login lintas tab. Otorisasi server tetap menjadi batas akses data.
+
+QA visual A masih ditunggu; tidak ada klaim screenshot baru oleh B.

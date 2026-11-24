@@ -10,6 +10,7 @@
 
 import React, {
   useState,
+  useRef,
   useEffect,
   useCallback,
   createContext,
@@ -90,6 +91,17 @@ async function postJson<T = any>(
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Latest intent owns the UI. Ordered mutations also preserve Set-Cookie order.
+  const authOperation = useRef(0);
+  const mutationQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const postAuth = useCallback((url: string, body?: unknown) => {
+    const request = mutationQueue.current.then(() => postJson(url, body));
+    mutationQueue.current = request.then(
+      () => undefined,
+      () => undefined,
+    );
+    return request;
+  }, []);
   const [currentUser, setCurrentUserState] = useState<ClientUser | null>(null);
   const [application, setApplication] = useState<AccountApplication | null>(
     null,
@@ -114,16 +126,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
+    const operation = ++authOperation.current;
     try {
       const res = await fetch("/api/auth/me", {
         credentials: "same-origin",
         cache: "no-store",
       });
+      if (operation !== authOperation.current) return null;
       if (res.status === 401 || res.status === 403) {
         setCurrentUser(null);
         return null;
       }
       const data = await res.json();
+      if (operation !== authOperation.current) return null;
       if (
         data?.user &&
         (!data.user.accountStatus ||
@@ -136,29 +151,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setCurrentUser(null);
       return null;
     } catch {
+      if (operation !== authOperation.current) return null;
       // Never enter the dashboard from an unverified local cache.
       setCurrentUser(null);
       return null;
     } finally {
-      setIsReady(true);
+      if (operation === authOperation.current) {
+        setIsReady(true);
+        setIsLoading(false);
+      }
     }
   }, [setCurrentUser]);
 
   // Verifikasi sesi server sekali saat aplikasi dimuat.
   useEffect(() => {
     void refreshUser();
+    return () => {
+      authOperation.current += 1;
+    };
   }, [refreshUser]);
 
   const login = useCallback(
     async (email: string, password: string) => {
+      const operation = ++authOperation.current;
       setIsLoading(true);
       setError(null);
       setApplication(null);
       try {
-        const { ok, data } = await postJson("/api/auth/login", {
+        const { ok, data } = await postAuth("/api/auth/login", {
           email,
           password,
         });
+        if (operation !== authOperation.current) return null;
         if (
           data?.accountStatus === "pending" ||
           data?.accountStatus === "rejected"
@@ -184,22 +208,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCurrentUser(data.user);
         return data.user as ClientUser;
       } catch {
+        if (operation !== authOperation.current) return null;
         setError("Gagal terhubung. Periksa koneksi internet Anda.");
         return null;
       } finally {
-        setIsLoading(false);
+        if (operation === authOperation.current) {
+          setIsLoading(false);
+          setIsReady(true);
+        }
       }
     },
-    [setCurrentUser],
+    [setCurrentUser, postAuth],
   );
 
   const loginWithGoogle = useCallback(
     async (credential: string) => {
+      const operation = ++authOperation.current;
       setIsLoading(true);
       setError(null);
       setApplication(null);
       try {
-        const { ok, data } = await postJson("/api/auth/google", { credential });
+        const { ok, data } = await postAuth("/api/auth/google", { credential });
+        if (operation !== authOperation.current) return null;
         if (
           data?.accountStatus === "pending" ||
           data?.accountStatus === "rejected"
@@ -238,22 +268,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCurrentUser(data.user);
         return data.user as ClientUser;
       } catch {
+        if (operation !== authOperation.current) return null;
         setError("Gagal terhubung. Periksa koneksi internet Anda.");
         return null;
       } finally {
-        setIsLoading(false);
+        if (operation === authOperation.current) {
+          setIsLoading(false);
+          setIsReady(true);
+        }
       }
     },
-    [setCurrentUser],
+    [setCurrentUser, postAuth],
   );
 
   const register = useCallback(
     async (userData: RegisterInput) => {
+      const operation = ++authOperation.current;
       setIsLoading(true);
       setError(null);
       setApplication(null);
       try {
-        const { ok, data } = await postJson("/api/auth/register", userData);
+        const { ok, data } = await postAuth("/api/auth/register", userData);
+        if (operation !== authOperation.current) return null;
         if (ok && data?.accountStatus === "pending") {
           setApplication({
             accountStatus: "pending",
@@ -269,23 +305,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         return null;
       } catch {
+        if (operation !== authOperation.current) return null;
         setError("Gagal terhubung. Periksa koneksi internet Anda.");
         return null;
       } finally {
-        setIsLoading(false);
+        if (operation === authOperation.current) {
+          setIsLoading(false);
+          setIsReady(true);
+        }
       }
     },
-    [setCurrentUser],
+    [setCurrentUser, postAuth],
   );
 
   const logout = useCallback(async () => {
+    authOperation.current += 1;
     setCurrentUser(null);
+    setApplication(null);
+    setError(null);
+    setIsLoading(false);
+    setIsReady(true);
     try {
-      await postJson("/api/auth/logout");
+      await postAuth("/api/auth/logout");
     } catch {
       /* ignore */
     }
-  }, [setCurrentUser]);
+  }, [setCurrentUser, postAuth]);
 
   const checkSlugAvailable = useCallback(async (slug: string) => {
     try {
