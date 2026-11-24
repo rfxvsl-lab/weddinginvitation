@@ -1,5 +1,10 @@
 # Backlog tema undangan
 
+Pembaruan 24 November 2026: semua brief berikut adalah **ide**, bukan instruksi rilis otomatis.
+Baca [QUALITY-V2.md](QUALITY-V2.md), catat sumber aset, dan ikuti branch/draft PR pada
+[PLAYBOOK.md](PLAYBOOK.md). Ritme kategori atau satu tema per sesi tidak boleh mengalahkan
+quality gate. Tema existing, font aplikasi dan harga dilindungi sesuai pemilik.
+
 Sesi otomatis mengambil baris `todo` paling atas. Sejak 3.8.0 semua tema (termasuk 8 tema lama, kini di
 `src/themes/catalog/`) mengikuti `docs/themes/STANDARD.md`; `src/components/templates/*` tidak dipakai lagi. Urutan sengaja diselang-seling
 (adat ↔ modern ↔ floral ↔ minimalis) dan **setiap baris ketiga adalah tema Spesial**

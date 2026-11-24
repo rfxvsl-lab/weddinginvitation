@@ -46,8 +46,8 @@ export default function ThemeSelector({
       {/* Varian warna tema aktif */}
       {variants.length > 1 && onSelectVariant && (
         <div className="rounded-2xl border border-[#E8DFD4] bg-white p-4">
-          <p className="text-[13px] font-semibold text-[#2A1E21]">Warna tema {activeKit?.name}</p>
-          <p className="mt-0.5 text-[12px] text-[#6B5D54]">Pilih varian warna — tata letak dan animasi tetap sama.</p>
+          <p className="text-[13px] font-semibold text-[var(--rh-ink)]">Warna tema {activeKit?.name}</p>
+          <p className="mt-0.5 text-[12px] text-[var(--rh-ink-2)]">Pilih varian warna — tata letak dan animasi tetap sama.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {variants.map((v) => {
               const pal = { ...activeKit!.palette, ...v.palette };
@@ -58,7 +58,7 @@ export default function ThemeSelector({
                   type="button"
                   onClick={() => onSelectVariant(v.id)}
                   aria-pressed={on}
-                  className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-[12px] font-medium transition ${on ? 'border-[#7A2E3B] bg-[#7A2E3B]/5 text-[#7A2E3B]' : 'border-[#E8DFD4] text-[#54464A] hover:border-[#B8955A]'}`}
+                  className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-[12px] font-medium transition ${on ? 'border-[var(--rh-primary)] bg-[var(--rh-primary)]/5 text-[var(--rh-primary)]' : 'border-[#E8DFD4] text-[var(--rh-ink-2)] hover:border-[#B8955A]'}`}
                 >
                   <span className="flex overflow-hidden rounded-full border border-black/10">
                     {[pal.primary, pal.secondary, pal.bg].map((c, i) => (
@@ -77,14 +77,14 @@ export default function ThemeSelector({
       {/* Header + Filter Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-[12px] font-medium text-[#7A2E3B]">
+          <div className="flex items-center gap-2 text-[12px] font-medium text-[var(--rh-primary)]">
             <Palette className="h-3.5 w-3.5" />
             <span>Semua {DEFAULT_THEMES.length} Tema Gratis</span>
           </div>
-          <h2 className="mt-1 font-serif text-[24px] leading-tight text-[#2A1E21]">
+          <h2 className="mt-1 font-serif text-[24px] leading-tight text-[var(--rh-ink)]">
             Pilih Tema Undangan
           </h2>
-          <p className="mt-1 text-[13px] text-[#6B5D54]">
+          <p className="mt-1 text-[13px] text-[var(--rh-ink-2)]">
             Ganti tema kapan saja tanpa menghapus data mempelai, acara, maupun daftar tamu.
           </p>
         </div>
@@ -99,8 +99,8 @@ export default function ThemeSelector({
                 onClick={() => setFilter(key)}
                 className={`rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition cursor-pointer ${
                   active
-                    ? 'border-[#2A1E21] bg-[#2A1E21] text-white'
-                    : 'border-[#E6DDD2] bg-white text-[#54464A] hover:bg-[#F8F5F0]'
+                    ? 'border-[var(--rh-ink)] bg-[var(--rh-ink)] text-white'
+                    : 'border-[var(--rh-line)] bg-white text-[var(--rh-ink-2)] hover:bg-[var(--rh-ivory)]'
                 }`}
               >
                 {label}
@@ -124,8 +124,8 @@ export default function ThemeSelector({
               onClick={() => onSelectTheme(theme.id)}
               className={`group flex flex-col overflow-hidden rounded-2xl border bg-white text-left transition-all cursor-pointer ${
                 isSelected
-                  ? 'border-[#7A2E3B] ring-2 ring-[#7A2E3B]/20'
-                  : 'border-[#E6DDD2] hover:border-[#C7B7A1]'
+                  ? 'border-[var(--rh-primary)] ring-2 ring-[var(--rh-primary)]/20'
+                  : 'border-[var(--rh-line)] hover:border-[#C7B7A1]'
               }`}
             >
               {/* Visual Preview Thumbnail */}
@@ -136,10 +136,10 @@ export default function ThemeSelector({
                 }}
               >
                 {fresh && (
-                  <span className="absolute left-2 top-2 z-10 rounded-full bg-[#7A2E3B] px-2 py-0.5 text-[10.5px] font-semibold text-white">Baru</span>
+                  <span className="absolute left-2 top-2 z-10 rounded-full bg-[var(--rh-primary)] px-2 py-0.5 text-[10.5px] font-semibold text-white">Baru</span>
                 )}
                 {theme.tier === 'special' && (
-                  <span className="absolute right-2 top-2 z-10 rounded-full bg-[#2A1E21] px-2 py-0.5 text-[10.5px] font-semibold text-[#E9D3A6]">Spesial</span>
+                  <span className="absolute right-2 top-2 z-10 rounded-full bg-[var(--rh-ink)] px-2 py-0.5 text-[10.5px] font-semibold text-[#E9D3A6]">Spesial</span>
                 )}
                 {imgSrc ? (
                   <img
@@ -171,7 +171,7 @@ export default function ThemeSelector({
                 )}
 
                 {isSelected && (
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#7A2E3B] px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm">
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[var(--rh-primary)] px-2.5 py-1 text-[10.5px] font-bold text-white shadow-sm">
                     <Check className="h-3 w-3" />
                     Aktif
                   </span>
@@ -182,14 +182,14 @@ export default function ThemeSelector({
               <div className="flex flex-1 flex-col justify-between gap-4 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="truncate text-[14px] font-bold text-[#2A1E21] group-hover:text-[#7A2E3B] transition-colors">
+                    <h3 className="truncate text-[14px] font-bold text-[var(--rh-ink)] group-hover:text-[var(--rh-primary)] transition-colors">
                       {theme.name}
                     </h3>
-                    <p className="mt-0.5 text-[11.5px] text-[#7D6F71]">
+                    <p className="mt-0.5 text-[11.5px] text-[var(--rh-muted)]">
                       {PATTERN_LABELS[theme.pattern] || theme.pattern}
                     </p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#E6DDD2] bg-[#F8F5F0] px-2 py-1 text-[11px] font-semibold text-[#54464A]">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[var(--rh-line)] bg-[var(--rh-ivory)] px-2 py-1 text-[11px] font-semibold text-[var(--rh-ink-2)]">
                     <Eye className="h-3 w-3" />
                     Preview
                   </span>

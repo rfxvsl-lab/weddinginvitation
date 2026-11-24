@@ -106,10 +106,10 @@ export default function EnterpriseSignInView({
         >
           <Building2 size={12} /> Portal Akses Enterprise
         </span>
-        <h2 className="text-[28px] font-serif leading-tight text-[#2A1E21]">
+        <h2 className="text-[28px] font-serif leading-tight text-[var(--rh-ink)]">
           Masuk dengan Email Perusahaan
         </h2>
-        <p className="text-[13.5px] leading-relaxed text-[#6B5D54]">
+        <p className="text-[13.5px] leading-relaxed text-[var(--rh-ink-2)]">
           Masukkan email kantor resmi dan kode akses khusus yang diterbitkan
           oleh tim RuangHadir.
         </p>
@@ -133,7 +133,7 @@ export default function EnterpriseSignInView({
               autoComplete="email"
             />
           </div>
-          <p className="text-[11px] text-[#7D6F71]">
+          <p className="text-[11px] text-[var(--rh-muted)]">
             Domain webmail publik (Gmail, Yahoo, Outlook) tidak diizinkan pada
             jalur Enterprise.
           </p>
@@ -197,7 +197,7 @@ export default function EnterpriseSignInView({
           color: 'var(--saas-ink-2)',
         }}
       >
-        <p className="flex items-center gap-1.5 font-bold text-[#2A1E21]">
+        <p className="flex items-center gap-1.5 font-bold text-[var(--rh-ink)]">
           <ShieldCheck size={14} style={{ color: 'var(--saas-gold)' }} />
           Belum memiliki kode akses Enterprise?
         </p>
@@ -205,7 +205,7 @@ export default function EnterpriseSignInView({
           Hubungi{' '}
           <a
             href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=Permintaan%20Kode%20Akses%20Enterprise`}
-            className="font-bold text-[#7A2E3B] hover:underline"
+            className="font-bold text-[var(--rh-primary)] hover:underline"
           >
             {ENTERPRISE_CONTACT_EMAIL}
           </a>{' '}
@@ -216,7 +216,7 @@ export default function EnterpriseSignInView({
       <button
         type="button"
         onClick={onBackToPersonal}
-        className="flex w-full items-center justify-center gap-1.5 text-[13px] font-bold text-[#6B5D54] hover:text-[#2A1E21] cursor-pointer"
+        className="flex w-full items-center justify-center gap-1.5 text-[13px] font-bold text-[var(--rh-ink-2)] hover:text-[var(--rh-ink)] cursor-pointer"
       >
         <ArrowLeft size={14} /> Kembali ke Login Akun Gratis
       </button>

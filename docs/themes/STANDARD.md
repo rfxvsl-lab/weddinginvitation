@@ -1,5 +1,9 @@
 # Standar tema undangan RuangHadir
 
+## Pembaruan pemilik — 24 November 2026
+
+Untuk **tema selanjutnya**, baca [QUALITY-V2.md](QUALITY-V2.md) dan [kesepakatan kolaborasi](../../COLLABORATION.md) terlebih dahulu. Bagian di bawah mendeskripsikan kontrak mesin existing; bukan izin merombak preview/tema yang sudah disukai pemilik. Jangan generate SVG atau ilustrasi generik dengan AI untuk memenuhi checklist. Tema baru memerlukan konsep, sumber aset yang jelas, dan QA visual. Teknik 2.5D/partikel/ornamen dipilih bila membantu konsep; jumlah efek bukan ukuran kualitas.
+
 Acuan: pola yang dipakai template premium di pasar Indonesia (Katsudoto, Satu Momen,
 Viding/Invitato). Tamu sudah terbiasa dengan alur ini, jadi semua tema reguler mengikutinya.
 Pembeda antartema ada di **seni, warna, huruf, ornamen, sampul, panggung pembuka, dan varian
@@ -56,10 +60,11 @@ Dua tema yang berurutan di katalog tidak boleh sama di `cover` + `hero` + satu v
 
 ## Aplikasi (landing, auth, dashboard)
 
-Mengikuti `elayadesign/ai-design-skills` → `landing-page-design` Part B: satu typeface
-(Manrope), heading semibold tanpa italic, judul hero bergradasi teks #000 → #666, kalimat inti
-yang menyala kata per kata, tanpa tanda hubung di copy, latar datar, kurva gerak
-`cubic-bezier(0.22,1,0.36,1)`. Token ada di bagian akhir `src/index.css`.
+Font Manrope existing dipertahankan sesuai pemilik. Arah aplikasi: warna ceria yang terkontrol,
+ikon fungsional, hierarki tugas, formulir/tabel mudah dibaca. Gradasi judul, teks menyala kata per
+kata, dan dekorasi animasi **tidak wajib**. Token aplikasi baru ada di `src/styles/product.css`,
+dengan scope `.rh-product`; tidak berlaku pada dokumen iframe undangan. Lihat
+[sintesis riset](../research/06-SYNTHESIS.md) untuk alasan dan peta implementasi.
 
 ## Mode kamera (tema Spesial gaya "undangan seret")
 

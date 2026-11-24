@@ -1,5 +1,10 @@
 # Playbook — menambah tema undangan (Theme Kit)
 
+**Pembaruan pemilik 24 November 2026:** baca [QUALITY-V2.md](QUALITY-V2.md) dan
+[COLLABORATION.md](../../COLLABORATION.md). Keduanya mengatur pengembangan berikutnya.
+Preview/tema existing tidak diubah oleh redesign aplikasi. Jangan menghasilkan SVG/ilustrasi AI
+atau menyalin aset kompetitor. Brief `todo` belum berarti siap rilis; sumber seni dan QA harus jelas.
+
 Dokumen ini dipakai oleh sesi otomatis harian **dan** manusia. Satu tema = satu file.
 Semua fitur (sampul, musik, hitung mundur, acara + peta + kalender, kisah, galeri,
 amplop digital, RSVP, tiket tamu) sudah disediakan `src/themes/kit/KitLayout.tsx`.
@@ -18,14 +23,14 @@ Acuan kualitas: template premium (mis. Vitopia "Royal Garden"). Yang ditiru adal
 diterapkan **sesuai konsep masing-masing tema**. Setiap tema WAJIB punya alur dan tampilan
 bagian sendiri — jangan membuat semua tema menjadi satu halaman dengan urutan bagian yang sama.
 
-Teknik yang wajib ada (wujudnya menyesuaikan tema):
+Teknik yang dapat dipilih sesuai konsep (tidak wajib ditumpuk pada setiap tema):
 1. **Pembuka berlapis 2.5D** setelah sampul dibuka (kamera bergerak, lapisan masuk dengan
    kedalaman berbeda), lalu nama mempelai masuk bertahap.
 2. **Ornamen yang digerakkan gulir** (masuk dari samping, bergoyang/bergeser mengikuti posisi
    gulir) — ornamennya khas tema (bunga, gunungan, lentera, pita film, dll.).
 3. **Animasi masuk per elemen** dari arah berbeda, bukan semua fade yang sama.
-4. **Seni artistik**: lukisan di `public/assets/art/` atau SVG yang benar-benar dirancang
-   (gradien, lipatan, cahaya, tekstur). Dilarang bentuk SVG generik.
+4. **Seni artistik**: aset existing yang dikurasi atau karya desainer dengan sumber dan lisensi
+   tercatat. Jangan generate SVG, pola flora, atau ilustrasi AI untuk mengejar jumlah tema.
 5. Fitur wajib tetap lengkap (mempelai, acara + peta + kalender, hitung mundur, galeri,
    tanda kasih, RSVP + ucapan, penutup), tetapi **urutan, bentuk, dan jumlah layar bebas**
    sesuai konsep (bab layar penuh, halaman buku, slide, tiket, playlist, dsb.). Atur lewat
@@ -41,13 +46,14 @@ membuat tema ini berbeda dari 5 tema terakhir.
    Jika id sudah ada di `src/themes/catalog/`, tandai `done` lalu ambil berikutnya.
 2. **Rancang sebelum menulis kode** (tulis singkat di pesan commit):
    - palet 6–9 warna (cek kontras teks vs bg ≥ 4.5:1, tombol `onPrimary` vs `primary` ≥ 4.5:1)
-   - pasangan font Google (display + body; `script` opsional). Jangan pakai font yang
-     sudah dipakai 3 tema terakhir.
+   - pasangan font tema (display + body; `script` opsional) dipilih karena cocok dengan konsep,
+     bukan rotasi acak. Font aplikasi Manrope tidak diubah.
    - kombinasi varian: `cover`, `hero`, `frame`, `couple`, `events`, `gallery`, `countdown`,
      `ambient`, `reveal`, `divider`. **Wajib berbeda** dari tema sebelumnya minimal di
      `cover` + `hero` + satu lainnya. Lihat tabel "Kombinasi terpakai" di BACKLOG.
-   - satu **elemen khas** (Signature/CoverArt/cornerSvg/dividerSvg) yang membuat tema
-     dikenali — motif budaya, tekstur, ilustrasi garis. SVG digambar sendiri, ringan (< 4 KB).
+   - satu **elemen khas** yang membuat tema dikenali — komposisi foto, bingkai, seni atau motif
+     dengan sumber terverifikasi. Tidak wajib SVG. Jika aset belum siap, catat `blocked: art review`;
+     jangan menggantinya dengan SVG generik atau menyalin gambar vendor.
 3. **Tulis** `src/themes/catalog/<id>.tsx` meniru `sage-garden.tsx`:
    `export default defineTheme({ ... addedAt: '<tanggal hari ini, Asia/Jakarta>' })`.
    - `id` kebab-case, unik. `category` salah satu: `classic` (adat), `modern`, `floral`,
@@ -68,9 +74,11 @@ membuat tema ini berbeda dari 5 tema terakhir.
 7. **Catat & kirim**
    - BACKLOG: ubah status brief menjadi `done (YYYY-MM-DD)` dan tambah baris di "Kombinasi terpakai".
    - `CHANGELOG.md`: tambah baris di bagian "Tema baru".
-   - `git add` hanya file tema, index katalog, shot `.webp`, BACKLOG, CHANGELOG
-     (untuk migrasi juga `defaultData.ts` / `InvitationPreview.tsx`).
-   - Commit `feat(theme): <Nama Tema>` lalu `git push origin main` (Vercel deploy otomatis).
+   - Kerjakan di branch terpisah. `git add` hanya file tema baru, index katalog, shot `.webp`,
+     BACKLOG, CHANGELOG dan catatan sumber aset/QA. Perubahan mesin/shared preview memerlukan
+     lingkup kerja tersendiri; jangan memasukkannya sebagai efek samping tema baru.
+   - Commit `feat(theme): <Nama Tema>`, push branch kerja, lalu buat draft PR untuk review pemilik
+     dan koordinasi Claude/GPT. Jangan langsung push `main` atau memicu produksi dari sesi tema.
    - Jika gagal di langkah mana pun dan tidak bisa diperbaiki: **jangan push**; tulis
      alasannya di BACKLOG pada brief tsb (`blocked: ...`) dan commit hanya perubahan BACKLOG.
 
@@ -95,7 +103,9 @@ Contoh lengkap: `catalog/lembayung.chapters.tsx` (2.5D, senja → malam, 10 bab)
 - Bab pembuka: lapisan pakai `hero order={n}` (ikut intro). Bab lain: `popup order={n}` untuk gaya
   kertas/wayang, atau tanpa popup untuk gaya lanskap. `exitX` untuk lapisan yang membelah ke samping.
 - `ink[id]` = warna teks + bayangan teks di atas langit bab itu; cek kontras tiap bab.
-- Semua gambar SVG buatan sendiri (`ridgePath`, `ridgeY`, `seeded`); tanpa gambar eksternal.
+- Gunakan aset seni terkurasi dan berlisensi; jangan menjadikan `ridgePath`, `ridgeY`, `seeded`
+  atau siluet SVG generik sebagai pengganti arahan seni. Kode vektor existing boleh tetap dipakai
+  oleh tema existing; tidak ada migrasi otomatis dari pembaruan panduan ini.
 - Kinerja: ≤ 7 `ArtLayer` per bab, animasi CSS hanya `transform`/`opacity`, partikel ≤ 30 per bab.
 - QA: `5-chapters.png` (tiap bab saat sejajar layar) harus memperlihatkan 10 adegan yang berbeda,
   teks terbaca, dan tidak ada ornamen depan yang menutupi isi penting.
@@ -115,5 +125,6 @@ Contoh lengkap: `catalog/lembayung.chapters.tsx` (2.5D, senja → malam, 10 bab)
 
 - Hanya ubah file yang disebut di langkah 7. Jangan sentuh auth, API, DB, payment, env.
 - Jangan menambah dependency npm.
-- Jangan menghapus atau mengubah tema yang sudah ada, kecuali brief `migrate`.
+- Jangan menghapus atau mengubah tema yang sudah ada. Label brief `migrate` sendiri bukan izin;
+  cocokkan dengan arahan pemilik dan lingkup PR sebelum menyentuh preview yang dilindungi.
 - Maksimal satu tema per sesi.

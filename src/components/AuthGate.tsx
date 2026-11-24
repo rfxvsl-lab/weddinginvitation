@@ -283,7 +283,7 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
   };
 
   return (
-    <div className="saas-scope min-h-screen lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
+    <div className="saas-scope rh-product rh-auth min-h-screen lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)]">
       <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
         {/* ==================== SIGN IN VIEW ==================== */}
         {mode === 'signin' && !showWelcome && (
@@ -367,24 +367,24 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
 
             <div className="space-y-2">
               <span className="saas-kicker">Akun Aktif · Full Gratis</span>
-              <h2 className="text-[28px] font-serif text-[#2A1E21] leading-tight">
+              <h2 className="text-[28px] font-serif text-[var(--rh-ink)] leading-tight">
                 Selamat Datang, {welcomeUser.fullName}
               </h2>
-              <p className="text-[13.5px] text-[#6B5D54] leading-relaxed">
+              <p className="text-[13.5px] text-[var(--rh-ink-2)] leading-relaxed">
                 Workspace undangan Anda sudah siap digunakan dengan seluruh fitur inti terbuka tanpa biaya.
               </p>
             </div>
 
-            <div className="bg-[#F8F5F0] border border-[#E6DDD2] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
+            <div className="bg-[var(--rh-ivory)] border border-[var(--rh-line)] p-4 rounded-xl space-y-2.5 text-left text-[13px]">
               <div className="flex justify-between items-center">
-                <span className="text-[#6B5D54]">Paket Aktif</span>
+                <span className="text-[var(--rh-ink-2)]">Paket Aktif</span>
                 <span className="font-bold text-[#3F7A52] bg-[#E9F2EA] px-2.5 py-0.5 rounded-full text-[12px] font-medium">
                   Full Gratis · Rp 0
                 </span>
               </div>
               <div className="flex justify-between items-center gap-3">
-                <span className="text-[#6B5D54]">Tautan Undangan</span>
-                <span className="font-mono text-[12px] font-semibold text-[#2A1E21] truncate">
+                <span className="text-[var(--rh-ink-2)]">Tautan Undangan</span>
+                <span className="font-mono text-[12px] font-semibold text-[var(--rh-ink)] truncate">
                   ruanghadir.net/{welcomeUser.activeSlug}
                 </span>
               </div>
