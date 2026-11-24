@@ -36,7 +36,9 @@ export default function ApplicationStatusView({
         {rejected
           ? "Pendaftaran belum disetujui."
           : application
-            ? "Pendaftaran kalian sudah kami terima."
+            ? application.source === "registration"
+              ? "Pendaftaran kalian sudah kami terima."
+              : "Pendaftaran kalian masih ditinjau."
             : "Periksa status pendaftaran kalian."}
       </h1>
       <div className="space-y-4 text-[15px] leading-relaxed text-[var(--rh-ink-2)]">

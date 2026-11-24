@@ -17,8 +17,8 @@ Video/frame undangan dan EnterpriseMotionPlayer tidak disentuh. Seluruh nilai/ha
 pada lima komponen dibandingkan dengan baseline untuk memastikan perubahan ini berupa
 presentasi; pengecualian yang disengaja adalah kondisi !open untuk CTA header.
 
-Usulan rendah prioritas field sumber “Lainnya” dan perbedaan copy pending saat login
-belum diimplementasikan. Keduanya tetap dicatat, tanpa menambah field backend secara diam-diam.
+Field sumber “Lainnya” tetap backlog rendah prioritas. Perbedaan copy pending ditutup pada
+bagian Penutupan QA di bawah; tidak menambah field backend.
 
 A telah merevisi patch admin pada6adb87c: seluruh warna memakai rh-* dengan root rh-product,
 dan ID catatan dibedakan note-card/note-table. B meninjau lalu menggabungkan8a79906+6adb87c
@@ -37,3 +37,28 @@ judul; outline tombol/link/input tetap. Koreksi CSS terakhir menunggu cek visual
 Editor E1/E2 dari room31 juga ditangani: h5 memakai var(--font-ui) existing Manrope; lima
 toggle punya nama aksesibel sesuai field dan ring primary pada keyboard focus. Callback,
 checked/value serta statebinding lain dibandingkan AST dan sama. URLmonospace tidak diubah.
+
+## Penutupan QA dan penyempurnaan — 25 November
+
+A melaporkan pada room37 bahwa kandidat fc2f70b lulus pemeriksaan akhir: fokus judul tanpa
+outline dekoratif dan fokus kontrol tetap, h5 seluruh tab Manrope, lima toggle bernama dengan
+ring keyboard/Spasi, regresi landing390/768/1024/1280 dan alur persetujuan akun lulus.
+Ini laporan A dengan konteks dev lokal, bukan pengujian produksi atau browser B.
+
+B menutup dua detail dari catatan A:
+
+- Label pembungkus lima toggle memiliki area sentuh44×44px. Ukuran track tidak diperbesar;
+  posisi relatif dipindahkan ke track agar knob tidak bergeser ke atas ketika label membesar.
+  checked/value/handler tetap.
+- Context status client membedakan source registration versus login. Pendaftaran202 menampilkan
+  “sudah kami terima”; login pending menampilkan “masih ditinjau”. Status rejected serta halaman
+  status yang dimuat ulang tetap seperti sebelumnya. Metadata ini tidak dikirim ke server,
+  tidak memberi akses akun dan tidak menambah field database.
+
+Scope diumumkan di room38 sebelum implementasi. Masukan sumber “Lainnya” tetap backlog rendah
+prioritas; belum ada perubahan kontrak form/backend. Kandidat baru ini perlu cek visual A untuk
+area sentuh/posisi knob dan dua varian copy. Tidak auto-merge main atau deploy produksi.
+
+Validasi putaran ini: TypeScript, build Node22, tes provider auth yang sudah ada, batas
+preview/font/paket dan diff whitespace lulus. Atribut fungsional seluruh toggle identik
+dengan baseline; perubahan area sentuh hanya class. Tidak mengklaim QA browser baru oleh B.

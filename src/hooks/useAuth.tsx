@@ -34,6 +34,7 @@ export interface GoogleSignupInfo {
 }
 
 export interface AccountApplication {
+  source?: "registration" | "login";
   accountStatus: "pending" | "rejected";
   application?: { fullName?: string; email?: string };
 }
@@ -189,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ) {
           setApplication({
             accountStatus: data.accountStatus,
+            source: "login",
             application: data.application,
           });
           setCurrentUser(null);
@@ -236,6 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ) {
           setApplication({
             accountStatus: data.accountStatus,
+            source: "login",
             application: data.application,
           });
           setCurrentUser(null);
@@ -293,6 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (ok && data?.accountStatus === "pending") {
           setApplication({
             accountStatus: "pending",
+            source: "registration",
             application: data.application,
           });
           setCurrentUser(null);

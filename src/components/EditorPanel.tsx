@@ -634,14 +634,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 1: Akad Nikah
                   </h5>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center cursor-pointer">
                     <input
                       type="checkbox" aria-label="Tampilkan akad nikah"
                       className="sr-only peer"
                       checked={data?.events?.akad?.enabled !== false}
                       onChange={(e) => updateAkad('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                    <div className="relative w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
@@ -720,14 +720,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                     <span className="w-2 h-2 rounded-full bg-[var(--rh-primary)]" />
                     Sesi 2: Resepsi Pernikahan
                   </h5>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center cursor-pointer">
                     <input
                       type="checkbox" aria-label="Tampilkan resepsi pernikahan"
                       className="sr-only peer"
                       checked={data?.events?.resepsi?.enabled !== false}
                       onChange={(e) => updateResepsi('enabled', e.target.checked)}
                     />
-                    <div className="w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                    <div className="relative w-7 h-4 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
                   </label>
                 </div>
 
@@ -809,14 +809,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 <span className="font-bold text-[var(--rh-ink)] text-xs block">Tampilkan Bagian Cerita Cinta</span>
                 <span className="text-[10px] text-[var(--rh-muted)]">Aktifkan atau sembunyikan seluruh bagian perjalanan kisah cinta pada halaman undangan.</span>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center cursor-pointer">
                 <input
                   type="checkbox" aria-label="Tampilkan cerita cinta"
                   checked={data?.showLoveStories !== false}
                   onChange={(e) => onChange({ ...data, showLoveStories: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="relative w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
@@ -962,14 +962,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 <span className="font-bold text-[var(--rh-ink)] text-xs block">Digital Entry Pass (QR Check-in)</span>
                 <span className="text-[10px] text-[var(--rh-muted)]">Aktifkan tiket QR check-in untuk tamu undangan</span>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center cursor-pointer">
                 <input
                   type="checkbox" aria-label="Tampilkan kode QR tamu"
                   checked={data.enableDigitalPass !== false}
                   onChange={(e) => onChange({ ...data, enableDigitalPass: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="relative w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
 
@@ -1002,14 +1002,14 @@ export default function EditorPanel({ data, onChange, packageId = 'luxury' }: Ed
                 <span className="font-bold text-[var(--rh-ink)] text-xs block">Live Moments (Kamera Tamu & Ucapan Suara)</span>
                 <span className="text-[10px] text-[var(--rh-muted)]">Tamu bisa mengirim foto ke dinding momen dan merekam ucapan suara</span>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center cursor-pointer">
                 <input
                   type="checkbox" aria-label="Aktifkan Live Moments"
                   checked={data.enableLiveMoments !== false}
                   onChange={(e) => onChange({ ...data, enableLiveMoments: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
+                <div className="relative w-9 h-5 bg-[var(--rh-line-strong)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--rh-primary)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--rh-paper)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--rh-paper)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--rh-paper)] after:border-[var(--rh-line-strong)] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--rh-primary)]"></div>
               </label>
             </div>
             <div className="p-5 border border-[var(--rh-line)] rounded-2xl bg-[var(--rh-paper)] space-y-4 shadow-sm relative overflow-hidden">
