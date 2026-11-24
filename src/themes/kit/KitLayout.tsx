@@ -893,11 +893,14 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                   )}
                 </div>
                 {node}
-                <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
-                  <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-                    <StageFront flora={flora} />
+                {/* buket lukisan di depan panggung hanya untuk tema berornamen bunga */}
+                {(spec.ornament || (spec.floraArt ? 'flora' : 'none')) === 'flora' && (
+                  <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+                    <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+                      <StageFront flora={flora} />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           }
