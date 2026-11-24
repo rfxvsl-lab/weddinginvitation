@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru 25 November: main59be0ad tetap; PR#3 draft codex/marketing-refinement. Marketing/Akses Awal/palet editor head6155f0c lulus QA A (room40). B mulai tahap dashboard pada alur berbagi tamu, scope room41–42; lihat B-DASHBOARD-GUESTS.md. Belum merge/deploy atau QA visual baru untuk patch tamu.
+> Status terbaru 25 November: main59be0ad tetap; PR#3 draft codex/marketing-refinement. Marketing/Akses Awal/palet editor head6155f0c lulus QA A (room40). B mulai tahap dashboard pada alur berbagi tamu, scope room41–42; lihat B-DASHBOARD-GUESTS.md. Patch tamu6e6cdf0 dan koreksi ringkasan berikutnya (B-DASHBOARD-OVERVIEW.md) belum QA visual baru. Ringkasan memperbaiki tanggal sesi nonaktif dan feedback salin lintas proyek. Belum merge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan

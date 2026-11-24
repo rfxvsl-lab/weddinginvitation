@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ArrowRight, Check, Copy, ExternalLink } from "lucide-react";
 import type {
   SaaSUser,
@@ -53,9 +53,6 @@ export default function DashboardOverview({
   onPublish,
   publicSlug,
 }: DashboardOverviewProps) {
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
-    "idle",
-  );
   const slug = publicSlug || invitation?.slug || user.activeSlug || "";
   const liveUrl = slug ? `https://ruanghadir.net/${slug}` : "";
   const published = Boolean(invitation?.isPublished);
@@ -80,9 +77,8 @@ export default function DashboardOverview({
       id: "events",
       label: "Tanggal acara",
       detail: "Tambahkan jadwal akad atau resepsi.",
-      done: Boolean(
-        weddingData?.events?.akad?.date?.trim() ||
-          weddingData?.events?.resepsi?.date?.trim(),
+      done: [weddingData?.events?.akad, weddingData?.events?.resepsi].some(
+        (event) => event?.enabled !== false && Boolean(event?.date?.trim()),
       ),
       action: () => onNavigate("design"),
     },
@@ -111,15 +107,6 @@ export default function DashboardOverview({
   const complete = checklist.filter((item) => item.done).length;
   const next = checklist.find((item) => !item.done);
   const percent = Math.round((complete / checklist.length) * 100);
-  const copyLink = async () => {
-    if (!liveUrl) return;
-    try {
-      await navigator.clipboard.writeText(liveUrl);
-      setCopyState("copied");
-    } catch {
-      setCopyState("error");
-    }
-  };
   const metrics = [
     {
       label: "Kunjungan",
@@ -183,35 +170,12 @@ export default function DashboardOverview({
           )}
         </div>
         {liveUrl && (
-          <div className="rh-inline-actions">
-            <button type="button" className="rh-action" onClick={copyLink}>
-              {copyState === "copied" ? (
-                <Check size={15} aria-hidden />
-              ) : (
-                <Copy size={15} aria-hidden />
-              )}
-              {copyState === "copied" ? "Tersalin" : "Salin tautan"}
-            </button>
-            {published && (
-              <a
-                className="rh-action"
-                href={`/${slug}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Buka
-                <ExternalLink size={14} aria-hidden />
-              </a>
-            )}
-          </div>
-        )}
-        <span className="sr-only" role="status" aria-live="polite">
-          {copyState === "copied" ? "Tautan berhasil disalin." : ""}
-        </span>
-        {copyState === "error" && (
-          <p className="rh-copy-error" role="alert">
-            Tautan belum bisa disalin otomatis. Pilih dan salin alamat di atas.
-          </p>
+          <InvitationLinkControls
+            key={`${invitation?.id || ""}:${liveUrl}`}
+            url={liveUrl}
+            slug={slug}
+            published={published}
+          />
         )}
       </section>
 
@@ -351,5 +315,60 @@ export default function DashboardOverview({
         </div>
       </div>
     </div>
+  );
+}
+
+/** A fresh link/project gets fresh feedback; late clipboard attempts cannot overwrite a newer one. */
+function InvitationLinkControls({ url, slug, published }: {
+  url: string;
+  slug: string;
+  published: boolean;
+}) {
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
+  const operation = useRef(0);
+  const copyLink = async () => {
+    const current = ++operation.current;
+    setCopyState("idle");
+    try {
+      await navigator.clipboard.writeText(url);
+      if (current === operation.current) setCopyState("copied");
+    } catch {
+      if (current === operation.current) setCopyState("error");
+    }
+  };
+  return (
+    <>
+      <div className="rh-inline-actions">
+        <button type="button" className="rh-action" onClick={copyLink}>
+          {copyState === "copied" ? (
+            <Check size={15} aria-hidden />
+          ) : (
+            <Copy size={15} aria-hidden />
+          )}
+          {copyState === "copied" ? "Tersalin" : "Salin tautan"}
+        </button>
+        {published && (
+          <a
+            className="rh-action"
+            href={`/${slug}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Buka
+            <ExternalLink size={14} aria-hidden />
+          </a>
+        )}
+      </div>
+      <span className="sr-only" role="status" aria-live="polite">
+        {copyState === "copied" ? "Tautan berhasil disalin." : ""}
+      </span>
+      {copyState === "error" && (
+        <p className="rh-copy-error" role="alert">
+          Tautan belum bisa disalin otomatis. Pilih dan salin alamat di atas.
+        </p>
+      )}
+    </>
   );
 }
