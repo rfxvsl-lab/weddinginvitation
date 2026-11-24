@@ -6,6 +6,7 @@ import DashboardSidebar from "../../src/components/DashboardSidebar";
 import EditorPanel from "../../src/components/EditorPanel";
 import GuestManager from "../../src/components/GuestManager";
 import AnalyticsDashboard from "../../src/components/AnalyticsDashboard";
+import PublishModal from "../../src/components/PublishModal";
 import ProfilePanel from "../../src/components/ProfilePanel";
 import UpgradePanel from "../../src/components/UpgradePanel";
 import ThemeSelector from "../../src/components/ThemeSelector";
@@ -52,6 +53,7 @@ function Review() {
   const [notice, setNotice] = useState(
     "Data contoh. Perubahan hanya di halaman ini, tidak tersimpan ke akun.",
   );
+  const [publishOpen, setPublishOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const currentAnalytics = {
     ...analytics,
@@ -88,6 +90,28 @@ function Review() {
     ]);
     setNotice("Data contoh terisi.");
   };
+  if (segment === "publish") return (
+    <AlertModalProvider>
+      <div className="saas-scope saas-dash rh-product fixed inset-0 h-[100dvh] overflow-hidden">
+        <p className="p-4">Fixture modal publikasi · data contoh, publikasi dinonaktifkan.</p>
+        <button type="button" className="rh-action m-4" onClick={() => setPublishOpen(true)}>Buka modal publikasi</button>
+        <PublishModal
+          show={publishOpen}
+          onClose={() => setPublishOpen(false)}
+          user={user}
+          wedding={{
+            weddingData: data,
+            themeId: "sage-garden",
+            invitation,
+            allInvitations: [invitation],
+            guests: [],
+            publishInvitation: async () => { throw new Error("Publikasi dinonaktifkan di fixture review."); },
+            updateGuestStatus: () => { throw new Error("API tamu dinonaktifkan di fixture review."); },
+          }}
+        />
+      </div>
+    </AlertModalProvider>
+  );
   if (segment === "landing") return <LandingPage />;
   if (segment === "auth")
     return (

@@ -39,3 +39,22 @@ Tidak mengirim WhatsApp atau mempublikasikan undangan untuk pengujian.
 
 Permintaan QA dikirim ke room; tidak mengklaim A sudah membalas. Tidak auto-merge atau
 deploy aplikasi produksi oleh B. Commit/PR akhir dilaporkan di room dan PR review baru.
+
+## Fixture QA tanpa akun — 25 November
+
+Room58: B menyiapkan layar publish pada scripts/fixtures/product-review.tsx dan selector
+tinggi iframe pada scripts/review-product-ui.mjs. Tidak ada perubahan aplikasi produksi.
+Layar memakai PublishModal asli di shell fixed100dvh, data contoh/daftar tamu kosong agar
+sesuai screenshot. Tutup dan buka ulang tersedia; publishInvitation/updateGuestStatus
+ditolak adaptor fixture, tidak menyentuh API akun. Tidak menguji pengiriman WhatsApp.
+
+Jalankan setelah build aplikasi: node scripts/review-product-ui.mjs /absolute/output-directory
+(output di luar repo), kemudian buka index.html melalui server statik sesuai environment
+review yang tersedia. Pilih Bagian Modal publikasi, lebar390 dan tinggi640/844; ulangi360
+serta1280×800. Frame memakai tinggi1000 secara default; selector tinggi baru mencegah
+pengujian mobile tersamarkan oleh frame yang terlalu tinggi. B tidak menerbitkan fixture.
+
+Bundling fixture berhasil menggunakan CSS hasil build kandidat PR#4. Diff whitespace
+bersih, src/** tidak berubah. Build/typecheck aplikasi tidak diulang karena source produksi
+tidak berubah sejak pemeriksaan sebelumnya. Belum membuka fixture dalam browser; ukuran,
+posisi dan scroll belum diklaim lulus. Perilaku keyboard/address bar HP tetap perlu uji fisik.
