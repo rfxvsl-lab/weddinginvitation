@@ -5,7 +5,7 @@ import { ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits';
 const FAQS = [
   {
     q: 'Benarkah semua fitur gratis?',
-    a: 'Ya. Akun gratis mencakup seluruh tema, tamu tanpa batas, RSVP, amplop digital, check-in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark, untuk hingga 3 undangan aktif.',
+    a: 'Ya. Akun gratis mencakup seluruh tema, tamu tanpa batas, RSVP, amplop digital, check in QR, galeri, musik, serta ekspor CSV/PDF tanpa watermark, untuk hingga 3 undangan aktif.',
   },
   {
     q: 'Apakah tamu perlu memasang aplikasi?',
@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: 'Amplop digital mendukung metode apa saja?',
-    a: 'Rekening bank (BCA, Mandiri, BRI, BNI, dan lainnya), e-wallet, QRIS, serta alamat pengiriman kado fisik.',
+    a: 'Rekening bank (BCA, Mandiri, BRI, BNI, dan lainnya), dompet digital, QRIS, serta alamat pengiriman kado fisik.',
   },
   {
     q: 'Bagaimana cara mendapatkan akses Enterprise?',

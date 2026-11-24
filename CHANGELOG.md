@@ -7,6 +7,16 @@
 - 2026-11-23 — **Lembayung** (Spesial · 2.5D senja → malam berlampion)
 - 2026-11-23 — **Sage Garden** (minimalis) · pilot Theme Kit
 
+## [3.8.0] — 2026-11-24 — Standar kompetitor untuk semua tema + sistem visual aplikasi
+
+- **Standar tema** (`docs/themes/STANDARD.md`): semua tema reguler memakai alur yang lazim di template premium (Katsudoto, Satu Momen, Viding/Invitato): kutipan berfoto → mempelai → save the date di atas foto → acara dengan baris tanggal klasik → kisah bergaris waktu → galeri + lightbox → kartu rekening → RSVP → ringkasan & daftar ucapan → penutup berfoto. Bunga tidak lagi ditempel di setiap kartu; ornamen hanya di tepi bagian (`ornament`: flora / line / none).
+- **Sampul baru**: foto berbingkai bentuk tema, nama tamu di antara dua garis, catatan salah tulis nama, tombol berikon yang otomatis kontras dengan latar sampul.
+- **Navigasi bawah** berikon yang menandai bagian aktif + tombol musik bundar (menggantikan menu hamburger), **lightbox** galeri dengan sebelumnya/berikutnya/geser, validasi RSVP di tempat.
+- **Desktop**: foto pasangan berganti pelan di kiri dengan nama & tanggal memakai huruf tema; undangan 430px di kanan. Tiket tamu kini di dalam kolom undangan.
+- **8 tema lama dibangun ulang** di Theme Kit dengan id yang sama (undangan yang sudah ada ikut berubah): Luxury Pink, Grand Ballroom (ornamen sudut klasik, acara bergaya tiket, mempelai berdampingan), Royal Arabian (ornamen bintang delapan, galeri pita), Javanese Classic (ornamen kawung, acara bergaris waktu), Lagu Kita (tiket konser, galeri pita, tanpa bunga), Cinema Rouge, Cinematic 2D Parallax, Heirloom Storybook.
+- **Aplikasi** (landing, auth, dashboard) mengikuti `elayadesign/ai-design-skills` landing-page-design: satu typeface Manrope (tanpa italic), judul hero bergradasi teks, kalimat inti yang menyala kata per kata, satu CTA utama di atas lipatan, copy tanpa tanda hubung, panel auth berlatar datar dengan tampilan tema asli, kurva gerak `cubic-bezier(0.22,1,0.36,1)`.
+- Screenshot katalog semua tema diperbarui.
+
 ## [3.7.1] — 2026-11-24 — Konsep asli 8 tema dikembalikan
 
 - 8 tema lama (Luxury Pink, Grand Ballroom, Netflix Luxury, Royal Arabian, SpotiLove, Javanese Classic, Cinematic 2D Parallax, Storybook) dikembalikan ke tata letak & konsep aslinya; migrasi ke tampilan seragam di 3.7.0 dibatalkan.

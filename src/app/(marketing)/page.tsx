@@ -7,6 +7,7 @@ import { LandingFeatures } from '@/components/landing/LandingFeatures';
 import { LandingPricing } from '@/components/landing/LandingPricing';
 import { LandingFaq } from '@/components/landing/LandingFaq';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { LandingTagline } from '@/components/landing/LandingTagline';
 import { SaasVideoStudio } from '@/components/saas/SaasVideoStudio';
 
 export default function LandingPage() {
@@ -24,6 +25,7 @@ export default function LandingPage() {
         <LandingThemes />
         <LandingSteps />
         <LandingFeatures />
+        <LandingTagline />
         <SaasVideoStudio />
         <LandingPricing />
         <LandingFaq />

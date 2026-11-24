@@ -8,7 +8,7 @@ const FREE = [
   `Semua ${DEFAULT_THEMES.length} tema, termasuk tema baru setiap hari`,
   'Tamu dan nama personal tanpa batas',
   'RSVP, buku ucapan, dan amplop digital',
-  'Check-in QR serta ekspor CSV/PDF',
+  'Check in QR serta ekspor CSV/PDF',
   'Hingga 3 undangan aktif, tanpa watermark',
 ];
 

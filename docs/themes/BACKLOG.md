@@ -1,7 +1,7 @@
 # Backlog tema undangan
 
-Sesi otomatis mengambil baris `todo` paling atas. Jangan menyentuh 8 tema lama
-(`src/components/templates/*`) — konsep aslinya dipertahankan dan ditingkatkan secara manual. Urutan sengaja diselang-seling
+Sesi otomatis mengambil baris `todo` paling atas. Sejak 3.8.0 semua tema (termasuk 8 tema lama, kini di
+`src/themes/catalog/`) mengikuti `docs/themes/STANDARD.md`; `src/components/templates/*` tidak dipakai lagi. Urutan sengaja diselang-seling
 (adat ↔ modern ↔ floral ↔ minimalis) dan **setiap baris ketiga adalah tema Spesial**
 (adegan 2D/2.5D paralaks — ikuti bagian "Tema Spesial" di PLAYBOOK).
 Format: `status | id | Nama | tier/kategori | brief`

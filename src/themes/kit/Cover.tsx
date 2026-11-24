@@ -359,6 +359,8 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
           outlineOffset: 6,
           borderRadius: spec.radius,
           background: `${p.surface}E6`,
+          // isi kartu berada di atas warna permukaan, bukan warna sampul
+          color: p.text,
           transition: `transform ${OPEN_MS}ms ${ease}, filter ${OPEN_MS}ms ease`,
           transform: opening ? 'scale(1.25)' : 'none',
           filter: opening ? 'blur(8px)' : 'none',

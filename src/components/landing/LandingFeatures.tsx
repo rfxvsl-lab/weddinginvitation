@@ -15,7 +15,7 @@ const FEATURES = [
   {
     icon: Wallet,
     title: 'Amplop digital',
-    body: 'Tampilkan rekening bank, e-wallet, QRIS, dan alamat kirim kado dengan tombol salin.',
+    body: 'Tampilkan rekening bank, dompet digital, QRIS, dan alamat kirim kado dengan tombol salin.',
   },
   {
     icon: Images,
@@ -24,7 +24,7 @@ const FEATURES = [
   },
   {
     icon: QrCode,
-    title: 'Check-in QR di lokasi',
+    title: 'Check in QR di lokasi',
     body: 'Tamu yang sudah konfirmasi mendapat kode QR. Penerima tamu memindainya dari HP untuk mencatat kehadiran dan jumlah orang.',
   },
   {

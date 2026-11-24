@@ -81,7 +81,7 @@ export function LandingThemes() {
                     alt={`Pratinjau tema ${t.name}`}
                     fill
                     sizes="(max-width: 768px) 45vw, 380px"
-                    className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+                    className="object-cover object-top transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                   />
                 </div>
                 <div className="mt-3 flex items-baseline justify-between gap-3">
