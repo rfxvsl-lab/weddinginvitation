@@ -36,6 +36,7 @@ export default defineTheme({
     { id: 'lilac', name: 'Lilac', palette: { primary: '#7E5A9B', secondary: '#C6AED8', text: '#3D2A4C', muted: '#7A6889', bg: '#F8F4FB', cover: '#EDE3F4', onCover: '#3D2A4C' }, floraArt: 'lavender' },
     { id: 'marun', name: 'Marun', palette: { primary: '#7E1F35', secondary: '#C98C99', text: '#3E1420', muted: '#7C5560', bg: '#FBF3F4', cover: '#F1DDE1', onCover: '#3E1420' }, floraArt: 'burgundy' },
   ],
+  ornament: 'flora',
   divider: 'floral',
   frame: 'arch',
   radius: 20,

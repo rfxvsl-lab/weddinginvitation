@@ -334,6 +334,7 @@ export default defineTheme({
   pattern:
     "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><g fill='none' stroke='%23C9A85C' stroke-width='1' opacity='.1'><path d='M0 7 L7 0 M7 14 L14 7 M14 21 L21 14 M21 28 L28 21'/><path d='M14 7 L21 14 M0 21 L7 28 M21 0 L28 7 M7 14 L0 7'/></g></svg>\")",
   patternOpacity: 1,
+  ornament: 'line',
   divider: 'none',
   // seruling bambu beruas mengapit goong berpencon
   dividerSvg:

@@ -39,6 +39,8 @@ export default defineTheme({
     { id: 'malam', name: 'Biru Malam', palette: { bg: '#0F1E3A', surface: '#16284A', onPrimary: '#0F1E3A', cover: '#0A1428' } },
     { id: 'marun', name: 'Marun', palette: { bg: '#2A0F16', surface: '#3A161F', onPrimary: '#2A0F16', cover: '#1C0A0F' } },
   ],
+  ornament: 'line',
+  cornerSvg: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 62V2h60"/><g transform="translate(19 19)"><rect x="-9" y="-9" width="18" height="18"/><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)"/><circle r="3" fill="currentColor" stroke="none"/></g><path d="M36 7h26M7 36v26" stroke-width=".7"/><path d="M33 19h29M19 33v29" stroke-dasharray="1.5 3"/></svg>',
   divider: 'diamond',
   frame: 'arch',
   radius: 14,
@@ -47,7 +49,7 @@ export default defineTheme({
   couple: 'cards',
   countdown: 'boxes',
   events: 'cards',
-  gallery: 'grid',
+  gallery: 'film',
   ambient: 'sparkles',
   reveal: 'blur',
   copy: {

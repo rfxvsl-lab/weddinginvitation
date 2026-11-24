@@ -416,7 +416,15 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
               </div>
             ) : (
               <Reveal variant={R} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-                {photos.map((src, i) => tile(src, i, i === 0 ? { gridColumn: '1 / -1', aspectRatio: '4 / 3' } : { aspectRatio: '1 / 1' }))}
+                {photos.map((src, i) => {
+                  // foto pertama lebar penuh; baris terakhir selalu penuh (tanpa sel kosong)
+                  const rest = photos.length - 1;
+                  const last = i === photos.length - 1;
+                  if (i === 0) return tile(src, i, { gridColumn: '1 / -1', aspectRatio: '4 / 3' });
+                  if (rest % 3 === 1 && last) return tile(src, i, { gridColumn: '1 / -1', aspectRatio: '3 / 2' });
+                  if (rest % 3 === 2 && i === photos.length - 2) return tile(src, i, { gridColumn: 'span 2', aspectRatio: 'auto', height: '100%' });
+                  return tile(src, i, { aspectRatio: '1 / 1' });
+                })}
               </Reveal>
             )}
           </div>
