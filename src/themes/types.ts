@@ -8,6 +8,7 @@
  */
 
 import type React from 'react';
+import type { CamLayer, CamPoint } from './kit/camera';
 
 export type ThemeCategory = 'classic' | 'modern' | 'floral' | 'minimalist' | 'storybook';
 
@@ -165,6 +166,24 @@ export interface ThemeSpec {
    * Komponen kustom disusun dari <ArtLayer hero order> di kit/chapters.
    */
   Stage?: React.ComponentType<{ palette: ThemePalette; flora: { colors: string[]; leaf: string; art: string }; photo?: string }>;
+  /**
+   * Mode kamera (gaya "undangan seret"): satu dunia ilustrasi berlapis paralaks yang dilewati
+   * kamera saat digulir. Tiap bagian adalah stasiun kamera; isi bagian melayang sebagai panel
+   * kertas. Lihat src/themes/kit/camera.tsx.
+   */
+  camera?: {
+    stations: Partial<Record<SectionId, CamPoint>>;
+    layers: () => CamLayer[];
+    sky: [number, string, string][];
+    tint: [number, string, number][];
+    /** karakter 2.5D (memakai useCamera) */
+    Actors?: React.ComponentType;
+    actorDepth?: number;
+    /** panel isi bagian */
+    panel: { background: string; border?: string; blur?: number };
+    /** tinggi jeda perjalanan kamera antarbagian (default 75vh) */
+    gap?: string;
+  };
   /** default 'regular' */
   tier?: ThemeTier;
   /** wajib untuk tier 'special' */

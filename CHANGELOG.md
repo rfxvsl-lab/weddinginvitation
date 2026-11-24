@@ -16,6 +16,9 @@
 - **8 tema lama dibangun ulang** di Theme Kit dengan id yang sama (undangan yang sudah ada ikut berubah): Luxury Pink, Grand Ballroom (ornamen sudut klasik, acara bergaya tiket, mempelai berdampingan), Royal Arabian (ornamen bintang delapan, galeri pita), Javanese Classic (ornamen kawung, acara bergaris waktu), Lagu Kita (tiket konser, galeri pita, tanpa bunga), Cinema Rouge, Cinematic 2D Parallax, Heirloom Storybook.
 - **Aplikasi** (landing, auth, dashboard) mengikuti `elayadesign/ai-design-skills` landing-page-design: satu typeface Manrope (tanpa italic), judul hero bergradasi teks, kalimat inti yang menyala kata per kata, satu CTA utama di atas lipatan, copy tanpa tanda hubung, panel auth berlatar datar dengan tampilan tema asli, kurva gerak `cubic-bezier(0.22,1,0.36,1)`.
 - Screenshot katalog semua tema diperbarui.
+- **Mode kamera** (`src/themes/kit/camera.tsx`): satu dunia ilustrasi berlapis paralaks yang dilewati kamera saat digulir (geser, naik, zoom); tiap bagian adalah stasiun kamera, isi bagian melayang sebagai panel kertas; warna langit & rona waktu mengikuti perjalanan; karakter 2.5D berlangganan posisi kamera.
+- **Heirloom Storybook** dibangun ulang dengan mode kamera: dunia buku cerita gouache bergaris tinta dari pagi sampai malam (rumah pondok, pohon tua & ayunan, kolam & jembatan, menara jam, masjid & tarub berjanur, jembatan batu, jemuran bingkai foto, kantor pos, gazebo lampion, sumur harapan, rumah di bukit + kembang api) dan sepasang mempelai 2.5D yang berjalan, menoleh, dan menghadap tamu di tiap stasiun.
+- **Taman Kertas** digambar ulang sebagai diorama kertas potong; **Pasundan** digambar ulang dengan bahasa batik Mega Mendung.
 
 ## [3.7.1] — 2026-11-24 — Konsep asli 8 tema dikembalikan
 

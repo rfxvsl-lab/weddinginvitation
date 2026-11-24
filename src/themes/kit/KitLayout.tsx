@@ -19,6 +19,7 @@ import { ArtLayer } from './chapters';
 import { Bloom, Bouquet, BottomNav, KitOverlay, Lightbox, MusicDisc, PaintedStage, Slideshow, StageFront, defaultFlora, relTime, type Flora } from './standard';
 import { STANDARD_ORDER, standardSections } from './standardSections';
 import { IcCalendar, IcChat, IcGift, IcHeart, IcHome, IcImage } from './icons';
+import { CameraStage } from './camera';
 
 interface KitLayoutProps {
   data: WeddingData;
@@ -809,6 +810,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           rsvp: { name: rName, setName: setRName, status: rStatus, setStatus: setRStatus, pax: rPax, setPax: setRPax, wish: rWish, setWish: setRWish, sent: rSent, error: rError, submit: submitRSVP },
           calendarUrl,
           fmtDate,
+          floating: spec.camera?.panel,
         }),
         hero: sceneSections.hero,
       };
@@ -822,6 +824,36 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     dateShort: fmtDate(mainDate, { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' · '),
   };
   const Backdrop = Chapter ? undefined : scene?.Backdrop;
+
+  // ---------- mode kamera ----------
+  const cam = !scene ? spec.camera : undefined;
+  const camRoot = useRef<HTMLElement | null>(null);
+  const camSections = cam ? order.map((id) => ({ id, node: id === 'hero' ? camHero() : sections[id]?.() })).filter((x) => x.node && cam.stations[x.id]) : [];
+  const camStations = useMemo(() => (cam ? camSections.map((x) => cam.stations[x.id]!) : []), [cam, camSections.map((x) => x.id).join()]);
+  const camLayers = useMemo(() => (cam ? cam.layers() : []), [cam]);
+  function camHero() {
+    const ink = spec.heroInk || p.text;
+    return (
+      <section style={{ position: 'relative', zIndex: 2, minHeight: '100vh', textAlign: 'center', padding: '12vh 24px 0', color: ink, textShadow: '0 1px 0 rgba(255,255,255,.55), 0 0 22px rgba(255,248,235,.9)' }}>
+        <Reveal variant={R} when={opened} from="down">
+          <p style={{ ...eyebrow, color: ink, opacity: 0.85 }}>{c.heroTitle || 'The Wedding of'}</p>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="left" delay={0.15} style={{ marginTop: 12 }}>
+          <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 76px)', fontWeight: 400, lineHeight: 1, margin: 0, color: p.primary }}>{groom.nickname}</h1>
+        </Reveal>
+        <Reveal variant="zoom" when={opened} delay={0.35}>
+          <p style={{ fontFamily: display, fontSize: 24, margin: '4px 0', color: ink }}>&amp;</p>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="right" delay={0.45}>
+          <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 76px)', fontWeight: 400, lineHeight: 1, margin: 0, color: p.primary }}>{bride.nickname}</h1>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="up" delay={0.65}>
+          <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.22em', textTransform: 'uppercase', marginTop: 16 }}>{dateText}</p>
+          <p style={{ fontFamily: spec.fonts.body, fontSize: 14, marginTop: 26, opacity: 0.85 }}>Gulir untuk memulai perjalanan</p>
+        </Reveal>
+      </section>
+    );
+  }
 
   const NAV_ICON: Partial<Record<SectionId, React.ReactNode>> = {
     hero: <IcHome size={18} />,
@@ -868,6 +900,21 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
         </KitOverlay>
       )}
 
+      {cam ? (
+        <main ref={camRoot} style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', zIndex: 0 }}>
+            <CameraStage stations={camStations} layers={camLayers} sky={cam.sky} tint={cam.tint} actors={cam.Actors ? <cam.Actors /> : null} actorDepth={cam.actorDepth} root={camRoot} />
+          </div>
+          {camSections.map(({ id, node }, i) => (
+            <div key={id} data-section={id} style={{ position: 'relative', zIndex: 2 }}>
+              <div data-cam-hold style={id === 'hero' ? { minHeight: '100vh' } : { padding: '6vh 0' }}>
+                {node}
+              </div>
+              <div data-cam-gap aria-hidden style={{ height: i === camSections.length - 1 ? '30vh' : cam.gap || '75vh' }} />
+            </div>
+          ))}
+        </main>
+      ) : (
       <main style={{ position: 'relative', zIndex: 2, maxWidth: Chapter ? 'none' : 560, margin: '0 auto', opacity: opened || Chapter || !scene ? 1 : 0, transition: 'opacity 900ms ease 500ms' }}>
         {order.map((id) => {
           const node = sections[id]?.();
@@ -958,6 +1005,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           );
         })}
       </main>
+      )}
 
       {opened && (
         <KitOverlay z={70}>

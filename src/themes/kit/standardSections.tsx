@@ -54,6 +54,11 @@ export interface StdCtx {
   };
   calendarUrl: (ev: EventDetails, title: string) => string;
   fmtDate: (iso: string, opts?: Intl.DateTimeFormatOptions) => string;
+  /**
+   * Mode panel melayang (tema kamera): tiap bagian menjadi kartu kertas di atas dunia ilustrasi,
+   * tanpa pita latar & tanpa pita foto layar penuh.
+   */
+  floating?: { background: string; border?: string; blur?: number };
 }
 
 export const STANDARD_ORDER: SectionId[] = ['hero', 'quote', 'couple', 'countdown', 'events', 'story', 'gallery', 'gift', 'rsvp', 'wishes', 'closing'];
@@ -62,7 +67,7 @@ export const STANDARD_ORDER: SectionId[] = ['hero', 'quote', 'couple', 'countdow
 const BAND: Partial<Record<SectionId, boolean>> = { events: true, gift: true, wishes: false };
 
 export function standardSections(ctx: StdCtx): Record<SectionId, () => React.ReactNode> {
-  const { spec, data, flora, img, heroPhoto, dateText, events, left, passed, copied, copy, openLightbox, rsvp, rsvps, guest, calendarUrl, fmtDate } = ctx;
+  const { spec, data, flora, img, heroPhoto, dateText, events, left, passed, copied, copy, openLightbox, rsvp, rsvps, guest, calendarUrl, fmtDate, floating } = ctx;
   const p = spec.palette;
   const c = spec.copy || {};
   const R = spec.reveal;
@@ -73,7 +78,12 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
   const body = spec.fonts.body;
   const groom = data.couple.groom;
   const bride = data.couple.bride;
-  const ornament: 'flora' | 'line' | 'none' = spec.ornament || (spec.floraArt ? 'flora' : spec.cornerSvg ? 'line' : 'none');
+  const ornament: 'flora' | 'line' | 'none' = floating ? 'none' : spec.ornament || (spec.floraArt ? 'flora' : spec.cornerSvg ? 'line' : 'none');
+  // warna teks di pita foto (putih) atau di panel kertas (warna tema)
+  const onBand = floating ? p.primary : '#fff';
+  const onBandSoft = floating ? p.muted : 'rgba(255,255,255,.88)';
+  const glass = floating ? p.surface : 'rgba(255,255,255,.12)';
+  const glassLine = floating ? `${p.secondary}88` : 'rgba(255,255,255,.28)';
 
   // ---------- token ----------
   const eyebrow: React.CSSProperties = { fontFamily: label, fontSize: 12, fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: p.muted, margin: 0 };
@@ -113,17 +123,34 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
     boxShadow: '0 24px 48px -36px rgba(0,0,0,.45)',
     textAlign: 'center',
   };
-  const section = (id: SectionId, i: number): React.CSSProperties => ({
-    position: 'relative',
-    zIndex: 2,
-    padding: '88px 28px',
-    textAlign: 'center',
-    background: BAND[id] ? p.surface : undefined,
-    // lekuk tipis di tepi pita
-    boxShadow: BAND[id] ? `inset 0 1px 0 ${p.secondary}33, inset 0 -1px 0 ${p.secondary}33` : undefined,
-    ['--i' as string]: i,
-  });
-  const inner: React.CSSProperties = { position: 'relative', zIndex: 2, maxWidth: 400, margin: '0 auto' };
+  const section = (id: SectionId, i: number): React.CSSProperties =>
+    floating
+      ? { position: 'relative', zIndex: 2, padding: '0 14px', textAlign: 'center', ['--i' as string]: i }
+      : {
+          position: 'relative',
+          zIndex: 2,
+          padding: '88px 28px',
+          textAlign: 'center',
+          background: BAND[id] ? p.surface : undefined,
+          // lekuk tipis di tepi pita
+          boxShadow: BAND[id] ? `inset 0 1px 0 ${p.secondary}33, inset 0 -1px 0 ${p.secondary}33` : undefined,
+          ['--i' as string]: i,
+        };
+  const inner: React.CSSProperties = floating
+    ? {
+        position: 'relative',
+        zIndex: 2,
+        maxWidth: 420,
+        margin: '0 auto',
+        background: floating.background,
+        border: floating.border,
+        borderRadius: 26,
+        padding: '40px 20px 36px',
+        boxShadow: '0 30px 60px -36px rgba(40,24,10,.55)',
+        backdropFilter: floating.blur ? `blur(${floating.blur}px)` : undefined,
+        WebkitBackdropFilter: floating.blur ? `blur(${floating.blur}px)` : undefined,
+      }
+    : { position: 'relative', zIndex: 2, maxWidth: 400, margin: '0 auto' };
 
   const Title = (text: string, sub?: string) => (
     <Reveal variant={R} style={{ marginBottom: 34 }}>
@@ -133,7 +160,18 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
     </Reveal>
   );
   const Orn = (seed: number, flip = false) => <SectionOrnament mode={ornament} flora={flora} svg={spec.cornerSvg} color={p.secondary} flip={flip} seed={seed} />;
-  const photoBand = (src: string, children: React.ReactNode, key: string, minH = '86vh') => (
+  const photoBand = (src: string, children: React.ReactNode, key: string, minH = '86vh') =>
+    floating ? (
+      <section key={key} style={section('countdown', 0)}>
+        <div style={inner}>
+          <div style={{ width: 168, height: 210, margin: '0 auto 26px', padding: 5, borderRadius: '999px 999px 10px 10px', border: `1px solid ${p.secondary}` }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', borderRadius: '999px 999px 7px 7px', display: 'block' }} />
+          </div>
+          {children}
+        </div>
+      </section>
+    ) : (
     <section key={key} style={{ position: 'relative', zIndex: 2, minHeight: minH, overflow: 'hidden', color: '#fff', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '96px 28px' }}>
       <Px style={{ position: 'absolute', inset: '-12% 0' }} y={[-50, 50]}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -142,7 +180,7 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
       <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${p.cover || '#000'}99 0%, rgba(0,0,0,.35) 45%, ${p.cover || '#000'}D9 100%)` }} />
       <div style={{ ...inner, textShadow: '0 2px 16px rgba(0,0,0,.4)' }}>{children}</div>
     </section>
-  );
+    );
   const parents = (m: typeof groom) => [m.fatherName, m.motherName].filter(Boolean).join(' & ');
   const photos = (data.gallery || []).filter(Boolean).map(img);
   const pick = (i: number) => photos[i % Math.max(photos.length, 1)] || heroPhoto;
@@ -240,12 +278,12 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
             pick(3),
             <>
               <Reveal variant={R}>
-                <p style={{ ...eyebrow, color: 'rgba(255,255,255,.85)' }}>{c.countdownTitle || 'Menghitung hari'}</p>
-                <h2 style={{ ...titleSt, color: '#fff', marginTop: 10, fontSize: hasScript ? 54 : 38 }}>Save the Date</h2>
-                <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.22em', textTransform: 'uppercase', margin: '14px 0 0' }}>{dateText}</p>
+                <p style={{ ...eyebrow, color: onBandSoft }}>{c.countdownTitle || 'Menghitung hari'}</p>
+                <h2 style={{ ...titleSt, color: onBand, marginTop: 10, fontSize: hasScript ? 54 : 38 }}>Save the Date</h2>
+                <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.22em', textTransform: 'uppercase', margin: '14px 0 0', color: floating ? p.text : undefined }}>{dateText}</p>
               </Reveal>
               {passed ? (
-                <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontStyle: 'italic', fontSize: 20, marginTop: 26 }}>
+                <Reveal variant={R} delay={0.1} style={{ fontFamily: display, fontStyle: 'italic', fontSize: 20, marginTop: 26, color: floating ? p.text : undefined }}>
                   Hari bahagia telah tiba
                 </Reveal>
               ) : (
@@ -258,7 +296,7 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
                       [left.s, 'Detik'],
                     ] as [number, string][]
                   ).map(([v, l]) => (
-                    <div key={l} style={{ padding: '14px 0 12px', borderRadius: Math.min(radius, 14), background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.28)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', textShadow: 'none' }}>
+                    <div key={l} style={{ padding: '14px 0 12px', borderRadius: Math.min(radius, 14), background: glass, border: `1px solid ${glassLine}`, color: floating ? p.primary : undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', textShadow: 'none' }}>
                       <div style={{ fontFamily: display, fontSize: 28, lineHeight: 1.1, fontVariantNumeric: 'lining-nums tabular-nums' }}>{String(v).padStart(2, '0')}</div>
                       <div style={{ fontFamily: label, fontSize: 10.5, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, opacity: 0.85 }}>{l}</div>
                     </div>
@@ -267,7 +305,7 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
               )}
               {events[0] && events[0][1].date && (
                 <Reveal variant={R} delay={0.2} style={{ marginTop: 28 }}>
-                  <a className="kit-press" href={calendarUrl(events[0][1], `Pernikahan ${groom.nickname} & ${bride.nickname}`)} target="_blank" rel="noreferrer" style={{ ...btn, background: 'rgba(255,255,255,.14)', borderColor: 'rgba(255,255,255,.6)', color: '#fff', backdropFilter: 'blur(6px)', textShadow: 'none' }}>
+                  <a className="kit-press" href={calendarUrl(events[0][1], `Pernikahan ${groom.nickname} & ${bride.nickname}`)} target="_blank" rel="noreferrer" style={floating ? btn : { ...btn, background: 'rgba(255,255,255,.14)', borderColor: 'rgba(255,255,255,.6)', color: '#fff', backdropFilter: 'blur(6px)', textShadow: 'none' }}>
                     <IcCalendar size={16} /> Simpan tanggal
                   </a>
                 </Reveal>
@@ -636,8 +674,8 @@ export function standardSections(ctx: StdCtx): Record<SectionId, () => React.Rea
         photos[photos.length - 1] || heroPhoto,
         <>
           <Reveal variant={R}>
-            <h2 style={{ ...titleSt, color: '#fff', fontSize: hasScript ? 54 : 38 }}>{c.closingTitle || 'Terima Kasih'}</h2>
-            <p style={{ ...bodySt, color: 'rgba(255,255,255,.92)', maxWidth: 340, margin: '18px auto 0' }}>
+            <h2 style={{ ...titleSt, color: onBand, fontSize: hasScript ? 54 : 38 }}>{c.closingTitle || 'Terima Kasih'}</h2>
+            <p style={{ ...bodySt, color: floating ? p.text : 'rgba(255,255,255,.92)', maxWidth: 340, margin: '18px auto 0' }}>
               {c.closingText || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.'}
             </p>
           </Reveal>

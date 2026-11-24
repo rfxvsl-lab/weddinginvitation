@@ -60,3 +60,12 @@ Mengikuti `elayadesign/ai-design-skills` → `landing-page-design` Part B: satu 
 (Manrope), heading semibold tanpa italic, judul hero bergradasi teks #000 → #666, kalimat inti
 yang menyala kata per kata, tanpa tanda hubung di copy, latar datar, kurva gerak
 `cubic-bezier(0.22,1,0.36,1)`. Token ada di bagian akhir `src/index.css`.
+
+## Mode kamera (tema Spesial gaya "undangan seret")
+
+`ThemeSpec.camera` → satu dunia memanjang berlapis (0 = jauh, 1 = dekat) yang dilewati kamera.
+Isi bagian = panel kertas melayang; di jeda antarbagian kamera berjalan ke stasiun berikutnya.
+Wajib: semua posisi kamera di antara stasiun tetap berupa dunia yang utuh (tidak ada ruang kosong
+atau ganti latar), karakter 2.5D digerakkan dari posisi kamera (bukan waktu) sehingga setiap posisi
+gulir punya pose pasti. QA: lembar kontak ≥ 30 posisi gulir merata, bukan hanya stasiun.
+Contoh: `catalog/storybook.tsx` + `storybook.world.tsx` + `storybook.couple.tsx`.
