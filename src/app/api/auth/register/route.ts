@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const noWa = clean(body?.noWa, 20).replace(/[^\d+]/g, '');
     const sosmed = clean(body?.sosmed, 80);
     const activeSlug = normalizeSlug(body?.activeSlug || `${coupleGroom}-${coupleBride}`);
-    // Formulir Akses Awal (opsional, ditinjau admin)
+    // Formulir Akses Awal (ditinjau admin). eventDate boleh kosong; city & referralSource wajib.
     const eventDateRaw = clean(body?.eventDate, 10);
     const application = {
       eventDate: /^\d{4}-\d{2}-\d{2}$/.test(eventDateRaw) ? eventDateRaw : undefined,
@@ -58,6 +58,9 @@ export async function POST(req: Request) {
     }
 
     if (!coupleGroom || !coupleBride) return jsonError('Nama panggilan kedua mempelai wajib diisi.');
+    if (eventDateRaw && !application.eventDate) return jsonError('Format tanggal acara tidak valid.');
+    if (!application.city) return jsonError('Kota acara wajib diisi.');
+    if (!application.referralSource) return jsonError('Mohon pilih dari mana Anda mengetahui RuangHadir.');
     if (!fullName) fullName = `${coupleGroom} & ${coupleBride}`;
     if (noWa.replace(/\D/g, '').length < 9) return jsonError('Nomor WhatsApp tidak valid.');
     if (activeSlug.length < 3) return jsonError('Tautan undangan minimal 3 karakter.');

@@ -26,8 +26,12 @@ Harga, kuota, dan `activeDays` 365 tidak diubah.
 | `GET /api/auth/me` | `401 { user: null }` |
 
 Field register yang diterima: `fullName`, `email`, `password` atau `googleSignupToken`,
-`coupleGroom`, `coupleBride`, `noWa`, `sosmed`, `activeSlug`, serta field baru opsional
-`eventDate` (YYYY-MM-DD), `city`, `referralSource`, `note`.
+`coupleGroom`, `coupleBride`, `noWa`, `sosmed` (opsional), `activeSlug`, serta field baru
+`eventDate` (YYYY-MM-DD, boleh kosong; format salah → 400), `city` (wajib), `referralSource`
+(wajib, teks bebas; UI B memakai pilihan + Lainnya), `note` (opsional, ≤500).
+
+Urutan gabung: backend ini mewajibkan `city` dan `referralSource`, jadi form lama di `main` akan
+mendapat 400. Gabungkan bersama atau setelah frontend B.
 
 Akun yang ditolak setelah sempat masuk kehilangan akses paling lambat 60 detik (cache status di
 `getSession`); di proses yang sama aksi admin langsung membersihkan cache.
