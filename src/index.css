@@ -1864,3 +1864,51 @@ body {
 .rh-scrub::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(184, 149, 90, 0.35); }
 .rh-scrub::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 999px; background: #FFFFFF; }
 .rh-scrub:focus-visible { outline: 2px solid #B8955A; outline-offset: 6px; }
+
+/* ==========================================================================
+   Sistem visual aplikasi v4 — mengikuti elayadesign/ai-design-skills
+   (landing-page-design, Part B). Berlaku untuk landing, auth, dashboard (.saas-scope).
+   - B1: satu typeface (Manrope), heading semibold, tanpa italic, tanpa ultra bold
+   - B5: judul hero bergradasi kiri→kanan #000→#666 (satu-satunya gradasi, hanya teks)
+   - B7: kurva gerak cubic-bezier(0.22,1,0.36,1), durasi ≥ 300ms untuk warna, 500ms untuk posisi
+   Template undangan tidak memakai .saas-scope sehingga tidak terpengaruh.
+   ========================================================================== */
+.saas-scope {
+  --font-display: var(--font-ui);
+  --saas-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --saas-dur: 0.3s;
+  font-family: var(--font-ui), "Manrope", system-ui, sans-serif;
+}
+.saas-scope h1,
+.saas-scope h2,
+.saas-scope h3,
+.saas-scope h4,
+.saas-scope .rh-display,
+.saas-scope .saas-statnum,
+.saas-scope .saas-serif-i,
+.saas-dash h2,
+.saas-dash h3,
+.saas-dash h4 {
+  font-family: var(--font-ui), "Manrope", system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.saas-scope p { text-wrap: pretty; }
+.saas-scope em, .saas-scope i { font-style: normal; }
+.saas-scope b, .saas-scope strong { font-weight: 600; }
+.saas-scope .rh-hero-title {
+  max-width: 680px;
+  background: linear-gradient(90deg, #000000 0%, #666666 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.saas-scope .rh-hero-sub { max-width: 680px; }
+
+/* B11: kalimat inti yang menyala kata demi kata saat digulir */
+.rh-tagline-word { color: var(--rh-ink); opacity: .3; transition: opacity .7s cubic-bezier(0.22, 1, 0.36, 1); }
+.rh-tagline-word.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .rh-tagline-word { opacity: 1; transition: none; } }

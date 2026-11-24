@@ -31,6 +31,23 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
   const script = spec.fonts.script || spec.fonts.display;
   const labelFont = spec.fonts.label || spec.fonts.body;
 
+  // tombol harus kontras dengan latar sampul; bila warna utama terlalu dekat, pakai warna kedua
+  const lum = (hex: string) => {
+    const h = hex.replace('#', '');
+    const [r, g, b] = [0, 2, 4].map((i) => {
+      const c = parseInt(h.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string) => {
+    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+    return (x + 0.05) / (y + 0.05);
+  };
+  const safe = /^#[0-9a-f]{6}$/i;
+  const btnBg = safe.test(p.primary) && safe.test(coverBg) && contrast(p.primary, coverBg) < 2.2 ? p.secondary : p.primary;
+  const btnFg = btnBg === p.primary ? p.onPrimary : safe.test(btnBg) && lum(btnBg) > 0.35 ? '#1A1A1A' : '#FFFFFF';
+
   const open = () => {
     if (opening) return;
     setOpening(true);
@@ -48,39 +65,64 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
   const ease = 'cubic-bezier(.7,0,.2,1)';
   const Art = spec.CoverArt;
 
+  // Komposisi sampul standar (pola template premium): foto berbingkai → judul → nama → tanggal →
+  // nama tamu di antara dua garis → tombol buka. Tanpa kartu putih generik.
+  const frameRadius: Record<string, string> = { arch: '999px 999px 8px 8px', circle: '999px', oval: '50%', rect: '8px', polaroid: '3px' };
+  const showPhoto = Boolean(photo) && spec.cover !== 'photo' && spec.cover !== 'scene' && spec.cover !== 'envelope' && spec.cover !== 'film';
+  const fr = frameRadius[spec.frame] || frameRadius.arch;
   const inner = (
-    <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 28px' }}>
-      <p style={{ fontFamily: labelFont, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', opacity: 0.8 }}>{title}</p>
-      <h1 style={{ fontFamily: script, fontSize: 'clamp(44px, 13vw, 64px)', lineHeight: 1.05, fontWeight: 400, margin: '14px 0 6px' }}>
-        {groom} <span style={{ fontFamily: display, fontSize: '0.6em', fontStyle: 'italic', color: p.secondary }}>&amp;</span> {bride}
+    <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 28px', width: '100%', maxWidth: 420 }}>
+      {showPhoto && (
+        <div style={{ width: spec.frame === 'circle' ? 150 : 148, height: spec.frame === 'circle' ? 150 : 196, padding: 5, borderRadius: fr, border: `1px solid ${p.secondary}`, marginBottom: 26, boxShadow: '0 20px 40px -24px rgba(0,0,0,.6)' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', borderRadius: fr, display: 'block' }} />
+        </div>
+      )}
+      <p style={{ fontFamily: labelFont, fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.85, margin: 0 }}>{title}</p>
+      <h1 style={{ fontFamily: script, fontSize: 'clamp(44px, 13vw, 60px)', lineHeight: 1.08, fontWeight: 400, margin: '14px 0 10px', textWrap: 'balance' }}>
+        {groom} <span style={{ fontFamily: display, fontSize: '0.55em', fontStyle: 'italic', color: p.secondary }}>&amp;</span> {bride}
       </h1>
-      <p style={{ fontFamily: spec.fonts.body, fontSize: 14, opacity: 0.85 }}>{dateText}</p>
-      {/* kartu tamu standar */}
-      <div style={{ margin: '24px 0 22px', minWidth: 240, maxWidth: 320, padding: '14px 24px', borderRadius: 12, background: `${p.surface}F2`, color: p.text, boxShadow: '0 14px 30px -18px rgba(0,0,0,.6)', textShadow: 'none' }}>
-        <p style={{ fontFamily: labelFont, fontSize: 12, letterSpacing: '0.06em', opacity: 0.75, margin: 0 }}>{label}</p>
-        <p style={{ fontFamily: display, fontSize: 21, fontWeight: 600, margin: '4px 0 2px', lineHeight: 1.25 }}>{guestName}</p>
-        <p style={{ fontFamily: labelFont, fontSize: 12, opacity: 0.7, margin: 0 }}>Di Tempat</p>
+      <p style={{ fontFamily: labelFont, fontSize: 12.5, letterSpacing: '0.2em', textTransform: 'uppercase', opacity: 0.9, margin: 0 }}>{dateText}</p>
+      <div style={{ margin: '30px 0 26px', width: '100%', maxWidth: 300, textShadow: 'none' }}>
+        <p style={{ fontFamily: labelFont, fontSize: 12.5, letterSpacing: '0.04em', opacity: 0.8, margin: 0 }}>{label}</p>
+        <div style={{ margin: '12px 0 0', padding: '12px 8px', borderTop: `1px solid ${p.secondary}AA`, borderBottom: `1px solid ${p.secondary}AA` }}>
+          <p style={{ fontFamily: display, fontSize: 22, fontWeight: 600, margin: 0, lineHeight: 1.3 }}>{guestName}</p>
+        </div>
+        <p style={{ fontFamily: labelFont, fontSize: 11.5, opacity: 0.65, margin: '10px 0 0' }}>Mohon maaf bila ada kesalahan penulisan nama dan gelar</p>
       </div>
       <button
         data-kit-open
         type="button"
         onClick={open}
+        className="kit-press"
         style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 10,
+          minHeight: 46,
           fontFamily: labelFont,
-          fontSize: 12,
+          fontSize: 12.5,
           fontWeight: 600,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: p.onPrimary,
-          background: p.primary,
+          color: btnFg,
+          background: btnBg,
           border: 'none',
-          borderRadius: Math.min(spec.radius, 999),
-          padding: '14px 26px',
+          borderRadius: Math.min(spec.radius, 999) >= 20 ? 999 : Math.max(6, Math.min(spec.radius, 14)),
+          padding: '12px 26px',
           cursor: 'pointer',
-          boxShadow: '0 12px 26px -14px rgba(0,0,0,.55)',
+          boxShadow: '0 14px 28px -14px rgba(0,0,0,.6)',
         }}
       >
-        {spec.cover === 'film' ? '▶' : '✉'} {button}
+        {spec.cover === 'film' ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden><path d="M8 5.5v13l10-6.5Z" fill="currentColor" /></svg>
+        ) : (
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="3.5" y="5.5" width="17" height="13" rx="1.5" />
+            <path d="m4 6.5 8 6 8-6" />
+          </svg>
+        )}
+        {button}
       </button>
     </div>
   );
@@ -91,10 +133,12 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
     zIndex: 100,
     color: onCover,
     background: coverBg,
+    backgroundImage: [spec.pattern, `radial-gradient(120% 80% at 50% 40%, transparent 40%, rgba(0,0,0,.28) 100%)`].filter(Boolean).join(', '),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    pointerEvents: 'auto',
   };
 
   // ---------------- photo: foto penuh, sampul naik ke atas ----------------
@@ -127,7 +171,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
       boxShadow: side === 'l' ? 'inset -20px 0 40px -20px rgba(0,0,0,.4)' : 'inset 20px 0 40px -20px rgba(0,0,0,.4)',
     });
     return (
-      <div style={{ ...base, background: 'transparent' }}>
+      <div style={{ ...base, background: 'transparent', backgroundImage: 'none' }}>
         <div style={panel('l')} />
         <div style={panel('r')} />
         {Art && <Art palette={p} />}
@@ -145,6 +189,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
       width: '50%',
       [side === 'l' ? 'left' : 'right']: 0,
       background: coverBg,
+      backgroundImage: [spec.pattern, side === 'l' ? 'linear-gradient(90deg, transparent 60%, rgba(0,0,0,.18))' : 'linear-gradient(270deg, transparent 60%, rgba(0,0,0,.18))'].filter(Boolean).join(', '),
       // bayangan lembut di sambungan pintu (tanpa garis yang memotong teks)
       boxShadow: side === 'l' ? 'inset -14px 0 22px -20px rgba(0,0,0,.28)' : 'inset 14px 0 22px -20px rgba(0,0,0,.28)',
       transformOrigin: side === 'l' ? '0 50%' : '100% 50%',
@@ -152,7 +197,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
       transform: opening ? `perspective(1200px) rotateY(${side === 'l' ? 100 : -100}deg)` : 'none',
     });
     return (
-      <div style={{ ...base, background: 'transparent', perspective: 1200 }}>
+      <div style={{ ...base, background: 'transparent', backgroundImage: 'none', perspective: 1200 }}>
         <div style={door('l')} />
         <div style={door('r')} />
         {Art && <Art palette={p} />}
@@ -249,7 +294,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
       transform: opening && leader === 0 ? `translateY(${top ? '-100%' : '100%'})` : 'none',
     });
     return (
-      <div style={{ ...base, background: 'transparent', color: onCover }}>
+      <div style={{ ...base, background: 'transparent', backgroundImage: 'none', color: onCover }}>
         <div style={half(true)} />
         <div style={half(false)} />
         {!opening && (
@@ -282,6 +327,7 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
         style={{
           ...base,
           background: 'transparent',
+          backgroundImage: 'none',
           color: spec.scene?.heroText || onCover,
           alignItems: 'flex-start',
           paddingTop: '14vh',
@@ -313,6 +359,8 @@ export default function Cover({ spec, groom, bride, dateText, guestName, photo, 
           outlineOffset: 6,
           borderRadius: spec.radius,
           background: `${p.surface}E6`,
+          // isi kartu berada di atas warna permukaan, bukan warna sampul
+          color: p.text,
           transition: `transform ${OPEN_MS}ms ${ease}, filter ${OPEN_MS}ms ease`,
           transform: opening ? 'scale(1.25)' : 'none',
           filter: opening ? 'blur(8px)' : 'none',

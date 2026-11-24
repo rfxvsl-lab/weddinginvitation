@@ -7,36 +7,38 @@ import { THEME_SHOTS } from './themeShots';
 const FAN = [
   { id: 'royal-arabian', name: 'Royal Arabian Night', cls: 'rh-fan-left' },
   { id: 'javanese-classic', name: 'Javanese Classic', cls: 'rh-fan-right' },
-  { id: 'storybook-interactive', name: 'Heirloom Storybook 3D', cls: 'rh-fan-center' },
+  { id: 'sage-garden', name: 'Sage Garden', cls: 'rh-fan-center' },
 ];
 
-const FACTS = ['Gratis, tanpa watermark', 'Link bernama untuk setiap tamu', 'RSVP & check-in QR di hari H'];
+const FACTS = ['Gratis, tanpa watermark', 'Tautan bernama untuk setiap tamu', 'RSVP dan check in QR di hari H'];
 
 export function LandingHero() {
   return (
     <section className="relative overflow-hidden">
       <div className="mx-auto grid max-w-[1200px] items-center gap-14 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pb-28 lg:pt-16">
         <div className="max-w-[600px]">
-          <h1 className="rh-display text-[44px] leading-[1.02] sm:text-[60px] lg:text-[68px]">
-            Undangan digital seindah kartu cetak, semudah mengirim pesan.
+          <h1 className="rh-display rh-hero-title text-4xl sm:text-5xl">
+            Undangan digital
+            <br className="hidden sm:block" /> seindah kartu cetak,
+            <br className="hidden sm:block" /> semudah mengirim pesan.
           </h1>
-          <p className="mt-6 max-w-[520px] text-[17px] leading-[1.65] text-[var(--rh-ink-2)]">
+          <p className="rh-hero-sub mt-6 text-lg text-[var(--rh-ink-2)]">
             Pilih tema, isi data acara, lalu kirim tautan dengan nama setiap tamu lewat WhatsApp.
-            Konfirmasi kehadiran, amplop digital, dan check-in di lokasi sudah termasuk.
+            Konfirmasi kehadiran, amplop digital, dan check in di lokasi sudah termasuk.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link href="/auth?mode=register" className="saas-btn-primary px-6 text-[15px] sm:!min-h-[50px]">
+          <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <Link href="/auth?mode=register" className="saas-btn-primary px-6 text-base sm:!min-h-[48px]">
               Buat undangan gratis
             </Link>
-            <Link href="/preview" className="saas-btn-outline px-6 text-[15px] sm:!min-h-[50px]">
+            <Link href="/preview" className="text-sm font-semibold text-[var(--rh-ink-2)] underline decoration-[var(--rh-line-strong)] underline-offset-4 transition-colors duration-300 hover:text-[var(--rh-ink)]">
               Lihat contoh undangan
             </Link>
           </div>
 
-          <ul className="mt-9 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          <ul className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
             {FACTS.map((f) => (
-              <li key={f} className="flex items-center gap-2 text-[14px] text-[var(--rh-ink-2)]">
+              <li key={f} className="flex items-center gap-2 text-sm text-[var(--rh-ink-2)]">
                 <Check size={16} strokeWidth={2.2} className="shrink-0 text-[var(--rh-gold)]" aria-hidden />
                 {f}
               </li>

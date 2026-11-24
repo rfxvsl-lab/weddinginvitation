@@ -16,7 +16,10 @@ import { Ambient, Corner, Divider, Frame, Reveal, fontImport } from './primitive
 import { getKitTheme } from '../catalog';
 import { Px, SceneProvider, requestTiltPermission } from './scene';
 import { ArtLayer } from './chapters';
-import { Bloom, Bouquet, NavMenu, PaintedStage, Slideshow, StageFront, Vinyl, defaultFlora, relTime, type Flora } from './standard';
+import { Bloom, Bouquet, BottomNav, KitOverlay, Lightbox, MusicDisc, PaintedStage, Slideshow, StageFront, defaultFlora, relTime, type Flora } from './standard';
+import { STANDARD_ORDER, standardSections } from './standardSections';
+import { IcCalendar, IcChat, IcGift, IcHeart, IcHome, IcImage } from './icons';
+import { CameraStage } from './camera';
 
 interface KitLayoutProps {
   data: WeddingData;
@@ -26,6 +29,8 @@ interface KitLayoutProps {
   rsvps: RSVP[];
   embedded?: boolean;
   invitationId?: string;
+  /** bagian tambahan dari InvitationPreview (tiket tamu) — dirender di dalam kolom, sebelum footer */
+  extras?: React.ReactNode;
 }
 
 // Urutan standar (mengikuti alur template premium): pembuka → kutipan → mempelai → tayangan foto →
@@ -64,7 +69,20 @@ function calendarUrl(ev: EventDetails, title: string) {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedded = false, invitationId }: KitLayoutProps) {
+/**
+ * Gaya bersama: keadaan tombol (hover/aktif/fokus). Tata letak desktop (foto di kiri,
+ * undangan di kanan) diatur DesktopInvitationWrapper di luar iframe.
+ */
+const KIT_CSS = `
+.kit-press{transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .3s cubic-bezier(.22,1,.36,1),background-color .3s cubic-bezier(.22,1,.36,1),color .3s cubic-bezier(.22,1,.36,1)}
+.kit-press:hover{opacity:.9;transform:translateY(-1px)}
+.kit-press:active{transform:scale(.98)}
+.kit-press:focus-visible,.kit-field:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.kit-field:focus{border-color:currentColor}
+@media (prefers-reduced-motion:reduce){.kit-press,.kit-press:hover{transition:none;transform:none}}
+`;
+
+export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedded = false, extras }: KitLayoutProps) {
   const baseSpec = getKitTheme(theme.id) as ThemeSpec;
   // varian warna pilihan pemilik undangan (dashboard)
   const variant = baseSpec.variants?.find((v) => v.id === data.themeVariant);
@@ -77,7 +95,8 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   const [opened, setOpened] = useState(embedded);
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightbox, setLightboxState] = useState<{ photos: string[]; i: number } | null>(null);
+  const setLightbox = (src: string | null) => setLightboxState(src ? { photos: [src], i: 0 } : null);
   const [copied, setCopied] = useState<string | null>(null);
 
   const img = (u?: string) => convertGoogleDriveUrl(u || '');
@@ -142,9 +161,12 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
   const [rPax, setRPax] = useState(1);
   const [rWish, setRWish] = useState('');
   const [rSent, setRSent] = useState(false);
+  const [rError, setRError] = useState<string | null>(null);
   const submitRSVP = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rName.trim() || !rWish.trim()) return;
+    if (!rName.trim()) return setRError('Nama belum diisi. Tulis nama Anda agar mempelai mengenali ucapan ini.');
+    if (!rWish.trim()) return setRError('Ucapan belum diisi. Tulis doa atau ucapan singkat untuk kedua mempelai.');
+    setRError(null);
     onAddRSVP({
       id: `rsvp-${Date.now()}`,
       guestId: guest?.id,
@@ -177,7 +199,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     [data.events]
   );
 
-  const order = (spec.sections || DEFAULT_ORDER).filter((id) => !(spec.scene && (id === 'interlude' || id === 'wishes')));
+  const order = (spec.sections || (spec.scene ? DEFAULT_ORDER : STANDARD_ORDER)).filter((id) => !(spec.scene && (id === 'interlude' || id === 'wishes')));
   const R = spec.reveal;
   const display = spec.fonts.display;
   const script = spec.fonts.script || display;
@@ -294,7 +316,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     );
   };
 
-  const sections: Record<SectionId, () => React.ReactNode> = {
+  const sceneSections: Record<SectionId, () => React.ReactNode> = {
     hero: () => {
       if (spec.hero === 'scene') {
         const name: React.CSSProperties = { fontFamily: script, fontSize: 'clamp(56px, 17vw, 88px)', fontWeight: 400, lineHeight: 1, margin: 0 };
@@ -336,7 +358,7 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
             <h1 style={nameSt}>{groom.nickname}</h1>
           </Reveal>
           <Reveal variant="zoom" when={introDone} delay={0.35}>
-            <p style={{ fontFamily: display, fontStyle: 'italic', fontSize: 26, margin: '2px 0', color: onPhoto ? col : p.secondary }}>&amp;</p>
+            <p style={{ fontFamily: display, fontStyle: 'italic', fontSize: 28, margin: '2px 0', color: onPhoto || spec.heroInk ? col : p.primary, opacity: 0.8 }}>&amp;</p>
           </Reveal>
           <Reveal variant={R} when={introDone} from="right" delay={0.45}>
             <h1 style={{ ...nameSt, marginBottom: 16 }}>{bride.nickname}</h1>
@@ -766,6 +788,33 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     },
   };
 
+  // Tema reguler memakai bagian standar (pola template premium); tema Spesial memakai bab adegan.
+  const sections: Record<SectionId, () => React.ReactNode> = scene
+    ? sceneSections
+    : {
+        ...standardSections({
+          spec,
+          data,
+          flora,
+          guest,
+          rsvps,
+          img,
+          heroPhoto,
+          dateText,
+          events,
+          left,
+          passed,
+          copied,
+          copy,
+          openLightbox: (photos, i) => setLightboxState({ photos, i }),
+          rsvp: { name: rName, setName: setRName, status: rStatus, setStatus: setRStatus, pax: rPax, setPax: setRPax, wish: rWish, setWish: setRWish, sent: rSent, error: rError, submit: submitRSVP },
+          calendarUrl,
+          fmtDate,
+          floating: spec.camera?.panel,
+        }),
+        hero: sceneSections.hero,
+      };
+
   const Signature = spec.Signature;
   const Chapter = scene?.Chapter;
   const chapterData = {
@@ -775,6 +824,49 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
     dateShort: fmtDate(mainDate, { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' · '),
   };
   const Backdrop = Chapter ? undefined : scene?.Backdrop;
+
+  // ---------- mode kamera ----------
+  const cam = !scene ? spec.camera : undefined;
+  const camRoot = useRef<HTMLElement | null>(null);
+  const camSections = cam ? order.map((id) => ({ id, node: id === 'hero' ? camHero() : sections[id]?.() })).filter((x) => x.node && cam.stations[x.id]) : [];
+  const camStations = useMemo(() => (cam ? camSections.map((x) => cam.stations[x.id]!) : []), [cam, camSections.map((x) => x.id).join()]);
+  const camLayers = useMemo(() => (cam ? cam.layers() : []), [cam]);
+  function camHero() {
+    const ink = spec.heroInk || p.text;
+    return (
+      <section style={{ position: 'relative', zIndex: 2, minHeight: '100vh', textAlign: 'center', padding: '12vh 24px 0', color: ink, textShadow: '0 1px 0 rgba(255,255,255,.55), 0 0 22px rgba(255,248,235,.9)' }}>
+        <Reveal variant={R} when={opened} from="down">
+          <p style={{ ...eyebrow, color: ink, opacity: 0.85 }}>{c.heroTitle || 'The Wedding of'}</p>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="left" delay={0.15} style={{ marginTop: 12 }}>
+          <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 76px)', fontWeight: 400, lineHeight: 1, margin: 0, color: p.primary }}>{groom.nickname}</h1>
+        </Reveal>
+        <Reveal variant="zoom" when={opened} delay={0.35}>
+          <p style={{ fontFamily: display, fontSize: 24, margin: '4px 0', color: ink }}>&amp;</p>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="right" delay={0.45}>
+          <h1 style={{ fontFamily: script, fontSize: 'clamp(54px, 16vw, 76px)', fontWeight: 400, lineHeight: 1, margin: 0, color: p.primary }}>{bride.nickname}</h1>
+        </Reveal>
+        <Reveal variant={R} when={opened} from="up" delay={0.65}>
+          <p style={{ fontFamily: label, fontSize: 13, letterSpacing: '0.22em', textTransform: 'uppercase', marginTop: 16 }}>{dateText}</p>
+          <p style={{ fontFamily: spec.fonts.body, fontSize: 14, marginTop: 26, opacity: 0.85 }}>Gulir untuk memulai perjalanan</p>
+        </Reveal>
+      </section>
+    );
+  }
+
+  const NAV_ICON: Partial<Record<SectionId, React.ReactNode>> = {
+    hero: <IcHome size={18} />,
+    couple: <IcHeart size={18} />,
+    events: <IcCalendar size={18} />,
+    gallery: <IcImage size={18} />,
+    gift: <IcGift size={18} />,
+    rsvp: <IcChat size={18} />,
+  };
+  const NAV_SHORT: Partial<Record<SectionId, string>> = { hero: 'Beranda', couple: 'Mempelai', events: 'Acara', gallery: 'Galeri', gift: 'Hadiah', rsvp: 'Ucapan' };
+  const navItems = order
+    .filter((id) => NAV_ICON[id] && (id === 'hero' || sections[id]?.()))
+    .map((id) => ({ id, label: NAV_SHORT[id] as string, icon: NAV_ICON[id] }));
 
   const page = (
     <div
@@ -789,17 +881,40 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
       }}
     >
       <style>{fontImport(spec.fonts.google)}</style>
-      {Backdrop && (
-        <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          <Backdrop palette={p} />
-        </div>
+      <KitOverlay z={0}>
+        {Backdrop && (
+          <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+            <Backdrop palette={p} />
+          </div>
+        )}
+        {spec.pattern && !scene && <div aria-hidden style={{ position: 'fixed', inset: 0, backgroundImage: spec.pattern, opacity: spec.patternOpacity ?? 0.5, pointerEvents: 'none', zIndex: 0 }} />}
+      </KitOverlay>
+      <KitOverlay z={1}>
+        {Signature && <Signature palette={p} />}
+        {opened && <Ambient preset={spec.ambient} palette={p} />}
+      </KitOverlay>
+
+      {!opened && (
+        <KitOverlay z={100}>
+          <Cover spec={spec} groom={groom.nickname} bride={bride.nickname} dateText={dateText} guestName={guestName} photo={heroPhoto} onOpen={handleOpen} />
+        </KitOverlay>
       )}
-      {spec.pattern && !scene && <div aria-hidden style={{ position: 'fixed', inset: 0, backgroundImage: spec.pattern, opacity: spec.patternOpacity ?? 0.5, pointerEvents: 'none', zIndex: 0 }} />}
-      {Signature && <Signature palette={p} />}
-      {opened && <Ambient preset={spec.ambient} palette={p} />}
 
-      {!opened && <Cover spec={spec} groom={groom.nickname} bride={bride.nickname} dateText={dateText} guestName={guestName} photo={heroPhoto} onOpen={handleOpen} />}
-
+      {cam ? (
+        <main ref={camRoot} style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ position: 'sticky', top: 0, height: '100vh', marginBottom: '-100vh', zIndex: 0 }}>
+            <CameraStage stations={camStations} layers={camLayers} sky={cam.sky} tint={cam.tint} actors={cam.Actors ? <cam.Actors /> : null} actorDepth={cam.actorDepth} root={camRoot} />
+          </div>
+          {camSections.map(({ id, node }, i) => (
+            <div key={id} data-section={id} style={{ position: 'relative', zIndex: 2 }}>
+              <div data-cam-hold style={id === 'hero' ? { minHeight: '100vh' } : { padding: '6vh 0' }}>
+                {node}
+              </div>
+              <div data-cam-gap aria-hidden style={{ height: i === camSections.length - 1 ? '30vh' : cam.gap || '75vh' }} />
+            </div>
+          ))}
+        </main>
+      ) : (
       <main style={{ position: 'relative', zIndex: 2, maxWidth: Chapter ? 'none' : 560, margin: '0 auto', opacity: opened || Chapter || !scene ? 1 : 0, transition: 'opacity 900ms ease 500ms' }}>
         {order.map((id) => {
           const node = sections[id]?.();
@@ -825,11 +940,14 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
                   )}
                 </div>
                 {node}
-                <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
-                  <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-                    <StageFront flora={flora} />
+                {/* buket lukisan di depan panggung hanya untuk tema berornamen bunga */}
+                {(spec.ornament || (spec.floraArt ? 'flora' : 'none')) === 'flora' && (
+                  <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+                    <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+                      <StageFront flora={flora} />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           }
@@ -887,28 +1005,33 @@ export default function KitLayout({ data, theme, guest, onAddRSVP, rsvps, embedd
           );
         })}
       </main>
+      )}
 
       {opened && (
-        <NavMenu
-          p={p}
-          font={label}
-          items={order.filter((id) => NAV_LABEL[id] && sections[id]?.()).map((id) => ({ id, label: NAV_LABEL[id] as string }))}
-        />
+        <KitOverlay z={70}>
+          <BottomNav p={p} font={label} items={navItems} />
+          {data.musicUrl && !embedded && <MusicDisc playing={playing} onToggle={toggleMusic} p={p} />}
+        </KitOverlay>
       )}
-      {data.musicUrl && opened && !embedded && <Vinyl playing={playing} onToggle={toggleMusic} accent={p.primary} />}
+      {extras && <div style={{ position: 'relative', zIndex: 2 }}>{extras}</div>}
+      {!scene && (
+        <footer style={{ position: 'relative', zIndex: 2, padding: '28px 20px 110px', textAlign: 'center', background: p.cover || p.text, color: p.onCover || p.bg }}>
+          <p style={{ fontFamily: label, fontSize: 12, letterSpacing: '0.12em', margin: 0, opacity: 0.75 }}>Undangan digital oleh RuangHadir</p>
+        </footer>
+      )}
       <style>{'@keyframes kit-spin { to { transform: rotate(360deg); } } @keyframes kit-cue { 0%{transform:scaleY(0);opacity:0} 40%{transform:scaleY(1);opacity:.6} 100%{transform:scaleY(1) translateY(30px);opacity:0} }'}</style>
 
       {lightbox && (
-        <div role="dialog" aria-label="Foto" onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(0,0,0,.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lightbox} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-        </div>
+        <KitOverlay z={120}>
+          <Lightbox photos={lightbox.photos} index={lightbox.i} onIndex={(i) => setLightboxState({ ...lightbox, i })} onClose={() => setLightboxState(null)} />
+        </KitOverlay>
       )}
     </div>
   );
 
   return (
     <SceneProvider opened={opened} intro={scene?.intro || 'descend'} introMs={introMs}>
+      <style>{KIT_CSS}</style>
       {page}
     </SceneProvider>
   );

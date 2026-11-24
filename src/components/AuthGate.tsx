@@ -420,23 +420,21 @@ function AuthGateInner({ onLoginSuccess }: AuthGateProps) {
         )}
       </div>
 
-      {/* Panel visual (desktop): tampilan undangan asli */}
-      <aside className="relative hidden overflow-hidden bg-[#2A1E21] lg:block" aria-hidden>
-        <Image
-          src="/assets/themes/shots/storybook-interactive.webp"
-          alt=""
-          fill
-          sizes="45vw"
-          className="object-cover opacity-90"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2A1E21] via-[#2A1E21]/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-12 text-[#F6EFE6]">
-          <p className="rh-display max-w-[420px] text-[34px] leading-[1.12]">
-            Satu tautan untuk seluruh tamu, lengkap dengan nama mereka.
-          </p>
-          <p className="mt-4 max-w-[380px] text-[15px] leading-[1.6] text-[#D9CCC4]">
-            Tema, RSVP, amplop digital, dan check-in QR — gratis untuk setiap pasangan.
-          </p>
+      {/* Panel visual (desktop): tiga tampilan undangan asli, latar datar (tanpa gradasi) */}
+      <aside className="relative hidden flex-col justify-center gap-12 overflow-hidden bg-[#1F1F1F] px-12 py-16 lg:flex" aria-hidden>
+        <div className="flex items-end justify-center gap-4">
+          {['royal-arabian', 'sage-garden', 'cremy-rose'].map((id, i) => (
+            <div
+              key={id}
+              className={`relative aspect-[9/19.5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl ${i === 1 ? 'w-[200px] -translate-y-6' : 'w-[160px] opacity-80'}`}
+            >
+              <Image src={`/assets/themes/shots/${id}.webp`} alt="" fill sizes="200px" className="object-cover object-top" />
+            </div>
+          ))}
+        </div>
+        <div className="mx-auto max-w-[460px] text-center text-[#F6EFE6]">
+          <p className="rh-display text-3xl font-semibold">Satu tautan untuk seluruh tamu, lengkap dengan nama mereka.</p>
+          <p className="mt-4 text-base text-[#C9C2BC]">Tema, RSVP, amplop digital, dan check in QR. Gratis untuk setiap pasangan.</p>
         </div>
       </aside>
     </div>

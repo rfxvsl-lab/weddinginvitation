@@ -5,7 +5,14 @@ Semua fitur (sampul, musik, hitung mundur, acara + peta + kalender, kisah, galer
 amplop digital, RSVP, tiket tamu) sudah disediakan `src/themes/kit/KitLayout.tsx`.
 Tugas tema hanya menentukan **rasa**: palet, font, ornamen, varian tiap bagian, dan teks.
 
-## Standar kualitas (gaya & teknik — BUKAN struktur yang sama)
+## Standar tema (wajib dibaca dulu)
+
+Tema reguler memakai alur bagian standar kompetitor di `docs/themes/STANDARD.md`
+(`kit/standardSections.tsx`). Jangan menulis ulang bagian; bedakan tema lewat seni, warna,
+huruf, `cover`, `Stage`/`hero`, `couple`, `events`, `gallery`, `ornament` (+ `floraArt`/`cornerSvg`).
+Tema Spesial tetap memakai bab adegan (bagian di bawah).
+
+## Standar kualitas (gaya & teknik)
 
 Acuan kualitas: template premium (mis. Vitopia "Royal Garden"). Yang ditiru adalah **tekniknya**,
 diterapkan **sesuai konsep masing-masing tema**. Setiap tema WAJIB punya alur dan tampilan

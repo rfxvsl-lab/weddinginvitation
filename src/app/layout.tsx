@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import ZoomLock from '@/components/system/ZoomLock';
-import { DM_Serif_Display, DM_Sans, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import { DM_Serif_Display, DM_Sans, Manrope } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '../hooks/useAuth';
 import { ToastProvider } from '../hooks/useToast';
@@ -21,17 +21,12 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-// Tipografi aplikasi (landing, auth, dashboard)
-const playfair = Playfair_Display({
-  variable: "--font-display",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const jakarta = Plus_Jakarta_Sans({
+// Tipografi aplikasi (landing, auth, dashboard): satu keluarga huruf — Manrope
+// (aturan ai-design-skills/landing-page-design B1: satu typeface, tanpa italic, maks. bold).
+const manrope = Manrope({
   variable: "--font-ui",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -68,7 +63,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={`${dmSerif.variable} ${dmSans.variable} ${playfair.variable} ${jakarta.variable} antialiased bg-background text-foreground`}>
+      <body className={`${dmSerif.variable} ${dmSans.variable} ${manrope.variable} antialiased bg-background text-foreground`}>
         <ZoomLock />
         <ThemeProvider
           attribute="class"

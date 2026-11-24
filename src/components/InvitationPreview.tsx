@@ -318,7 +318,8 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
   );
 
   if (currentTheme.layout === 'kit') {
-    return withExtras(
+    // tiket tamu dirender di dalam kolom undangan (agar ikut tata letak desktop)
+    return (
       <KitLayout
         data={data}
         theme={currentTheme}
@@ -327,6 +328,9 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
         rsvps={rsvps}
         embedded={embedded}
         invitationId={invitationId}
+        extras={
+          <GuestPassSection invitationId={invitationId} guest={guest} data={data} accentColor={currentTheme.accentHex || currentTheme.primaryHex} dark={darkLayout} />
+        }
       />
     );
   }

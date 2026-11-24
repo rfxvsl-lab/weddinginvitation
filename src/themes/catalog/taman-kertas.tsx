@@ -11,7 +11,7 @@ import TamanChapter, { TAMAN_INK } from './taman-kertas.chapters';
 
 /** Sampul: tepi halaman pop-up yang masih terlipat di bagian bawah. */
 function FoldedPages() {
-  const cols = ['#E4EDDC', '#C9DFC6', '#A9CBB0', '#F3CFC9', '#EBA9AE', '#6E9C7F'];
+  const cols = ['#F5ECDF', '#EFD3C4', '#E8BCAE', '#B5C4A6', '#8BA685', '#5F8266'];
   return (
     <div aria-hidden style={{ position: 'absolute', left: '8%', right: '8%', bottom: '9%', zIndex: 1 }}>
       {cols.map((c, i) => (
@@ -38,15 +38,15 @@ export default defineTheme({
   name: 'Taman Kertas',
   tier: 'special',
   category: 'storybook',
-  description: 'Buku pop-up kertas potong: lapisan taman berdiri satu per satu dan bergeser saat digulir.',
+  description: 'Diorama kertas potong: renda, pakis, bangau origami, dan lentera yang berdiri halaman demi halaman.',
   addedAt: '2026-11-23',
   palette: {
     bg: '#FDF6EE',
     surface: '#FFFDF9',
-    primary: '#C4566B',
-    secondary: '#9CC3A6',
-    text: '#4E3742',
-    muted: '#82697A',
+    primary: '#B9614E',
+    secondary: '#8BA685',
+    text: '#4A3340',
+    muted: '#7D6670',
     onPrimary: '#FFFDF9',
     cover: '#FBEDE3',
     onCover: '#4E3742',
