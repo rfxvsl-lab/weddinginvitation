@@ -66,12 +66,14 @@ export function LandingNav() {
           <Link href="/auth" className="rh-nav-signin">
             Masuk
           </Link>
-          <Link
-            href="/auth?mode=register"
-            className="rh-action rh-action-primary rh-nav-register"
-          >
-            Daftar Akses Awal
-          </Link>
+          {!open && (
+            <Link
+              href="/auth?mode=register"
+              className="rh-action rh-action-primary rh-nav-register"
+            >
+              Daftar Akses Awal
+            </Link>
+          )}
           <button
             ref={toggleRef}
             type="button"

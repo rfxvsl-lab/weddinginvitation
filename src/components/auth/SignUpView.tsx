@@ -82,7 +82,7 @@ export default function SignUpView(props: SignUpViewProps) {
   useEffect(() => {
     headingRef.current?.focus();
   }, [props.step]);
-  const inputClass = "saas-input w-full !min-h-[46px] !text-[16px]";
+  const inputClass = "saas-input saas-input-flush w-full !min-h-[46px] !text-[16px]";
   return (
     <section
       className="w-full max-w-[520px] space-y-7 px-2 py-4"
@@ -101,7 +101,7 @@ export default function SignUpView(props: SignUpViewProps) {
           id="signup-heading"
           ref={headingRef}
           tabIndex={-1}
-          className="text-[30px] leading-tight tracking-tight"
+          className="text-[30px] leading-tight tracking-tight focus:outline-none"
         >
           {STEPS[props.step - 1]}
         </h1>

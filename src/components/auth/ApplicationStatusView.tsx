@@ -31,7 +31,7 @@ export default function ApplicationStatusView({
         id="application-heading"
         ref={titleRef}
         tabIndex={-1}
-        className="text-[32px] leading-tight tracking-tight text-[var(--rh-ink)]"
+        className="text-[32px] leading-tight tracking-tight text-[var(--rh-ink)] focus:outline-none"
       >
         {rejected
           ? "Pendaftaran belum disetujui."

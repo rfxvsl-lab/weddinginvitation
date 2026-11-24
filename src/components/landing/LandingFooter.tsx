@@ -74,7 +74,7 @@ export function LandingFooter() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-[14px] text-[var(--rh-ink-2)] hover:text-[var(--rh-wine)]"
+                    className="inline-flex min-h-[44px] items-center text-[14px] text-[var(--rh-ink-2)] hover:text-[var(--rh-wine)] md:min-h-0"
                   >
                     {label}
                   </Link>

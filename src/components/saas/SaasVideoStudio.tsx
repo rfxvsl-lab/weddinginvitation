@@ -71,14 +71,14 @@ export function SaasVideoStudio() {
   const progress = frame / VIDEO_TOTAL_FRAMES;
 
   return (
-    <section id="video-enterprise" className="scroll-mt-20 bg-[var(--rh-ink)] text-[#EFE6DC]">
+    <section id="video-enterprise" className="scroll-mt-20 bg-[var(--rh-ink)] text-[var(--rh-paper)]">
       <div className="mx-auto grid max-w-[1200px] items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_auto] lg:gap-24 lg:py-28">
         <div className="max-w-[520px]">
-          <p className="text-[14px] font-medium text-[var(--rh-gold)]">Khusus Enterprise</p>
-          <h2 className="mt-4 text-[36px] leading-[1.08] !text-white sm:text-[46px]">
+          <p className="text-[14px] font-medium text-[var(--rh-gold-soft)]">Khusus Enterprise</p>
+          <h2 className="mt-4 text-[36px] leading-[1.08] !text-[var(--rh-paper)] sm:text-[46px]">
             Video undangan yang bergerak seperti film pendek.
           </h2>
-          <p className="mt-5 text-[16px] leading-[1.7] text-[#CDBFB8]">
+          <p className="mt-5 text-[16px] leading-[1.7] text-[var(--rh-line-strong)]">
             Setiap video disusun dari elemen undangannya sendiri: tirai Grand Ballroom, gunungan Javanese,
             amplop Luxury Pink. Lengkap dengan nama, foto, jadwal, dan lokasi acara Anda.
           </p>
@@ -86,7 +86,7 @@ export function SaasVideoStudio() {
           <ul className="mt-8 flex flex-col gap-3.5">
             {POINTS.map((p) => (
               <li key={p} className="flex gap-3 text-[15px] leading-[1.55]">
-                <Check size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--rh-gold)]" aria-hidden />
+                <Check size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-[var(--rh-gold-soft)]" aria-hidden />
                 {p}
               </li>
             ))}
@@ -95,13 +95,13 @@ export function SaasVideoStudio() {
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
               href={`mailto:${ENTERPRISE_CONTACT_EMAIL}?subject=${encodeURIComponent("Video undangan Enterprise")}`}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-[10px] bg-[var(--rh-gold)] px-6 text-[15px] font-semibold text-[var(--rh-ink)] transition-colors hover:bg-[#C9AC77]"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-[10px] bg-[var(--rh-gold-soft)] px-6 text-[15px] font-semibold text-[var(--rh-ink)] transition-colors hover:bg-[var(--rh-paper)]"
             >
               Hubungi tim Enterprise
             </a>
             <Link
               href="/auth?mode=enterprise"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-[10px] border border-[#5A464B] px-6 text-[15px] font-semibold text-white transition-colors hover:border-white"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-[10px] border border-[var(--rh-line-strong)] px-6 text-[15px] font-semibold text-[var(--rh-paper)] transition-colors hover:border-[var(--rh-paper)]"
             >
               Masuk dengan kode akses
             </Link>
@@ -112,7 +112,7 @@ export function SaasVideoStudio() {
           {/* Perangkat */}
           <div
             ref={stageRef}
-            className="relative aspect-[9/16] w-full rounded-[38px] border border-white/10 bg-black p-[9px] shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]"
+            className="relative aspect-[9/16] w-full rounded-[38px] border border-[var(--rh-ink-2)] bg-[var(--rh-ink)] p-[9px]"
           >
             <div className="relative h-full w-full overflow-hidden rounded-[30px]">
               <EnterpriseMotionPlayer
@@ -131,7 +131,7 @@ export function SaasVideoStudio() {
               type="button"
               onClick={() => setIsPlaying((v) => !v)}
               aria-label={isPlaying ? "Jeda video" : "Putar video"}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[var(--rh-ink)] transition-transform hover:scale-105"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--rh-paper)] text-[var(--rh-ink)] transition-transform hover:scale-105"
             >
               {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
             </button>
@@ -145,12 +145,12 @@ export function SaasVideoStudio() {
               aria-label="Posisi video"
               className="rh-scrub h-1 w-full cursor-pointer appearance-none rounded-full"
               style={{
-                background: `linear-gradient(90deg, var(--rh-gold) ${progress * 100}%, rgba(255,255,255,0.18) ${progress * 100}%)`,
+                background: `linear-gradient(90deg, var(--rh-gold-soft) ${progress * 100}%, var(--rh-ink-2) ${progress * 100}%)`,
               }}
             />
           </div>
 
-          <div role="tablist" aria-label="Pilih tema video" className="mt-5 grid w-full grid-cols-3 gap-1 rounded-[12px] bg-white/[0.06] p-1">
+          <div role="tablist" aria-label="Pilih tema video" className="mt-5 grid w-full grid-cols-3 gap-1 rounded-[12px] bg-[var(--rh-ink-2)] p-1">
             {VIDEO_THEMES.map((t) => {
               const active = t.id === themeId;
               return (
@@ -165,7 +165,7 @@ export function SaasVideoStudio() {
                     setIsPlaying(true);
                   }}
                   className={`rounded-[9px] px-2 py-2 text-[12.5px] font-medium transition-colors ${
-                    active ? "bg-white text-[var(--rh-ink)]" : "text-[#CDBFB8] hover:text-white"
+                    active ? "bg-[var(--rh-paper)] text-[var(--rh-ink)]" : "text-[var(--rh-paper)] hover:bg-[var(--rh-ink)]"
                   }`}
                 >
                   {t.shortName.replace("Classic", "").replace("Grand ", "").trim()}
