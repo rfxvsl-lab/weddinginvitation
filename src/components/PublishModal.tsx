@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { resolvePublicSlug } from '../lib/utils';
 import { Copy, Check, MessageSquare, AlertCircle, ChevronRight, CheckCircle, ExternalLink, Send, Globe } from 'lucide-react';
 import { Logo } from './ui/Logo';
@@ -6,6 +6,7 @@ import { SaaSUser } from '../types';
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { canAccess } from '../lib/packageLimits';
 import UpgradePrompt from './UpgradePrompt';
+import { normalizeWhatsAppPhone } from '../lib/guestSharing';
 import { useAlertModal } from '../hooks/useAlertModal';
 
 interface PublishModalProps {
@@ -27,6 +28,62 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
   const guests = wedding.guests || [];
   const activeSaaSUser = user;
+  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
+  const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
+  const [linkError, setLinkError] = useState('');
+  const [shareFeedback, setShareFeedback] = useState('');
+  const linkOperation = useRef(0);
+  const messageOperation = useRef(0);
+  const linkContext = useRef('');
+  const messageContext = useRef('');
+  linkContext.current = JSON.stringify([show, user?.id, siteUrl]);
+  messageContext.current = JSON.stringify([show, user?.id, siteUrl, selectedShareGuestId, customShareMessage]);
+
+  useEffect(() => {
+    setLinkCopiedInPublishModal(false);
+    setLinkError('');
+    return () => { linkOperation.current++; };
+  }, [show, user?.id, siteUrl]);
+  useEffect(() => {
+    setShareMessageCopied(false);
+    setShareFeedback('');
+    return () => { messageOperation.current++; };
+  }, [show, user?.id, siteUrl, selectedShareGuestId, customShareMessage]);
+
+  const copyText = async (kind: 'link' | 'message') => {
+    const operation = kind === 'link' ? linkOperation : messageOperation;
+    const context = kind === 'link' ? linkContext : messageContext;
+    const request = ++operation.current;
+    const key = context.current;
+    if (kind === 'link') { setLinkCopiedInPublishModal(false); setLinkError(''); }
+    else { setShareMessageCopied(false); setShareFeedback(''); }
+    try {
+      await navigator.clipboard.writeText(kind === 'link' ? siteUrl : customShareMessage);
+      if (request !== operation.current || key !== context.current) return;
+      if (kind === 'link') setLinkCopiedInPublishModal(true);
+      else {
+        setShareMessageCopied(true);
+        setShareFeedback('Pesan tersalin. Status tamu tidak berubah; lanjutkan berbagi secara manual.');
+      }
+    } catch {
+      if (request !== operation.current || key !== context.current) return;
+      if (kind === 'link') setLinkError('Tautan belum bisa disalin otomatis. Izinkan clipboard lalu coba lagi.');
+      else setShareFeedback('Pesan belum bisa disalin otomatis. Pilih dan salin teks pada kolom Pesan Undangan secara manual.');
+    }
+  };
+
+  const openWhatsApp = () => {
+    const guest = guests.find((g: any) => g.id === selectedShareGuestId);
+    if (!guest) return;
+    const phone = normalizeWhatsAppPhone(guest.phoneNumber || '');
+    if (!phone) {
+      setShareFeedback('Nomor WhatsApp belum diisi atau formatnya belum sesuai. Salin pesan untuk membagikannya secara manual.');
+      return;
+    }
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(customShareMessage)}`, '_blank', 'noopener,noreferrer');
+    setShareFeedback('Lanjutkan pengiriman di WhatsApp. Jika jendela tidak muncul, izinkan pop-up atau salin pesan. RuangHadir belum dapat memverifikasi pesan terkirim atau dibaca.');
+  };
+
 
   // Generate message
   const generateFormattedMessage = (guestId: string, templateId: string) => {
@@ -63,8 +120,6 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const packageId = activeSaaSUser.packageId || 'demo';
   const publishAllowed = canAccess(packageId, 'canPublish');
   const themeName = DEFAULT_THEMES.find(t => t.id === wedding.themeId)?.name || 'Grand Ballroom';
-  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
-  const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, activeSaaSUser.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
 
   // If publish not allowed (demo), show upgrade prompt
   if (!publishAllowed) {
@@ -173,10 +228,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                     <span className="text-[11px] text-zinc-600 break-all select-all">{siteUrl}</span>
                   </div>
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(siteUrl);
-                      setLinkCopiedInPublishModal(true);
-                    }}
+                    aria-label="Salin tautan publikasi"
+                    onClick={() => copyText('link')}
                     className={`px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 shrink-0 ${
                       linkCopiedInPublishModal
                         ? 'bg-zinc-50 text-emerald-700 border border-zinc-200'
@@ -198,6 +251,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                 </div>
               </div>
             )}
+
+            {linkError && <p role="status" className="text-xs text-[var(--rh-danger)]">{linkError}</p>}
 
             {publishSuccess && (
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-zinc-200 p-5 rounded-2xl text-center space-y-2 animate-fadeIn">
@@ -339,17 +394,15 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               </div>
             </div>
 
+            <p role="status" className="text-[11px] text-[var(--rh-muted)]">{shareFeedback || 'Salin pesan dan buka WhatsApp tidak membuktikan pesan terkirim atau dibaca. Status tamu tidak diubah.'}</p>
+
             {/* Share Action Buttons */}
             {selectedShareGuestId && (
               <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-zinc-100">
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(customShareMessage);
-                    setShareMessageCopied(true);
-                    wedding.updateGuestStatus(selectedShareGuestId, 'Sent');
-                    setTimeout(() => setShareMessageCopied(false), 2000);
-                  }}
+                  aria-label="Salin pesan undangan"
+                  onClick={() => copyText('message')}
                   className="py-2.5 px-3 bg-white hover:bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-zinc-600 transition-all"
                 >
                   {shareMessageCopied ? (
@@ -367,17 +420,12 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
                 <button
                   type="button"
-                  onClick={() => {
-                    const guest = guests.find((g: any) => g.id === selectedShareGuestId);
-                    if (!guest) return;
-                    const waUrl = `https://api.whatsapp.com/send?phone=${guest.phoneNumber}&text=${encodeURIComponent(customShareMessage)}`;
-                    wedding.updateGuestStatus(guest.id, 'Opened');
-                    window.open(waUrl, '_blank');
-                  }}
+                  aria-label="Buka draf WhatsApp"
+                  onClick={openWhatsApp}
                   className="py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-emerald-500/20 transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Kirim WA</span>
+                  <span>Buka WhatsApp</span>
                 </button>
               </div>
             )}

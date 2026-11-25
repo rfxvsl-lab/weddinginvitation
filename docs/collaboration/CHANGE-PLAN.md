@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru 25 November: PR#3 sudah terpantau merged oleh pihak lain ke main6a7de34. Pemilik meminta koreksi modal publikasi mobile yang bagian atasnya terpotong. B membuat review baru codex/fix-publish-modal-scroll; lihat B-PUBLISH-MOBILE-SCROLL.md. QA A room62 melaporkan scroll PR4 lulus di360/390/1280; room63 melaporkan regresi dashboard lulus dengan temuan aksesibilitas modal dan aksi tamu mobile untuk tindak lanjut. Bukti/batas di B-PUBLISH-MOBILE-SCROLL.md. Belum uji HPfisik. B tidak auto-merge/deploy.
+> Status terbaru25November: main67b89b7 tetap. PR6katalog menunggu reviewpengecualian, PR7draft dan PR8d2a07b9 gabungan sudahQA A90/91, buktiA94 pada1ed4b42. B menemukan jalur PublishModal masihmemalsukanSent/Opened saatcopy/bukaWA dan clipboardgagal tetapTersalin. Scope95 branch codex/publish-sharing-truth memperbaiki keduaalurtanpastatuspalsu, clipboardasync/race dan formatWA; lihat B-PUBLISH-SHARING.md. TesReactaktual/tsc/boundaries lulus, buildNode22 lulus (warningDB/paymentbelumkonfigurasi), QAbrowserkandidat belumada. Fokusdialog tetapbacklog. Tidak auto-merge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan
