@@ -71,13 +71,44 @@ const QUALITIES: { id: VideoQuality; label: string; desc: string }[] = [
   { id: 'fast', label: 'Cepat 720p', desc: '±2x lebih cepat, cocok untuk WhatsApp' },
 ];
 
-type JobPhase = 'music' | 'prepare' | 'render' | 'finalize';
+type JobPhase = 'music' | 'prepare' | 'render' | 'finalize' | 'zip';
 interface Job {
   phase: JobPhase;
   frame: number;
   total: number;
   startedAt: number;
   renderStartedAt: number | null;
+  batch?: { index: number; count: number; name: string };
+}
+interface BatchResult {
+  url: string;
+  name: string;
+  size: number;
+  count: number;
+  failed: string[];
+  elapsedMs: number;
+  warnings: string[];
+  container: string;
+}
+
+/** Batas render massal per job: semua video ditampung di memori sebelum di-ZIP. */
+const MAX_BATCH = 20;
+
+const slugForFile = (s: string) =>
+  s
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30) || 'undangan';
+
+function uniqueName(name: string, files: { name: string }[]) {
+  if (!files.some((f) => f.name === name)) return name;
+  const dot = name.lastIndexOf('.');
+  let i = 2;
+  while (files.some((f) => f.name === `${name.slice(0, dot)}-${i}${name.slice(dot)}`)) i++;
+  return `${name.slice(0, dot)}-${i}${name.slice(dot)}`;
 }
 interface RenderResult {
   url: string;
@@ -266,7 +297,21 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
   const stageRef = useRef<ExportStageHandle>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [result, setResult] = useState<RenderResult | null>(null);
-  const [error, setError] = useState<{ message: string; musicFailed?: boolean } | null>(null);
+  const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
+  const [error, setError] = useState<{ message: string; musicFailed?: boolean; batch?: boolean } | null>(null);
+  const [guestMode, setGuestMode] = useState<'single' | 'batch'>('single');
+  const [batchIds, setBatchIds] = useState<string[]>([]);
+  const [batchQuery, setBatchQuery] = useState('');
+  /** Nama tamu yang sedang dirender di panggung ekspor (undefined = ikut pilihan tunggal). */
+  const [stageGuest, setStageGuest] = useState<string | null | undefined>(undefined);
+  const filteredGuests = useMemo(() => {
+    const q = batchQuery.trim().toLowerCase();
+    return q ? guests.filter((g) => `${g.name} ${g.group || ''}`.toLowerCase().includes(q)) : guests;
+  }, [guests, batchQuery]);
+  // Tamu yang sudah dihapus dari daftar tidak ikut batch.
+  useEffect(() => {
+    setBatchIds((ids) => ids.filter((id) => guests.some((g) => g.id === id)));
+  }, [guests]);
 
   useEffect(() => () => {
     abortRef.current?.abort();
@@ -274,6 +319,13 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
   useEffect(() => () => {
     if (result) URL.revokeObjectURL(result.url);
   }, [result]);
+  useEffect(() => () => {
+    if (batchResult) URL.revokeObjectURL(batchResult.url);
+  }, [batchResult]);
+  const stageCouple = useMemo(
+    () => (stageGuest === undefined ? coupleData : { ...coupleData, guestName: stageGuest || undefined }),
+    [coupleData, stageGuest]
+  );
 
   useEffect(() => {
     if (!isRendering) return;
@@ -284,24 +336,42 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     return () => window.removeEventListener('beforeunload', warn);
   }, [isRendering]);
 
-  const startRender = async ({ skipMusic = false }: { skipMusic?: boolean } = {}) => {
+  /** Satu job render: tunggal (guestIds = [satu id atau null]) atau massal (beberapa tamu → ZIP). */
+  const startRender = async ({ skipMusic = false, batch = false }: { skipMusic?: boolean; batch?: boolean } = {}) => {
     if (!isEnt || isRendering) return;
     const { exportFilmVideo, supportsVideoExport, VideoExportError } = await import('@/lib/video/exportVideo');
+    const { createRasterCache } = await import('@/lib/video/frameRasterizer');
     setError(null);
     if (!supportsVideoExport()) {
       setError({ message: 'Browser ini belum bisa membuat video. Gunakan Chrome, Edge, atau Safari versi terbaru di komputer atau HP.' });
       return;
     }
+    const targets: { id: string | null; name: string | null }[] = batch
+      ? guests.filter((g) => batchIds.includes(g.id)).slice(0, MAX_BATCH).map((g) => ({ id: g.id, name: g.name }))
+      : [{ id: guest?.id ?? null, name: guest?.name ?? null }];
+    if (!targets.length) return;
     if (result) {
       URL.revokeObjectURL(result.url);
       setResult(null);
+    }
+    if (batchResult) {
+      URL.revokeObjectURL(batchResult.url);
+      setBatchResult(null);
     }
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     const startedAt = performance.now();
     const useMusic = !skipMusic && !!musicUrl;
+    const total = Math.round(VIDEO_DURATION_SEC * VIDEO_FPS);
     setIsPlaying(false);
-    setJob({ phase: useMusic ? 'music' : 'prepare', frame: 0, total: Math.round(VIDEO_DURATION_SEC * VIDEO_FPS), startedAt, renderStartedAt: null });
+    setJob({
+      phase: useMusic ? 'music' : 'prepare',
+      frame: 0,
+      total,
+      startedAt,
+      renderStartedAt: null,
+      batch: batch ? { index: 0, count: targets.length, name: targets[0].name || '' } : undefined,
+    });
 
     let wakeLock: { release: () => Promise<void> } | null = null;
     try {
@@ -323,39 +393,80 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
           });
         } catch (e) {
           if (ctrl.signal.aborted) throw e;
-          setError({ message: (e as Error).message, musicFailed: true });
+          setError({ message: (e as Error).message, musicFailed: true, batch });
           return;
         }
       }
 
-      await nextFrame();
-      const node = stageRef.current?.node();
-      if (!node) throw new Error('Panggung render belum siap. Coba lagi.');
+      const cache = createRasterCache();
+      const files: { name: string; data: Uint8Array }[] = [];
+      const failed: string[] = [];
+      const warnings = new Set<string>();
+      let last: { out: ExportFilmResult; name: string } | null = null;
 
-      let lastUi = 0;
-      const out = await exportFilmVideo({
-        node,
-        width: size.width,
-        height: size.height,
-        fps: VIDEO_FPS,
-        durationSec: VIDEO_DURATION_SEC,
-        seek: (t) => stageRef.current?.seek(t),
-        audio,
-        fontCssUrls: [MOTION_FONT_CSS_URL],
-        fontFamilies: MOTION_FONT_FAMILIES[themeId],
-        signal: ctrl.signal,
-        onProgress: (p) => {
-          const now = performance.now();
-          if (p.phase === 'render' && p.frame < p.total && now - lastUi < 250) return;
-          lastUi = now;
-          setJob((j) =>
-            j ? { ...j, phase: p.phase, frame: p.frame, total: p.total, renderStartedAt: j.renderStartedAt ?? (p.phase === 'render' ? now : null) } : j
-          );
-        },
-      });
-      const name = videoFileName({ groom: coupleData.groom, bride: coupleData.bride, themeId, aspect: aspectId, guestName: guest?.name, ext: out.container });
-      const file = new File([out.blob], name, { type: out.mimeType });
-      setResult({ url: URL.createObjectURL(out.blob), file, meta: out, withMusic: !!out.audioCodec });
+      for (let k = 0; k < targets.length; k++) {
+        const target = targets[k];
+        flushSync(() => setStageGuest(target.name));
+        setJob((j) => (j ? { ...j, phase: 'prepare', frame: 0, renderStartedAt: null, batch: j.batch ? { index: k, count: targets.length, name: target.name || '' } : undefined } : j));
+        await nextFrame();
+        const node = stageRef.current?.node();
+        if (!node) throw new Error('Panggung render belum siap. Coba lagi.');
+
+        let lastUi = 0;
+        try {
+          const out = await exportFilmVideo({
+            node,
+            width: size.width,
+            height: size.height,
+            fps: VIDEO_FPS,
+            durationSec: VIDEO_DURATION_SEC,
+            seek: (t) => stageRef.current?.seek(t),
+            audio,
+            fontCssUrls: [MOTION_FONT_CSS_URL],
+            fontFamilies: MOTION_FONT_FAMILIES[themeId],
+            rasterCache: cache,
+            signal: ctrl.signal,
+            onProgress: (p) => {
+              const now = performance.now();
+              if (p.phase === 'render' && p.frame < p.total && now - lastUi < 250) return;
+              lastUi = now;
+              setJob((j) =>
+                j ? { ...j, phase: p.phase, frame: p.frame, total: p.total, renderStartedAt: j.renderStartedAt ?? (p.phase === 'render' ? now : null) } : j
+              );
+            },
+          });
+          out.warnings.forEach((w) => warnings.add(w));
+          const name = videoFileName({ groom: coupleData.groom, bride: coupleData.bride, themeId, aspect: aspectId, guestName: target.name, ext: out.container });
+          last = { out, name };
+          if (batch) files.push({ name: uniqueName(name, files), data: new Uint8Array(await out.blob.arrayBuffer()) });
+        } catch (e) {
+          if (ctrl.signal.aborted || (e instanceof VideoExportError && e.code === 'aborted') || !batch) throw e;
+          failed.push(target.name || 'Tamu');
+        }
+      }
+
+      if (!batch && last) {
+        const file = new File([last.out.blob], last.name, { type: last.out.mimeType });
+        setResult({ url: URL.createObjectURL(last.out.blob), file, meta: last.out, withMusic: !!last.out.audioCodec });
+      } else if (batch) {
+        if (!files.length) throw new Error('Tidak ada video yang berhasil dirender.');
+        setJob((j) => (j ? { ...j, phase: 'zip' } : j));
+        const { zipSync } = await import('fflate');
+        // Video sudah terkompresi: simpan tanpa kompresi ulang (level 0) supaya cepat.
+        const zip = zipSync(Object.fromEntries(files.map((f) => [f.name, [f.data, { level: 0 }]])) as Parameters<typeof zipSync>[0]);
+        const zipName = `video-undangan-${slugForFile(coupleData.groom)}-${slugForFile(coupleData.bride)}-${files.length}-tamu.zip`;
+        const blob = new Blob([zip], { type: 'application/zip' });
+        setBatchResult({
+          url: URL.createObjectURL(blob),
+          name: zipName,
+          size: blob.size,
+          count: files.length,
+          failed,
+          elapsedMs: performance.now() - startedAt,
+          warnings: Array.from(warnings),
+          container: last?.out.container || 'mp4',
+        });
+      }
     } catch (e) {
       if (ctrl.signal.aborted || (e instanceof VideoExportError && e.code === 'aborted')) {
         setError({ message: 'Render dibatalkan.' });
@@ -366,20 +477,21 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
       await wakeLock?.release().catch(() => undefined);
       abortRef.current = null;
       setJob(null);
+      setStageGuest(undefined);
     }
   };
 
   const cancelRender = () => abortRef.current?.abort();
 
-  const download = () => {
-    if (!result) return;
+  const downloadUrl = (url: string, name: string) => {
     const a = document.createElement('a');
-    a.href = result.url;
-    a.download = result.file.name;
+    a.href = url;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     a.remove();
   };
+  const download = () => result && downloadUrl(result.url, result.file.name);
 
   const canShareFile = useMemo(() => {
     if (!result || typeof navigator === 'undefined' || !navigator.canShare) return false;
@@ -423,6 +535,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     prepare: 'Menyiapkan font & foto…',
     render: `Merender frame ${job?.frame ?? 0}/${job?.total ?? 0}`,
     finalize: 'Menyusun file video…',
+    zip: 'Menyusun file ZIP…',
   };
 
   const elapsed = progress * VIDEO_DURATION_SEC;
@@ -498,6 +611,11 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#14161F]/88 p-6 text-center text-white" role="status" aria-live="polite">
                 <Loader2 className="h-7 w-7 animate-spin" />
                 <div className="space-y-1">
+                  {job?.batch && (
+                    <p className="text-[12.5px] font-semibold text-white/80">
+                      Video {job.batch.index + 1} dari {job.batch.count}: {job.batch.name}
+                    </p>
+                  )}
                   <p className="text-[15px] font-semibold">{job ? phaseLabel[job.phase] : ''}</p>
                   <p className="text-[12.5px] text-white/70">
                     {eta ? `Sisa sekitar ${eta}. ` : ''}Biarkan halaman ini tetap terbuka.
@@ -652,26 +770,114 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             <h3 id="vs-guest" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
               <UserRound className="h-4 w-4 text-[var(--rh-primary)]" /> Nama tamu di video
             </h3>
-            <select
-              aria-labelledby="vs-guest"
-              value={guest?.id || ''}
-              disabled={isRendering}
-              onChange={(e) => update({ guestId: e.target.value || null })}
-              className="w-full rounded-2xl border border-white/80 bg-white/80 px-3.5 py-3 text-[13px] text-[var(--rh-ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rh-primary)]/40"
-            >
-              <option value="">Umum: “Tamu Undangan”</option>
-              {guests.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                  {g.group ? ` (${g.group})` : ''}
-                </option>
+            <div className="grid grid-cols-2 gap-1 rounded-full bg-[var(--rh-ink)]/[0.05] p-1" role="tablist" aria-label="Jumlah video">
+              {(
+                [
+                  ['single', 'Satu video'],
+                  ['batch', `Banyak tamu (ZIP)`],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={guestMode === id}
+                  disabled={isRendering}
+                  onClick={() => setGuestMode(id)}
+                  className={`rounded-full px-3 py-2 text-[12px] font-semibold transition disabled:opacity-55 ${
+                    guestMode === id ? 'bg-white text-[var(--rh-ink)] shadow-sm' : 'text-[var(--rh-ink-2)] hover:text-[var(--rh-ink)]'
+                  }`}
+                >
+                  {label}
+                </button>
               ))}
-            </select>
-            <p className="text-[11.5px] text-[var(--rh-muted)]">
-              {guests.length
-                ? 'Pilih tamu untuk membuat versi personal. Nama file ikut mencantumkan nama tamu.'
-                : 'Tambahkan tamu di Daftar Tamu untuk membuat versi personal.'}
-            </p>
+            </div>
+
+            {guestMode === 'single' ? (
+              <>
+                <select
+                  aria-label="Nama tamu di video"
+                  value={guest?.id || ''}
+                  disabled={isRendering}
+                  onChange={(e) => update({ guestId: e.target.value || null })}
+                  className="w-full rounded-2xl border border-white/80 bg-white/80 px-3.5 py-3 text-[13px] text-[var(--rh-ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rh-primary)]/40"
+                >
+                  <option value="">Umum: “Tamu Undangan”</option>
+                  {guests.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                      {g.group ? ` (${g.group})` : ''}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11.5px] text-[var(--rh-muted)]">
+                  {guests.length
+                    ? 'Pilih tamu untuk membuat versi personal. Nama file ikut mencantumkan nama tamu.'
+                    : 'Tambahkan tamu di Daftar Tamu untuk membuat versi personal.'}
+                </p>
+              </>
+            ) : guests.length ? (
+              <div className="space-y-2.5">
+                <input
+                  type="search"
+                  value={batchQuery}
+                  onChange={(e) => setBatchQuery(e.target.value)}
+                  placeholder="Cari nama atau grup tamu"
+                  aria-label="Cari tamu"
+                  className="w-full rounded-2xl border border-white/80 bg-white/80 px-3.5 py-2.5 text-[13px] text-[var(--rh-ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rh-primary)]/40"
+                />
+                <div className="flex items-center justify-between text-[11.5px] text-[var(--rh-muted)]">
+                  <span>
+                    {batchIds.length} dipilih · maks. {MAX_BATCH} per ZIP
+                  </span>
+                  <span className="flex gap-3">
+                    <button
+                      type="button"
+                      disabled={isRendering}
+                      onClick={() => setBatchIds(filteredGuests.slice(0, MAX_BATCH).map((g) => g.id))}
+                      className="font-semibold text-[var(--rh-primary)] hover:underline disabled:opacity-50"
+                    >
+                      Pilih {Math.min(MAX_BATCH, filteredGuests.length)} teratas
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isRendering || !batchIds.length}
+                      onClick={() => setBatchIds([])}
+                      className="font-semibold text-[var(--rh-ink-2)] hover:underline disabled:opacity-50"
+                    >
+                      Kosongkan
+                    </button>
+                  </span>
+                </div>
+                <ul className="max-h-56 overflow-y-auto rounded-2xl border border-white/80 bg-white/60 divide-y divide-black/5" aria-label="Pilih tamu">
+                  {filteredGuests.map((g) => {
+                    const checked = batchIds.includes(g.id);
+                    const full = !checked && batchIds.length >= MAX_BATCH;
+                    return (
+                      <li key={g.id}>
+                        <label className={`flex items-center gap-3 px-3.5 py-2.5 text-[12.5px] ${full ? 'opacity-50' : 'cursor-pointer hover:bg-white/70'}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            disabled={isRendering || full}
+                            onChange={() => setBatchIds((ids) => (checked ? ids.filter((x) => x !== g.id) : [...ids, g.id]))}
+                            className="h-4 w-4 accent-[var(--rh-primary)]"
+                          />
+                          <span className="min-w-0 flex-1 truncate text-[var(--rh-ink)]">{g.name}</span>
+                          {g.group && <span className="shrink-0 text-[11px] text-[var(--rh-muted)]">{g.group}</span>}
+                        </label>
+                      </li>
+                    );
+                  })}
+                  {!filteredGuests.length && <li className="px-3.5 py-3 text-[12px] text-[var(--rh-muted)]">Tidak ada tamu yang cocok.</li>}
+                </ul>
+                <p className="text-[11.5px] text-[var(--rh-muted)]">
+                  Satu video per tamu, nama tamu tampil di film. Semua video dikemas jadi satu file ZIP. Gunakan kualitas Cepat 720p untuk batch besar.
+                </p>
+              </div>
+            ) : (
+              <p className="text-[11.5px] text-[var(--rh-muted)]">Tambahkan tamu di Daftar Tamu untuk render massal.</p>
+            )}
           </section>
 
           <section className="glx rounded-[26px] p-5 space-y-3.5" aria-labelledby="vs-music">
@@ -813,16 +1019,26 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             {isEnt ? (
               <div className="space-y-3">
                 <p className="text-[12px] text-[var(--rh-ink-2)]">
-                  MP4 {size.width}×{size.height}, {VIDEO_FPS} fps, {VIDEO_DURATION_SEC} detik{musicUrl ? `, musik: ${musicTitle}` : ', tanpa musik'}. Render berjalan di perangkat Anda; biasanya 1–3 menit untuk HD.
+                  {guestMode === 'batch' ? `${batchIds.length || 'Belum ada'} video, masing-masing ` : ''}MP4 {size.width}×{size.height}, {VIDEO_FPS} fps,{' '}
+                  {VIDEO_DURATION_SEC} detik{musicUrl ? `, musik: ${musicTitle}` : ', tanpa musik'}. Render berjalan di perangkat Anda
+                  {guestMode === 'batch' ? '; batch besar bisa memakan waktu lama.' : '; biasanya 1–3 menit untuk HD.'}
                 </p>
                 <button
                   type="button"
-                  onClick={() => startRender()}
-                  disabled={isRendering}
+                  onClick={() => startRender({ batch: guestMode === 'batch' })}
+                  disabled={isRendering || (guestMode === 'batch' && !batchIds.length)}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--rh-primary)] px-5 py-3 text-[13.5px] font-semibold text-white transition hover:bg-[var(--rh-primary-hover)] active:scale-[0.98] cursor-pointer disabled:opacity-60"
                 >
                   {isRendering ? <Loader2 className="h-4 w-4 animate-spin" /> : <Film className="h-4 w-4" />}
-                  {isRendering ? `Merender ${pct}%` : result ? 'Render ulang' : 'Render video'}
+                  {isRendering
+                    ? `Merender ${pct}%`
+                    : guestMode === 'batch'
+                      ? batchIds.length
+                        ? `Render ${batchIds.length} video (ZIP)`
+                        : 'Pilih tamu dulu'
+                      : result
+                        ? 'Render ulang'
+                        : 'Render video'}
                 </button>
 
                 {error && (
@@ -833,12 +1049,34 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
                     {error.musicFailed && (
                       <button
                         type="button"
-                        onClick={() => startRender({ skipMusic: true })}
+                        onClick={() => startRender({ skipMusic: true, batch: !!error.batch })}
                         className="rounded-full bg-white px-3.5 py-2 text-[12px] font-semibold text-[var(--rh-ink)] border border-black/10 hover:bg-white/80"
                       >
                         Render tanpa musik
                       </button>
                     )}
+                  </div>
+                )}
+
+                {batchResult && !isRendering && (
+                  <div className="space-y-3 rounded-2xl bg-white/70 border border-white/90 p-3.5">
+                    <p className="text-[12.5px] font-semibold text-[var(--rh-ink)]">
+                      {batchResult.count} video siap dalam satu ZIP ({formatBytes(batchResult.size)}, {batchResult.container.toUpperCase()}), selesai dalam{' '}
+                      {formatDuration(batchResult.elapsedMs)}.
+                    </p>
+                    {batchResult.failed.length > 0 && (
+                      <p className="text-[11.5px] text-[#8C1D18]">Gagal dirender: {batchResult.failed.join(', ')}. Coba render ulang untuk tamu tersebut.</p>
+                    )}
+                    {batchResult.warnings.some((w) => w.startsWith('img:')) && (
+                      <p className="text-[11.5px] text-[#8C6B34]">Sebagian foto tidak bisa dimuat dan diganti kosong. Periksa tautan foto di editor undangan.</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => downloadUrl(batchResult.url, batchResult.name)}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-full bg-[var(--rh-primary)] px-4 py-2.5 text-[12.5px] font-semibold text-white hover:bg-[var(--rh-primary-hover)]"
+                    >
+                      <Download className="h-4 w-4" /> Unduh ZIP
+                    </button>
                   </div>
                 )}
 
@@ -923,7 +1161,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
         </div>
       </div>
 
-      {isRendering && <ExportStage ref={stageRef} themeId={themeId} couple={coupleData} cssWidth={size.cssWidth} cssHeight={size.cssHeight} />}
+      {isRendering && <ExportStage ref={stageRef} themeId={themeId} couple={stageCouple} cssWidth={size.cssWidth} cssHeight={size.cssHeight} />}
     </div>
   );
 }

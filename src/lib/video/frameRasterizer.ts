@@ -22,6 +22,17 @@ export interface RasterizerOptions {
   /** Sisi terpanjang maksimum foto yang disematkan (px keluaran). */
   maxImageSide?: number;
   signal?: AbortSignal;
+  /** Cache bersama antar-render (mis. render massal per tamu): font & foto tidak diunduh ulang. */
+  cache?: RasterCache;
+}
+
+export interface RasterCache {
+  fonts: Map<string, string>;
+  images: Map<string, string>;
+}
+
+export function createRasterCache(): RasterCache {
+  return { fonts: new Map(), images: new Map() };
 }
 
 export interface FrameRasterizer {
@@ -108,24 +119,34 @@ function escapeXmlText(s: string) {
 }
 
 export async function createFrameRasterizer(node: HTMLElement, opts: RasterizerOptions = {}): Promise<FrameRasterizer> {
-  const { fontCssUrls = [], fontFamilies, maxImageSide = 1600, signal } = opts;
+  const { fontCssUrls = [], fontFamilies, maxImageSide = 1600, signal, cache } = opts;
   const warnings: string[] = [];
   const rect = node.getBoundingClientRect();
   const cssWidth = Math.round(rect.width || node.offsetWidth);
   const cssHeight = Math.round(rect.height || node.offsetHeight);
 
   await document.fonts.ready;
-  const fontCss = await embedFonts(fontCssUrls, fontFamilies, signal, warnings);
+  const fontKey = `${fontCssUrls.join('|')}#${(fontFamilies || []).join(',')}`;
+  let fontCss = cache?.fonts.get(fontKey);
+  if (fontCss === undefined) {
+    fontCss = await embedFonts(fontCssUrls, fontFamilies, signal, warnings);
+    if (!warnings.some((w) => w.startsWith('font'))) cache?.fonts.set(fontKey, fontCss);
+  }
 
   // Cache gambar: kumpulkan dari seluruh <img> / <image> yang mungkin muncul (frame awal sudah memuat semua src film).
-  const imageCache = new Map<string, string>();
+  const imageCache = cache?.images ?? new Map<string, string>();
+  const FAILED = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
   const ensureImage = async (src: string) => {
-    if (!src || src.startsWith('data:') || imageCache.has(src)) return;
+    if (!src || src.startsWith('data:')) return;
+    if (imageCache.has(src)) {
+      if (imageCache.get(src) === FAILED && !warnings.includes(`img:${src}`)) warnings.push(`img:${src}`);
+      return;
+    }
     try {
       imageCache.set(src, await imageToDataUrl(new URL(src, location.href).href, maxImageSide, signal));
     } catch {
       warnings.push(`img:${src}`);
-      imageCache.set(src, 'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
+      imageCache.set(src, FAILED);
     }
   };
   const collect = (root: Element) =>

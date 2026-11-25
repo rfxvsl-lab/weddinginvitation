@@ -61,6 +61,14 @@ Pemilik (25 Nov 2026, 22.56 WIB) menyerahkan fitur Enterprise ke A, dimulai dari
 Frame hasil dicek visual: aksara Jawa, font tema, foto Drive, ornamen, dan musik masuk.
 Lihat `qa-20261126-a-video/`.
 
+## Tahap 2a — render massal per tamu (ZIP)
+
+- Tab "Banyak tamu (ZIP)" di kartu Nama tamu: cari, centang, "Pilih N teratas", maksimal 20 per ZIP. Batas ini ada karena semua video ditampung di memori sebelum dikemas.
+- Video dirender satu per satu dengan nama tamu masing-masing. Musik di-decode sekali. Font dan foto disimpan di cache bersama (`createRasterCache`), jadi tidak diunduh ulang per tamu.
+- Bila satu tamu gagal, render lanjut ke tamu berikutnya dan nama yang gagal ditampilkan. Bila dibatalkan, seluruh batch berhenti.
+- ZIP memakai `fflate` level 0, tanpa kompresi ulang karena MP4 sudah terkompresi. Nama file per tamu dibuat unik.
+- QA (mode dev, 2 tamu, 720p, musik): ZIP 12,6 MB berisi `…-untuk-ibu-sari-tanpa-nomor.mp4` dan `…-untuk-bapak-budi-santoso.mp4`. Frame 6,3 dtk menampilkan "Katur dumateng … Bapak Budi Santoso" dan "… Ibu Sari Tanpa Nomor".
+
 ## Batasan yang diketahui
 
 - Render terjadi di perangkat pengguna. Gating Enterprise di sisi klien bisa diakali lewat devtools, sedangkan proxy aset tetap dijaga di server. Render di server (mis. Remotion Lambda) butuh biaya infrastruktur dan keputusan pemilik.
@@ -71,6 +79,5 @@ Lihat `qa-20261126-a-video/`.
 ## Tahap berikutnya (usulan, menunggu arah pemilik)
 
 1. Tema film baru dari reverse engineering video referensi (crane/parallax 3–5 layer, transisi tanpa cut).
-2. Render massal per tamu: antre untuk N tamu terpilih, lalu unduh ZIP.
-3. Durasi pilihan (15/30/60 dtk) dan teks narasi yang bisa diedit.
-4. Simpan hasil ke Cloudinary dan tampilkan di halaman undangan.
+2. Durasi pilihan (15/30/60 dtk) dan teks narasi yang bisa diedit.
+3. Simpan hasil ke Cloudinary dan tampilkan di halaman undangan.

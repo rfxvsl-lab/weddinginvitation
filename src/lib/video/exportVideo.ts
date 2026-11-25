@@ -33,6 +33,8 @@ export interface ExportFilmOptions {
   fontCssUrls?: string[];
   /** Keluarga font yang wajib disematkan (semua weight), lihat frameRasterizer. */
   fontFamilies?: string[];
+  /** Cache font/foto bersama antar-render (createRasterCache). */
+  rasterCache?: import('./frameRasterizer').RasterCache;
   signal?: AbortSignal;
   onProgress?: (p: ExportProgress) => void;
 }
@@ -114,7 +116,7 @@ export async function exportFilmVideo(opts: ExportFilmOptions): Promise<ExportFi
   const { mb, container, codec, audioCodec } = await pickCodecs(width, height, fps, !!opts.audio, opts.prefer);
   const { createFrameRasterizer } = await import('./frameRasterizer');
   await opts.seek(0);
-  const raster = await createFrameRasterizer(node, { fontCssUrls: opts.fontCssUrls, fontFamilies: opts.fontFamilies, maxImageSide: Math.max(width, height), signal });
+  const raster = await createFrameRasterizer(node, { fontCssUrls: opts.fontCssUrls, fontFamilies: opts.fontFamilies, cache: opts.rasterCache, maxImageSide: Math.max(width, height), signal });
   if (!raster.cssWidth || !raster.cssHeight) throw new VideoExportError('capture', 'Komposisi belum siap dirender (ukuran 0).');
 
   const canvas = document.createElement('canvas');
