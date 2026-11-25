@@ -18,6 +18,7 @@ import { buildTimeRemap, FilmData, FilmEvent, GRAIN, SpeedZone } from './motion/
 import JavaneseFilm, { JAVANESE_COMP_DUR, JAVANESE_SPEED } from './motion/JavaneseFilm';
 import BallroomFilm, { BALLROOM_COMP_DUR, BALLROOM_SPEED } from './motion/BallroomFilm';
 import PinkFilm, { PINK_COMP_DUR, PINK_SPEED } from './motion/PinkFilm';
+import JourneyFilm, { JOURNEY_COMP_DUR, JOURNEY_SPEED } from './motion/JourneyFilm';
 
 export interface MotionPlayerCouple extends VideoCoupleProps {
   heroPhoto?: string;
@@ -46,16 +47,18 @@ const FILMS: Record<VideoThemeId, { Comp: React.ComponentType<any>; dur: number;
   'javanese-classic': { Comp: JavaneseFilm, dur: JAVANESE_COMP_DUR, zones: JAVANESE_SPEED },
   'grand-ballroom': { Comp: BallroomFilm, dur: BALLROOM_COMP_DUR, zones: BALLROOM_SPEED },
   'luxury-pink': { Comp: PinkFilm, dur: PINK_COMP_DUR, zones: PINK_SPEED },
+  'storybook-journey': { Comp: JourneyFilm, dur: JOURNEY_COMP_DUR, zones: JOURNEY_SPEED },
 };
 
 /** Stylesheet font film; diekspor agar ekspor video bisa menyematkan font yang sama. */
 export const MOTION_FONT_CSS_URL =
-  "https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Italianno&display=swap";
 /** Keluarga font per film — disematkan penuh ke tiap frame saat ekspor. */
 export const MOTION_FONT_FAMILIES: Record<VideoThemeId, string[]> = {
   'javanese-classic': ['Philosopher', 'Gelasio', 'Montserrat', 'Noto Sans Javanese'],
   'grand-ballroom': ['Cinzel', 'Playfair Display', 'Lato'],
   'luxury-pink': ['Great Vibes', 'Playfair Display', 'Nunito Sans'],
+  'storybook-journey': ['Cinzel', 'EB Garamond', 'Italianno'],
 };
 const FONT_CSS = `@import url('${MOTION_FONT_CSS_URL}');`;
 

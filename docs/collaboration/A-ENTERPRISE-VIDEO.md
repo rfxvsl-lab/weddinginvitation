@@ -69,6 +69,28 @@ Lihat `qa-20261126-a-video/`.
 - ZIP memakai `fflate` level 0, tanpa kompresi ulang karena MP4 sudah terkompresi. Nama file per tamu dibuat unik.
 - QA (mode dev, 2 tamu, 720p, musik): ZIP 12,6 MB berisi `…-untuk-ibu-sari-tanpa-nomor.mp4` dan `…-untuk-bapak-budi-santoso.mp4`. Frame 6,3 dtk menampilkan "Katur dumateng … Bapak Budi Santoso" dan "… Ibu Sari Tanpa Nomor".
 
+## Tahap 2b — tema film baru "Perjalanan (Storybook)"
+
+Tema ini dibuat dari tata bahasa kamera hasil reverse engineering video referensi (dokumen Docs "Reverse Engineering Video Story"). Yang dipakai hanya tekniknya. Asetnya adalah latar cat air milik repo (`public/assets/storybook/bg-*.webp`); tidak ada gambar, karakter, atau komposisi dari video referensi.
+
+| Waktu komposisi | Adegan | Gerakan |
+| --- | --- | --- |
+| 0–3,2 | Langit pagi, "The Journey of", nama script | `title-push`, partikel cahaya |
+| 3,2–4,1 | Langit → desa | crane turun, dedaunan depan menyapu |
+| 4,1–7,7 | Desa: foto berdua naik dari bawah, nama lengkap | `rise-reveal`, lalu hold yang tetap bergerak halus |
+| 7,7–8,5 | Desa → padang | whip pan (2,3x), motion blur, roll −2,5° |
+| 8,5–11,7 | Potret mempelai di dua kedalaman, nama orang tua | `push-intimate` |
+| 11,7–12,5 | Padang → malam | crane ke langit, dedaunan tersapu |
+| 12,5–15,7 | Tanggal besar, rangkaian acara | bintang dan kunang-kunang berparallax |
+| 15,7–16,6 | Pintu rumah tampak di bingkai lengkung | `portal-push` |
+| 16,6–19,6 | "Kepada Yth. {tamu}", nama, tautan | hold, lalu fade |
+
+Layer dan kecepatan geraknya: L4 latar 0,35x · L2 subjek 1x · L1 dedaunan depan 1,8–2,2x · L0 partikel 1,6–2,5x ditambah gerak sendiri. Dedaunan diatur hanya melintas saat whip atau crane, tidak menutupi adegan yang sedang ditahan.
+
+QA build produksi, data undangan uji, HD 9:16, dengan musik: MP4 1080×1920 + AAC, 18,005 dtk, 13,1 MB, selesai dalam 1 mnt 51 dtk (`perjalanan-1080x1920-musik.jpg`).
+
+Tema ini juga muncul di daftar tema video landing (`SaasVideoStudio`, area B), karena daftar itu membaca `VIDEO_THEMES`. Satu baris sampel ditambahkan di sana agar tipe tetap valid.
+
 ## Batasan yang diketahui
 
 - Render terjadi di perangkat pengguna. Gating Enterprise di sisi klien bisa diakali lewat devtools, sedangkan proxy aset tetap dijaga di server. Render di server (mis. Remotion Lambda) butuh biaya infrastruktur dan keputusan pemilik.
@@ -78,6 +100,5 @@ Lihat `qa-20261126-a-video/`.
 
 ## Tahap berikutnya (usulan, menunggu arah pemilik)
 
-1. Tema film baru dari reverse engineering video referensi (crane/parallax 3–5 layer, transisi tanpa cut).
-2. Durasi pilihan (15/30/60 dtk) dan teks narasi yang bisa diedit.
-3. Simpan hasil ke Cloudinary dan tampilkan di halaman undangan.
+1. Durasi pilihan (15/30/60 dtk) dan teks narasi yang bisa diedit.
+2. Simpan hasil ke Cloudinary dan tampilkan di halaman undangan.

@@ -8,7 +8,7 @@
 
  */
 
-export type VideoThemeId = 'javanese-classic' | 'grand-ballroom' | 'luxury-pink';
+export type VideoThemeId = 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey';
 export type VideoAspectId = '9:16' | '1:1' | '16:9';
 
 export interface VideoCoupleProps {
@@ -67,6 +67,16 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     techniques: ['2.5D Camera Push-In', '3D Wax-Seal Envelope', 'Sun-Flare Match Cut', 'Rose Petals 60fps'],
     swatch: ['#FCF3F6', '#D99AB3', '#A83D68'],
     accent: '#A83D68',
+    isDark: false,
+  },
+  {
+    id: 'storybook-journey',
+    name: 'Perjalanan (Storybook)',
+    shortName: 'Perjalanan',
+    tagline: 'Dunia cat air berlapis · kamera crane, whip & portal · parallax 4 lapis',
+    techniques: ['Crane & Tilt', 'Parallax Berlapis', 'Whip Pan', 'Portal Push'],
+    swatch: ['#F6EEDC', '#C6A15B', '#8A5A2B'],
+    accent: '#8A5A2B',
     isDark: false,
   },
 ];

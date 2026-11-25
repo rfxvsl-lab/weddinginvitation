@@ -30,6 +30,7 @@ const SAMPLES: Record<VideoThemeId, MotionPlayerCouple> = {
   "javanese-classic": SAMPLE,
   "grand-ballroom": SAMPLE,
   "luxury-pink": SAMPLE,
+  "storybook-journey": SAMPLE,
 };
 
 const POINTS = [

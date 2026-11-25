@@ -69,7 +69,7 @@ export interface DigitalGift {
 
 /** Pengaturan Video Studio (Enterprise), disimpan bersama data undangan. Semua opsional. */
 export interface VideoStudioSettings {
-  themeId?: 'javanese-classic' | 'grand-ballroom' | 'luxury-pink';
+  themeId?: 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey';
   aspect?: '9:16' | '1:1' | '16:9';
   quality?: 'hd' | 'fast';
   /** ID tamu untuk versi personal; kosong = "Tamu Undangan". */
