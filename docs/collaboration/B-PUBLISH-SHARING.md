@@ -86,3 +86,28 @@ lulus; semua assertionclipboard/race/nomor/status sebelumnya tetap. Tidakpublish
 TypeScript, boundaries, whitespace dan buildNextNode22 lulus; warningDB/payment belumkonfig.
 B belum QA browser/mobile atas tambahanfallback; ukuran dan scroll perlu A ujiulang.
 QA A98 tidak otomatis menutup perubahanbaru ini. Fokusdialog tetapbacklog terpisah.
+
+## QA fallback A101 dan URL absolut B102
+
+A101 menguji head18e9208 di Chromium dev lokal dengan clipboard ditolak pada 390×640,
+390×844 dan1280×860. Hasil: input manual baru muncul setelah gagal, readonly dan berisi
+alamat; memilih teks tetap tidak mengaktifkan publish; konfirmasi manual mengaktifkan
+publish dengan status berbeda dan tombol clipboard tetap Salin. Target konfirmasi 274×44
+pada390 dan369×44 pada1280. Tutup-buka modal mereset konfirmasi. Label nomor kosong jelas.
+Scroll390×640 atas16/bawah624,390×844 atas16/bawah828, desktop card di tengah; overflow
+horizontal0, DB kedua tamu tetapDraft dan0pageerror. Tidak publish atau kirimWA.
+A belum menguji ganti akun/proyek di browser; itu hanya tercakup tes React B. HP fisik
+belum diuji. Screenshot QA9 belum dianggap tersedia di repo. Ini hasil A, bukan browser B.
+
+B menerima satu koreksi kecil A101: host/slug tanpa skema belum URL absolut saat ditempel
+ke aplikasi lain. Scope102 menambah prefix protocol halaman pada siteUrl yang dipakai
+clipboard, teks tautan dan input manual: HTTPS produksi, HTTP + port pada dev lokal.
+Tidak mengubah slug, tujuan undangan, hakpaket, callback publikasi atau renderer undangan.
+Tidak memaksa HTTPS ke localhost. GenerateFormattedMessage sudah memakai protocol sendiri
+sejak sebelumnya, dan tidak perlu diubah. Perubahan aplikasi hanya dua baris deklarasi.
+
+Tes PublishModal aktual lulus termasuk assertion clipboard dan fallback berisi URL HTTPS
+lengkap serta HTTP localhost:3100. Seluruh tes clipboard, race, manual confirmation dan
+status sebelumnya tetap lulus. TypeScript, boundaries dan whitespace lulus. Build Next Node22
+lulus (warning DB/payment produksi belum dikonfigurasi). A101 berlaku tepat head18e9208; koreksi URL baru belum
+mengklaim QA browser ulang. A diminta memeriksa alamat absolut pada kandidat terbaru.

@@ -25,7 +25,7 @@ assert.equal(publishButton().props.disabled,true);
 navigator.clipboard.writeText=async()=>{throw Error('denied')};
 await click('Salin tautan publikasi');assert.equal(publishButton().props.disabled,true);assert.match(json(),/belum bisa disalin otomatis/);
 const copied=[];navigator.clipboard.writeText=async text=>copied.push(text);
-await click('Salin tautan publikasi');assert.equal(copied[0],'example.test/satu');assert.equal(publishButton().props.disabled,false);
+await click('Salin tautan publikasi');assert.equal(copied[0],'https://example.test/satu');assert.equal(publishButton().props.disabled,false);
 await click('Salin pesan undangan');assert.match(copied[1],/https:\/\/example.test\/satu\?to=Budi&code=ABC/);assert.deepEqual(updates,[]);
 await click('Buka draf WhatsApp');assert.equal(new URL(opened[0][0]).pathname,'/6281234567890');assert.equal(opened[0][2],'noopener,noreferrer');assert.deepEqual(updates,[]);assert.match(json(),/belum dapat memverifikasi/);
 for(const phoneNumber of ['', '0812?text=injected','abc','123']){
@@ -52,6 +52,7 @@ assert.equal(publishButton().props.disabled,true,'latest failure wins over old s
 const manualButton=()=>view.root.findAllByType('button').find(n=>n.children.includes('Saya sudah menyimpan tautan'));
 const confirmManual=async()=>{assert.ok(manualButton());await act(async()=>{manualButton().props.onClick();});};
 assert.equal(publishButton().props.disabled,true);
+assert.equal(view.root.findByProps({id:'publish-manual-link'}).props.value,'https://example.test/dua','manual fallback contains full URL');
 let selected=0;
 await act(async()=>{view.root.findByProps({id:'publish-manual-link'}).props.onFocus({currentTarget:{select(){selected++;}}});});
 assert.equal(selected,1);assert.equal(publishButton().props.disabled,true,'selecting link alone does not confirm saving');
@@ -71,6 +72,13 @@ await act(async()=>view.update(React.createElement(Publish,{...props,user:{...pr
 assert.equal(publishButton().props.disabled,true,'legacy demo alias still requires saving the current link (existing package rights unchanged)');
 await act(async()=>view.update(React.createElement(Publish,{...props,user:null})));
 assert.equal(view.toJSON(),null,'manual path does not render publishing for a signed-out user');
+window.location={host:'localhost:3100',protocol:'http:'};
+await act(async()=>view.update(React.createElement(Publish,props)));
+navigator.clipboard={writeText:async text=>copied.push(text)};
+await click('Salin tautan publikasi');
+assert.equal(copied.at(-1),'http://localhost:3100/satu','local HTTP and port preserved');
+delete navigator.clipboard;await click('Salin tautan publikasi');
+assert.equal(view.root.findByProps({id:'publish-manual-link'}).props.value,'http://localhost:3100/satu');
 assert.deepEqual(updates,[]);assert.deepEqual(published,[],'tests must never publish');
 await act(async()=>view.unmount());
 console.log('PASS: PublishModal copy rejection/unavailable API, success gate, stale message/project and overlapping responses; WA format/empty/injection, manual confirmation separate from clipboard/select with modal/user/project reset and signed-out guard, no invented status, no publish.');

@@ -29,7 +29,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const guests = wedding.guests || [];
   const activeSaaSUser = user;
   const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
-  const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
+  const appProtocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
+  const siteUrl = `${appProtocol}//${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
   const [linkError, setLinkError] = useState('');
   const [manualSavedFor, setManualSavedFor] = useState('');
   const [shareFeedback, setShareFeedback] = useState('');
