@@ -48,8 +48,16 @@ const FILMS: Record<VideoThemeId, { Comp: React.ComponentType<any>; dur: number;
   'luxury-pink': { Comp: PinkFilm, dur: PINK_COMP_DUR, zones: PINK_SPEED },
 };
 
-const FONT_CSS =
-  "@import url('https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&display=swap');";
+/** Stylesheet font film; diekspor agar ekspor video bisa menyematkan font yang sama. */
+export const MOTION_FONT_CSS_URL =
+  "https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&display=swap";
+/** Keluarga font per film — disematkan penuh ke tiap frame saat ekspor. */
+export const MOTION_FONT_FAMILIES: Record<VideoThemeId, string[]> = {
+  'javanese-classic': ['Philosopher', 'Gelasio', 'Montserrat', 'Noto Sans Javanese'],
+  'grand-ballroom': ['Cinzel', 'Playfair Display', 'Lato'],
+  'luxury-pink': ['Great Vibes', 'Playfair Display', 'Nunito Sans'],
+};
+const FONT_CSS = `@import url('${MOTION_FONT_CSS_URL}');`;
 
 const SAMPLE_DIR = '/assets/video-sample';
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -108,7 +116,7 @@ function toFilmData(c: MotionPlayerCouple): FilmData {
   };
 }
 
-export default function EnterpriseMotionPlayer({ themeId, couple, progress, showWatermark = true }: EnterpriseMotionPlayerProps) {
+function EnterpriseMotionPlayer({ themeId, couple, progress, showWatermark = true }: EnterpriseMotionPlayerProps) {
   const film = FILMS[themeId] || FILMS['javanese-classic'];
   const remap = useMemo(() => buildTimeRemap(film.zones, film.dur, VIDEO_DURATION_SEC), [film]);
   const data = useMemo(() => toFilmData(couple), [couple]);
@@ -179,3 +187,6 @@ export default function EnterpriseMotionPlayer({ themeId, couple, progress, show
     </div>
   );
 }
+
+/** memo: re-render induk (mis. progres render) tidak me-reconcile ulang seluruh film bila props sama. */
+export default React.memo(EnterpriseMotionPlayer);
