@@ -36,3 +36,31 @@ nomor kosong tetap kosong.
 
 Ukuran target di tabel tamu 390 (G2): Salin 44×44, WA 44×44, QR 28×44, Buka Sebagai Tamu 28×28,
 Hapus 28×44.
+
+## PR #7 — Daftar Tamu (head `adb28af`, room #83)
+
+Lingkungan sama (Chromium dev lokal, bukan HP fisik). Visibilitas aksi diukur terhadap scroller daftar.
+
+| Viewport | Mode | Aksi tersembunyi | Berkas |
+| --- | --- | --- | --- |
+| 360×740 | kartu | 0 | `pr7-g1-360.jpg` |
+| 390×844 | kartu | 0 | `pr7-g1-390.jpg` |
+| 640×900 | kartu | 0 | `pr7-g1-640.jpg` |
+| 1280×860 (sidebar + Live Preview) | kartu | 0 | `pr7-g1-1280.jpg` |
+| 1920×1080 | tabel | 0 | `pr7-g1-1920.jpg` |
+
+Modal di luar `.rh-guest-list-container`, position fixed lebar penuh:
+
+- Tiket QR: `pr7-qr-390.jpg`, `pr7-qr-1280.jpg`
+- Kustom Cetak: `pr7-export-390.jpg`, `pr7-export-1280.jpg`
+
+Temuan backlog yang terlihat di `pr7-export-390.jpg`, belum dibandingkan dengan `main`:
+
+- Pratinjau cetak terpotong horizontal.
+- Judul "REKAP DAFTAR TAMU" berwarna ungu.
+- Tombol "Cetak PDF" bergaris fokus biru.
+- Overlay QR/export setinggi 820px di viewport 844px.
+
+## PR #6 — katalog /preview (patch A `e993c09`)
+
+`pr6-preview-fix-390.jpg`, `pr6-preview-fix-1280.jpg`: 13 kartu, 0 gambar sepenuh layar, satu h1.
