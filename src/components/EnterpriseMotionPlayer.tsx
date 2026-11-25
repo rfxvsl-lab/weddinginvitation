@@ -93,7 +93,7 @@ function img(url?: string) {
   return m ? `https://lh3.googleusercontent.com/d/${m[1]}` : url;
 }
 
-function toFilmData(c: MotionPlayerCouple): FilmData {
+export function toFilmData(c: MotionPlayerCouple): FilmData {
   const p = parseDate(c.dateRaw);
   const dateLong = `${p.weekday ? p.weekday + ', ' : ''}${Number(p.day)} ${p.month} ${p.year}`;
   const events: FilmEvent[] = c.events?.length
