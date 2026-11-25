@@ -58,3 +58,36 @@ Bundling fixture berhasil menggunakan CSS hasil build kandidat PR#4. Diff whites
 bersih, src/** tidak berubah. Build/typecheck aplikasi tidak diulang karena source produksi
 tidak berubah sejak pemeriksaan sebelumnya. Belum membuka fixture dalam browser; ukuran,
 posisi dan scroll belum diklaim lulus. Perilaku keyboard/address bar HP tetap perlu uji fisik.
+
+## QA A diterima — room62, 25 November
+
+A menguji head e36b4bf di aplikasi nyata/dev lokal dengan akun approved, membuka modal
+dari tombol Terbitkan undangan di Ringkasan. Playwright Chromium, bukan fixture dan bukan
+perangkat fisik. Ini hasil A yang dibaca B, bukan pengujian browser B.
+
+| Viewport | Hasil A |
+|---|---|
+| 390×640 | Card1119px; scrollTop0: atas y16; scroll maksimal: bawah y624 |
+| 390×844 | Atas y16, bawah pada scroll maksimal y828 |
+| 360×640 | Card1152px; atas y16, bawah pada scroll maksimal y624 |
+| 1280×800 | Card642px pendek di tengah: atas y79, bawah y721; tanpa scroll |
+
+A melaporkan overflow horizontal dokumen0 di seluruh ukuran, dan telah melihat screenshot
+atas/bawah390×640: logo/tutup/header/rincian akun sampai textarea dapat dijangkau. Handler
+tidak diuji mengirim: tidak publish atau WA. Screenshot masih di sisi A, belum diunggah
+ke repo saat laporan diterima. B meminta unggahan bukti melalui room64; tidak mengklaimnya
+sudah tersedia. Kesimpulan terbatas: masalah scroll lulus QA A pada viewport tersebut.
+
+Temuan aksesibilitas A sudah ada di main dan bukan regresi PR4: belum role dialog/aria-modal,
+fokus tetap di pemicu, Escape belum menutup, Tab dapat ke konten belakang. B menerima
+perbaikan sebagai follow-up terpisah: semantics+nama judul, fokus awal, Escape, trap dan
+restore. Implementasi perlu memperhitungkan alert modal bertingkat dan close saat publishing.
+Tidak memperluas patch scroll yang sudah diuji dengan perubahan fokus yang belum teruji.
+
+Room63: QA dashboard A pada main6a7de34 melaporkan alur tamu (nomor kosong, copy/WA tanpa
+mutasi status), ringkasan, analitik dan pemilih proyek lulus pada390×844/1280×860 tanpa
+overflow dokumen/pageerror. Temuan baru untuk follow-up dashboard: G1 aksi tamu tersembunyi
+di tabel horizontal mobile (743px dalam306px); G2 QR/Buka/Hapus belum44px; G3 kode membungkus;
+P1 slug selector pecah beberapa baris. Prioritas B: kartu tamu mobile dengan aksi terlihat,
+target44px/kode nowrap; slug truncate dengan title. File calon: GuestManager.tsx dan
+ProjectSwitcher.tsx, bukan berarti sudah diedit. Callback/kuota/QR engine tetap dilindungi.
