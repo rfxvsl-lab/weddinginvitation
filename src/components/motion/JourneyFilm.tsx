@@ -255,7 +255,7 @@ export default function JourneyFilm({ t, speed, W, H, d }: FilmProps) {
                   transform: `translateY(${k(t, 4.9, 5.6, 16, 0)}px)`,
                 }}
               >
-                <div style={{ fontFamily: F.display, fontSize: 10.5, letterSpacing: '0.28em', color: C.brown }}>DUA CERITA, SATU TUJUAN</div>
+                <div style={{ fontFamily: F.display, fontSize: 10.5, letterSpacing: '0.28em', color: C.brown, textTransform: 'uppercase' }}>{d.copy?.tagline || 'Dua cerita, satu tujuan'}</div>
                 <div style={{ fontFamily: F.body, fontSize: 19, color: C.ink, marginTop: 6, lineHeight: 1.25 }}>
                   <Chars text={d.groomFull} t={t} start={5.3} stagger={0.018} from={{ y: 6, opacity: 0, blur: 5 }} />
                   <div style={{ fontFamily: F.script, fontSize: 30, lineHeight: 1, color: C.brown, opacity: k(t, 5.8, 6.2, 0, 1) }}>dan</div>
@@ -375,7 +375,7 @@ export default function JourneyFilm({ t, speed, W, H, d }: FilmProps) {
                     <Chars text={d.guest} t={t} start={16.9} stagger={0.02} from={{ y: 6, opacity: 0, blur: 4 }} />
                   </div>
                   <div style={{ fontFamily: F.body, fontStyle: 'italic', fontSize: 14, color: C.ink, marginTop: 8, opacity: k(t, 17.4, 17.9, 0, 1) }}>
-                    Sampai jumpa di hari bahagia kami
+                    {d.copy?.closing || 'Sampai jumpa di hari bahagia kami'}
                   </div>
                   <div style={{ fontFamily: F.script, fontSize: 40, color: C.ink, lineHeight: 1.1, marginTop: 2, opacity: k(t, 17.7, 18.3, 0, 1) }}>
                     {d.groom} &amp; {d.bride}

@@ -30,6 +30,8 @@ export interface MotionPlayerCouple extends VideoCoupleProps {
   events?: FilmEvent[];
   gallery?: string[];
   guestName?: string;
+  tagline?: string;
+  closing?: string;
 }
 
 interface EnterpriseMotionPlayerProps {
@@ -113,6 +115,7 @@ function toFilmData(c: MotionPlayerCouple): FilmData {
     events,
     slug: c.slug,
     guest: c.guestName || 'Tamu Undangan',
+    copy: { tagline: c.tagline?.trim() || undefined, closing: c.closing?.trim() || undefined },
     photos: {
       couple: img(c.heroPhoto) || `${SAMPLE_DIR}/couple.webp`,
       groom: img(c.groomPhoto) || `${SAMPLE_DIR}/groom.webp`,

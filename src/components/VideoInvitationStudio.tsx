@@ -30,6 +30,7 @@ import {
   Link2,
   Copy,
   Check,
+  Type,
 } from 'lucide-react';
 import { isEnterpriseTier, ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits';
 import EnterpriseMotionPlayer, {
@@ -48,6 +49,8 @@ import {
   type ResolvedVideoSettings,
   type VideoQuality,
   type MusicSource,
+  COPY_LIMITS,
+  THEMES_WITH_COPY,
 } from '@/lib/video/studioSettings';
 import type { ExportFilmResult } from '@/lib/video/exportVideo';
 import { uploadWeddingAudio, uploadInvitationVideo } from '@/lib/cloudinary';
@@ -254,8 +257,10 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
       events: events.length ? events : undefined,
       gallery: gallery.length >= 4 ? gallery : undefined,
       guestName: guest?.name || undefined,
+      tagline: settings.copy.tagline || undefined,
+      closing: settings.copy.closing || undefined,
     };
-  }, [wedding, slug, guest?.name]);
+  }, [wedding, slug, guest?.name, settings.copy.tagline, settings.copy.closing]);
 
   // ---- Pemutaran preview ----
   const [progress, setProgress] = useState(0);
@@ -922,6 +927,43 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               </div>
             ) : (
               <p className="text-[11.5px] text-[var(--rh-muted)]">Tambahkan tamu di Daftar Tamu untuk render massal.</p>
+            )}
+          </section>
+
+          <section className="glx rounded-[26px] p-5 space-y-3" aria-labelledby="vs-copy">
+            <h3 id="vs-copy" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
+              <Type className="h-4 w-4 text-[var(--rh-primary)]" /> Teks di video
+            </h3>
+            {(THEMES_WITH_COPY as readonly string[]).includes(themeId) ? (
+              <>
+                {(
+                  [
+                    ['tagline', 'Kalimat pembuka', themeId === 'pasundan' ? 'Dua insan, satu asih' : 'Dua cerita, satu tujuan'],
+                    ['closing', 'Kalimat penutup', themeId === 'pasundan' ? 'Hatur nuhun kana sagala doa sareng rawuhna' : 'Sampai jumpa di hari bahagia kami'],
+                  ] as const
+                ).map(([key, label, placeholder]) => (
+                  <label key={key} className="block space-y-1.5">
+                    <span className="flex justify-between text-[12px] font-semibold text-[var(--rh-ink)]">
+                      <span>{label}</span>
+                      <span className="tabular text-[var(--rh-muted)]">
+                        {settings.copy[key].length}/{COPY_LIMITS[key]}
+                      </span>
+                    </span>
+                    <input
+                      type="text"
+                      value={settings.copy[key]}
+                      maxLength={COPY_LIMITS[key]}
+                      placeholder={placeholder}
+                      disabled={isRendering}
+                      onChange={(e) => update({ copy: { ...settings.copy, [key]: e.target.value } })}
+                      className="w-full rounded-2xl border border-white/80 bg-white/80 px-3.5 py-2.5 text-[13px] text-[var(--rh-ink)] placeholder:text-[var(--rh-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rh-primary)]/40"
+                    />
+                  </label>
+                ))}
+                <p className="text-[11.5px] text-[var(--rh-muted)]">Kosongkan untuk memakai teks bawaan film.</p>
+              </>
+            ) : (
+              <p className="text-[11.5px] text-[var(--rh-muted)]">Teks khusus tersedia untuk film Perjalanan dan Pasundan. Film ini memakai teks bawaannya.</p>
             )}
           </section>
 

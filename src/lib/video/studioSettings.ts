@@ -11,7 +11,12 @@ export interface ResolvedVideoSettings {
   guestId: string | null;
   music: { source: MusicSource; customUrl: string; customTitle: string; offsetSec: number; volume: number };
   shared: { url: string; themeId: string; aspect: string; guestName?: string | null; bytes: number; createdAt: string } | null;
+  copy: { tagline: string; closing: string };
 }
+
+export const COPY_LIMITS = { tagline: 32, closing: 60 } as const;
+/** Film yang membaca teks khusus. */
+export const THEMES_WITH_COPY = ['storybook-journey', 'pasundan'] as const;
 
 export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
   themeId: 'storybook-journey',
@@ -20,6 +25,7 @@ export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
   guestId: null,
   music: { source: 'invitation', customUrl: '', customTitle: '', offsetSec: 0, volume: 0.85 },
   shared: null,
+  copy: { tagline: '', closing: '' },
 };
 
 const ASPECTS: VideoAspectId[] = ['9:16', '1:1', '16:9'];
@@ -44,6 +50,10 @@ export function resolveVideoSettings(raw?: VideoStudioSettings | null): Resolved
       customTitle: typeof m?.customTitle === 'string' ? m.customTitle : '',
       offsetSec: clamp(m?.offsetSec, 0, 600, 0),
       volume: clamp(m?.volume, 0, 1, d.music.volume),
+    },
+    copy: {
+      tagline: typeof raw?.copy?.tagline === 'string' ? raw.copy.tagline.slice(0, COPY_LIMITS.tagline) : '',
+      closing: typeof raw?.copy?.closing === 'string' ? raw.copy.closing.slice(0, COPY_LIMITS.closing) : '',
     },
     shared:
       raw?.shared && typeof raw.shared.url === 'string' && /^https:\/\//.test(raw.shared.url)

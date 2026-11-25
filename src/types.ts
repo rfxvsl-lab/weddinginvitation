@@ -84,6 +84,8 @@ export interface VideoStudioSettings {
     /** 0..1 */
     volume?: number;
   };
+  /** Teks yang bisa diubah (berlaku untuk film Perjalanan & Pasundan). */
+  copy?: { tagline?: string; closing?: string };
   /** Video terakhir yang diunggah untuk dibagikan lewat tautan. */
   shared?: {
     url: string;

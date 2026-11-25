@@ -239,7 +239,7 @@ export default function PasundanFilm({ t, speed, W, H, d }: FilmProps) {
             </Oval>
             <L style={{ left: 22, right: 22, top: H * 0.12 + 300, ...center }}>
               <div style={{ padding: '12px 14px 14px', borderRadius: 10, background: 'rgba(20,40,30,0.86)', border: `1px solid ${C.gold}`, opacity: k(t, 4.6, 5.1, 0, 1), transform: `translateY(${k(t, 4.6, 5.3, 14, 0)}px)` }}>
-                <div style={{ fontFamily: F.label, fontSize: 10.5, letterSpacing: '0.3em', color: C.gold }}>DUA INSAN, SATU ASIH</div>
+                <div style={{ fontFamily: F.label, fontSize: 10.5, letterSpacing: '0.3em', color: C.gold, textTransform: 'uppercase' }}>{d.copy?.tagline || 'Dua insan, satu asih'}</div>
                 <div style={{ fontFamily: F.display, fontSize: 19, marginTop: 6, lineHeight: 1.3 }}>
                   <Chars text={d.groomFull} t={t} start={5.0} stagger={0.018} from={{ y: 6, opacity: 0, blur: 5 }} />
                   <div style={{ fontFamily: F.body, fontStyle: 'italic', fontSize: 15, color: C.gold, opacity: k(t, 5.5, 5.9, 0, 1) }}>sareng</div>
@@ -344,7 +344,7 @@ export default function PasundanFilm({ t, speed, W, H, d }: FilmProps) {
             <div style={{ fontFamily: F.display, fontSize: 24, marginTop: 6 }}>
               <Chars text={d.guest} t={t} start={16.8} stagger={0.02} from={{ y: 6, opacity: 0, blur: 4 }} />
             </div>
-            <div style={{ fontFamily: F.body, fontStyle: 'italic', fontSize: 15, marginTop: 18, opacity: k(t, 17.3, 17.8, 0, 1) }}>Hatur nuhun kana sagala doa sareng rawuhna</div>
+            <div style={{ fontFamily: F.body, fontStyle: 'italic', fontSize: 15, marginTop: 18, opacity: k(t, 17.3, 17.8, 0, 1) }}>{d.copy?.closing || 'Hatur nuhun kana sagala doa sareng rawuhna'}</div>
             <div style={{ fontFamily: F.display, fontSize: 40, lineHeight: 1.15, marginTop: 10, opacity: k(t, 17.6, 18.2, 0, 1) }}>
               {d.groom} <span style={{ fontFamily: F.body, fontStyle: 'italic', fontSize: 22, color: C.gold }}>&amp;</span> {d.bride}
             </div>
