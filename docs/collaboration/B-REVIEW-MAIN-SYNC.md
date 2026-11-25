@@ -27,3 +27,12 @@ QA terdahulu tetap diberi asal: A114 untuk source marketing PR10, A83/90/91 untu
 A98/101/104 untuk PR9. HPfisik/SR/keyboarddialog belum diklaim. Belum auto-merge main,
 deploy produksi, merilis tema baru atau menambah klaim produk. Commit B memakai trailer
 Co-authored-by Codex sesuai arahan pemilik. PR11 atribusi tetap terpisah.
+
+## Penyelarasan dokumen setelah main1465fa9
+
+Main1465fa9 memasukkan PR11 atribusi dan PR5 bukti QA A. A129 meminta konflik
+log diselesaikan lagi; B131/132 mengumumkan scope. Merge main KE branch PR8/9
+mempertahankan log116–118 dan semua bukti A. Source src/scripts identik head
+kandidat QA121 sebelumnya, dibuktikan diff kosong; tidak mengulang build/UI
+untuk perubahan hanya Markdown dan berkas bukti. Whitespace/resolusi konflik
+diperiksa. Bukan merge PR ke main atau deploy. QA fokus PR13 masih tertunda.
