@@ -130,6 +130,16 @@ export function uploadWeddingAudio(file: File, onProgress?: (p: number) => void)
   });
 }
 
+/** Upload video undangan hasil Video Studio (Enterprise) agar punya tautan yang bisa dibagikan. */
+export function uploadInvitationVideo(file: File | Blob, onProgress?: (p: number) => void) {
+  return uploadToCloudinary(file, {
+    folder: 'wedding/video',
+    resourceType: 'video',
+    onProgress,
+    maxSize: 100 * 1024 * 1024, // batas unggah video Cloudinary paket dasar
+  });
+}
+
 /**
  * Convert File to base64 data URL (untuk preview lokal sebelum upload)
  */

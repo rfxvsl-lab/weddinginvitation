@@ -399,6 +399,8 @@ export interface FilmData {
   slug: string;
   guest: string;
   photos: { couple: string; groom: string; bride: string; gallery: string[] };
+  /** Teks khusus dari Video Studio; kosong = teks bawaan film. */
+  copy?: { tagline?: string; closing?: string };
 }
 
 export interface FilmProps {
