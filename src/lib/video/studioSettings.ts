@@ -13,7 +13,7 @@ export interface ResolvedVideoSettings {
 }
 
 export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
-  themeId: 'javanese-classic',
+  themeId: 'storybook-journey',
   aspect: '9:16',
   quality: 'hd',
   guestId: null,

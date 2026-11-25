@@ -38,7 +38,28 @@ export const VIDEO_FPS = 30;
 export const VIDEO_DURATION_SEC = 18;
 export const VIDEO_TOTAL_FRAMES = VIDEO_FPS * VIDEO_DURATION_SEC; // 540 frames
 
+/** Urutan: tema pendamping dua tema undangan yang dipertahankan pemilik lebih dulu. */
 export const VIDEO_THEMES: VideoThemeMeta[] = [
+  {
+    id: 'storybook-journey',
+    name: 'Perjalanan (Storybook)',
+    shortName: 'Perjalanan',
+    tagline: 'Dunia cat air berlapis · kamera crane, whip & portal · parallax 4 lapis',
+    techniques: ['Crane & Tilt', 'Parallax Berlapis', 'Whip Pan', 'Portal Push'],
+    swatch: ['#F6EEDC', '#C6A15B', '#8A5A2B'],
+    accent: '#8A5A2B',
+    isDark: false,
+  },
+  {
+    id: 'pasundan',
+    name: 'Pasundan',
+    shortName: 'Pasundan',
+    tagline: 'Adat Sunda · gunung berlapis, sawah terasering & tirai awan Mega Mendung',
+    techniques: ['Parallax 5 Lapis', 'Cloud Wipe', 'Whip Pan', 'Trim Paths Kujang'],
+    swatch: ['#14281E', '#C9A85C', '#F1EAD6'],
+    accent: '#C9A85C',
+    isDark: true,
+  },
   {
     id: 'javanese-classic',
     name: 'Javanese Classic',
@@ -68,25 +89,5 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     swatch: ['#FCF3F6', '#D99AB3', '#A83D68'],
     accent: '#A83D68',
     isDark: false,
-  },
-  {
-    id: 'storybook-journey',
-    name: 'Perjalanan (Storybook)',
-    shortName: 'Perjalanan',
-    tagline: 'Dunia cat air berlapis · kamera crane, whip & portal · parallax 4 lapis',
-    techniques: ['Crane & Tilt', 'Parallax Berlapis', 'Whip Pan', 'Portal Push'],
-    swatch: ['#F6EEDC', '#C6A15B', '#8A5A2B'],
-    accent: '#8A5A2B',
-    isDark: false,
-  },
-  {
-    id: 'pasundan',
-    name: 'Pasundan',
-    shortName: 'Pasundan',
-    tagline: 'Adat Sunda · gunung berlapis, sawah terasering & tirai awan Mega Mendung',
-    techniques: ['Parallax 5 Lapis', 'Cloud Wipe', 'Whip Pan', 'Trim Paths Kujang'],
-    swatch: ['#14281E', '#C9A85C', '#F1EAD6'],
-    accent: '#C9A85C',
-    isDark: true,
   },
 ];
