@@ -1,4 +1,4 @@
-# A — Video Undangan Enterprise (tahap 1: ekspor jujur)
+# A — Video Undangan Enterprise
 
 Pemilik (25 Nov 2026, 22.56 WIB) menyerahkan fitur Enterprise ke A, dimulai dari Video Studio,
 "sampai fiturnya benar-benar lengkap". Dokumen ini mencatat tahap 1 di branch
@@ -98,6 +98,17 @@ Ini pendamping video untuk tema undangan Pasundan (`sunda-kujang`), salah satu d
 Alurnya: fajar dengan judul "Uleman Pernikahan" → crane turun menembus pita awan → sawah (foto oval emas naik, "Dua Insan, Satu Asih") → whip → "Pangantén" (dua potret di kedalaman berbeda, kujang tergambar) → tilt ke langit malam ("Waktos & Tempat") → tirai awan menutup lalu tersibak → penutup "Hatur nuhun…" dengan nama tamu.
 
 QA build produksi HD 9:16 + musik: MP4 1080×1920 + AAC, 10,1 MB, selesai dalam 1 mnt 14 dtk (`pasundan-1080x1920-musik.jpg`). Kalimat berbahasa Sunda ("sareng", "Putra ti", "Hatur nuhun kana sagala doa sareng rawuhna") perlu dicek penutur asli sebelum rilis.
+
+## Tahap 2d — tautan video, teks khusus, urutan tema
+
+- **Tautan video.** Tombol "Buat tautan video" mengunggah MP4 hasil render ke Cloudinary (`uploadInvitationVideo`, folder `wedding/video`, maks. 100 MB).
+  - Tautan disimpan di `videoStudio.shared` dan tetap ada setelah reload.
+  - Tersedia tombol salin tautan dan tautan WhatsApp `wa.me/?text=`.
+  - "Sembunyikan tautan" hanya menghapus rujukannya. File tetap ada di Cloudinary karena unggahan unsigned tidak bisa dihapus dari klien, dan teks tombol mengatakan hal itu.
+  - Diuji dengan request Cloudinary di-stub (4,9 MB terkirim ke stub), jadi tidak ada data uji yang masuk ke akun asli.
+- **Teks di video.** Kalimat pembuka (maks. 32 karakter) dan penutup (maks. 60 karakter) bisa diubah untuk film Perjalanan dan Pasundan. Disimpan di `videoStudio.copy`; bila kosong, film memakai teks bawaannya. Sudah dicek di pratinjau.
+- **Urutan tema.** Perjalanan dan Pasundan tampil lebih dulu, dan studio default ke Perjalanan.
+- **Akun non-Enterprise.** Tombol render tidak tersedia, kartu kunci tampil, pratinjau berwatermark. Proxy aset menjawab 403 untuk akun gratis dan 401 tanpa login.
 
 ## Batasan yang diketahui
 
