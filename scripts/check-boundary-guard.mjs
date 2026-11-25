@@ -24,6 +24,26 @@ for(const [file,addition,expected] of [
  } finally {fs.writeFileSync(target,original);}
  assert.deepEqual(fs.readFileSync(target),original,`exact restore: ${file}`);
 }
+// Fresh files under protected routes must fail even before git add; ordinary test
+// scripts may still be added. Exclusive creation never overwrites an existing file.
+for (const [file,allowed] of [
+ [`src/app/(marketing)/preview/boundary-untracked-${process.pid}.ts`,false],
+ [`scripts/boundary-untracked-${process.pid}.mjs`,true],
+]) {
+ const target=path.join(root,file);
+ const descriptor=fs.openSync(target,'wx');
+ try {
+  fs.writeFileSync(descriptor,'// guard untracked probe\n');
+  const result=guard();
+  assert.equal(result.signal,null);
+  if (allowed) assert.equal(result.status,0,result.stderr);
+  else {
+   assert.notEqual(result.status,0,'untracked protected file must fail before staging');
+   assert.match(result.stderr,/Untracked protected invitation files found/);
+  }
+ } finally {fs.closeSync(descriptor);fs.unlinkSync(target);}
+ assert.equal(fs.existsSync(target),false,'probe removed after test');
+}
 const after=guard();assert.equal(after.status,0,after.stderr);
-console.log('PASS: reviewed catalogue accepted; mutations of catalogue, theme renderer, package, CSS scope and viewport rejected; originals restored exactly; guard passes afterward.');
+console.log('PASS: reviewed catalogue accepted; mutations of catalogue, theme renderer, package, CSS scope and viewport rejected; untracked protected route rejected while new test script allowed; originals restored/probes removed; guard passes afterward.');
 console.log('Limit: verifies repository guard behavior, not browser rendering, physical pinch gestures or production services.');

@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status25November: main253e333 memuat CSSmarketing PR10. QA A121 pascasinkron PR8b6f6b83/PR9e216fab lulus fitur+marketing, tetapdrafttanpamerge/deploy B. Branch codex/catalog-guard-baseline mengusulkan guard rootcatalog dipin ke snapshotreview253e, pathrenderer/tema/paket lainnya tetap04; tesnegatif5mutasi menolakperubahan danrestorebyteasli. Lihat B-CATALOG-GUARD-BASELINE.md. Tidakada sourceaplikasidiubah. PR11atribusi terpisah; HPfisik/SR/fokusdialog tetapbelumteruji.
+> Status25November: main253e333 tetap. PR8/9 pascasinkron lulusQA A121 dan tetapdraft. A124 mereview PR12d5cb2bd guardpinnedcatalog dan tes tambahan lulus, menemukan batasuntracked lokal. B125 menambah cekfilebaru nonignored hanya protectedPaths serta tesprobeprotectedditolak/scriptsditerima; sourceaplikasi akhir tidakberubah. Node24/22 lulus. Lihat B-CATALOG-GUARD-BASELINE.md; perubahanbaru belumQA A. PR11atribusi terpisah; HPfisik/SR/dialog masihbacklog. Tidakmerge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan

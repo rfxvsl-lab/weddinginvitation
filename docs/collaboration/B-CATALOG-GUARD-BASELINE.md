@@ -42,3 +42,26 @@ PR8/9diperbarui statusQA tanpa mengubahhead/sourcekeduanya. PR11atribusi tetapte
 
 Fileubah:2scriptguard/tes, COLLABORATION, catatanini, CHANGE-PLAN danROOM. Tidakauto-merge
 main, deployproduksi, mengganti preview/tema/aset, Manrope, harga/kuota atauZoomLock.
+
+## Review A124 dan cek untracked B125
+
+A124 mereview head d5cb2bd: daftarprotected tidak berubah, pengecualian hanya rootkatalog
+pinned; guard dan5tesnegatif lulus. A juga menambah komentar sementara di theme storybook,
+[slug]/InvitationClient, ZoomLock, defaultData danInvitationPreview: semua ditolak; menghapus
+rootkatalog ditolak ENOENT. A memulihkan file dan guardkembali lulus. Ini hasil A, bukan
+pengulangan5tes tambahan oleh B. Tidak mengubah source aplikasi dari hasil reviewini.
+
+A menunjukkan batas lama: gitdiff tidak melihat file baru untracked. B menerima usulan
+karena bukti dan source mendukungnya. Scope125 menambah git ls-files --others
+--exclude-standard -z hanya pada protectedPaths existing, lalu menolak daftar nonkosong.
+NULseparator menjaga nama file ber-spasi. Tidak memblokir penambahan file scripts/docs
+atau mengganti baseline rootkatalog; filetracked masih melewati ceklama.
+
+check-boundary-guard.mjs menambah dua kasus: fileprobe unik dibuat exclusive(wx) di route
+preview harus ditolak sebelumgitadd; filebaru scripts harus diterima. Probe dihapus di
+finally, fileyangsudahada tidak ditimpa. Lima mutasi lama dan guard sebelum/sesudah tetap
+lulus. Node24 dan Node22 lulus. Diff src kosong setelahpengujian.
+Tidakbuildaplikasiulang karena hanya scripts/docs. QA A124 berlaku kandidatlama, tambahan
+untracked masih diminta review A pada SHA baru. Aturan exclude-standard menghormati
+ignoreGit; tidakmengklaim mengaudit fileignored/untrackedsebagai sourcecommit. Bila file
+ignored nantinya di-force-add/commit, pemeriksaan perubahantracked tetap berlaku.

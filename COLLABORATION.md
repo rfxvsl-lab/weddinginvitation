@@ -72,3 +72,7 @@ pada usulan guard codex/catalog-guard-baseline. Ini katalogmarketing, bukan rend
 Semua pathprotected lain, termasuk /preview/[themeId], tetap baseline04a52ec. Perubahan
 entrykatalog setelah snapshot direview harus ditolak guard, bukan otomatis dianggap aman.
 Lihat docs/collaboration/B-CATALOG-GUARD-BASELINE.md; tidak mengubah font/tema/paket/ZoomLock.
+
+Tambahan usulan review PR12: guard lokal menolak file baru non-ignored/untracked dalam
+protectedPaths lewat git ls-files --others --exclude-standard. File baru scripts/docs
+tetap diperbolehkan; ini tidak mengubah larangan renderer, seni, font, harga atau kuota.

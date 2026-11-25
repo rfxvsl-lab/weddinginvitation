@@ -24,6 +24,13 @@ const protectedPaths = [
   "public/assets",
   "src/lib/packageLimits.ts",
 ];
+// git diff does not include brand-new local files; protect the same paths before staging.
+const untrackedProtected = execFileSync(
+  "git",
+  ["ls-files", "--others", "--exclude-standard", "-z", "--", ...protectedPaths],
+  { cwd: root, encoding: "utf8" },
+).split("\0").filter(Boolean);
+assert.deepEqual(untrackedProtected, [], "Untracked protected invitation files found");
 const diff = execFileSync(
   "git",
   ["diff", "04a52ec", "--name-only", "--", ...protectedPaths],
