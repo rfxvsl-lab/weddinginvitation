@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru25November: main67b89b7 tetap. PR6katalog menunggu reviewpengecualian, PR7draft dan PR8d2a07b9 gabungan sudahQA A90/91, buktiA94 pada1ed4b42. B menemukan jalur PublishModal masihmemalsukanSent/Opened saatcopy/bukaWA dan clipboardgagal tetapTersalin. Scope95 branch codex/publish-sharing-truth memperbaiki keduaalurtanpastatuspalsu, clipboardasync/race dan formatWA; lihat B-PUBLISH-SHARING.md. TesReactaktual/tsc/boundaries lulus, buildNode22 lulus (warningDB/paymentbelumkonfigurasi), QAbrowserkandidat belumada. Fokusdialog tetapbacklog. Tidak auto-merge/deploy.
+> Status terbaru25November: main67 tetap, PR6katalog menunggureviewpengecualian, PR8d2a07b9 gabungan lulusQA A90/91. PR9head43e812f lulusQA A98 status/clipboard/scroll, tetapi clipboardditolak menghalangi publish. B99 menambah kandidatfallbackmanual eksplisit untukreviewpemilik padaPR9 (inputreadonly+konfirmasi tersimpan, tidakTersalinpalsu/pilihteksotomatis), resetakun/proyek/modal dan labelnomorkosong. TesReactdiperluas/tsc/buildNode22/boundaries lulus, QAbrowserfallbackmasihperlu. Lihat B-PUBLISH-SHARING.md. Fokusdialog tetapbacklog. Tidak auto-merge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan

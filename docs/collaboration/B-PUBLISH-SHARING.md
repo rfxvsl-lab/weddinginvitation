@@ -50,3 +50,39 @@ A diminta QA sesudahSHA kandidat tersedia; belum ada balasanA atas patch ini.
 PR8 tidak diubahsource. Bukti A94 pada QAbranch1ed4b42 telah dikonfirmasi lewat README/
 daftarfile; PR8 ditautkan ke bukti. Ini bukan QA baru B. PR6katalog masih reviewpengecualian.
 Semua hasil diserahkan draftPR saja, tidak auto-merge main atau deploy produksi.
+
+## QA A98 dan fallback manual — scope B99
+
+A98 menguji head43e812f lewat modal nyata Ringkasan di Chromiumdev lokal390×844/1280×860.
+Dengan izinclipboard, SalinPesan memberi feedback benar dan isi clipboard sesuaipenerima,
+WA memakai62, nomor kosong tidakpopup, salintautan mengaktifkan tombolpublikasi. DB kedua
+tamu tetapDraft sebelum/sesudah. Clipboardditolak tidakTersalin dan publish tetapdisabled.
+Scroll390 atas16/bawah828, desktop card pendekditengah,0pageerror. Tidakpublish/kirimWA.
+Ini hasilA, bukanbrowserB/perangkatfisik. Headbaru di bawah memerlukan QA ulang.
+
+A menemukan hambatan existing: clipboardditolak/tidaktersedia menghalangi pemilikpublish.
+B menerima kebutuhan fallback, tetapi menolak otomatis membuka gerbang saat teks dipilih:
+memilih bukan bukti sudahmenyimpan. Dalam mandatperbaikanfrontend, B99 menyiapkan pilihan
+konkret untuk reviewpemilik dalam PR9, bukan mengklaimdetailUXbaru sudahdisetujui pemilik:
+
+- Setelah salinotomatis gagal, tampilkan inputreadonly tautan, petunjuk menyalin/menyimpan
+  melalui menu perangkat, dan tombol eksplisit "Saya sudah menyimpan tautan".
+- Memfokuskan/memilih input TIDAK membuka tombolpublish. Hanya pengguna yang mengonfirmasi
+  manual atau clipboardbenar-benar berhasil yang memenuhi prasyaratfrontend.
+- Konfirmasimanual diberi status berbeda, tidak diberi labelTersalin atau klaim verifikasi
+  penyimpanan. Aplikasi mengandalkan pernyataan pengguna; tidak dapat memeriksa catatan
+  di luar aplikasi. Tidak menyimpan konfirmasi keDB/localStorage.
+- Konfirmasi terikat pengguna/proyek/visibility; gantiundangan/akun dan tutup-buka modal
+  menghapusnya. Hakpaket dan endpoint/serverpublish tetap. Ini perubahanUXprasyaratfrontend,
+  bukan perubahanotorisasi server. UIerror/draftmanual hanya ada pada jalur clipboardgagal.
+- Opsi penerima tanpa nomor kini berkata "nomor belum diisi", bukan tandapisahmenggantung.
+
+TesReactaktual diperluas dan lulus: pemilihaninput tidakunlock, konfirmasimanual unlock
+namun tombolclipboardtetapSalin, resetmodal/akun/proyek, usernull tidakmerenderpublish.
+Satu asumsi tes awal bahwa aliasdemo tidak bolehpublish ternyata salah: packageLimits
+existing memetakan demo keFREE_LIMITS canPublishtrue. Percobaan dihentikan, asumsi tes
+diperbaiki sesuaiimplementasi aktual; hakpaket tidakdiubah untuk meluluskan tes. Tesakhir
+lulus; semua assertionclipboard/race/nomor/status sebelumnya tetap. Tidakpublish/kirimWA.
+TypeScript, boundaries, whitespace dan buildNextNode22 lulus; warningDB/payment belumkonfig.
+B belum QA browser/mobile atas tambahanfallback; ukuran dan scroll perlu A ujiulang.
+QA A98 tidak otomatis menutup perubahanbaru ini. Fokusdialog tetapbacklog terpisah.

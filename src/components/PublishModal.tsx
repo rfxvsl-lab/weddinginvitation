@@ -31,17 +31,20 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
   const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
   const [linkError, setLinkError] = useState('');
+  const [manualSavedFor, setManualSavedFor] = useState('');
   const [shareFeedback, setShareFeedback] = useState('');
   const linkOperation = useRef(0);
   const messageOperation = useRef(0);
   const linkContext = useRef('');
   const messageContext = useRef('');
   linkContext.current = JSON.stringify([show, user?.id, siteUrl]);
+  const linkReady = linkCopiedInPublishModal || manualSavedFor === linkContext.current;
   messageContext.current = JSON.stringify([show, user?.id, siteUrl, selectedShareGuestId, customShareMessage]);
 
   useEffect(() => {
     setLinkCopiedInPublishModal(false);
     setLinkError('');
+    setManualSavedFor('');
     return () => { linkOperation.current++; };
   }, [show, user?.id, siteUrl]);
   useEffect(() => {
@@ -67,7 +70,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
       }
     } catch {
       if (request !== operation.current || key !== context.current) return;
-      if (kind === 'link') setLinkError('Tautan belum bisa disalin otomatis. Izinkan clipboard lalu coba lagi.');
+      if (kind === 'link') setLinkError('Tautan belum bisa disalin otomatis. Salin secara manual di bawah, atau izinkan clipboard lalu coba lagi.');
       else setShareFeedback('Pesan belum bisa disalin otomatis. Pilih dan salin teks pada kolom Pesan Undangan secara manual.');
     }
   };
@@ -215,9 +218,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                     <AlertCircle className="w-4 h-4 text-zinc-700" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-zinc-800">Salin Tautan Terlebih Dahulu</h4>
+                    <h4 className="text-xs font-bold text-zinc-800">Simpan Tautan Undangan</h4>
                     <p className="text-[11px] text-zinc-600 leading-relaxed mt-0.5">
-                      Salin tautan undangan resmi di bawah ini sebelum bisa menekan tombol Publish.
+                      Pastikan tautan undangan resmi di bawah ini tersimpan sebelum menekan tombol Publish.
                     </p>
                   </div>
                 </div>
@@ -252,7 +255,31 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               </div>
             )}
 
-            {linkError && <p role="status" className="text-xs text-[var(--rh-danger)]">{linkError}</p>}
+            {linkError && (
+              <div className="space-y-3 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-ivory)] p-4">
+                <p role="status" className="text-xs text-[var(--rh-danger)]">{linkError}</p>
+                <label htmlFor="publish-manual-link" className="block text-xs text-[var(--rh-ink-2)]">Pilih tautan, lalu gunakan menu salin perangkat dan simpan di catatan Anda.</label>
+                <input
+                  id="publish-manual-link"
+                  readOnly
+                  value={siteUrl}
+                  onFocus={(event) => event.currentTarget.select()}
+                  className="w-full rounded-lg border border-[var(--rh-line)] bg-[var(--rh-paper)] p-3 text-xs text-[var(--rh-ink)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    linkOperation.current++;
+                    setManualSavedFor(linkContext.current);
+                    setLinkError('');
+                  }}
+                  className="min-h-11 w-full rounded-lg border border-[var(--rh-primary)] bg-[var(--rh-paper)] px-3 py-2 text-xs font-semibold text-[var(--rh-primary)]"
+                >
+                  Saya sudah menyimpan tautan
+                </button>
+              </div>
+            )}
+            {manualSavedFor === linkContext.current && <p role="status" className="text-xs text-[var(--rh-ink-2)]">Anda mengonfirmasi tautan sudah disimpan secara manual.</p>}
 
             {publishSuccess && (
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-zinc-200 p-5 rounded-2xl text-center space-y-2 animate-fadeIn">
@@ -283,8 +310,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               {!publishSuccess && (
                 <button
                   onClick={async () => {
-                    if (!linkCopiedInPublishModal && !wedding.invitation?.isPublished) {
-                      alertModal.warning('Salin Tautan', 'Harap salin tautan rilis Anda terlebih dahulu!');
+                    if (!linkReady && !wedding.invitation?.isPublished) {
+                      alertModal.warning('Simpan Tautan', 'Pastikan tautan rilis Anda sudah disimpan terlebih dahulu.');
                       return;
                     }
                     setIsPublishing(true);
@@ -298,9 +325,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                       setIsPublishing(false);
                     }
                   }}
-                  disabled={isPublishing || (!linkCopiedInPublishModal && !wedding.invitation?.isPublished)}
+                  disabled={isPublishing || (!linkReady && !wedding.invitation?.isPublished)}
                   className={`flex-1 rounded-xl py-3 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
-                    isPublishing || (!linkCopiedInPublishModal && !wedding.invitation?.isPublished)
+                    isPublishing || (!linkReady && !wedding.invitation?.isPublished)
                       ? 'bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed'
                       : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-900 hover:to-black text-white shadow-lg shadow-zinc-900/20'
                   }`}
@@ -345,7 +372,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                   >
                     {guests.map((g: any) => (
                       <option key={g.id} value={g.id}>
-                        {g.name} ({g.group}) — {g.phoneNumber}
+                        {g.name} ({g.group}) — {g.phoneNumber || 'nomor belum diisi'}
                       </option>
                     ))}
                   </select>
