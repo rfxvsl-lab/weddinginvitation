@@ -84,3 +84,12 @@ Gabungan PR7+PR8 (`claude/int-pr7-pr8` c276564, source tiga file identik dengan 
 - Overlay setinggi viewport.
 - CSV terunduh.
 - 0 pageerror.
+
+## PR #9 — status berbagi jujur, fallback manual, URL absolut (head `7b32f18`, room #98/#101/#104)
+
+- `pr9-390-ok.jpg`: clipboard diizinkan, 390×844. Setelah Salin Pesan dan Buka WhatsApp, status tamu di DB tetap `Draft`.
+- `pr9-manual-390.jpg`, `pr9-manual-1280.jpg`: clipboard ditolak. Muncul pesan galat dan input readonly berisi URL absolut `http://localhost:3100/<slug>`, ditambah tombol "Saya sudah menyimpan tautan".
+- `pr9-manual-confirmed-390.jpg`, `pr9-manual-confirmed-1280.jpg`: setelah konfirmasi, Publish Sekarang aktif tanpa label "Tersalin".
+- `pr9b-390x640.jpg`: viewport pendek, modal di-scroll sampai bawah.
+
+Saat diuji tidak ada yang dipublikasikan dan tidak ada pesan WhatsApp yang dikirim.
