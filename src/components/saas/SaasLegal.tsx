@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { MarketingSurface } from "@/components/landing/MarketingSurface";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Mail, FileText, ShieldCheck, Cookie } from "lucide-react";
@@ -10,11 +11,11 @@ import { ENTERPRISE_CONTACT_EMAIL } from "@/lib/packageLimits";
 
 export function SaasPageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="saas-scope flex min-h-screen flex-col">
+    <MarketingSurface className="flex flex-col">
       <SaasNav />
       <div className="flex-1">{children}</div>
       <SaasFooter />
-    </div>
+    </MarketingSurface>
   );
 }
 
@@ -38,7 +39,7 @@ export function SaasLegalShell({
   const pathname = usePathname();
 
   return (
-    <div className="saas-scope flex min-h-screen flex-col">
+    <MarketingSurface className="flex flex-col">
       <SaasNav />
       <main className="saas-shell w-full flex-1 pb-20 pt-10 sm:pt-14">
         <div className="mx-auto max-w-[820px]">
@@ -126,6 +127,6 @@ export function SaasLegalShell({
         </div>
       </main>
       <SaasFooter />
-    </div>
+    </MarketingSurface>
   );
 }

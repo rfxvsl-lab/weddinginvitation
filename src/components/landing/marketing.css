@@ -667,3 +667,10 @@
     transition: none;
   }
 }
+
+/* Legal article headings retain document scale inside the shared marketing shell. */
+.rh-product.rh-marketing .saas-doc h2 {
+  font-size: 19px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}

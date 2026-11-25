@@ -1,11 +1,12 @@
 import React from 'react';
+import { MarketingSurface } from '@/components/landing/MarketingSurface';
 import Link from 'next/link';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 
 export default function NotFound() {
   return (
-    <div className="saas-scope flex min-h-screen flex-col">
+    <MarketingSurface className="flex flex-col">
       <LandingNav />
       <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-start justify-center px-5 py-24 sm:px-8">
         <p className="text-[14px] font-medium text-[var(--rh-gold-deep)]">Kesalahan 404</p>
@@ -19,6 +20,6 @@ export default function NotFound() {
         </div>
       </main>
       <LandingFooter />
-    </div>
+    </MarketingSurface>
   );
 }
