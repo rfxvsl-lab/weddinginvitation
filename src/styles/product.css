@@ -805,8 +805,13 @@
   margin-block: auto;
 }
 
-/* Same guest rows/handlers: compact cards on phones, table on larger screens. */
-@media screen and (max-width: 639px) {
+/* Same guest rows/handlers: compact cards whenever the list area is narrower than the table
+   (phones, and laptops where the sidebar + Live Preview leave ~550-700px), table otherwise. */
+.rh-product :has(> .rh-guest-list) {
+  container-type: inline-size;
+  container-name: rh-guests;
+}
+@container rh-guests (max-width: 860px) {
   .rh-product .rh-guest-list {
     border: 0;
     background: transparent;
@@ -848,6 +853,7 @@
     display: block;
     margin-bottom: 5px;
     color: var(--rh-muted);
+    font-family: var(--font-ui), sans-serif;
     font-size: 11px;
     font-weight: 500;
   }
@@ -859,5 +865,9 @@
     height: auto;
     border-top: 1px solid var(--rh-line);
     margin-top: 4px;
+  }
+  .rh-product .rh-guest-list td.rh-guest-actions > :is(button, a) {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
