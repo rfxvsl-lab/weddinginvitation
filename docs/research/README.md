@@ -45,3 +45,12 @@ Lihat [COLLABORATION.md](../../COLLABORATION.md). Harga, font, serta preview/tem
 [Bukti mentah, hasil QA dan batas pemeriksaan](07-EVIDENCE-AND-QA.md) melengkapi laporan. Struktur hero/ringkasan dirombak; panel lain mendapat konsistensi presentasi dan token. Ini belum berarti semua domain fungsional pada backlog selesai.
 
 Lima laporan berurutan, sintesis yang memetakan temuan ke implementasi, website riset privat, perubahan UI yang teruji dan terpisah dari preview, serta handover untuk Claude. Jangan menandai cakupan selesai jika pemeriksaan dashboard privat atau perilaku backend belum dilakukan.
+
+## Koreksi cakupan tema dan implementasi
+
+Status halaman publik pada tabel01–05 bukan pernyataan audit gerak penuh atau kualitas
+13 tema RuangHadir selesai. Source relevan pernah diperoleh, tetapi rekaman kontinu
+lintas viewport belum dibuktikan. Pemilik mengoreksi hasil implementasi dan ketergantungan
+pada satu vendor. Lihat [reset lintas vendor + prototipe nyata](09-THEME-IMPLEMENTATION-RESET.md).
+Pakai kekuatan tiap referensi untuk memperbaiki karya; jangan menunda implementasi
+menunggu audit satu website sempurna. Kandidat baru masih perlu review visual.

@@ -1,5 +1,21 @@
 # Playbook — menambah tema undangan (Theme Kit)
 
+## Koreksi pemilik terbaru — kualitas implementasi tema
+
+Pemilik menolak hasil tema saat ini. Referensi harus lintas vendor, tidak tergantung Wedew.
+Screenshot semua bagian dan source relevan cukup untuk mulai memperbaiki karya; jangan
+menjadikan audit satu vendor sempurna sebagai prasyarat berkarya. Video gerak bernilai
+bila tersedia, tetapi screenshot tidak boleh disebut rekaman kontinu. Lihat
+[reset implementasi dan kandidat konkret](../research/09-THEME-IMPLEMENTATION-RESET.md).
+
+Untuk pekerjaan berikutnya, aturan “urutan semua tema harus sama”, resep wajib 2.5D,
+dan pemilihan kombinasi varian sebagai ukuran selesai DICABUT sebagai arahan desain.
+Bagian teknis di bawah tetap menjelaskan mesin existing, bukan patokan mutu artistik.
+Gunakan ulang data/perilaku yang benar, rancang komposisi setiap bagian sesuai konsep.
+Buat satu kandidat utuh untuk direvisi, bukan memperbanyak reskin. Tema existing tidak
+dihapus/dimigrasi otomatis; prototipe terisolasi boleh dibuat sesuai koreksi pemilik.
+
+
 **Pembaruan pemilik 24 November 2026:** baca [QUALITY-V2.md](QUALITY-V2.md) dan
 [COLLABORATION.md](../../COLLABORATION.md). Keduanya mengatur pengembangan berikutnya.
 Preview/tema existing tidak diubah oleh redesign aplikasi. Jangan menghasilkan SVG/ilustrasi AI
