@@ -93,11 +93,11 @@ export default function ProjectSwitcher({
           <p className="text-[11px] font-bold text-[var(--rh-ink)] truncate transition-transform duration-200 group-hover/bento:translate-x-0.5">
             {currentInv?.title || 'Undangan'}
           </p>
-          <p className="text-[9px] text-[var(--rh-muted)] flex items-center gap-1">
-            <Link2 className="w-2.5 h-2.5" />
-            /{getDisplaySlug(currentInv || invitations[0])}
-            <span className="text-[var(--rh-line-strong)]">·</span>
-            {invitations.length}/{formatLimit(maxProjects)} proyek
+          <p className="text-[9px] text-[var(--rh-muted)] flex min-w-0 items-center gap-1">
+            <Link2 className="w-2.5 h-2.5 shrink-0" />
+            <span className="min-w-0 flex-1 truncate" title={`/${getDisplaySlug(currentInv || invitations[0])}`}>/{getDisplaySlug(currentInv || invitations[0])}</span>
+            <span className="shrink-0 text-[var(--rh-line-strong)]">·</span>
+            <span className="shrink-0 whitespace-nowrap">{invitations.length}/{formatLimit(maxProjects)} proyek</span>
           </p>
         </div>
         <ChevronDown className={`w-3.5 h-3.5 text-[var(--rh-muted)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
