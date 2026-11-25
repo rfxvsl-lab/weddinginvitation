@@ -93,3 +93,21 @@ Gabungan PR7+PR8 (`claude/int-pr7-pr8` c276564, source tiga file identik dengan 
 - `pr9b-390x640.jpg`: viewport pendek, modal di-scroll sampai bawah.
 
 Saat diuji tidak ada yang dipublikasikan dan tidak ada pesan WhatsApp yang dikirim.
+
+## PR #10 — MarketingSurface (head `cca1d47`, room #108–#111)
+
+Pengukuran baseline di `main` 67b89b7 (room #112): `/preview`, empat halaman legal, dan halaman 404 tidak memakai root marketing. Akibatnya, di 390, 768, dan 1280 sama-sama tampil 7 tautan nav dan tombol toggle sekaligus, dan katalog `display: block`.
+
+Hasil di PR10, untuk 8 route × 390/768/1280:
+
+- Semua halaman marketing memakai `rh-product rh-marketing`.
+- Nav per lebar: 390 → 1 tautan + toggle; 768 → 2 tautan + toggle; 1280 → 7 tautan tanpa toggle.
+- Judul h2 halaman legal tetap 19px.
+- `/preview` tampil sebagai grid dengan 13 kartu. Beranda tetap 6 kartu.
+- 404 berstatus 404 dan memakai wrapper.
+- `/preview/sage-garden` tanpa header/footer marketing.
+- Overflow 0 dan pageerror 0.
+
+Navigasi pulang-pergi (beranda → refund → preview → back → back) berjalan konsisten. Menu di 390 bisa ditutup dengan Escape, lalu fokus kembali ke tombol.
+
+Berkas: `pr10-surf-{390,1280}-{refund-policy,preview,home}.jpg`.
