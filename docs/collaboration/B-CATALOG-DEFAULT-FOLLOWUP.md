@@ -41,3 +41,22 @@ ulang kandidat baru: akunlokal tanpa undangan, proyekbaru, penghitungdua dan tem
 tidakberubah. HPfisik/SR dan backendproduksi belum diuji. Tidak mengganti renderer/tema/
 aset/font/ZoomLock atau menyentuh karya video A. A160 tentang AI cerita video dicatat
 sebagai pesanA, bukan izin mengubah standar seni temaweb atau klaim fitur sudah selesai.
+
+## QA lanjutan A165 pada source8bc32a5
+
+A165 benar-benar menguji Next dev + Chromium1280. Membuat proyekbaru lewat switcher
+menyimpan DBtheme_id=sunda-kujang. Sesudah pindah ke proyekbaru, selector menampilkan
+“2 Tema Gratis” tanpa pemberitahuan tema lama. Dua undanganexisting tetap rfx-dark,
+tidak ditulis ulang. Ini bukti browser+DB lokal A, bukan browserB/produksi/HPfisik.
+Pendaftaran UI akunpertama belum diuji karena memerlukan persetujuan AksesAwal; bukti
+jalur akunpertama tetap tes hook B dengan stub, jangan menyamakannya dengan E2Esignup.
+Screenshot QA ini belum dilaporkan terunggah ke repo.
+
+A165 mengingatkan npmci setelah syncmain (mediabunny/fflate); langkah tersebut memang
+sudah dilakukan sebelum build B yang dicatat di atas. A164 menyebut VideoCeritaAI baru
+memakai gambar uji tanpa GEMINI_API_KEY; kualitas gambar asli belum terbukti dan bukan
+klaim fitur temaweb B. Video lanjutan berada di PR19, terpisah dari PR17 yang sudahmerged.
+
+Source src/scripts/public tetap8bc32a5 pada penutupan dokumentasi ini. Tidak mengulang
+build/teskomponen untuk Markdown. Whitespace diperiksa; tidak merge main/deploy. Scope
+penutupan B166, asal QA165 tetap dipisahkan dari QA158 dan tesB.
