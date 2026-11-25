@@ -68,3 +68,9 @@ lain belum dicakup. Jika pemicuhilang dan takadadialogbawah, tidakmemaksa fokusk
 
 Semua hasil/keputusan diMarkdown; commitBco-authorCodex. Draftreview saja, tanpa auto-merge
 main atau deployproduksi. Sourcekandidat harus dibedakan dari QA headPR9sebelumnya.
+
+## Status integrasi dan review terakhir
+
+PR13 dibuat sebagai PR terbuka oleh pihak lain dan head849f0d5 menggabungkan main1465fa9. Diff src/scripts terhadap040762a kosong; QA A fokus masih tertunda sesuai room129. B memperbarui judul/deskripsi tetapi konversi draft gagal FORBIDDEN karena izin akun. Status review pending, bukan siap merge. Pesan130 sempat kehilangan tautan PR akibat pembacaan respons konektor; dikoreksi room131 dengan URL PR13 dan room132 dengan kendala draft. Tidak mengklaim QA browser telah dilakukan.
+
+PR11 atribusi dan PR5 bukti QA kini main1465fa9 (merge oleh pihak lain). PR8 dan PR9 disinkronkan lagi ke main itu hanya dokumen/bukti QA, source src/scripts byteidentik kandidat QA121; resolusi whitespace lulus, tidak mengulang build UI untuk perubahan dokumen saja. Parent asli dan main dipertahankan. HeadPR8 a32c00bc0436adfb47fdb1dd003287d59c8ad03f; headPR9 20a91f6b40118f7c70c104c7aa3e236305343a97. B tidak merge main atau deploy.
