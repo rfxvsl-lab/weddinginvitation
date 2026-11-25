@@ -18,7 +18,7 @@ export function manageDialogFocus(element: HTMLElement, options: {
     node.tabIndex >= 0 && !node.matches(':disabled') &&
     !node.closest('[hidden],[inert],[aria-hidden="true"]') && node.getClientRects().length > 0,
   );
-  const focus = (node: HTMLElement) => node.focus({ preventScroll: true });
+  const focus = (node: HTMLElement, preventScroll = true) => node.focus({ preventScroll });
   const first = () => controls()[0] || element;
   const keydown = (event: KeyboardEvent) => {
     if (!top() || event.isComposing) return;
@@ -29,7 +29,8 @@ export function manageDialogFocus(element: HTMLElement, options: {
       if (!nodes.length || !nodes.includes(active as HTMLElement) ||
           (event.shiftKey ? active === nodes[0] : active === nodes[nodes.length - 1])) {
         event.preventDefault();
-        focus(event.shiftKey ? nodes[nodes.length - 1] || element : nodes[0] || element);
+        // Keyboard navigation must reveal the destination in tall mobile dialogs.
+        focus(event.shiftKey ? nodes[nodes.length - 1] || element : nodes[0] || element, false);
       }
     }
   };

@@ -788,10 +788,10 @@
   outline: none;
 }
 
-/* Keep the start of tall publish dialogs inside the scrollable viewport. */
 /* Initial heading focus announces dialog context without an interactive-control ring. */
 .rh-product .rh-dialog-initial-focus:focus { outline: none; }
 
+/* Keep the start of tall publish dialogs inside the scrollable viewport. */
 .rh-product .rh-publish-overlay {
   display: flex;
   flex-direction: column;

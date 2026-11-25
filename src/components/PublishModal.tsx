@@ -329,6 +329,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                       alertModal.warning('Simpan Tautan', 'Pastikan tautan rilis Anda sudah disimpan terlebih dahulu.');
                       return;
                     }
+                    // Keep focus inside before the initiating button becomes disabled.
+                    initialFocus.current?.focus({ preventScroll: true });
                     setIsPublishing(true);
                     try {
                       await wedding.publishInvitation();
