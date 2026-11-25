@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import { resolvePublicSlug } from '../lib/utils';
 import { Copy, Check, MessageSquare, AlertCircle, ChevronRight, CheckCircle, ExternalLink, Send, Globe } from 'lucide-react';
 import { Logo } from './ui/Logo';
@@ -7,6 +7,7 @@ import { DEFAULT_THEMES } from '../data/defaultData';
 import { canAccess } from '../lib/packageLimits';
 import UpgradePrompt from './UpgradePrompt';
 import { normalizeWhatsAppPhone } from '../lib/guestSharing';
+import { useDialogFocus } from '../hooks/useDialogFocus';
 import { useAlertModal } from '../hooks/useAlertModal';
 
 interface PublishModalProps {
@@ -25,6 +26,14 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const [isPublishing, setIsPublishing] = useState(false);
   const [linkCopiedInPublishModal, setLinkCopiedInPublishModal] = useState(false);
   const alertModal = useAlertModal();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const initialFocus = useRef<HTMLHeadingElement>(null);
+  const titleId = useId();
+  useDialogFocus(Boolean(show && user), dialogRef, () => {
+    if (isPublishing) return;
+    setLinkCopiedInPublishModal(false);
+    onClose();
+  }, initialFocus);
 
   const guests = wedding.guests || [];
   const activeSaaSUser = user;
@@ -129,20 +138,22 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   if (!publishAllowed) {
     return (
       <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
-        <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
+        <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-busy={isPublishing} tabIndex={-1} className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
           <button
+            aria-label="Tutup dialog publikasi"
             onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
+            className="absolute top-5 right-5 w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
           >
             ✕
           </button>
           <div className="text-center space-y-3 pt-2">
             <Logo isLink={false} className="justify-center" />
-            <h3 className="text-xl font-bold text-zinc-900 tracking-tight">Publish Tidak Tersedia</h3>
+            <h3 ref={initialFocus} id={titleId} tabIndex={-1} className="rh-dialog-initial-focus text-xl font-bold text-zinc-900 tracking-tight">Publish Tidak Tersedia</h3>
             <p className="text-sm text-zinc-500">Paket Demo hanya untuk preview. Upgrade untuk mempublikasikan undangan Anda.</p>
           </div>
           <UpgradePrompt packageId={packageId} featureName="Publish Undangan" variant="banner" />
           <button
+            aria-label="Tutup dialog publikasi"
             onClick={onClose}
             className="w-full bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border border-zinc-200 rounded-xl py-3 text-xs font-bold cursor-pointer transition-all"
           >
@@ -155,15 +166,17 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
   return (
     <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
-      <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative border border-white/50">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-busy={isPublishing} tabIndex={-1} className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative border border-white/50">
         
         {/* Close Button */}
         <button
+          aria-label="Tutup dialog publikasi"
+          disabled={isPublishing}
           onClick={() => {
             setLinkCopiedInPublishModal(false);
             onClose();
           }}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
         >
           ✕
         </button>
@@ -172,7 +185,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
         <div className="text-center space-y-3 pt-2">
           <Logo isLink={false} className="justify-center" />
           <div>
-            <h3 className="text-xl font-bold text-zinc-900 tracking-tight">
+            <h3 ref={initialFocus} id={titleId} tabIndex={-1} className="rh-dialog-initial-focus text-xl font-bold text-zinc-900 tracking-tight">
               Publish & Bagikan Undangan
             </h3>
             <p className="text-sm text-zinc-500 mt-1">
@@ -299,6 +312,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
             {/* Action Buttons */}
             <div className="flex gap-3 pt-1">
               <button
+                disabled={isPublishing}
                 onClick={() => {
                   setLinkCopiedInPublishModal(false);
                   onClose();
