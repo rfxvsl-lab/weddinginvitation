@@ -1,0 +1,61 @@
+[
+  {
+    "file": "00-hero.jpg",
+    "stage": "hero awal"
+  },
+  {
+    "file": "01-couple.jpg",
+    "stage": "setelah gulir 0.7 halaman"
+  },
+  {
+    "file": "02-story-gallery.jpg",
+    "height": 7190,
+    "viewport": [
+      1363,
+      936
+    ],
+    "y": 1404
+  },
+  {
+    "file": "03-countdown.jpg",
+    "height": 7190,
+    "viewport": [
+      1363,
+      936
+    ],
+    "y": 2200
+  },
+  {
+    "file": "04-events-map.jpg",
+    "height": 7190,
+    "viewport": [
+      1363,
+      936
+    ],
+    "y": 2995
+  },
+  {
+    "file": "05-videos-rsvp.jpg",
+    "y": 3650
+  },
+  {
+    "file": "06-comments.jpg",
+    "y": 4399
+  },
+  {
+    "file": "07-donation.jpg",
+    "y": 5242
+  },
+  {
+    "file": "08-footer.jpg",
+    "height": 7190,
+    "viewportHeight": 936,
+    "y": 6178
+  },
+  {
+    "file": "09-footer-settled.jpg",
+    "height": 7190,
+    "viewportHeight": 936,
+    "y": 6178
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "acquired": "previous-session; read again in this turn",
+    "file": "02-viding-demo/theme-app.js",
+    "bytes": 43133,
+    "sha256": "82c09b3b890c40dd487ecceb262fecdd291de0fd601878027416345679fc7b72"
+  },
+  {
+    "acquired": "previous-session; read again in this turn",
+    "file": "02-viding-demo/theme.css",
+    "bytes": 72469,
+    "sha256": "9bfdb2289875300089b43e99e6bb9419b6a11a5bac53528ff6bf93c8404e1fde"
+  },
+  {
+    "acquired": "previous-session; read again in this turn",
+    "file": "03-katsudoto-demo/theme-app.js",
+    "bytes": 12705,
+    "sha256": "bc1f00690058c201d1edf16ae08fb1f381eac37b52bab3456cda9e50734deb1d"
+  },
+  {
+    "acquired": "previous-session; read again in this turn",
+    "file": "03-katsudoto-demo/theme.css",
+    "bytes": 89564,
+    "sha256": "15bf6e37cc41bd68db83a5c3734fa4461383bdd20d3b9f112a7d2fec57c583b3"
+  },
+  {
+    "acquired": "previous-session; read again in this turn",
+    "file": "04-owlink-demo/parallax.js",
+    "bytes": 2086,
+    "sha256": "8b5c6d6edf825ca8da44b31594a6a1f72f5069dcead189a1e2d47d8196d6babe"
+  }
+]

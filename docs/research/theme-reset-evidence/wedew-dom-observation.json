@@ -1,0 +1,307 @@
+{
+  "url": "https://demo.wedew.id/?theme_preview=sweet-luxury",
+  "viewport": [
+    1363,
+    936
+  ],
+  "height": 7190,
+  "sections": [
+    {
+      "height": 660,
+      "id": "block-hero",
+      "top": 0
+    },
+    {
+      "height": 649.5625,
+      "id": "block-couple",
+      "top": 610
+    },
+    {
+      "height": 619.890625,
+      "id": "block-story",
+      "top": 1259.5625
+    },
+    {
+      "height": 406,
+      "id": "block-gallery",
+      "top": 1879.453125
+    },
+    {
+      "height": 550.765625,
+      "id": "block-countdown",
+      "top": 2285.453125
+    },
+    {
+      "height": 557.921875,
+      "id": "block-events",
+      "top": 2836.21875
+    },
+    {
+      "height": 185.578125,
+      "id": "block-live",
+      "top": 3394.140625
+    },
+    {
+      "height": 736,
+      "id": "block-map",
+      "top": 3579.71875
+    },
+    {
+      "height": 475.265625,
+      "id": "block-videos",
+      "top": 4315.71875
+    },
+    {
+      "height": 263.578125,
+      "id": "block-invitation",
+      "top": 4790.984375
+    },
+    {
+      "height": 860.515625,
+      "id": "block-comments",
+      "top": 5054.5625
+    },
+    {
+      "height": 736.71875,
+      "id": "block-donation",
+      "top": 5915.078125
+    },
+    {
+      "height": 346.390625,
+      "id": "block-vendors",
+      "top": 6651.796875
+    },
+    {
+      "height": 192,
+      "id": "block-footer",
+      "top": 6998.1875
+    }
+  ],
+  "motion": [
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": "0",
+      "duration": "1200",
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": "0",
+      "duration": "1200",
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": "0",
+      "duration": "1200",
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "zoom-in",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H1"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": "300",
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-in",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-in",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "IMG"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "IMG"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-right",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-left",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-down",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "H2"
+    },
+    {
+      "aos": "fade-up",
+      "cssDuration": "1.2s",
+      "cssEase": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "delay": null,
+      "duration": null,
+      "tag": "DIV"
+    }
+  ],
+  "failedImageCount": 12
+}
