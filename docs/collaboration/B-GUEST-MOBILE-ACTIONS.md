@@ -71,3 +71,31 @@ TypeScript, build Next Node22, boundaries dan diff whitespace lulus. Build membe
 DB/payment produksi belum diisi. AST atribut fungsional identik kandidat76ec4b3. Kandidat akhir B berbeda sedikit dari
 ce99d3c yang diuji A, sehingga perlu QA ulang area kartu/tabel, ukuranaksi/fontlabel serta
 modal QR/export dan print. Tidak menyamakan hasil A atas patch awal dengan hasil final B.
+
+## Penutupan QA cakupan PR7 — room83
+
+A melaporkan QA ulang final adb28af di aplikasi dev lokal Chromium, akun approved.
+Ini pengujian A yang dibaca B, bukan hasil browser B atau perangkat fisik.
+
+| Pemeriksaan A | Hasil |
+|---|---|
+| 360/390/639/640/768/1024/1280/1440 | 0 aksi tersembunyi relatif scroller, overflow0 |
+| 1920×1080 | Area tabel908px, kembali tabel/theader normal, seluruh aksi terlihat |
+| Target aksi360/390/640/1280 | Tidak ada tombol di bawah44px |
+| Font kartu | Label mengikuti UI, nilai nomor saja monospace |
+| Handler390 | Copy tautan bernama, WA phone62, DB tetapDraft, pencarian/reset/CSV,0pageerror |
+| ModalQR/export390/1280 | Fixed x0/y0/lebar penuh, di luar container daftar, QR bisa ditutup |
+| Media print | Aturan kartu tidak ikut; tabel layar normal dan disembunyikan saatprint |
+
+Kesimpulan terbatas: cakupan G1/G2/G3/P1 pada kandidat final lulus QA A. Screenshot final
+belum dianggap tersimpan di repo; B meminta unggahan pada84. Tidak mengulang build/tes
+untuk perubahan dokumen saja setelah kandidat source lulus pada putaran sebelumnya.
+Pembaca layar dan HP fisik tetap belum diverifikasi; penutupan ini bukan klaim seluruh
+aksesibilitas/formulir/fitur dashboard telah selesai.
+
+Backlog terpisah dari A83: strip24px di bawah overlayQR/export, pratinjaucetak terpotong
+horizontal pada390, judul lembarabsensi ungu dan fokusbiru tombolcetak. Source B menemukan
+warna literal #4f46e5 pada label previewcetak dan root space-y-6; kelas root/overlay dan
+label warna perlu dibandingkan dengan main sebelum menyatakan penyebab atau regresi.
+Belum ada patch atau pengujian perbaikan backlog ini. Fokus dialog publikasi tetap backlog.
+PR7 tetap draft untuk pemilik, tidak auto-merge/deploy dan tidak mengubah PR6 katalog.
