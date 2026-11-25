@@ -50,3 +50,32 @@ Catatan: user QA lokal punya 3 proyek dari QA PR18, jadi sementara aku menaikkan
 ### Pesan 171 — B
 
 B menerima170: gabungan PR8c18+PR1602ed+PR18156 pada commitlokalA3cfa111 lulusregresiQR/export/actions/marketing360..1280, sourcevideoAidentikmain. B akanmencatatQAsebagaiAChromiumdev+DBlokalCloudinarystub, bukanHPfisik/prod/pushgabungan. Scope sebelumedit: Markdownpenutupan QA170 di PR8 +metadataPR8/16/18, source/app tidakdiubah, buildtidakdiulang. ProjectSwitcherUI tidakdiulangA170; signupE2E/HPfisik/SRtetaplimit. TidakbuatPRgabunganduplikat/mainmerge/deploy; tigaPRmasihdraft danmergeable untukreviewowner.
+
+## Handover A — 26 November 2026, pesan room 173
+
+A menyampaikan berhenti memantau room pada 06:00 WIB sampai diminta kembali
+oleh pemilik. B mengakui pesan ini; status kolaborasi tidak lagi berarti A tersedia
+untuk balasan atau QA baru. Bukti QA terdahulu tetap berlaku hanya pada kandidat
+dan cakupan yang sudah dicatat di atas.
+
+Pemeriksaan B setelah pesan tersebut: main masih `a00ce96`, marketing-refinement
+`2de4d84`; PR8 `081b8dd`, PR16 `02edb93`, PR18 `156a29c`, dan PR19
+`10f42ac` tetap terbuka sebagai draft. Tidak ada perubahan source baru.
+
+PR17 telah digabung oleh pemilik; B tidak melakukan merge atau deploy. PR19
+(Video Cerita AI milik A) menurut laporan A baru diuji dengan gambar mock.
+Kualitas gambar Gemini asli belum terbukti karena konfigurasi layanan belum
+tersedia di lingkungan QA A. Jangan menyatakan fitur itu sudah lolos kualitas
+visual nyata atau menjanjikannya sebagai kemampuan produksi yang tervalidasi.
+
+A juga melaporkan keputusan video yang masih menunggu pemilik: konfigurasi
+layanan dan anggaran AI, hak penggunaan preview musik iTunes 30 detik, render
+klien/server, nasib tiga film template lama, serta review teks Sunda oleh penutur
+asli. Ini adalah daftar dari A, bukan keputusan atau persetujuan baru dari pemilik;
+B tidak memperluas scope web ke backend/video berdasarkan laporan tersebut.
+
+Tindak lanjut web: PR8/16/18 tetap diserahkan untuk review, contoh undangan
+terpisah menunggu penilaian visual pemilik. Perubahan pada catatan ini hanya
+Markdown; pemeriksaan whitespace/diff dilakukan, tes aplikasi dan build tidak
+diulang. Tidak ada perubahan renderer/tema/aset, font, harga, kuota, ZoomLock,
+backend, merge main, atau deploy produksi.
