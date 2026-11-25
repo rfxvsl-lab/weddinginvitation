@@ -9,7 +9,7 @@ import { LandingPricing } from "@/components/landing/LandingPricing";
 import { LandingFaq } from "@/components/landing/LandingFaq";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { SaasVideoStudio } from "@/components/saas/SaasVideoStudio";
-import "@/components/landing/marketing.css";
+import { MarketingSurface } from "@/components/landing/MarketingSurface";
 
 export const metadata: Metadata = {
   title: "RuangHadir — Undangan pernikahan untuk cerita kalian",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="saas-scope rh-product rh-marketing min-h-screen">
+    <MarketingSurface>
       <a
         href="#konten"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-2"
@@ -43,6 +43,6 @@ export default function LandingPage() {
         <LandingFaq />
       </div>
       <LandingFooter />
-    </div>
+    </MarketingSurface>
   );
 }

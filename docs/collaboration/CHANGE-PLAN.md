@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru 25 November: main67b89b7 tetap. PR6 katalog draft menunggu review pengecualian rootkatalog. PR7 f0722f7 lulus QA A83; PR8 ac50117 lulus QA A90 (overlay/canvas/palet). A91 menguji gabungan c276564 lulus geometri/aksi/CSV; B mengintegrasikan PR7 ke branch REVIEW PR8 sesuai scope92, source3file byteidentik hasilA. PR8 kini memuatPR7; parentasli dipertahankan, konflik CSS/docs selesai tanpa merge main. Lihat B-GUEST-EXPORT-LAYOUT.md. Tesinteraksi/tsc/boundaries lulus, buildintegrasi Node22 lulus (warningDB/paymentbelumkonfigurasi). HPfisik/pembacalayar/keyboarddialog belum teruji; copy jumlah tamu dan fokusdialog tetapbacklog. Tidak auto-merge/deploy.
+> Status 25 November: main253e333 sudah memuat perbaikan CSS marketing PR10 (merged oleh pihak lain), QA A114 lulus. B menyinkronkan main KE branch review PR8/9 sesuai room118 dan menyelesaikan konflik dokumen; source fitur masing-masing harus byteidentik kandidat QA, source marketing byteidentik main. PR8 punya kartu/overlay/export (QA A83/90/91), PR9 punya berbagi/clipboard/fallback (QA A98/101/104), atribusiCodex PR11 terpisah. Lihat B-REVIEW-MAIN-SYNC.md. HPfisik/SR/keyboarddialog belum diuji, tidakmerge PR ke main atau deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan

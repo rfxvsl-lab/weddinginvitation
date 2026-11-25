@@ -27,7 +27,13 @@ const FEATURED = [
   "rfx-dark",
 ];
 
-export function LandingThemes() {
+type LandingThemesProps = {
+  /** teaser: beranda, 6 pilihan + tautan ke katalog. catalog: halaman /preview, semua tema. */
+  variant?: "teaser" | "catalog";
+};
+
+export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
+  const isCatalog = variant === "catalog";
   const [filter, setFilter] = useState<string>("all");
   const matching = useMemo(() => {
     const sorted = [...DEFAULT_THEMES].sort(
@@ -49,7 +55,8 @@ export function LandingThemes() {
       ...sorted.filter((theme) => !FEATURED.includes(theme.id)),
     ];
   }, [filter]);
-  const shown = matching.slice(0, 6);
+  const shown = isCatalog ? matching : matching.slice(0, 6);
+  const HeadingTag = isCatalog ? "h1" : "h2";
 
   return (
     <section
@@ -61,7 +68,11 @@ export function LandingThemes() {
         <div className="rh-marketing-section-heading">
           <div>
             <p className="rh-eyebrow">TEMA UNTUK CERITA KALIAN</p>
-            <h2 id="themes-heading">Temukan yang terasa pas.</h2>
+            <HeadingTag id="themes-heading">
+              {isCatalog
+                ? `Semua ${DEFAULT_THEMES.length} tema undangan`
+                : "Temukan yang terasa pas."}
+            </HeadingTag>
           </div>
           <p>
             Dari nuansa adat sampai taman yang hangat. Buka contoh undangannya,
@@ -81,13 +92,15 @@ export function LandingThemes() {
               aria-controls="marketing-theme-list"
               onClick={() => setFilter(key)}
             >
-              {label}
+              {isCatalog && key === "all" ? "Semua" : label}
             </button>
           ))}
         </div>
         <p className="rh-theme-count" role="status">
           {filter === "all"
-            ? `${shown.length} pilihan dari ${DEFAULT_THEMES.length} tema`
+            ? isCatalog
+              ? `${shown.length} tema`
+              : `${shown.length} pilihan dari ${DEFAULT_THEMES.length} tema`
             : `${shown.length} dari ${matching.length} tema ${FILTERS.find(([key]) => key === filter)?.[1]}`}
           {" · Semua tersedia dalam Akses Awal"}
         </p>
@@ -122,10 +135,16 @@ export function LandingThemes() {
         )}
         <div className="rh-theme-footer">
           <p>Data acara tetap tersimpan saat kalian mengganti tema.</p>
-          <Link href="/preview" className="rh-action">
-            Jelajahi semua {DEFAULT_THEMES.length} tema{" "}
-            <ArrowRight size={16} aria-hidden />
-          </Link>
+          {isCatalog ? (
+            <Link href="/auth?mode=register" className="rh-action">
+              Daftar Akses Awal <ArrowRight size={16} aria-hidden />
+            </Link>
+          ) : (
+            <Link href="/preview" className="rh-action">
+              Jelajahi semua {DEFAULT_THEMES.length} tema{" "}
+              <ArrowRight size={16} aria-hidden />
+            </Link>
+          )}
         </div>
       </div>
     </section>
