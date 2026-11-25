@@ -31,6 +31,7 @@ const SAMPLES: Record<VideoThemeId, MotionPlayerCouple> = {
   "grand-ballroom": SAMPLE,
   "luxury-pink": SAMPLE,
   "storybook-journey": SAMPLE,
+  pasundan: SAMPLE,
 };
 
 const POINTS = [

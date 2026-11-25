@@ -91,6 +91,14 @@ QA build produksi, data undangan uji, HD 9:16, dengan musik: MP4 1080×1920 + AA
 
 Tema ini juga muncul di daftar tema video landing (`SaasVideoStudio`, area B), karena daftar itu membaca `VIDEO_THEMES`. Satu baris sampel ditambahkan di sana agar tipe tetap valid.
 
+## Tahap 2c — tema film "Pasundan"
+
+Ini pendamping video untuk tema undangan Pasundan (`sunda-kujang`), salah satu dari dua tema yang dipertahankan pemilik. Semua gambar digambar ulang dari nol sebagai SVG prosedural: punggung gunung 5 lapis, awan berpita bergaya Mega Mendung, sawah terasering bergaris emas, dan siluet kujang dengan trim paths. Tidak ada kode atau aset dari `src/themes/catalog/sunda-kujang*`; yang diambil dari tema hanya palet (hijau leuweung, emas, krem) dan font (Gilda Display, Lora, Cinzel).
+
+Alurnya: fajar dengan judul "Uleman Pernikahan" → crane turun menembus pita awan → sawah (foto oval emas naik, "Dua Insan, Satu Asih") → whip → "Pangantén" (dua potret di kedalaman berbeda, kujang tergambar) → tilt ke langit malam ("Waktos & Tempat") → tirai awan menutup lalu tersibak → penutup "Hatur nuhun…" dengan nama tamu.
+
+QA build produksi HD 9:16 + musik: MP4 1080×1920 + AAC, 10,1 MB, selesai dalam 1 mnt 14 dtk (`pasundan-1080x1920-musik.jpg`). Kalimat berbahasa Sunda ("sareng", "Putra ti", "Hatur nuhun kana sagala doa sareng rawuhna") perlu dicek penutur asli sebelum rilis.
+
 ## Batasan yang diketahui
 
 - Render terjadi di perangkat pengguna. Gating Enterprise di sisi klien bisa diakali lewat devtools, sedangkan proxy aset tetap dijaga di server. Render di server (mis. Remotion Lambda) butuh biaya infrastruktur dan keputusan pemilik.

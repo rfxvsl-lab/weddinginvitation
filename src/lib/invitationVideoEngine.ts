@@ -8,7 +8,7 @@
 
  */
 
-export type VideoThemeId = 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey';
+export type VideoThemeId = 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey' | 'pasundan';
 export type VideoAspectId = '9:16' | '1:1' | '16:9';
 
 export interface VideoCoupleProps {
@@ -78,5 +78,15 @@ export const VIDEO_THEMES: VideoThemeMeta[] = [
     swatch: ['#F6EEDC', '#C6A15B', '#8A5A2B'],
     accent: '#8A5A2B',
     isDark: false,
+  },
+  {
+    id: 'pasundan',
+    name: 'Pasundan',
+    shortName: 'Pasundan',
+    tagline: 'Adat Sunda · gunung berlapis, sawah terasering & tirai awan Mega Mendung',
+    techniques: ['Parallax 5 Lapis', 'Cloud Wipe', 'Whip Pan', 'Trim Paths Kujang'],
+    swatch: ['#14281E', '#C9A85C', '#F1EAD6'],
+    accent: '#C9A85C',
+    isDark: true,
   },
 ];
