@@ -18,6 +18,8 @@ import { buildTimeRemap, FilmData, FilmEvent, GRAIN, SpeedZone } from './motion/
 import JavaneseFilm, { JAVANESE_COMP_DUR, JAVANESE_SPEED } from './motion/JavaneseFilm';
 import BallroomFilm, { BALLROOM_COMP_DUR, BALLROOM_SPEED } from './motion/BallroomFilm';
 import PinkFilm, { PINK_COMP_DUR, PINK_SPEED } from './motion/PinkFilm';
+import JourneyFilm, { JOURNEY_COMP_DUR, JOURNEY_SPEED } from './motion/JourneyFilm';
+import PasundanFilm, { PASUNDAN_COMP_DUR, PASUNDAN_SPEED } from './motion/PasundanFilm';
 
 export interface MotionPlayerCouple extends VideoCoupleProps {
   heroPhoto?: string;
@@ -28,6 +30,8 @@ export interface MotionPlayerCouple extends VideoCoupleProps {
   events?: FilmEvent[];
   gallery?: string[];
   guestName?: string;
+  tagline?: string;
+  closing?: string;
 }
 
 interface EnterpriseMotionPlayerProps {
@@ -46,10 +50,22 @@ const FILMS: Record<VideoThemeId, { Comp: React.ComponentType<any>; dur: number;
   'javanese-classic': { Comp: JavaneseFilm, dur: JAVANESE_COMP_DUR, zones: JAVANESE_SPEED },
   'grand-ballroom': { Comp: BallroomFilm, dur: BALLROOM_COMP_DUR, zones: BALLROOM_SPEED },
   'luxury-pink': { Comp: PinkFilm, dur: PINK_COMP_DUR, zones: PINK_SPEED },
+  'storybook-journey': { Comp: JourneyFilm, dur: JOURNEY_COMP_DUR, zones: JOURNEY_SPEED },
+  pasundan: { Comp: PasundanFilm, dur: PASUNDAN_COMP_DUR, zones: PASUNDAN_SPEED },
 };
 
-const FONT_CSS =
-  "@import url('https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&display=swap');";
+/** Stylesheet font film; diekspor agar ekspor video bisa menyematkan font yang sama. */
+export const MOTION_FONT_CSS_URL =
+  "https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Gelasio:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&family=Noto+Sans+Javanese&family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&family=Nunito+Sans:wght@300;400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Italianno&family=Gilda+Display&family=Lora:ital,wght@0,400;0,600;1,400&display=swap";
+/** Keluarga font per film — disematkan penuh ke tiap frame saat ekspor. */
+export const MOTION_FONT_FAMILIES: Record<VideoThemeId, string[]> = {
+  'javanese-classic': ['Philosopher', 'Gelasio', 'Montserrat', 'Noto Sans Javanese'],
+  'grand-ballroom': ['Cinzel', 'Playfair Display', 'Lato'],
+  'luxury-pink': ['Great Vibes', 'Playfair Display', 'Nunito Sans'],
+  'storybook-journey': ['Cinzel', 'EB Garamond', 'Italianno'],
+  pasundan: ['Gilda Display', 'Lora', 'Cinzel'],
+};
+const FONT_CSS = `@import url('${MOTION_FONT_CSS_URL}');`;
 
 const SAMPLE_DIR = '/assets/video-sample';
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -99,6 +115,7 @@ function toFilmData(c: MotionPlayerCouple): FilmData {
     events,
     slug: c.slug,
     guest: c.guestName || 'Tamu Undangan',
+    copy: { tagline: c.tagline?.trim() || undefined, closing: c.closing?.trim() || undefined },
     photos: {
       couple: img(c.heroPhoto) || `${SAMPLE_DIR}/couple.webp`,
       groom: img(c.groomPhoto) || `${SAMPLE_DIR}/groom.webp`,
@@ -108,7 +125,7 @@ function toFilmData(c: MotionPlayerCouple): FilmData {
   };
 }
 
-export default function EnterpriseMotionPlayer({ themeId, couple, progress, showWatermark = true }: EnterpriseMotionPlayerProps) {
+function EnterpriseMotionPlayer({ themeId, couple, progress, showWatermark = true }: EnterpriseMotionPlayerProps) {
   const film = FILMS[themeId] || FILMS['javanese-classic'];
   const remap = useMemo(() => buildTimeRemap(film.zones, film.dur, VIDEO_DURATION_SEC), [film]);
   const data = useMemo(() => toFilmData(couple), [couple]);
@@ -179,3 +196,6 @@ export default function EnterpriseMotionPlayer({ themeId, couple, progress, show
     </div>
   );
 }
+
+/** memo: re-render induk (mis. progres render) tidak me-reconcile ulang seluruh film bila props sama. */
+export default React.memo(EnterpriseMotionPlayer);

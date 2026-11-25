@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import { resolvePublicSlug } from '../lib/utils';
 import { Copy, Check, MessageSquare, AlertCircle, ChevronRight, CheckCircle, ExternalLink, Send, Globe } from 'lucide-react';
 import { Logo } from './ui/Logo';
@@ -6,6 +6,8 @@ import { SaaSUser } from '../types';
 import { DEFAULT_THEMES } from '../data/defaultData';
 import { canAccess } from '../lib/packageLimits';
 import UpgradePrompt from './UpgradePrompt';
+import { normalizeWhatsAppPhone } from '../lib/guestSharing';
+import { useDialogFocus } from '../hooks/useDialogFocus';
 import { useAlertModal } from '../hooks/useAlertModal';
 
 interface PublishModalProps {
@@ -24,9 +26,77 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const [isPublishing, setIsPublishing] = useState(false);
   const [linkCopiedInPublishModal, setLinkCopiedInPublishModal] = useState(false);
   const alertModal = useAlertModal();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const initialFocus = useRef<HTMLHeadingElement>(null);
+  const titleId = useId();
+  useDialogFocus(Boolean(show && user), dialogRef, () => {
+    if (isPublishing) return;
+    setLinkCopiedInPublishModal(false);
+    onClose();
+  }, initialFocus);
 
   const guests = wedding.guests || [];
   const activeSaaSUser = user;
+  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
+  const appProtocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
+  const siteUrl = `${appProtocol}//${appHost}/${resolvePublicSlug(wedding.invitation?.slug, user?.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
+  const [linkError, setLinkError] = useState('');
+  const [manualSavedFor, setManualSavedFor] = useState('');
+  const [shareFeedback, setShareFeedback] = useState('');
+  const linkOperation = useRef(0);
+  const messageOperation = useRef(0);
+  const linkContext = useRef('');
+  const messageContext = useRef('');
+  linkContext.current = JSON.stringify([show, user?.id, siteUrl]);
+  const linkReady = linkCopiedInPublishModal || manualSavedFor === linkContext.current;
+  messageContext.current = JSON.stringify([show, user?.id, siteUrl, selectedShareGuestId, customShareMessage]);
+
+  useEffect(() => {
+    setLinkCopiedInPublishModal(false);
+    setLinkError('');
+    setManualSavedFor('');
+    return () => { linkOperation.current++; };
+  }, [show, user?.id, siteUrl]);
+  useEffect(() => {
+    setShareMessageCopied(false);
+    setShareFeedback('');
+    return () => { messageOperation.current++; };
+  }, [show, user?.id, siteUrl, selectedShareGuestId, customShareMessage]);
+
+  const copyText = async (kind: 'link' | 'message') => {
+    const operation = kind === 'link' ? linkOperation : messageOperation;
+    const context = kind === 'link' ? linkContext : messageContext;
+    const request = ++operation.current;
+    const key = context.current;
+    if (kind === 'link') { setLinkCopiedInPublishModal(false); setLinkError(''); }
+    else { setShareMessageCopied(false); setShareFeedback(''); }
+    try {
+      await navigator.clipboard.writeText(kind === 'link' ? siteUrl : customShareMessage);
+      if (request !== operation.current || key !== context.current) return;
+      if (kind === 'link') setLinkCopiedInPublishModal(true);
+      else {
+        setShareMessageCopied(true);
+        setShareFeedback('Pesan tersalin. Status tamu tidak berubah; lanjutkan berbagi secara manual.');
+      }
+    } catch {
+      if (request !== operation.current || key !== context.current) return;
+      if (kind === 'link') setLinkError('Tautan belum bisa disalin otomatis. Salin secara manual di bawah, atau izinkan clipboard lalu coba lagi.');
+      else setShareFeedback('Pesan belum bisa disalin otomatis. Pilih dan salin teks pada kolom Pesan Undangan secara manual.');
+    }
+  };
+
+  const openWhatsApp = () => {
+    const guest = guests.find((g: any) => g.id === selectedShareGuestId);
+    if (!guest) return;
+    const phone = normalizeWhatsAppPhone(guest.phoneNumber || '');
+    if (!phone) {
+      setShareFeedback('Nomor WhatsApp belum diisi atau formatnya belum sesuai. Salin pesan untuk membagikannya secara manual.');
+      return;
+    }
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(customShareMessage)}`, '_blank', 'noopener,noreferrer');
+    setShareFeedback('Lanjutkan pengiriman di WhatsApp. Jika jendela tidak muncul, izinkan pop-up atau salin pesan. RuangHadir belum dapat memverifikasi pesan terkirim atau dibaca.');
+  };
+
 
   // Generate message
   const generateFormattedMessage = (guestId: string, templateId: string) => {
@@ -63,27 +133,27 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
   const packageId = activeSaaSUser.packageId || 'demo';
   const publishAllowed = canAccess(packageId, 'canPublish');
   const themeName = DEFAULT_THEMES.find(t => t.id === wedding.themeId)?.name || 'Grand Ballroom';
-  const appHost = typeof window !== 'undefined' ? window.location.host : 'ruanghadir.net';
-  const siteUrl = `${appHost}/${resolvePublicSlug(wedding.invitation?.slug, activeSaaSUser.activeSlug, wedding.allInvitations?.length) || 'demo'}`;
 
   // If publish not allowed (demo), show upgrade prompt
   if (!publishAllowed) {
     return (
       <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
-        <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
+        <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-busy={isPublishing} tabIndex={-1} className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-md space-y-5 shadow-2xl relative border border-white/50">
           <button
+            aria-label="Tutup dialog publikasi"
             onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
+            className="absolute top-5 right-5 w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
           >
             ✕
           </button>
           <div className="text-center space-y-3 pt-2">
             <Logo isLink={false} className="justify-center" />
-            <h3 className="text-xl font-bold text-zinc-900 tracking-tight">Publish Tidak Tersedia</h3>
+            <h3 ref={initialFocus} id={titleId} tabIndex={-1} className="rh-dialog-initial-focus text-xl font-bold text-zinc-900 tracking-tight">Publish Tidak Tersedia</h3>
             <p className="text-sm text-zinc-500">Paket Demo hanya untuk preview. Upgrade untuk mempublikasikan undangan Anda.</p>
           </div>
           <UpgradePrompt packageId={packageId} featureName="Publish Undangan" variant="banner" />
           <button
+            aria-label="Tutup dialog publikasi"
             onClick={onClose}
             className="w-full bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border border-zinc-200 rounded-xl py-3 text-xs font-bold cursor-pointer transition-all"
           >
@@ -96,15 +166,17 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
   return (
     <div className="rh-publish-overlay fixed inset-0 bg-black/50 backdrop-blur-xl z-[300] animate-fadeIn">
-      <div className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative border border-white/50">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-busy={isPublishing} tabIndex={-1} className="rh-publish-card bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-3xl w-full max-w-4xl space-y-6 shadow-2xl relative border border-white/50">
         
         {/* Close Button */}
         <button
+          aria-label="Tutup dialog publikasi"
+          disabled={isPublishing}
           onClick={() => {
             setLinkCopiedInPublishModal(false);
             onClose();
           }}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 hover:text-zinc-800 text-sm transition-all cursor-pointer"
         >
           ✕
         </button>
@@ -113,7 +185,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
         <div className="text-center space-y-3 pt-2">
           <Logo isLink={false} className="justify-center" />
           <div>
-            <h3 className="text-xl font-bold text-zinc-900 tracking-tight">
+            <h3 ref={initialFocus} id={titleId} tabIndex={-1} className="rh-dialog-initial-focus text-xl font-bold text-zinc-900 tracking-tight">
               Publish & Bagikan Undangan
             </h3>
             <p className="text-sm text-zinc-500 mt-1">
@@ -160,9 +232,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                     <AlertCircle className="w-4 h-4 text-zinc-700" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-zinc-800">Salin Tautan Terlebih Dahulu</h4>
+                    <h4 className="text-xs font-bold text-zinc-800">Simpan Tautan Undangan</h4>
                     <p className="text-[11px] text-zinc-600 leading-relaxed mt-0.5">
-                      Salin tautan undangan resmi di bawah ini sebelum bisa menekan tombol Publish.
+                      Pastikan tautan undangan resmi di bawah ini tersimpan sebelum menekan tombol Publish.
                     </p>
                   </div>
                 </div>
@@ -173,10 +245,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                     <span className="text-[11px] text-zinc-600 break-all select-all">{siteUrl}</span>
                   </div>
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(siteUrl);
-                      setLinkCopiedInPublishModal(true);
-                    }}
+                    aria-label="Salin tautan publikasi"
+                    onClick={() => copyText('link')}
                     className={`px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 shrink-0 ${
                       linkCopiedInPublishModal
                         ? 'bg-zinc-50 text-emerald-700 border border-zinc-200'
@@ -199,6 +269,32 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               </div>
             )}
 
+            {linkError && (
+              <div className="space-y-3 rounded-xl border border-[var(--rh-line)] bg-[var(--rh-ivory)] p-4">
+                <p role="status" className="text-xs text-[var(--rh-danger)]">{linkError}</p>
+                <label htmlFor="publish-manual-link" className="block text-xs text-[var(--rh-ink-2)]">Pilih tautan, lalu gunakan menu salin perangkat dan simpan di catatan Anda.</label>
+                <input
+                  id="publish-manual-link"
+                  readOnly
+                  value={siteUrl}
+                  onFocus={(event) => event.currentTarget.select()}
+                  className="w-full rounded-lg border border-[var(--rh-line)] bg-[var(--rh-paper)] p-3 text-xs text-[var(--rh-ink)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    linkOperation.current++;
+                    setManualSavedFor(linkContext.current);
+                    setLinkError('');
+                  }}
+                  className="min-h-11 w-full rounded-lg border border-[var(--rh-primary)] bg-[var(--rh-paper)] px-3 py-2 text-xs font-semibold text-[var(--rh-primary)]"
+                >
+                  Saya sudah menyimpan tautan
+                </button>
+              </div>
+            )}
+            {manualSavedFor === linkContext.current && <p role="status" className="text-xs text-[var(--rh-ink-2)]">Anda mengonfirmasi tautan sudah disimpan secara manual.</p>}
+
             {publishSuccess && (
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-zinc-200 p-5 rounded-2xl text-center space-y-2 animate-fadeIn">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
@@ -216,6 +312,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
             {/* Action Buttons */}
             <div className="flex gap-3 pt-1">
               <button
+                disabled={isPublishing}
                 onClick={() => {
                   setLinkCopiedInPublishModal(false);
                   onClose();
@@ -228,8 +325,8 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               {!publishSuccess && (
                 <button
                   onClick={async () => {
-                    if (!linkCopiedInPublishModal && !wedding.invitation?.isPublished) {
-                      alertModal.warning('Salin Tautan', 'Harap salin tautan rilis Anda terlebih dahulu!');
+                    if (!linkReady && !wedding.invitation?.isPublished) {
+                      alertModal.warning('Simpan Tautan', 'Pastikan tautan rilis Anda sudah disimpan terlebih dahulu.');
                       return;
                     }
                     setIsPublishing(true);
@@ -243,9 +340,9 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                       setIsPublishing(false);
                     }
                   }}
-                  disabled={isPublishing || (!linkCopiedInPublishModal && !wedding.invitation?.isPublished)}
+                  disabled={isPublishing || (!linkReady && !wedding.invitation?.isPublished)}
                   className={`flex-1 rounded-xl py-3 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
-                    isPublishing || (!linkCopiedInPublishModal && !wedding.invitation?.isPublished)
+                    isPublishing || (!linkReady && !wedding.invitation?.isPublished)
                       ? 'bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed'
                       : 'bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-900 hover:to-black text-white shadow-lg shadow-zinc-900/20'
                   }`}
@@ -290,7 +387,7 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
                   >
                     {guests.map((g: any) => (
                       <option key={g.id} value={g.id}>
-                        {g.name} ({g.group}) — {g.phoneNumber}
+                        {g.name} ({g.group}) — {g.phoneNumber || 'nomor belum diisi'}
                       </option>
                     ))}
                   </select>
@@ -339,17 +436,15 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
               </div>
             </div>
 
+            <p role="status" className="text-[11px] text-[var(--rh-muted)]">{shareFeedback || 'Salin pesan dan buka WhatsApp tidak membuktikan pesan terkirim atau dibaca. Status tamu tidak diubah.'}</p>
+
             {/* Share Action Buttons */}
             {selectedShareGuestId && (
               <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-zinc-100">
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(customShareMessage);
-                    setShareMessageCopied(true);
-                    wedding.updateGuestStatus(selectedShareGuestId, 'Sent');
-                    setTimeout(() => setShareMessageCopied(false), 2000);
-                  }}
+                  aria-label="Salin pesan undangan"
+                  onClick={() => copyText('message')}
                   className="py-2.5 px-3 bg-white hover:bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-zinc-600 transition-all"
                 >
                   {shareMessageCopied ? (
@@ -367,17 +462,12 @@ export default function PublishModal({ show, onClose, user, wedding }: PublishMo
 
                 <button
                   type="button"
-                  onClick={() => {
-                    const guest = guests.find((g: any) => g.id === selectedShareGuestId);
-                    if (!guest) return;
-                    const waUrl = `https://api.whatsapp.com/send?phone=${guest.phoneNumber}&text=${encodeURIComponent(customShareMessage)}`;
-                    wedding.updateGuestStatus(guest.id, 'Opened');
-                    window.open(waUrl, '_blank');
-                  }}
+                  aria-label="Buka draf WhatsApp"
+                  onClick={openWhatsApp}
                   className="py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-emerald-500/20 transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Kirim WA</span>
+                  <span>Buka WhatsApp</span>
                 </button>
               </div>
             )}

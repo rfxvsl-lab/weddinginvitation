@@ -67,6 +67,36 @@ export interface DigitalGift {
   accountHolder: string;
 }
 
+/** Pengaturan Video Studio (Enterprise), disimpan bersama data undangan. Semua opsional. */
+export interface VideoStudioSettings {
+  themeId?: 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey' | 'pasundan';
+  aspect?: '9:16' | '1:1' | '16:9';
+  quality?: 'hd' | 'fast';
+  /** ID tamu untuk versi personal; kosong = "Tamu Undangan". */
+  guestId?: string | null;
+  music?: {
+    source: 'invitation' | 'custom' | 'none';
+    /** URL musik khusus video (unggahan Cloudinary). */
+    customUrl?: string;
+    customTitle?: string;
+    /** Mulai dari detik ke-n lagu. */
+    offsetSec?: number;
+    /** 0..1 */
+    volume?: number;
+  };
+  /** Teks yang bisa diubah (berlaku untuk film Perjalanan & Pasundan). */
+  copy?: { tagline?: string; closing?: string };
+  /** Video terakhir yang diunggah untuk dibagikan lewat tautan. */
+  shared?: {
+    url: string;
+    themeId: string;
+    aspect: string;
+    guestName?: string | null;
+    bytes: number;
+    createdAt: string;
+  } | null;
+}
+
 export interface WeddingData {
   couple: WeddingCouple;
   events: {
@@ -79,6 +109,7 @@ export interface WeddingData {
   gifts: DigitalGift[];
   musicUrl: string;
   musicTitle: string;
+  videoStudio?: VideoStudioSettings;
   countdownDate: string;
   quoteText: string;
   quoteSource: string;
