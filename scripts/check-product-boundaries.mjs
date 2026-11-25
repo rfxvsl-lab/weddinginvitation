@@ -29,10 +29,23 @@ const diff = execFileSync(
   ["diff", "04a52ec", "--name-only", "--", ...protectedPaths],
   { cwd: root, encoding: "utf8" },
 );
-assert.equal(
-  diff.trim(),
-  "",
+// Owner-requested marketing catalogue fix, reviewed in PR10 and merged at this
+// immutable revision. Only this entry gets a new baseline; invitation routes keep
+// the original baseline above, including every other path under /preview.
+const catalogueEntry = "src/app/(marketing)/preview/page.tsx";
+const catalogueReview = "253e333333c91f237c44c66f97655c5fdc57338c";
+const changedProtected = diff.trim().split("\n").filter(Boolean);
+assert.deepEqual(
+  changedProtected.filter((file) => file !== catalogueEntry),
+  [],
   "Protected preview/theme/assets/zoom/package files changed",
+);
+assert.equal(
+  fs.readFileSync(path.join(root, catalogueEntry), "utf8"),
+  execFileSync("git", ["show", `${catalogueReview}:${catalogueEntry}`], {
+    cwd: root, encoding: "utf8",
+  }),
+  "Catalogue entry changed beyond reviewed PR10 baseline",
 );
 const before = execFileSync("git", ["show", "04a52ec:src/app/layout.tsx"], {
   cwd: root,
@@ -111,7 +124,7 @@ release();
 check(doc, "gesturestart", {}, false);
 check(win, "wheel", { ctrlKey: true }, false);
 console.log(
-  "PASS: protected files unchanged; font/viewport unchanged; product CSS scoped; zoom prevention, normal scroll/keys and listener cleanup verified.",
+  "PASS: protected invitation files and reviewed catalogue unchanged; font/viewport unchanged; product CSS scoped; zoom prevention, normal scroll/keys and listener cleanup verified.",
 );
 console.log(
   "Limit: synthetic EventTarget checks do not replace pinch testing on physical iOS/Android devices.",

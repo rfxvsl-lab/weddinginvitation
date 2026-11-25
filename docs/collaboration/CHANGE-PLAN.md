@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru25November: pemilik melaporkan CSS legal/previewrusak, Bbrowserpublikmengonfirmasi. Prioritas kembali marketing: branch codex/marketing-surface-css berbasisPR6 menyatukan importCSS+scope dalam MarketingSurface untuk home/catalog/empatlegal/404, tanpa menyentuh renderer. TesSSRdirectentry/katalog/tsc lulus; guardexisting masihflagrootkatalog dimintaowner, ceksemuabataslainlulus tanpaubahguard. BuildNode22lulus (warningDB/paymentbelumkonfig), QAvisualkandidat masihdiminta; lihat B-MARKETING-CSS-INTEGRATION.md. PR8/9dashboardtetapterpisah, main67tidakberubah. Tidakmerge/deploy.
+> Status25November: main253e333 memuat CSSmarketing PR10. QA A121 pascasinkron PR8b6f6b83/PR9e216fab lulus fitur+marketing, tetapdrafttanpamerge/deploy B. Branch codex/catalog-guard-baseline mengusulkan guard rootcatalog dipin ke snapshotreview253e, pathrenderer/tema/paket lainnya tetap04; tesnegatif5mutasi menolakperubahan danrestorebyteasli. Lihat B-CATALOG-GUARD-BASELINE.md. Tidakada sourceaplikasidiubah. PR11atribusi terpisah; HPfisik/SR/fokusdialog tetapbelumteruji.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan

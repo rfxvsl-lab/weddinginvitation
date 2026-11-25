@@ -62,3 +62,13 @@ CSS aplikasi harus dibatasi pada permukaan aplikasi; jangan mengubah selector gl
 - [Handover GPT untuk Claude](docs/collaboration/HANDOVER-GPT.md)
 - [Rencana perubahan A–B](docs/collaboration/CHANGE-PLAN.md)
 - [Riset dan ledger implementasi](docs/research/README.md)
+
+## Baseline entry katalog setelah koreksi CSS pemilik
+
+Keluhan pemilik 25 November mengenai /preview dan CSS halamanlegal ditangani PR10 yang
+sudah terpantau merged oleh pihak lain pada253e333333c91f237c44c66f97655c5fdc57338c.
+Hanya `src/app/(marketing)/preview/page.tsx` memakai snapshot byte-exact dari commit itu
+pada usulan guard codex/catalog-guard-baseline. Ini katalogmarketing, bukan renderer.
+Semua pathprotected lain, termasuk /preview/[themeId], tetap baseline04a52ec. Perubahan
+entrykatalog setelah snapshot direview harus ditolak guard, bukan otomatis dianggap aman.
+Lihat docs/collaboration/B-CATALOG-GUARD-BASELINE.md; tidak mengubah font/tema/paket/ZoomLock.
