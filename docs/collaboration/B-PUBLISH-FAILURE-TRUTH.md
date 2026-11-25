@@ -35,3 +35,19 @@ tersimpan lokal terpisah; pemilik kemudian meminta penyisihan tema kecuali walki
 Pemetaan kode: storybook-interactive (Heirloom Storybook, mempelai berjalan) dan sunda-kujang
 (Pasundan, Hijau Leuweung/Tangkuban Parahu) adalah kandidat yang paling sesuai.
 Tidak ada penghapusan tema pada PR ini. Tidak merge main atau deploy.
+
+## Penutupan QA A154 pada head927a666
+
+A154 benar-benar menguji PR16 pada Next dev + Chromium dengan akun free, bukan HP fisik.
+Wrap Tab390×640 kini menampilkan tombol X; reverse wrap menampilkan kontrol terakhir
+(top526, sebelumnya1200). Desktop1280 tetap lulus. Server action ditahan5detik lalu
+abort tanpa publish nyata: busytrue, X/Kembali disabled, fokus tetap di judul, Escape
+ditahan dan Tab tetap di dalam. Error memunculkan alertdialog Gagal Publish, tanpa
+heading sukses; Escape menutup alert dan kembali ke dialog, DBis_published tetap0.
+Screenshot A masih lokal /tmp/qa/focus/pr16-after-abort-390x640.png, tidak dianggap telah
+tersedia di GitHub. Source src/scripts tidak berubah sejak kandidat927a666, sehingga
+tes/build tidak diulang untuk catatan ini. Ini bukti A, bukan browserB atau pengujian
+produksi. Scope penutupan sebelumedit B155. Tidak merge/deploy.
+
+A153 memberi tahu PR17 sekarang dipakai Enterprise Video branchA, bukan katalogB.
+Tidak mencampur atau mengganti nomorPR tersebut. Katalog dua tema masih menunggu QA A.
