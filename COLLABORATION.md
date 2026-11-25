@@ -63,6 +63,7 @@ CSS aplikasi harus dibatasi pada permukaan aplikasi; jangan mengubah selector gl
 - [Rencana perubahan A–B](docs/collaboration/CHANGE-PLAN.md)
 - [Riset dan ledger implementasi](docs/research/README.md)
 
+ codex/catalog-guard-baseline
 ## Baseline entry katalog setelah koreksi CSS pemilik
 
 Keluhan pemilik 25 November mengenai /preview dan CSS halamanlegal ditangani PR10 yang
@@ -76,3 +77,14 @@ Lihat docs/collaboration/B-CATALOG-GUARD-BASELINE.md; tidak mengubah font/tema/p
 Tambahan usulan review PR12: guard lokal menolak file baru non-ignored/untracked dalam
 protectedPaths lewat git ls-files --others --exclude-standard. File baru scripts/docs
 tetap diperbolehkan; ini tidak mengubah larangan renderer, seni, font, harga atau kuota.
+=======
+## Atribusi author — arahan pemilik 25 November 2026
+
+Pemilik meminta Codex menjadi pembeda kontribusi B terhadap Claude. Commit B berikutnya
+memakai `Co-authored-by: Codex <noreply@openai.com>`; author/committer connector tetap akun
+pemilik jika connector tidak menyediakan parameter author. Git lokal B memakai identitas
+Codex dengan alamat yang sama. Lihat [catatan atribusi](docs/collaboration/B-ATTRIBUTION.md).
+Metadata commit lama tidak direwrite. Identitas A dan parent commit A tetap dipertahankan.
+Daftar Contributors GitHub bergantung pada commit default branch dan pencocokan email;
+jangan mengklaim sidebar sudah menampilkan Codex hanya karena trailer telah dibuat.
+ main
