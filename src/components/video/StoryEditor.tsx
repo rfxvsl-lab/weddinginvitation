@@ -466,7 +466,7 @@ export default function StoryEditor({ story, onChange, groomName, brideName, ven
         </ul>
         {story.characterSheet && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={story.characterSheet} alt="Lembar karakter hasil AI" className="w-full rounded-2xl border border-white" />
+          <img src={story.characterSheet} alt="Lembar karakter hasil AI" className="max-h-56 w-auto max-w-full rounded-2xl border border-white" />
         )}
         {!canGenerate && (
           <p className="text-[11.5px] text-[#8C6B34]">
