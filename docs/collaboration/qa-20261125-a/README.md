@@ -64,3 +64,23 @@ Temuan backlog yang terlihat di `pr7-export-390.jpg`, belum dibandingkan dengan 
 ## PR #6 — katalog /preview (patch A `e993c09`)
 
 `pr6-preview-fix-390.jpg`, `pr6-preview-fix-1280.jpg`: 13 kartu, 0 gambar sepenuh layar, satu h1.
+
+## PR #8 — overlay QR/export dan kanvas A4 (head `ac50117`, room #90; gabungan PR7+PR8 room #91)
+
+Asal strip bawah dicek di `main` 67b89b7 pada 390×844. Overlay QR dan export punya `margin-bottom: 24px`, karena aturan `space-y-6` di Tailwind v4 berlaku juga untuk anak `fixed`. Akibatnya tinggi overlay 820px. Berkas: `pr8-main-qr-390x844.jpg`, `pr8-main-export-390x844.jpg`.
+
+Hasil di PR8:
+
+| Viewport | Tinggi overlay QR/export | Rentang geser kanvas (lebar penuh) | Berkas |
+| --- | --- | --- | --- |
+| 360×740 | 740 / 740 | 0 → 516 | `pr8-qr-360x740.jpg`, `pr8-export-360x740.jpg` |
+| 390×640 | 640 / 640 | 0 → 486 | `pr8-qr-390x640.jpg`, `pr8-export-390x640.jpg` |
+| 390×844 | 844 / 844 | 0 → 486 | `pr8-qr-390x844.jpg`, `pr8-export-390x844.jpg` |
+| 1280×860 | 860 / 860 | 0 → 268 | `pr8-qr-1280x860.jpg`, `pr8-export-1280x860.jpg` |
+
+Gabungan PR7+PR8 (`claude/int-pr7-pr8` c276564, source tiga file identik dengan PR8 d2a07b9):
+
+- Aksi tamu tersembunyi 0 di 360–1440 (tampilan kartu). Di 1920 tampil sebagai tabel.
+- Overlay setinggi viewport.
+- CSV terunduh.
+- 0 pageerror.
