@@ -42,3 +42,32 @@ scroll panjang, serta tabel cetak/CSV tetap. Tes tidak menghapus/mengirim pesan 
 produksi. B belum menguji browser/perangkat fisik; tidak mengklaim balasan A yang belum ada.
 Tidak auto-merge atau deploy produksi. Bukti A awal tersedia pada PR5 branchQA A; laporan
 awal itu belum merupakan QA patch ini. Fokus dialog publikasi masih backlog terpisah.
+
+## QA A putaran pertama dan koreksi lebar area
+
+Room78: A menguji PR7 head76ec4b3 di Chromium dev dengan akun approved. Pada360/390/639px
+kartu muat,10/10aksi terlihat tanpa geser, semua≥44px; copy/WA tetapstatusDraft, cari/reset
+dan CSV lulus tanpa pageerror. Namun pada640/768/1024/1280/1440, tabel811px lebih lebar dari
+area yang tersisa karena sidebar/LivePreview; sebagian/bahkan semua aksi tidak tampak.
+Jadi G1 BELUM selesai pada kandidat pertama. Label nomor ikutmono dan tinggi aksi40px
+di beberapa keadaan desktop juga dicatat. Ini hasil A, bukan browser B/perangkat fisik.
+
+A menyiapkan ce99d3c di claude/guest-actions-container: containerquery860px, target44px
+dan fontlabel. A melaporkan geometri/handler ulang lulus360 sampai1920, tabel kembali pada
+area≥861px. B menerima arah containerquery sesuai bukti bahwa lebar workspace berbeda
+dari viewport. Patch A diintegrasikan pada branch PR7, lalu B membatasi cakupannya:
+
+- Container khusus .rh-guest-list-container membungkus daftar saja. Modal fixedQR/export
+  dan print-section tetap di luarnya. B tidak memakai :has pada root seluruh GuestManager;
+  ini pembatasan pengaruh layout, bukan klaim patch A sudah menyebabkan regresi modal.
+- Container dan query tetap berada dalam @media screen. CSS cetak tidak diberi querykartu.
+- Sel nomor mewarisi font UI; hanya nilai nomornya memakai span monospace. Label ::before
+  mengikuti font UI tanpa menambah deklarasi keluarga font CSS yang dilarang guard.
+- Query area≤860px memakai kartu yang sama; area lebih lebar tetap tabel. Tidak membuat
+  ulang data/callback atau mengubah on*,value,disabled/href/source bisnis.
+
+Scope B diumumkan80: GuestManager.tsx, product.css dan dokumen. Tes GuestSharing lulus;
+TypeScript, build Next Node22, boundaries dan diff whitespace lulus. Build memberi warning
+DB/payment produksi belum diisi. AST atribut fungsional identik kandidat76ec4b3. Kandidat akhir B berbeda sedikit dari
+ce99d3c yang diuji A, sehingga perlu QA ulang area kartu/tabel, ukuranaksi/fontlabel serta
+modal QR/export dan print. Tidak menyamakan hasil A atas patch awal dengan hasil final B.

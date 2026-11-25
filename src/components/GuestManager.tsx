@@ -501,7 +501,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         Salin tautan dan buka WhatsApp tidak membuktikan pesan terkirim atau dibaca. Catatan status tidak memastikan kehadiran; kehadiran di lokasi mengikuti kolom Check-in.
       </p>
 
-      {/* GUEST LIST CONTAINER */}
+      {/* Query only the list area; fixed dialogs and print output stay outside. */}
+      <div className="rh-guest-list-container">
       <div className="rh-guest-list bg-white rounded-2xl border border-zinc-200/60 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table aria-label="Daftar tamu dan tautan undangan" className="w-full text-left border-collapse">
@@ -531,8 +532,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         {guest.invitationCode}
                       </code>
                     </td>
-                    <td data-label="Nomor WhatsApp" className="px-4 py-3.5 text-xs text-zinc-500 font-mono">
-                      {guest.phoneNumber || 'Belum diisi'}
+                    <td data-label="Nomor WhatsApp" className="px-4 py-3.5 text-xs text-zinc-500">
+                      <span className="font-mono">{guest.phoneNumber || 'Belum diisi'}</span>
                     </td>
                     <td data-label="Batas orang" className="px-4 py-3.5 text-center text-xs font-bold text-zinc-800">
                       {guest.paxLimit} Pax
@@ -661,6 +662,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
             </tbody>
           </table>
         </div>
+      </div>
+
       </div>
 
       {/* GLOWING MODAL SHOWING THE SELECTED GUEST TICKET QR & CHECK-IN SYSTEM SIMULATOR */}
