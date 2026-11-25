@@ -64,3 +64,11 @@ atau deployproduksi; UItema/aset/Manrope/harga/kuota/ZoomLock tetap dilindungi.
 Buildintegrasi final NextNode22 lulus; warningDB/paymentexisting. Setelah next-env
 dikembalikan byteincomingmain, tscakhir lulus. Guardreview lulus sebelum pemulihan
 filegenerated; bytefont/viewport/source dilindungi tidak berubah.
+
+## Penutupan regresi gabungan A170
+
+A170 menggabungkan PR8c18c962 +PR1602edb93 +PR18156a29c di commitlokal3cfa111,
+tidakdipush. QR/export/kanvasA4/aksi/CSV/marketingdirectentry360..1280 lulus tanpa
+pageerror; filevideoA tetapmaina00. ProjectSwitcherUI tidakdiulang, signup/HPfisik/SR
+masihlimit. Bukti dibedakan dari tesB dan QA121 di B-REVIEW-READY-2026-11-26.md.
+PenutupanMarkdown saja; source tidakdiubah, buildtidakdiulang; tidakmerge/deploy.
