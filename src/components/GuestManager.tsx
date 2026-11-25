@@ -668,7 +668,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
       {/* GLOWING MODAL SHOWING THE SELECTED GUEST TICKET QR & CHECK-IN SYSTEM SIMULATOR */}
       {selectedQRBoxGuest && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fadeIn select-none">
+        <div className="rh-guest-overlay fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fadeIn select-none">
           <div className="bg-surface-container-lowest border border-outline-variant rounded-[2.5rem] p-6 max-w-sm w-full space-y-5 text-center text-zinc-100 shadow-[0_0_35px_rgba(220,38,38,0.3)] relative overflow-hidden">
             {/* Header notch accent */}
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-650 via-red-500 to-red-650" />
@@ -794,10 +794,10 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
       {/* ====== ADVANCED CUSTOM EXPORT & PDF PRINT CONFIGURATION DIALOG ====== */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 bg-[#000]/80 backdrop-blur-md z-[180] flex items-center justify-center p-4 animate-fadeIn select-none md:p-6">
-          <div className="bg-white text-[var(--color-on-surface)] rounded-3xl w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden shadow-2xl border border-outline-variant">
+        <div className="rh-guest-overlay fixed inset-0 bg-[#000]/80 backdrop-blur-md z-[180] flex items-center justify-center p-4 animate-fadeIn select-none md:p-6">
+          <div className="rh-guest-export-card bg-white text-[var(--color-on-surface)] rounded-3xl w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden shadow-2xl border border-outline-variant">
             {/* Sidebar Controls */}
-            <div className="w-full md:w-80 bg-surface-container-low border-b md:border-b-0 md:border-r border-[var(--color-outline-variant)] p-5 shrink-0 flex flex-col justify-between overflow-y-auto">
+            <div className="rh-guest-export-controls w-full md:w-80 bg-surface-container-low border-b md:border-b-0 md:border-r border-[var(--color-outline-variant)] p-5 shrink-0 flex flex-col justify-between overflow-y-auto">
               <div className="space-y-5">
                 <div>
                   <span className="text-[9px] font-mono tracking-widest text-primary font-black uppercase block">ruanghadir.net Export Wizard</span>
@@ -842,7 +842,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includeSignatureColumn}
                         onChange={(e) => setIncludeSignatureColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Tanda Tangan</span>
@@ -855,7 +855,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includePhoneColumn}
                         onChange={(e) => setIncludePhoneColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Kontak WA</span>
@@ -868,7 +868,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includeStatusColumn}
                         onChange={(e) => setIncludeStatusColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Kehadiran Digital</span>
@@ -893,7 +893,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <button
                   type="button"
                   onClick={handleTriggerPrint}
-                  className="w-full py-2.5 bg-primary hover:bg-primary/90 hover:border-outline-variant text-primary-foreground border border-indigo-600 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  className="w-full py-2.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white border border-[var(--rh-primary)] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Cetak PDF / Print Fisik</span>
@@ -909,17 +909,23 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               </div>
             </div>
 
-            {/* WYSIWYG Print Preview Canvas Sheet */}
-            <div className="flex-1 bg-surface-container-low p-6 overflow-y-auto flex justify-center">
-              <div className="bg-white w-[210mm] min-h-[297mm] h-fit p-10 shadow-lg border border-outline-variant flex flex-col justify-between text-[var(--color-on-surface)] scale-95 origin-top relative rounded-sm">
+            {/* Screen-only A4 canvas: both edges remain reachable by scrolling. */}
+            <div
+              role="region"
+              aria-label="Pratinjau laporan A4, gulir untuk melihat seluruh lembar"
+              tabIndex={0}
+              className="rh-guest-export-canvas flex-1 bg-surface-container-low p-6"
+            >
+              <p className="mb-4 text-[11px] leading-relaxed text-[var(--rh-muted)]">Pratinjau A4. Gulir ke samping dan ke bawah untuk melihat seluruh lembar.</p>
+              <div className="rh-guest-export-sheet bg-white w-[210mm] min-h-[297mm] h-fit p-10 shadow-lg border border-outline-variant flex flex-col justify-between text-[var(--color-on-surface)] relative rounded-sm">
 
                 {/* Visual Watermarked Badge */}
-                <div className="absolute top-2 right-4 text-[9px] font-mono tracking-widest text-slate-350 select-none uppercase">Print Preview Sheet A4 (Skala 95%)</div>
+                <div className="absolute top-2 right-4 text-[9px] font-mono tracking-widest text-slate-350 select-none uppercase">Pratinjau A4 · gulir untuk melihat seluruh lembar</div>
 
                 <div className="space-y-6">
                   {/* Ledger Header */}
                   <div className="text-center border-b-2 border-slate-800 pb-3">
-                    <span className="text-[9px] font-mono font-bold tracking-widest text-[#4f46e5]/80 uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
+                    <span className="text-[9px] font-mono font-bold tracking-widest text-[var(--rh-muted)] uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
                     <h2 className="saas-ui-title text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {coupleNames}</h2>
                     <div className="flex justify-between items-center text-[9px] text-[var(--color-outline)] font-mono mt-2">
                       <span>Platform Portal: ruanghadir.net</span>
