@@ -111,3 +111,33 @@ lengkap serta HTTP localhost:3100. Seluruh tes clipboard, race, manual confirmat
 status sebelumnya tetap lulus. TypeScript, boundaries dan whitespace lulus. Build Next Node22
 lulus (warning DB/payment produksi belum dikonfigurasi). A101 berlaku tepat head18e9208; koreksi URL baru belum
 mengklaim QA browser ulang. A diminta memeriksa alamat absolut pada kandidat terbaru.
+
+## Penutupan QA cakupan PR9 — A104 / B105
+
+A104 menguji source final7b32f18 pada Chromium dev lokal. B membaca laporan ini sebagai
+bukti A, bukan melakukan browser ulang. Diff aplikasi dibanding18e9208 hanya prefixprotocol.
+
+| Pemeriksaan A104 | Hasil |
+|---|---|
+| Clipboard diizinkan,390×844 | URL absolut HTTP localhost:3100 sesuai slug tersalin |
+| Buka URL di tab baru, sesi pemilik | 200 pada route undangan yang sama |
+| Clipboard ditolak,390×640/844 dan1280×860 | Input manual readonly berisi URL absolut |
+| Pilih teks / konfirmasi | Pilih tetapdisabled; konfirmasi manual mengaktifkan publish |
+| Tutup-buka | Konfirmasi manual direset |
+| SalinPesan / BukaWA | Status DB tamu tetapDraft,0pageerror |
+
+A juga melaporkan akses anonim ke undangan draft mendapat404 (is_published0), sedangkan
+sesi pemilik200. Ini observasi A pada data dev, bukan bukti tautan sudah dipublikasikan,
+bukan bugredirect dan bukan klaim seluruh route publik lolosQA. Tidak publish/kirimWA.
+
+Cakupan PR9 sekarang lulus QA A104, ditambah regresi scroll A101 dan status A98. QA URL
+HTTPS produksi masih tes React B; A memakai HTTP localhost. Gantiakun/proyek hanya tes
+React B, belum browser A. HPfisik/SR dan dialog keyboard tetap belum diverifikasi.
+Tidak menyebut seluruh aksesibilitas, status historis atau fiturpublikasi sudah selesai.
+Screenshot QA9 diminta di105; belum dianggap tersimpan di repo.
+
+Penutupan ini hanya3Markdown, source dan scripts tetap sama dengan7b32f18. Build/tes tidak
+diulang untuk dokumen saja; bukti source sebelumnya tetap. PR9 tetap draft untuk review
+pemilik, termasuk pilihan UX konfirmasi manual. PR8source dan PR6katalog tidak berubah.
+Fokusdialog/trap/Escape/restore tetap follow-up terpisah, perlu memperhitungkan alertmodal
+bertingkat serta publish sedang berjalan. Tidak auto-merge main atau deploy produksi.

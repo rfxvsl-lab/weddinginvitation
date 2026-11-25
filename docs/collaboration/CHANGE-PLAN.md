@@ -1,6 +1,6 @@
 # Rencana perubahan — kontributor A dan B
 
-> Status terbaru 25 November: main67 tetap. PR6 katalog menunggu review pengecualian; PR8d2a07b9 gabungan lulus QA A90/91. PR9head18e9208 fallback manual lulus QA A101 pada390×640/844 dan1280: tanpa status palsu, konfirmasi/resetmodal/scroll/DB tetapDraft. B102 mengoreksi URL clipboard/manual menjadi absolut sesuai protocol/host halaman; tes React URL HTTPS dan HTTP lokal, tsc/boundaries lulus, build NextNode22 lulus (warningDB/paymentbelumkonfig). QA browser koreksi URL masih diminta; akun/proyek hanya tesReact, HPfisik belum diuji. Lihat B-PUBLISH-SHARING.md. Fokusdialog tetapbacklog. Tidak auto-merge/deploy.
+> Status terbaru 25 November: main67 tetap. PR6 katalog menunggu review pengecualian rootkatalog; PR8d2a07b9 gabungan lulus QA A90/91. PR9source7b32f18 lulus QA A104 URL absolut/clipboard/fallback/status, bersama QA scroll A101; hasil dan batas di B-PUBLISH-SHARING.md. A menguji HTTPdev, HTTPS dan resetakun/proyek hanya tesReact B; HPfisik/SR/keyboarddialog belum teruji. PenutupanQA hanyaMarkdown, tidakulangbuild. PR9 tetapdraft untukreviewpemilik termasukUXkonfirmasimanual; fokusdialog follow-upterpisah. Tidak auto-merge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
 landing page marketing, lalu dashboard UI. Semua rencana tetap berada di Markdown dan
