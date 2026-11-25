@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingThemes } from '@/components/landing/LandingThemes';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import '@/components/landing/marketing.css';
 
 export const metadata: Metadata = {
   title: 'Tema Undangan Pernikahan Digital — RuangHadir',
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function PreviewGalleryPage() {
   return (
-    <div className="saas-scope min-h-screen">
+    <div className="saas-scope rh-product rh-marketing min-h-screen">
       <LandingNav />
       <main>
-        <LandingThemes />
+        <LandingThemes variant="catalog" />
       </main>
       <LandingFooter />
     </div>
