@@ -45,7 +45,7 @@ const SEGMENT_META: Record<DashboardSegment, { title: string; sub: string }> = {
   overview: { title: 'Ringkasan', sub: 'Status undangan & metrik utama' },
   design: { title: 'Editor Undangan', sub: 'Konten mempelai, acara, galeri & amplop' },
   settings: { title: 'Koleksi Tema', sub: 'Pilih tampilan & tata letak undangan' },
-  video: { title: 'Video Studio', sub: 'Make Your Invitation Video — Eksklusif Enterprise (Remotion 30fps)' },
+  video: { title: 'Video Studio', sub: 'Film undangan MP4 dari data undangan — Enterprise' },
   guests: { title: 'Daftar Tamu', sub: 'Nama personal, link WhatsApp & QR check-in' },
   analytics: { title: 'Analitik & RSVP', sub: 'Kunjungan & konfirmasi kehadiran tamu' },
   profile: { title: 'Profil & Pengaturan', sub: 'Informasi akun & tautan undangan' },
@@ -59,7 +59,7 @@ export default function App() {
   const [activeSegment, setActiveSegment] = useState<DashboardSegment>(() => {
     if (typeof window === 'undefined') return 'overview';
     const tab = new URLSearchParams(window.location.search).get('tab');
-    const allowed: DashboardSegment[] = ['overview', 'design', 'settings', 'guests', 'analytics', 'profile', 'upgrade'];
+    const allowed: DashboardSegment[] = ['overview', 'design', 'settings', 'video', 'guests', 'analytics', 'profile', 'upgrade'];
     return allowed.includes(tab as DashboardSegment) ? (tab as DashboardSegment) : 'overview';
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -351,9 +351,11 @@ export default function App() {
           {activeSegment === 'video' && (
             <VideoInvitationStudio
               wedding={wedding.weddingData}
+              guests={wedding.guests || []}
               slug={slug}
               user={auth.currentUser}
               onOpenEnterprise={() => setActiveSegment('upgrade')}
+              onSettingsChange={(videoStudio) => wedding.setWeddingData((prev) => ({ ...prev, videoStudio }))}
             />
           )}
 

@@ -63,7 +63,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
             <p className="rh-eyebrow">TEMA UNTUK CERITA KALIAN</p>
             <HeadingTag id="themes-heading">
               {isCatalog
-                ? `Semua ${AVAILABLE_THEMES.length} tema undangan`
+                ? `${AVAILABLE_THEMES.length} tema undangan`
                 : "Temukan yang terasa pas."}
             </HeadingTag>
           </div>

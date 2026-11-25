@@ -62,3 +62,12 @@ Audit teks Remotion/AfterEffects di main menemukan UI pada App.tsx dan VideoInvi
 bukan komponen marketing landing. PR17 A sudah mengganti area itu. B tidak menyentuh file
 A atau mengiklankan implementasi PR17 sebelum keputusan pemilik/integrasi. Komentar kode
 pada tema dilindungi bukan klaim marketing dan tidak diedit.
+
+## Tindak lanjut QA A158 dan maina00ce96
+
+Katalog/picker/pricing/legacy routes telah lulus QA browser A158 (390/1280). Ditemukan
+bugdefault baru yang masihrfx-dark; kini Pasundan untuk initialempty/akunpertama/proyekbaru,
+undangantersimpan tetap memakai IDnya. Countercopy dirapikan. Maina00ce96 (PR17 merged
+pihaklain) disinkronkan KE branchreview sebelum validasi baru; tidak mengubah sourceA.
+Tesactualhook/Reactpicker/SSR/TypeScript/buildNextNode22 lulus; defaultbaru belumQA A.
+Lihat B-CATALOG-DEFAULT-FOLLOWUP.md. Harga/kuota/renderer/tema/aset/ZoomLock tetap.

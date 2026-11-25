@@ -74,7 +74,11 @@ RuangHadir beroperasi dengan model bisnis **2-Tier yang transparan**:
 
 ## 6. iOS 26 Liquid Glass UI & Enterprise Video Studio (v2.3.0)
 - **Global Design Language**: All SaaS marketing, authentication, and dashboard surfaces follow an iOS 26 Liquid Glass aesthetic (`.glx*` Tailwind v4 utilities, specular top-rim lighting, `backdrop-filter: blur() saturate()`, `#007AFF` primary system blue, `#1D1D1F` label typography, and `prefers-reduced-transparency` fallback).
-- **Make Your Invitation Video (Enterprise-Only)**:
-  - Auto-populates active wedding invitation data (couple names, event date/time, venue, invitation URL) into a 4-scene, 30fps animated composition.
-  - Supports `9:16` (1080×1920 Reels/TikTok/WhatsApp Status), `1:1` (1080×1080), and `16:9` (1920×1080) outputs.
-  - Free-tier users may preview their composition with an Enterprise Preview badge; watermark-free HD rendering and Remotion JSON Render Spec export are strictly unlocked for verified Enterprise accounts (`admin@ruanghadir.net`).
+- **Video Undangan (Enterprise)** — diperbarui 26 Nov 2026, lihat `docs/collaboration/A-ENTERPRISE-VIDEO.md`:
+  - Film 18 detik, 30 fps, otomatis dari data undangan (nama, orang tua, foto, galeri, acara, tanggal, lokasi, slug), 3 tema: Javanese Classic, Grand Ballroom, Luxury Love Pink.
+  - Unduhan dirender frame demi frame dari komposisi yang sama dengan pratinjau (bukan rekaman layar), MP4 H.264 + AAC; WebM hanya bila browser tidak bisa membuat H.264.
+  - Format `9:16` (1080×1920), `1:1` (1080×1080), `16:9` (1920×1080); kualitas Cepat 720p tersedia.
+  - Musik: musik undangan, musik khusus video (unggah), atau tanpa musik; titik mulai, volume, fade otomatis.
+  - Versi personal per tamu (nama tamu tampil di film dan di nama file).
+  - Pengaturan studio tersimpan di data undangan (`weddingData.videoStudio`).
+  - Akun non-Enterprise hanya pratinjau berwatermark; render & unduh khusus Enterprise.

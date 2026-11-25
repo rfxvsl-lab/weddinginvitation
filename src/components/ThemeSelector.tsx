@@ -82,7 +82,7 @@ export default function ThemeSelector({
         <div>
           <div className="flex items-center gap-2 text-[12px] font-medium text-[var(--rh-primary)]">
             <Palette className="h-3.5 w-3.5" />
-            <span>Semua {AVAILABLE_THEMES.length} Tema Gratis</span>
+            <span>{AVAILABLE_THEMES.length} Tema Gratis</span>
           </div>
           <h2 className="mt-1 font-serif text-[24px] leading-tight text-[var(--rh-ink)]">
             Pilih Tema Undangan

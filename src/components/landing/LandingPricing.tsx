@@ -5,7 +5,7 @@ import { ENTERPRISE_CONTACT_EMAIL, PACKAGE_LIMITS } from "@/lib/packageLimits";
 import { AVAILABLE_THEMES } from "@/lib/availableThemes";
 
 const FREE = [
-  `Semua ${AVAILABLE_THEMES.length} tema undangan`,
+  `${AVAILABLE_THEMES.length} tema undangan`,
   "Tamu dan tautan bernama tanpa batas",
   "RSVP, ucapan, galeri, musik, dan amplop digital",
   "Check in QR serta ekspor CSV/PDF",
