@@ -17,8 +17,8 @@ for(const [name,Component] of Object.entries(mod.exports)){
  // React may prepend image preload hints before the page root.
  assert.match(html,/<div class="saas-scope rh-product rh-marketing min-h-screen [^"]*">/,`${name} owns scope on direct render`);
  assert.match(html,/class="rh-landing-nav"/);assert.match(html,/class="rh-landing-footer"/);
- if(name==='catalog'){assert.equal((html.match(/class="rh-theme-card"/g)||[]).length,13);assert.match(html,/<h1/);}
- if(name==='home')assert.equal((html.match(/class="rh-theme-card"/g)||[]).length,6);
+ if(name==='catalog'){assert.equal((html.match(/class="rh-theme-card"/g)||[]).length,2);assert.match(html,/<h1/);}
+ if(name==='home')assert.equal((html.match(/class="rh-theme-card"/g)||[]).length,2);
  if(['refund','privacy','cookie','terms'].includes(name))assert.match(html,/saas-doc/);
 }
 const surface=fs.readFileSync('src/components/landing/MarketingSurface.tsx','utf8');assert.match(surface,/import "\.\/marketing\.css"/,'scope and stylesheet share one dependency');
@@ -26,5 +26,5 @@ const sources=cp.execFileSync('rg',['-l','LandingNav|LandingFooter','src','--glo
 for(const p of sources)assert.match(fs.readFileSync(p,'utf8'),/<MarketingSurface/,'new chrome consumers must use styled shell: '+p);
 for(const p of Object.values(files).filter(p=>/policy|terms-of-service/.test(p)))assert.equal(fs.readFileSync(p,'utf8'),cp.execFileSync('git',['show',`origin/main:${p}`],{encoding:'utf8'}),'legal policy content unchanged');
 for(const p of ['src/app/(marketing)/preview/[themeId]/page.tsx','src/app/(marketing)/layout.tsx'])assert.equal(fs.readFileSync(p,'utf8'),cp.execFileSync('git',['show',`origin/main:${p}`],{encoding:'utf8'}),'shared route group / invitation demo not scoped');
-console.log('PASS: actual home/catalog/four legal/404 direct-entry SSR owns CSS scope; all chrome consumers covered; catalog13/home6; legal contents and invitation routes unchanged.');
+console.log('PASS: actual home/catalog/four legal/404 direct-entry SSR owns CSS scope; all chrome consumers covered; catalog2/home2; legal contents and invitation routes unchanged.');
 console.log('Limit: mocked Next primitives/static SSR; geometry, CSS delivery, menu interaction and route navigation need browser QA.');

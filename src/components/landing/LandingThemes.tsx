@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { DEFAULT_THEMES } from "@/data/defaultData";
+import { AVAILABLE_THEMES, hasAvailableThemeCategory } from "@/lib/availableThemes";
 import { THEME_CATEGORY_LABEL } from "./themeShots";
 import { themeShot } from "@/themes/shots";
 import { isNewTheme } from "@/themes/catalog";
@@ -18,14 +18,7 @@ const FILTERS = [
   ["minimalist", "Minimalis"],
   ["storybook", "Interaktif"],
 ] as const;
-const FEATURED = [
-  "sage-garden",
-  "javanese-classic",
-  "royal-arabian",
-  "grand-ballroom",
-  "storybook",
-  "rfx-dark",
-];
+const FEATURED = ["sunda-kujang", "storybook-interactive"];
 
 type LandingThemesProps = {
   /** teaser: beranda, 6 pilihan + tautan ke katalog. catalog: halaman /preview, semua tema. */
@@ -36,7 +29,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
   const isCatalog = variant === "catalog";
   const [filter, setFilter] = useState<string>("all");
   const matching = useMemo(() => {
-    const sorted = [...DEFAULT_THEMES].sort(
+    const sorted = [...AVAILABLE_THEMES].sort(
       (a, b) =>
         Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) ||
         (b.addedAt || "").localeCompare(a.addedAt || ""),
@@ -48,7 +41,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
           : theme.pattern === filter,
       );
     const picks = FEATURED.flatMap(
-      (id) => DEFAULT_THEMES.find((theme) => theme.id === id) || [],
+      (id) => AVAILABLE_THEMES.find((theme) => theme.id === id) || [],
     );
     return [
       ...picks,
@@ -70,12 +63,12 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
             <p className="rh-eyebrow">TEMA UNTUK CERITA KALIAN</p>
             <HeadingTag id="themes-heading">
               {isCatalog
-                ? `Semua ${DEFAULT_THEMES.length} tema undangan`
+                ? `Semua ${AVAILABLE_THEMES.length} tema undangan`
                 : "Temukan yang terasa pas."}
             </HeadingTag>
           </div>
           <p>
-            Dari nuansa adat sampai taman yang hangat. Buka contoh undangannya,
+            Pasundan dan Heirloom Storybook. Buka contoh undangannya,
             rasakan setiap detailnya.
           </p>
         </div>
@@ -84,7 +77,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
           aria-label="Filter kategori tema"
           className="rh-theme-filters"
         >
-          {FILTERS.map(([key, label]) => (
+          {FILTERS.filter(([key]) => hasAvailableThemeCategory(key)).map(([key, label]) => (
             <button
               key={key}
               type="button"
@@ -100,7 +93,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
           {filter === "all"
             ? isCatalog
               ? `${shown.length} tema`
-              : `${shown.length} pilihan dari ${DEFAULT_THEMES.length} tema`
+              : `${shown.length} pilihan dari ${AVAILABLE_THEMES.length} tema`
             : `${shown.length} dari ${matching.length} tema ${FILTERS.find(([key]) => key === filter)?.[1]}`}
           {" · Semua tersedia dalam Akses Awal"}
         </p>
@@ -141,7 +134,7 @@ export function LandingThemes({ variant = "teaser" }: LandingThemesProps) {
             </Link>
           ) : (
             <Link href="/preview" className="rh-action">
-              Jelajahi semua {DEFAULT_THEMES.length} tema{" "}
+              Jelajahi semua {AVAILABLE_THEMES.length} tema{" "}
               <ArrowRight size={16} aria-hidden />
             </Link>
           )}

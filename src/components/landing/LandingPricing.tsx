@@ -2,10 +2,10 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ENTERPRISE_CONTACT_EMAIL, PACKAGE_LIMITS } from "@/lib/packageLimits";
-import { DEFAULT_THEMES } from "@/data/defaultData";
+import { AVAILABLE_THEMES } from "@/lib/availableThemes";
 
 const FREE = [
-  `Semua ${DEFAULT_THEMES.length} tema undangan`,
+  `Semua ${AVAILABLE_THEMES.length} tema undangan`,
   "Tamu dan tautan bernama tanpa batas",
   "RSVP, ucapan, galeri, musik, dan amplop digital",
   "Check in QR serta ekspor CSV/PDF",
