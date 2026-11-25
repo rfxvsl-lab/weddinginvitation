@@ -52,3 +52,49 @@ ZoomLock tetap. Perlindungan preview tidak diberi pengecualian pada patch ini.
   masih backlog terpisah dengan perhatian pada alertmodal bertingkat.
 
 Serahkan draft PR saja; tidak auto-merge main atau deploy aplikasi produksi.
+
+## QA A90 dan integrasi review A91/B92
+
+A90 menguji ac50117 di Chromium dev lokal. Diagnosis baseline kini dikonfirmasi A:
+main67b89b7 pada390×844 memiliki margin-bottom24px (bukan margin-top) dari Tailwindv4
+space-y-6; overlay inset0 menjadi820px. Kandidat PR8 marginbottom0, top0 dan bottom sama
+persis viewport pada360×740,390×640,390×844,1280×860; QR dapat ditutup.
+
+| QA A90 | Hasil yang dilaporkan |
+|---|---|
+| Kontrol export | CSV, Cetak dan Batal dapat dicapai via scroll di4ukuran termasuk390×640 |
+| Canvas horizontal | scrollLeft0→max516/486/486/268, sesuai scrollWidth-clientWidth |
+| Canvas vertikal | scrollTop mencapai956/992/919/518, kedua tepi dapat dijangkau |
+| Tepi kiri | Konten mulai24px dari tepi area, tidak terpotong |
+| Semantik canvas | Region bernama, tabindex0 |
+| Warna | Accentcheckbox rgb23,107,91; tidak ada teks keunguan di overlay |
+| CSV / error | FileCSV terunduh,0pageerror |
+
+Ini QA A, bukan pengulangan browser B, HPfisik, pembaca layar atau dialogprintfisik.
+A91 juga menguji source gabungan PR7f0722f7+PR8ac50117 pada c276564: kartu360–1440 dan
+tabel1920 tanpa aksi tersembunyi/overflow, overlay tepatviewport di4ukuran, canvas dapat
+digeser penuh, tombol terjangkau dan CSV terunduh tanpa pageerror. A melaporkan tsc lulus.
+
+B menerima arah integrasi tetapi tidak menjalankan saran merge main. Sesuai scope92,
+B menggabungkan parentPR7 ke branch REVIEW PR8 agar konflik tidak diserahkan mentah ke
+pemilik. Konflik nyata: product.css, CHANGE-PLAN dan ROOM. Resolusi CSS eksplisit adalah
+main + blokPR7 lengkap (termasuk penutup @media screen) + blokPR8 lengkap. GuestManager
+automerge, ProjectSwitcher dariPR7. Seluruh3file aplikasi hasilnya BYTEIDENTIK dengan
+c276564 yang sudah diuji A, diperiksa memakai Pythonassert. Tidak ada patch source baru
+setelah hasil A; dokumen B dikonsolidasikan. PR7 tetap draft mandiri, tidak ditutup.
+
+B menjalankan ulang tes GuestSharing dan ProjectSwitcher existing, TypeScript, guard dan
+whitespace: lulus. Build integrasi Next Node22 lulus; warning DB/payment produksi belum dikonfigurasi. Actual
+print-section tetap dilindungi oleh perubahan terdahulu; renderer/tema/aset/font/harga/
+kuota/ZoomLock tidak berubah. Source marketing PR6 tidak masuk integrasi ini.
+
+PR8 setelah integrasi MEMUAT cakupan PR7; bukan lagi patch export saja. Kedua parent asli
+dipertahankan. Pemilik bisa meninjau PR7 lebih dahulu; sesudah itu hanya delta export dan
+dokumen yang tersisa pada PR8. B tidak auto-merge main atau deploy. Bila source berubah
+pada review berikutnya, hasil visual A91 tidak otomatis berlaku untuk source baru.
+
+Backlog copy lama A90: label "Mata Anggaran" pada ringkasan preview sebenarnya menampilkan
+jumlah baris tamu, bukan biaya ataupun jumlah pax. Calon label "Jumlah tamu" dengan unit
+nama, terpisah dari "Total pax". Belum diubah; jangan menyebutnya perhitungan biaya. QA
+keyboard penuh/fokus dialog, screenshotPR8 dan perangkat fisik masih belum diverifikasi
+B; screenshot baru diminta di92, belum dianggap ada. Bukti PR7 lama tersedia A19f3e24.
