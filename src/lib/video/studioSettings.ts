@@ -10,6 +10,7 @@ export interface ResolvedVideoSettings {
   quality: VideoQuality;
   guestId: string | null;
   music: { source: MusicSource; customUrl: string; customTitle: string; offsetSec: number; volume: number };
+  shared: { url: string; themeId: string; aspect: string; guestName?: string | null; bytes: number; createdAt: string } | null;
 }
 
 export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
@@ -18,6 +19,7 @@ export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
   quality: 'hd',
   guestId: null,
   music: { source: 'invitation', customUrl: '', customTitle: '', offsetSec: 0, volume: 0.85 },
+  shared: null,
 };
 
 const ASPECTS: VideoAspectId[] = ['9:16', '1:1', '16:9'];
@@ -43,6 +45,17 @@ export function resolveVideoSettings(raw?: VideoStudioSettings | null): Resolved
       offsetSec: clamp(m?.offsetSec, 0, 600, 0),
       volume: clamp(m?.volume, 0, 1, d.music.volume),
     },
+    shared:
+      raw?.shared && typeof raw.shared.url === 'string' && /^https:\/\//.test(raw.shared.url)
+        ? {
+            url: raw.shared.url,
+            themeId: String(raw.shared.themeId || ''),
+            aspect: String(raw.shared.aspect || ''),
+            guestName: raw.shared.guestName ?? null,
+            bytes: Number(raw.shared.bytes) || 0,
+            createdAt: String(raw.shared.createdAt || ''),
+          }
+        : null,
   };
 }
 

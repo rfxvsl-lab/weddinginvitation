@@ -84,6 +84,15 @@ export interface VideoStudioSettings {
     /** 0..1 */
     volume?: number;
   };
+  /** Video terakhir yang diunggah untuk dibagikan lewat tautan. */
+  shared?: {
+    url: string;
+    themeId: string;
+    aspect: string;
+    guestName?: string | null;
+    bytes: number;
+    createdAt: string;
+  } | null;
 }
 
 export interface WeddingData {

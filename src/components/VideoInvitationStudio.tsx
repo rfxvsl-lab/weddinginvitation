@@ -27,6 +27,9 @@ import {
   Volume2,
   VolumeX,
   Gauge,
+  Link2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { isEnterpriseTier, ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits';
 import EnterpriseMotionPlayer, {
@@ -47,7 +50,7 @@ import {
   type MusicSource,
 } from '@/lib/video/studioSettings';
 import type { ExportFilmResult } from '@/lib/video/exportVideo';
-import { uploadWeddingAudio } from '@/lib/cloudinary';
+import { uploadWeddingAudio, uploadInvitationVideo } from '@/lib/cloudinary';
 
 interface VideoInvitationStudioProps {
   wedding: WeddingData;
@@ -295,6 +298,8 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
 
   // ---- Render ----
   const stageRef = useRef<ExportStageHandle>(null);
+  /** Nama tamu pada hasil render tunggal terakhir (untuk metadata tautan). */
+  const stageGuestNameForResult = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [result, setResult] = useState<RenderResult | null>(null);
   const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
@@ -446,6 +451,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
       }
 
       if (!batch && last) {
+        stageGuestNameForResult.current = targets[0]?.name ?? null;
         const file = new File([last.out.blob], last.name, { type: last.out.mimeType });
         setResult({ url: URL.createObjectURL(last.out.blob), file, meta: last.out, withMusic: !!last.out.audioCodec });
       } else if (batch) {
@@ -507,6 +513,45 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
       await navigator.share({ files: [result.file], title: `Undangan ${coupleData.groom} & ${coupleData.bride}` });
     } catch {
       /* dibatalkan pengguna */
+    }
+  };
+
+  const [videoUpload, setVideoUpload] = useState<number | null>(null);
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+  /** URL blob hasil render yang sudah dibuatkan tautan (supaya tombol tidak muncul lagi). */
+  const [sharedResultUrl, setSharedResultUrl] = useState<string | null>(null);
+  const saveVideoLink = async () => {
+    if (!result || videoUpload !== null) return;
+    setVideoUploadError(null);
+    setVideoUpload(0);
+    try {
+      const res = await uploadInvitationVideo(result.file, (p) => setVideoUpload(p));
+      update({
+        shared: {
+          url: res.secureUrl,
+          themeId,
+          aspect: aspectId,
+          guestName: stageGuestNameForResult.current,
+          bytes: res.bytes || result.file.size,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      setSharedResultUrl(result.url);
+    } catch (e) {
+      setVideoUploadError(`Video gagal diunggah: ${(e as Error)?.message || 'jaringan'}. File tetap bisa diunduh.`);
+    } finally {
+      setVideoUpload(null);
+    }
+  };
+  const copyVideoLink = async () => {
+    if (!settings.shared) return;
+    try {
+      await navigator.clipboard.writeText(settings.shared.url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setVideoUploadError('Browser menolak menyalin otomatis. Salin tautan secara manual dari kotak di atas.');
     }
   };
 
@@ -1041,6 +1086,44 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
                         : 'Render video'}
                 </button>
 
+                {settings.shared?.url && !isRendering && (
+                  <div className="space-y-2 rounded-2xl bg-white/70 border border-white/90 p-3.5">
+                    <p className="text-[12px] font-semibold text-[var(--rh-ink)]">Tautan video</p>
+                    <input
+                      readOnly
+                      value={settings.shared.url}
+                      onFocus={(e) => e.currentTarget.select()}
+                      aria-label="Tautan video"
+                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-[12px] text-[var(--rh-ink)]"
+                    />
+                    <p className="text-[11px] text-[var(--rh-muted)]">
+                      {VIDEO_THEMES.find((x) => x.id === settings.shared?.themeId)?.name || settings.shared.themeId} · {settings.shared.aspect}
+                      {settings.shared.guestName ? ` · untuk ${settings.shared.guestName}` : ''} · {formatBytes(settings.shared.bytes)}. Siapa pun yang punya tautan ini bisa menonton videonya.
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={copyVideoLink}
+                        className="flex items-center justify-center gap-1.5 rounded-full bg-white border border-black/10 px-3 py-2 text-[12px] font-semibold text-[var(--rh-ink)] hover:bg-white/80"
+                      >
+                        {linkCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {linkCopied ? 'Tersalin' : 'Salin tautan'}
+                      </button>
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(`Video undangan ${coupleData.groom} & ${coupleData.bride}: ${settings.shared.url}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 rounded-full bg-[#1F7A4D] px-3 py-2 text-[12px] font-semibold text-white hover:bg-[#186A42]"
+                      >
+                        <Share2 className="h-3.5 w-3.5" /> WhatsApp
+                      </a>
+                    </div>
+                    <button type="button" onClick={() => update({ shared: null })} className="text-[11.5px] font-semibold text-[var(--rh-ink-2)] hover:underline">
+                      Sembunyikan tautan (file tetap tersimpan)
+                    </button>
+                  </div>
+                )}
+                {videoUploadError && <p className="text-[12px] font-medium text-[#8C1D18]">{videoUploadError}</p>}
+
                 {error && (
                   <div className="rounded-2xl bg-[#B3261E]/8 border border-[#B3261E]/20 p-3.5 space-y-2.5" role="alert">
                     <p className="flex items-start gap-2 text-[12.5px] font-medium text-[#8C1D18]">
@@ -1124,6 +1207,17 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
                         </button>
                       )}
                     </div>
+                    {sharedResultUrl === result.url ? null : (
+                      <button
+                        type="button"
+                        onClick={saveVideoLink}
+                        disabled={videoUpload !== null}
+                        className="flex w-full items-center justify-center gap-1.5 rounded-full bg-white border border-black/10 px-4 py-2.5 text-[12.5px] font-semibold text-[var(--rh-ink)] hover:bg-white/80 disabled:opacity-60"
+                      >
+                        {videoUpload !== null ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
+                        {videoUpload !== null ? `Mengunggah ${videoUpload}%` : 'Buat tautan video'}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
