@@ -13,6 +13,7 @@
  *   alert.info('Info', 'Keterangan tambahan.');
  */
 
+import { useDialogFocus } from './useDialogFocus';
 import React, { useState, useCallback, createContext, useContext, useRef, useEffect } from 'react';
 import {
   PiCheckCircleDuotone as CheckCircle,
@@ -75,14 +76,11 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
   const theme = THEME[alert.type];
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape key
+  useDialogFocus(true, modalRef, onClose);
+  // A queued alert replaces content without unmounting the dialog. Focus its action.
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+    modalRef.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+  }, [alert]);
 
   // Close on backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -103,6 +101,7 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
       {/* Modal */}
       <div
         ref={modalRef}
+        tabIndex={-1}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="rh-alert-title"
@@ -151,7 +150,6 @@ function AlertModalOverlay({ alert, onClose }: { alert: AlertData; onClose: () =
             ) : (
               <button
                 onClick={() => { alert.onAction?.(); onClose(); }}
-                autoFocus
                 className={`w-full py-3 ${theme.buttonBg} text-white text-xs font-bold rounded-lg transition-all cursor-pointer`}
               >
                 {alert.buttonText || 'Mengerti'}
