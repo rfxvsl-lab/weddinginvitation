@@ -60,6 +60,13 @@ export default function SehariLayout({ data, guest, embedded = false, rsvps, onA
   const heroPhoto = data.bgImageUrl || photos[0] || groom.photoUrl;
   const limit = Math.max(1, guest?.paxLimit || 10);
   useEffect(() => { if (opened && !embedded) hero.current?.focus({ preventScroll: true }); }, [opened, embedded]);
+  // srcdoc resolves plain #fragments against the parent URL. Keep section jumps
+  // inside the document that owns the clicked link, including nested previews.
+  function navigateSection(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    const id = e.currentTarget.getAttribute('href')?.slice(1);
+    if (id) e.currentTarget.ownerDocument.getElementById(id)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }
   async function music() {
     if (!audio.current) return;
     if (playing) { audio.current.pause(); setPlaying(false); }
@@ -83,7 +90,7 @@ export default function SehariLayout({ data, guest, embedded = false, rsvps, onA
       <Photo url={data.ogImageUrl || heroPhoto} alt={`Potret ${names}`} className={s.coverPhoto} loading="eager" />
       <div className={s.coverPaper}><p className={s.eyebrow}>Sebuah hari, sebuah awal</p><h1>{groom.nickname || groom.fullName}<em>&</em>{bride.nickname || bride.fullName}</h1><p>{date(mainDate)}</p><div className={s.guest}><small>Kepada yang terkasih</small><p>{guest?.name || 'Tamu Undangan'}</p></div><button data-kit-open onClick={open}>Buka undangan <span aria-hidden>↗</span></button></div>
     </section> : <>
-      <nav className={s.nav} aria-label="Bagian undangan"><a href="#sehari-couple">Mempelai</a><a href="#sehari-events">Acara</a><a href="#sehari-rsvp">Kehadiran</a></nav>
+      <nav className={s.nav} aria-label="Bagian undangan"><a href="#sehari-couple" onClick={navigateSection}>Mempelai</a><a href="#sehari-events" onClick={navigateSection}>Acara</a><a href="#sehari-rsvp" onClick={navigateSection}>Kehadiran</a></nav>
       <main>
         <section ref={hero} tabIndex={-1} className={s.hero} id="sehari-home"><div className={s.heroTitle}><p className={s.eyebrow}>Kami mengundangmu merayakan</p><h1>{groom.nickname || groom.fullName}<em>dan</em>{bride.nickname || bride.fullName}</h1><p>{date(mainDate)} <span aria-hidden>·</span> {events[0]?.venueName}</p></div><Photo url={heroPhoto} alt={`Kebersamaan ${names}`} className={s.heroPhoto} loading="eager" /><p className={s.caption}>Sehari untuk dirayakan. Selamanya untuk dijalani.</p></section>
         {data.quoteText && <section className={s.quote}><p className={s.eyebrow}>Tentang sebuah janji</p><blockquote>{data.quoteText}</blockquote>{data.quoteSource && <cite>{data.quoteSource}</cite>}</section>}

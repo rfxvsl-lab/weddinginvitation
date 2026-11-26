@@ -19,6 +19,18 @@ const html=renderToStaticMarkup(React.createElement(Theme,{data:input,embedded:t
 assert.ok(html.includes(input.couple.groom.fullName));assert.ok(!html.includes('Lihat foto 1'));assert.ok(!html.includes('Lihat informasi tanda kasih'));assert.ok(!html.includes('Akad Nikah'));assert.ok(!html.includes('<svg'));assert.ok(html.includes('Sebuah cerita tentang kita.'));
 let root;let sent=[];let mode='fail';let release;
 await act(async()=>{root=create(React.createElement(Theme,{data,rsvps:[],embedded:true,guest:{name:'Tamu',id:'test',paxLimit:2},onAddRSVP:r=>{sent.push(r);if(mode==='fail')throw Error('offline');return new Promise(resolve=>{release=resolve;});}}));});
+// Invoke actual navigation handlers with an iframe document distinct from the parent.
+const navigation = root.root.findByType('nav').findAllByType('a');
+assert.equal(navigation.length, 3);
+for (const link of navigation) {
+ assert.equal(typeof link.props.onClick, 'function', 'fragment links must intercept srcdoc navigation');
+ const expectedId = link.props.href.slice(1);let prevented=false;const visits=[];
+ const ownerDocument={getElementById(id){visits.push(id);return {scrollIntoView(options){visits.push(options);}};}};
+ link.props.onClick({preventDefault(){prevented=true;},currentTarget:{ownerDocument,getAttribute(){return link.props.href;}}});
+ assert.ok(prevented);assert.deepEqual(visits,[expectedId,{behavior:'auto',block:'start'}]);
+ // A missing section still must not navigate/reload the iframe.
+ prevented=false;link.props.onClick({preventDefault(){prevented=true;},currentTarget:{ownerDocument:{getElementById(){return null;}},getAttribute(){return link.props.href;}}});assert.ok(prevented);
+}
 const form=()=>root.root.findByType('form');const fields=()=>root.root.findAllByType('input');
 await act(async()=>{fields()[0].props.onChange({target:{value:'Nama Tamu'}});root.root.findByType('textarea').props.onChange({target:{value:'Bahagia selalu'}});fields()[1].props.onChange({target:{value:'8'}});});
 await act(async()=>{await form().props.onSubmit({preventDefault(){}});});
