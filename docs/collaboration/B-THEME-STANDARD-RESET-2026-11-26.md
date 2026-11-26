@@ -57,3 +57,32 @@ Kalender memakai Google Calendar all-day dengan jam WIB dalam detail; import kal
 - `git diff --check`: PASS; file renderer/seni tema lama tidak berubah. Wiring katalog/dispatch diperiksa untuk tambahan ID saja.
 
 Status: **kandidat implementasi untuk review**, belum lulus visual/QA browser, belum siap rilis. Tindak lanjut: ambil screenshot tiap bagian dan rekaman scroll pada viewport STANDARD, periksa CSS iframe dan nama panjang di browser, lalu minta penilaian pemilik atas satu kandidat. Tidak membuat tema kedua untuk menutupi kekurangan kandidat pertama. Tidak merge main/deploy produksi.
+
+## Pemeriksaan lanjutan — 26 November 2026
+
+PR20 head `928102b` menerima status GitHub `Vercel: failure`, target deployment
+`https://vercel.com/rfxvsls-projects/ruangundang/Fo7FQ85Af8PFuRDcvyQWW3PgZCtp`.
+Komentar bot mencatat Error pada 22:07 WIB. Tidak ada URL preview berhasil pada
+komentar itu. Halaman detail deployment mengarah ke login Vercel, jadi penyebab
+gagal belum diketahui; tidak menyimpulkan ini error tema, konfigurasi, atau izin.
+Tidak login/mengubah akses/redeploy produksi untuk menebak penyebab.
+
+Pemeriksaan independen: dependensi worktree dijadikan direktori lokal dari paket
+yang sudah ada, tanpa mengubah package.json/package-lock.json. `npm run build`
+standar (Next16.2.9 Turbopack, Node24.22.3) kemudian PASS exit0; sebelumnya yang
+diverifikasi baru build webpack. Ini membuktikan kode dapat dibuild dalam kedua
+mode pada lingkungan lokal, bukan membuktikan deployment Vercel sehat atau
+CSS/gerak sudah lolos review visual. Warning konfigurasi payment dan tabel sitemap
+DB lokal tetap seperti yang dicatat sebelumnya. Generated next-env dikembalikan
+ke versi incoming branch. Tidak ada perubahan kode aplikasi atau konfigurasi.
+
+Tindak lanjut yang masih terbuka: periksa log deployment pada akun Vercel yang
+berwenang; sediakan lingkungan browser yang berjalan untuk screenshot per bagian,
+rekaman scroll dan QA CSS iframe. Jangan memberikan URL preview yang ditebak atau
+menyatakan build lokal menggantikan bukti visual tersebut.
+
+Pembaruan target runtime: Node22.23.5 diperoleh dari paket resmi npm `node@22`
+untuk pengujian lokal, tanpa perubahan manifest/lockfile. Build Next Turbopack
+pada Node22.23.5 PASS exit0, termasuk TypeScript dan generasi halaman. Tes komponen
+`check-sehari-theme.mjs` juga PASS pada Node22. Ini menutup batas target runtime
+yang disebut pada pemeriksaan awal; batas browser/visual/Vercel tetap terbuka.
