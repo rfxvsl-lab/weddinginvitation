@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import { buildSync } from 'esbuild';
+import { createRequire } from 'node:module';
+import fs from 'node:fs';
+import Module from 'node:module';
+const require = createRequire(import.meta.url);
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+const { create, act } = require('react-test-renderer');
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+const css = fs.readFileSync('src/themes/sehari/sehari.module.css', 'utf8');
+const result = buildSync({ stdin: { contents: "export {default as Theme} from './src/themes/sehari/SehariLayout';export {DEFAULT_WEDDING_DATA as data,DEFAULT_THEMES as themes} from './src/data/defaultData';", resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, platform: 'node', format: 'cjs', packages: 'external', loader: { '.css': 'empty' }, outfile: '/tmp/sehari-test.cjs', write: false });
+const mod = new Module(`${process.cwd()}/scripts/sehari-test.cjs`); mod.paths = require.resolve.paths('react');mod._compile(result.outputFiles.find(f=>f.path.endsWith('.cjs')).text, `${process.cwd()}/scripts/sehari-test.cjs`);
+const { Theme, data, themes } = mod.exports;
+assert.equal(themes.filter(t => t.id === 'sehari-selamanya').length, 1);
+assert.equal(themes.length, 14, '13 existing IDs plus one addition');
+const input = structuredClone(data);input.couple.groom.fullName = 'Nama Mempelai Sangat Panjang '.repeat(5);input.couple.groom.photoUrl='';input.gallery=[];input.gifts=[];input.loveStories=[];input.quoteText='';input.events.akad.enabled=false;input.events.resepsi.date='2026-99-99';input.musicUrl='';
+const html=renderToStaticMarkup(React.createElement(Theme,{data:input,embedded:true,rsvps:[],onAddRSVP(){}}));
+assert.ok(html.includes(input.couple.groom.fullName));assert.ok(!html.includes('Lihat foto 1'));assert.ok(!html.includes('Lihat informasi tanda kasih'));assert.ok(!html.includes('Akad Nikah'));assert.ok(!html.includes('<svg'));assert.ok(html.includes('Sebuah cerita tentang kita.'));
+let root;let sent=[];let mode='fail';let release;
+await act(async()=>{root=create(React.createElement(Theme,{data,rsvps:[],embedded:true,guest:{name:'Tamu',id:'test',paxLimit:2},onAddRSVP:r=>{sent.push(r);if(mode==='fail')throw Error('offline');return new Promise(resolve=>{release=resolve;});}}));});
+const form=()=>root.root.findByType('form');const fields=()=>root.root.findAllByType('input');
+await act(async()=>{fields()[0].props.onChange({target:{value:'Nama Tamu'}});root.root.findByType('textarea').props.onChange({target:{value:'Bahagia selalu'}});fields()[1].props.onChange({target:{value:'8'}});});
+await act(async()=>{await form().props.onSubmit({preventDefault(){}});});
+assert.equal(sent[0].paxCount,2);assert.ok(JSON.stringify(root.toJSON()).includes('belum berhasil'));
+mode='pending';let promise;
+await act(async()=>{promise=form().props.onSubmit({preventDefault(){}});await Promise.resolve();});
+assert.ok(root.root.findAllByType('button').some(b=>b.props.disabled));
+await act(async()=>{release();await promise;});
+assert.ok(JSON.stringify(root.toJSON()).includes('Ucapan diteruskan ke halaman undangan.'));assert.equal(root.root.findByType('textarea').props.value,'');
+await act(async()=>root.unmount());
+assert.ok(css.includes('prefers-reduced-motion:no-preference'));assert.ok(css.includes('font-size:16px'));assert.ok(css.includes('overflow-wrap:anywhere'));
+const luminance = hex => {
+ const rgb=hex.match(/[0-9a-f]{2}/gi).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
+ return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
+};
+for(const [a,b] of [['#22352e','#faf6ed'],['#faf6ed','#183fc4'],['#22352e','#efce61'],['#22352e','#e6ecdf']]) {
+ const la=luminance(a),lb=luminance(b);assert.ok((Math.max(la,lb)+.05)/(Math.min(la,lb)+.05)>=4.5,`${a} on ${b}`);
+}
+console.log('PASS: 14 registered themes, SSR optional/invalid data/fallback, RSVP throw/pending/success and guest limit. CSS tokens inspected; no browser layout or storage persistence claimed.');
