@@ -25,3 +25,39 @@ Semua tiga tautan bagian kini memanggil handler yang mencegah navigasi default d
 - Tes handler dengan document stub bukan browser iframe nyata. Verifikasi klik ketiga menu pada deployment perbaikan tetap diperlukan; jangan mengklaim perbaikan sudah live atau lulus browser hanya karena tes hijau.
 
 Tidak menggabungkan PR sendiri, tidak deploy produksi. Main yang sudah dirilis oleh aktor lain hanya dibaca. Kualitas visual seluruh bagian serta ukuran mobile/reduced motion/gesture tetap backlog pengujian nyata, bukan dianggap selesai dari perbaikan navigasi ini.
+
+## QA publik lanjutan — 27 November 2026
+
+Repo/main tetap7fcb1ae; PR21 head6fa694a masih open/draft dan komentar Vercel
+menyatakan Ready. Ini bukan bukti PR21 sudah dirilis ke halaman publik. B memakai
+halaman demo publik versi main untuk melanjutkan QA fitur yang tidak diubah oleh
+fix navigasi. Menu anchor tidak diklik ulang; tidak menganggap hasil ini sebagai
+QA browser atas handler PR21.
+
+Lingkungan CUA Chrome desktop1363×936, iframe430px. Pemeriksaan nyata:
+
+- Buka sampul, lalu scroll biasa ke profil, acara, galeri, RSVP, dan penutup. Screenshot
+  diamati pada tool untuk profil/acara/galeri/modal/RSVP/penutup; tidak disimpan
+  sebagai artefak repo dan bukan rekaman penuh alur scroll.
+- Galeri foto1 terbuka; Berikutnya mengubah foto/counter menjadi2/9; Sebelumnya
+  kembali1/9. Tombol Tutup berfungsi. Escape pada pembukaan terpisah menutup
+  dialog dan fokus kembali ke tombol Lihat foto1, tanpa kembali ke sampul.
+- Disclosure tanda kasih terbuka dan memperlihatkan dua rekening serta alamat;
+  klik Salin nomor menampilkan status Nomor berhasil disalin. Isi clipboard tidak
+  dibaca kembali, jadi status UI dibuktikan, bukan perbandingan byte clipboard.
+- Isi nama QA RuangHadir dan ucapan uji pada halaman demo, Kirim ucapan menampilkan
+  status penerusan serta item ucapan, lalu mengosongkan textarea. Reload dan buka
+  lagi membuktikan ucapan uji hilang. Ini state demo React, bukan bukti simpan
+  RSVP ke DB produksi. Tidak memanggil validasi tiket atau mengirim data tamu nyata.
+- Pembacaan DOM lewat frameLocator pada iframe berjudul Undangan pernikahan:
+  width430, body.scrollWidth−clientWidth=0. Foto Salsa complete=true, naturalWidth1600,
+  kotak180.703125×280. Tidak ada img complete dengan naturalWidth0 pada pemeriksaan
+  setelah interaksi. Ruang foto yang sempat kosong tidak diklaim bug CSS permanen.
+- Penutup terlihat; GuestPass existing masih membawa gaya visualnya sendiri.
+  Keselarasan visual tambahan tersebut perlu review terpisah, bukan dinyatakan
+  tuntas hanya karena tema baru terbaca.
+
+Batas tersisa: browser pada deployment PR21, seluruh ukuran mobile/fisik, gesture
+ZoomLock, reduced-motion, data ekstrem di browser, screenshot tersimpan, rekaman
+scroll penuh, kegagalan clipboard di browser, dan jalur RSVP backend. Tidak ada
+perubahan source untuk hasil QA ini; build/tes kode tidak diulang. Tidak merge/deploy.
