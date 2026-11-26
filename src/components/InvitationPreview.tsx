@@ -38,6 +38,7 @@ import SpotiLoveLayout from './templates/SpotiLoveLayout';
 import JavaneseClassicLayout from './templates/JavaneseClassicLayout';
 import ParallaxCinematicLayout from './templates/ParallaxCinematicLayout';
 import StorybookInteractiveLayout from './templates/StorybookInteractiveLayout';
+import SehariLayout from '../themes/sehari/SehariLayout';
 import KitLayout from '../themes/kit/KitLayout';
 import DesktopInvitationWrapper from './layout/DesktopInvitationWrapper';
 import GuestPassSection from './GuestPassSection';
@@ -316,6 +317,13 @@ function InvitationPreviewContent({ data, themeId, onAddRSVP, rsvps, guest, embe
       />
     </>
   );
+
+  if (currentTheme.id === 'sehari-selamanya') {
+    return <SehariLayout data={data} guest={guest} onAddRSVP={onAddRSVP}
+      rsvps={rsvps} embedded={embedded}
+      extras={<GuestPassSection invitationId={invitationId} guest={guest} data={data}
+        accentColor={currentTheme.primaryHex} dark={false} />} />;
+  }
 
   if (currentTheme.layout === 'kit') {
     // tiket tamu dirender di dalam kolom undangan (agar ikut tata letak desktop)

@@ -1,76 +1,62 @@
-# Standar tema undangan RuangHadir
+# Standar tema RuangHadir — edisi 26 November 2026
 
-## Pembaruan pemilik — 24 November 2026
+Standar kerja B berdasarkan koreksi pemilik: tema lama tetap disimpan; bangun satu tema baru dengan standar baru. Dokumen ini menggantikan resep visual lama, bukan mengklaim desain baru sudah disetujui pemilik.
 
-Untuk **tema selanjutnya**, baca [QUALITY-V2.md](QUALITY-V2.md) dan [kesepakatan kolaborasi](../../COLLABORATION.md) terlebih dahulu. Bagian di bawah mendeskripsikan kontrak mesin existing; bukan izin merombak preview/tema yang sudah disukai pemilik. Jangan generate SVG atau ilustrasi generik dengan AI untuk memenuhi checklist. Tema baru memerlukan konsep, sumber aset yang jelas, dan QA visual. Teknik 2.5D/partikel/ornamen dipilih bila membantu konsep; jumlah efek bukan ukuran kualitas.
+## Satu standar kualitas, komposisi tiap tema berbeda
 
-Acuan: pola yang dipakai template premium di pasar Indonesia (Katsudoto, Satu Momen,
-Viding/Invitato). Tamu sudah terbiasa dengan alur ini, jadi semua tema reguler mengikutinya.
-Pembeda antartema ada di **seni, warna, huruf, ornamen, sampul, panggung pembuka, dan varian
-bagian**, bukan di urutan bagian. Tema Spesial (adegan 2D/2.5D) tetap memakai bab adegan sendiri.
+Yang diseragamkan: keterbacaan, ketepatan data, kontrol, ketahanan CSS, sumber aset, dan bukti QA. Hero 2.5D, font skrip, bingkai oval, kartu kaca, partikel, ikon, bunga, serta urutan bagian tertentu **tidak wajib**. Jangan mengulang halaman yang sama lalu mengganti palet. Dua tema harus dapat dibedakan melalui komposisi, pemakaian foto, hierarki teks, dan alur geraknya.
 
-Kode: `src/themes/kit/standardSections.tsx` (bagian), `Cover.tsx` (sampul),
-`standard.tsx` (navigasi bawah, tombol musik, lightbox, ornamen tepi, panel desktop),
-`src/components/layout/DesktopInvitationWrapper.tsx` (tata letak desktop).
+## Sebelum implementasi
 
-## Alur bagian (tema reguler)
+Tulis brief berisi suasana, sasaran pasangan, satu ide visual, sumber foto/seni, palet dengan peran, komposisi setiap bagian, perilaku motion, serta kebutuhan tanpa foto. Tunjukkan perbedaan dengan tema terdekat. Buat satu kandidat lengkap; jangan membuat tema berikutnya dari antrean otomatis.
 
-| # | Bagian | Isi wajib |
+## Kontrak per bagian
+
+| Bagian | Kriteria penerimaan | Bukti yang disertakan |
 |---|---|---|
-| 1 | Sampul | foto berbingkai bentuk tema, judul kecil, nama mempelai, tanggal, "Kepada Yth." + nama tamu di antara dua garis, catatan salah tulis nama, tombol buka dengan ikon |
-| 2 | Pembuka (hero) | panggung 2.5D tema, nama masuk bertahap setelah kamera turun |
-| 3 | Kutipan | foto berbingkai + ayat/kutipan + sumber |
-| 4 | Mempelai | foto berbingkai, nama panggilan (skrip), nama lengkap, "Putra/Putri dari" + orang tua, tombol Instagram |
-| 5 | Save the date | pita foto layar penuh, hitung mundur 4 kotak kaca, tombol simpan tanggal |
-| 6 | Acara | per acara: nama, baris tanggal klasik (HARI · tanggal besar · BULAN TAHUN), jam, tempat, alamat, tombol lokasi + kalender; siaran langsung bila ada |
-| 7 | Kisah | garis waktu: chip tahun, foto (bila ada), judul, cerita |
-| 8 | Galeri | masonry / kisi dengan foto utama / pita geser; lightbox dengan sebelumnya/berikutnya, penghitung, geser |
-| 9 | Amplop digital | kartu rekening (nama bank, chip, nomor, pemilik) + tombol salin; alamat kado terpisah |
-| 10 | RSVP | nama, kehadiran (radio), jumlah tamu, ucapan; validasi di tempat dengan pesan yang jelas |
-| 11 | Ucapan | ringkasan Hadir / Tidak hadir / Masih ragu + daftar ucapan |
-| 12 | Penutup | pita foto layar penuh, terima kasih, "Kami yang berbahagia", nama, keluarga |
-| — | Tiket tamu, footer | di dalam kolom undangan |
+| Sampul | Nama, tanggal, tamu, tombol terbaca pada layar pendek; tombol buka bekerja | Screenshot awal dan rekaman klik buka |
+| Hero | Nama panjang tidak terpotong, foto tidak merusak hierarki; isi tampil tanpa menunggu intro panjang | Screenshot setelah buka dan data nama panjang |
+| Mempelai | Identitas, orang tua, foto masing-masing terbaca; fallback tanpa foto sengaja didesain | Screenshot kedua profil |
+| Acara | Tanggal/jam/tempat/alamat benar; acara nonaktif tidak tampil; tautan lokasi/kalender bermakna | Screenshot serta pemeriksaan tujuan tautan |
+| Cerita & galeri | Cerita bukan kartu berulang tanpa hierarki; foto memiliki ritme; galeri dapat dibuka dan ditutup tanpa kehilangan posisi | Screenshot tiap bagian, uji lightbox/keyboard |
+| Tanda kasih | Informasi mudah disalin, kegagalan clipboard dijelaskan; tanpa rekening tidak menampilkan panel kosong | Uji salin berhasil/gagal |
+| RSVP & ucapan | Label jelas; validasi, sedang mengirim, gagal, dan berhasil mengikuti kemampuan callback/API nyata | Uji data valid/kosong, pending dan error |
+| Penutup | Penutup yang disengaja, nama terbaca, navigasi/kontrol tidak menutupi isi | Screenshot bagian paling bawah |
 
-Navigasi: pil mengambang di bawah (Beranda, Mempelai, Acara, Galeri, Hadiah, Ucapan) yang
-menandai bagian aktif; tombol musik bundar di kanan bawah.
+Fitur opsional disembunyikan bila datanya kosong/nonaktif. Demo tidak boleh menyatakan data tersimpan permanen apabila hanya masuk state halaman. Konfirmasi server hanya boleh diklaim setelah ada respons server yang diperiksa.
 
-Desktop (≥ 1024px): foto pasangan berganti pelan di kiri dengan nama + tanggal memakai huruf
-tema, undangan 430px di kanan.
+## Art direction dan aset
 
-## Aturan visual
+- Jangan generate SVG/ilustrasi generik untuk mengisi ruang. Tidak perlu ornamen jika komposisi foto dan tipografi sudah kuat.
+- Catat asal, pemilik, lisensi, dan kebutuhan izin tiap aset. Source kompetitor adalah bukti analisis, bukan aset siap pakai.
+- Tema adat memerlukan referensi bentuk dan review konteks budaya; nama daerah saja tidak cukup.
+- Palet diberi peran: latar, teks, aksi, aksen. Warna ceria boleh terkontrol; warna pink tidak ditambahkan sebagai default otomatis.
+- Manrope aplikasi tetap. Font tema lama tetap. Kandidat baru menjelaskan pemilihan tipografinya sendiri.
 
-- Skala huruf: label 12px huruf kapital renggang · isi 15/1.75 · judul skrip 46 (display 34) ·
-  nama 48–56 · tidak ada teks isi < 12.5px.
-- Jarak bagian 88px, lebar isi maks 400px, kartu radius = `radius` tema, tombol ≥ 44px.
-- Ornamen hanya di **tepi bagian** (`ornament`: `flora` lukisan bunga, `line` = `cornerSvg`,
-  `none`). Dilarang menempel bunga di kartu, foto, atau di atas teks.
-- Pita latar `surface` untuk Acara & Amplop agar ritme halaman berselang-seling.
-- Tombol: ikon garis + teks, keadaan hover/aktif/fokus (`.kit-press`), kontras ≥ 4.5:1.
-  Tombol sampul otomatis memakai warna kedua bila warna utama terlalu dekat dengan latar sampul.
-- Foto selalu `object-fit: cover` dengan fokus wajah (`center 25–30%`).
-- Gerak: hanya `transform`/`opacity`, kurva `cubic-bezier(.22,1,.36,1)`, hormati
-  `prefers-reduced-motion`.
+## Layout dan CSS
 
-## Pembeda tiap tema (wajib diisi)
+- Mobile: satu kolom undangan; desktop: foto/nama di kiri, kolom undangan sempit di kanan mengikuti wrapper existing.
+- Uji 360×640, 390×844, 430×932, desktop 1280×860 dan 1440×900. Angka ini target QA, bukan klaim sudah diuji.
+- Tidak ada overflow horizontal/teks terpotong; jangan menyembunyikan kerusakan dengan overflow hidden global.
+- CSS tema baru memakai CSS Modules atau root scope unik, tidak selector global yang merembes ke tema lain.
+- Input minimal 16px; target sentuh minimal 44px; body 14–16px; label kecil tidak dipakai untuk paragraf. Kontras teks normal ditargetkan ≥4.5:1.
+- Uji nama sangat panjang, alamat panjang, tanpa foto, foto gagal dimuat, galeri kosong/panjang, tanpa cerita/rekening.
+- Pertahankan ZoomLock/viewport existing. Uji gesture dan fokus input pada perangkat nyata sebelum mengklaim semua browser terkunci.
 
-`palette` + `variants`, `fonts`, `cover`, `frame`, `hero`/`Stage`, `couple`
-(`cards`/`split`), `events` (`cards`/`timeline`/`ticket`), `gallery`
-(`masonry`/`grid`/`film`), `ornament` + `floraArt`/`cornerSvg`, `ambient`, `pattern`, `copy`.
-Dua tema yang berurutan di katalog tidak boleh sama di `cover` + `hero` + satu varian lain.
+## Gerak
 
-## Aplikasi (landing, auth, dashboard)
+Tulis tabel pemicu → elemen → perubahan → durasi → reduced motion. Animasi bukan syarat semua bagian. Tidak ada teks/form yang terus mengambang. Pengguna boleh segera menggulir/mengakses acara. Rekam alur buka → scroll sampai penutup, bukan hanya screenshot hero. Untuk dunia paralaks kontinu, sertakan minimal 30 posisi kamera termasuk antarbab; bukan 30 foto pose yang sama.
 
-Font Manrope existing dipertahankan sesuai pemilik. Arah aplikasi: warna ceria yang terkontrol,
-ikon fungsional, hierarki tugas, formulir/tabel mudah dibaca. Gradasi judul, teks menyala kata per
-kata, dan dekorasi animasi **tidak wajib**. Token aplikasi baru ada di `src/styles/product.css`,
-dengan scope `.rh-product`; tidak berlaku pada dokumen iframe undangan. Lihat
-[sintesis riset](../research/06-SYNTHESIS.md) untuk alasan dan peta implementasi.
+## Bukti riset
 
-## Mode kamera (tema Spesial gaya "undangan seret")
+Gunakan laporan [Wedew](../research/01-WEDEW.md), [Viding](../research/02-VIDING.md), [Katsudoto](../research/03-KATSUDOTO.md), [Our Wedding Link](../research/04-OUR-WEDDING-LINK.md), dan [WebNikah](../research/05-WEBNIKAH.md). Catat URL demo, tindakan, tangkapan bagian, serta JS/CSS tema yang benar-benar diperiksa. Chunk framework tidak membuktikan transisi tema. Pisahkan observasi UI, temuan source, inferensi, dan usulan. Laporan lama tidak otomatis membuktikan ada rekaman penuh baru.
 
-`ThemeSpec.camera` → satu dunia memanjang berlapis (0 = jauh, 1 = dekat) yang dilewati kamera.
-Isi bagian = panel kertas melayang; di jeda antarbagian kamera berjalan ke stasiun berikutnya.
-Wajib: semua posisi kamera di antara stasiun tetap berupa dunia yang utuh (tidak ada ruang kosong
-atau ganti latar), karakter 2.5D digerakkan dari posisi kamera (bukan waktu) sehingga setiap posisi
-gulir punya pose pasti. QA: lembar kontak ≥ 30 posisi gulir merata, bukan hanya stasiun.
-Contoh: `catalog/storybook.tsx` + `storybook.world.tsx` + `storybook.couple.tsx`.
+## Status yang boleh dipakai
+
+1. **Konsep**: brief dan komposisi, belum implementasi.
+2. **Kandidat review**: implementasi ada, QA/batas dicatat, belum persetujuan visual.
+3. **Lulus teknis**: hanya untuk pemeriksaan yang nyata lulus; sebutkan viewport/lingkungan.
+4. **Disetujui visual**: hanya setelah keputusan pemilik yang nyata.
+5. **Siap rilis**: visual, integrasi, hak aset, dan regresi lengkap; pemilik menentukan merge/deploy.
+
+Tidak ada nilai rata-rata yang menutupi kegagalan kritis. Teks terpotong, kontrol tidak bisa dipakai, aset tanpa hak, atau klaim simpan palsu wajib diperbaiki. Build hijau bukan bukti visual bagus.

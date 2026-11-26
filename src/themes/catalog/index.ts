@@ -10,6 +10,7 @@
 
 import type { ThemeSpec } from '../types';
 import type { ThemeConfig } from '../../types';
+import sehariSelamanya from './sehari-selamanya';
 import sageGarden from './sage-garden';
 import lembayung from './lembayung';
 import tamanKertas from './taman-kertas';
@@ -25,6 +26,7 @@ import parallaxCinematic from './parallax-cinematic';
 import storybook from './storybook';
 
 export const KIT_THEMES: ThemeSpec[] = [
+  sehariSelamanya,
   sundaKujang,
   tamanKertas,
   lembayung,

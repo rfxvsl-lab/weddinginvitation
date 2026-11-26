@@ -5,10 +5,8 @@ Baca [QUALITY-V2.md](QUALITY-V2.md), catat sumber aset, dan ikuti branch/draft P
 [PLAYBOOK.md](PLAYBOOK.md). Ritme kategori atau satu tema per sesi tidak boleh mengalahkan
 quality gate. Tema existing, font aplikasi dan harga dilindungi sesuai pemilik.
 
-Sesi otomatis mengambil baris `todo` paling atas. Sejak 3.8.0 semua tema (termasuk 8 tema lama, kini di
-`src/themes/catalog/`) mengikuti `docs/themes/STANDARD.md`; `src/components/templates/*` tidak dipakai lagi. Urutan sengaja diselang-seling
-(adat ↔ modern ↔ floral ↔ minimalis) dan **setiap baris ketiga adalah tema Spesial**
-(adegan 2D/2.5D paralaks — ikuti bagian "Tema Spesial" di PLAYBOOK).
+**Arsip ide, bukan antrean eksekusi otomatis.** Label `done` lama adalah riwayat implementasi, bukan bukti lolos standar edisi baru. Tema existing tetap disimpan. Setiap ide memerlukan brief, satu kandidat lengkap, bukti QA, dan review visual pemilik sebelum diteruskan.
+
 Format: `status | id | Nama | tier/kategori | brief`
 
 | Status | id | Nama | Tier / kategori | Brief |
