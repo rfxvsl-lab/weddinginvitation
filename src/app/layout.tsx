@@ -33,7 +33,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: 'RuangHadir — Platform Undangan Pernikahan Digital Gratis & Elegan',
-  description: 'Buat undangan pernikahan digital modern secara gratis di ruanghadir.net. Dilengkapi puluhan tema elegan yang bertambah setiap hari, link personal nama tamu, RSVP real-time, amplop digital, dan QR check-in.',
+  description: 'Buat undangan pernikahan digital di RuangHadir dengan tema pilihan, tautan bernama tamu, RSVP, amplop digital, dan QR check-in.',
   keywords: ['undangan digital gratis', 'undangan pernikahan gratis', 'undangan online gratis', 'wedding invitation', 'RSVP digital', 'ruanghadir'],
   authors: [{ name: 'ruanghadir.net' }],
   icons: {
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'RuangHadir — Platform Undangan Pernikahan Digital Gratis & Elegan',
-    description: 'Buat undangan pernikahan digital modern secara gratis. Tema elegan baru setiap hari, link personal nama tamu, RSVP real-time, amplop digital, dan QR check-in.',
+    description: 'Buat undangan pernikahan digital dengan tema pilihan, tautan bernama tamu, RSVP, amplop digital, dan QR check-in.',
     siteName: 'ruanghadir.net',
     type: 'website',
   },

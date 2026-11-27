@@ -14,11 +14,11 @@ import { MarketingSurface } from "@/components/landing/MarketingSurface";
 export const metadata: Metadata = {
   title: "RuangHadir — Undangan pernikahan untuk cerita kalian",
   description:
-    "Buat undangan pernikahan gratis dengan tema pilihan, tautan bernama tamu, RSVP, dan amplop digital. Siapkan undangan, bagikan, lalu sambut tamu di hari bahagia.",
+    "Buat undangan pernikahan dengan tema pilihan, tautan bernama tamu, RSVP, dan amplop digital. Pendaftaran paket Gratis melalui Akses Awal dan ditinjau admin.",
   openGraph: {
     title: "RuangHadir — Undangan pernikahan untuk cerita kalian",
     description:
-      "Lihat contoh tema, buat undangan gratis, dan kelola konfirmasi kehadiran dalam satu tempat.",
+      "Lihat contoh tema dan daftar Akses Awal paket Gratis. Pendaftaran ditinjau admin sebelum kalian mulai mengelola undangan.",
     type: "website",
   },
 };
