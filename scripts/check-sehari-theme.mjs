@@ -31,6 +31,11 @@ for (const link of navigation) {
  // A missing section still must not navigate/reload the iframe.
  prevented=false;link.props.onClick({preventDefault(){prevented=true;},currentTarget:{ownerDocument:{getElementById(){return null;}},getAttribute(){return link.props.href;}}});assert.ok(prevented);
 }
+// Music belongs to the sticky navigation flow, never an overlay above RSVP.
+const musicControls = root.root.findByType('nav').findAllByType('button');
+assert.equal(musicControls.length, 1, 'music remains reachable in the navigation');
+assert.equal(musicControls[0].props['aria-pressed'], false);
+assert.ok(musicControls[0].children.includes('Putar musik'));
 const form=()=>root.root.findByType('form');const fields=()=>root.root.findAllByType('input');
 await act(async()=>{fields()[0].props.onChange({target:{value:'Nama Tamu'}});root.root.findByType('textarea').props.onChange({target:{value:'Bahagia selalu'}});fields()[1].props.onChange({target:{value:'8'}});});
 await act(async()=>{await form().props.onSubmit({preventDefault(){}});});
