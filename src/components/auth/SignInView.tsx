@@ -5,7 +5,7 @@
  * dilengkapi tombol masuk ke Portal Enterprise.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { Logo } from "@/components/ui/Logo";
 import { Building2, Mail, Lock, AlertCircle, ChevronRight } from "lucide-react";
@@ -35,6 +35,9 @@ export default function SignInView({
   onGotoSignUp,
   onGotoEnterprise,
 }: SignInViewProps) {
+  const [googleError, setGoogleError] = useState<string | null>(null);
+  const visibleError = error || googleError;
+
   return (
     <div className="w-full max-w-[440px] saas-card p-8 sm:p-10 space-y-6 animate-in fade-in zoom-in-95 duration-500">
       {/* Header */}
@@ -78,7 +81,13 @@ export default function SignInView({
       )}
 
       {/* Form */}
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form
+        onSubmit={(event) => {
+          setGoogleError(null);
+          onSubmit(event);
+        }}
+        className="space-y-4"
+      >
         <div className="space-y-1.5">
           <label className="saas-field-label" htmlFor="signin-email">
             Email
@@ -117,13 +126,13 @@ export default function SignInView({
           </div>
         </div>
 
-        {error && (
+        {visibleError && (
           <div
             role="alert"
             className="flex items-center gap-2 text-xs text-red-800 bg-red-50 p-3.5 border border-red-200 rounded-xl"
           >
             <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+            <span>{visibleError}</span>
           </div>
         )}
 
@@ -151,8 +160,15 @@ export default function SignInView({
 
       <div className="flex justify-center w-full">
         <GoogleLogin
-          onSuccess={onGoogleSuccess}
-          onError={() => console.error("Google Login Failed")}
+          onSuccess={(response) => {
+            setGoogleError(null);
+            onGoogleSuccess(response);
+          }}
+          onError={() =>
+            setGoogleError(
+              "Masuk dengan Google belum berhasil. Coba lagi atau gunakan email dan password.",
+            )
+          }
           theme="outline"
           shape="pill"
           text="continue_with"
