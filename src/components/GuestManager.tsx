@@ -501,19 +501,20 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         Salin tautan dan buka WhatsApp tidak membuktikan pesan terkirim atau dibaca. Catatan status tidak memastikan kehadiran; kehadiran di lokasi mengikuti kolom Check-in.
       </p>
 
-      {/* GUEST LIST CONTAINER */}
-      <div className="bg-white rounded-2xl border border-zinc-200/60 overflow-hidden shadow-sm">
+      {/* Query only the list area; fixed dialogs and print output stay outside. */}
+      <div className="rh-guest-list-container">
+      <div className="rh-guest-list bg-white rounded-2xl border border-zinc-200/60 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table aria-label="Daftar tamu dan tautan undangan" className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gradient-to-r from-zinc-50 to-zinc-100/50 text-[10px] uppercase font-bold text-zinc-500 border-b border-zinc-200">
-                <th className="px-5 py-3">Nama Tamu & Grup</th>
-                <th className="px-4 py-3">Kode Unik</th>
-                <th className="px-4 py-3">No. Telp</th>
-                <th className="px-4 py-3 text-center">Pax limit</th>
-                <th className="px-4 py-3">Catatan status</th>
-                <th className="px-4 py-3">Check-in</th>
-                <th className="px-5 py-3 text-right">Aksi Undangan</th>
+                <th scope="col" className="px-5 py-3">Nama Tamu & Grup</th>
+                <th scope="col" className="px-4 py-3">Kode Unik</th>
+                <th scope="col" className="px-4 py-3">No. Telp</th>
+                <th scope="col" className="px-4 py-3 text-center">Pax limit</th>
+                <th scope="col" className="px-4 py-3">Catatan status</th>
+                <th scope="col" className="px-4 py-3">Check-in</th>
+                <th scope="col" className="px-5 py-3 text-right">Aksi Undangan</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -526,18 +527,18 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         {guest.group}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5">
-                      <code className="text-[10px] font-mono px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md">
+                    <td data-label="Kode unik" className="px-4 py-3.5">
+                      <code className="whitespace-nowrap text-[10px] font-mono px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md">
                         {guest.invitationCode}
                       </code>
                     </td>
-                    <td className="px-4 py-3.5 text-xs text-zinc-500 font-mono">
-                      {guest.phoneNumber || 'Belum diisi'}
+                    <td data-label="Nomor WhatsApp" className="px-4 py-3.5 text-xs text-zinc-500">
+                      <span className="font-mono">{guest.phoneNumber || 'Belum diisi'}</span>
                     </td>
-                    <td className="px-4 py-3.5 text-center text-xs font-bold text-zinc-800">
+                    <td data-label="Batas orang" className="px-4 py-3.5 text-center text-xs font-bold text-zinc-800">
                       {guest.paxLimit} Pax
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td data-label="Catatan status" className="px-4 py-3.5">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold ${guest.status === 'Opened'
                           ? 'bg-[var(--rh-primary-soft)] text-[var(--rh-primary)] border border-[var(--rh-line)]'
                           : guest.status === 'Sent'
@@ -547,7 +548,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         {guestRecordLabel(guest.status)}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td data-label="Check-in" className="px-4 py-3.5">
                       {(() => {
                         const c = checkinOf(guest);
                         if (!c) return <span className="text-[10px] text-zinc-400">—</span>;
@@ -565,7 +566,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         );
                       })()}
                     </td>
-                    <td className="px-5 py-3.5 text-right flex items-center justify-end gap-1.5 h-full">
+                    <td className="rh-guest-actions px-5 py-3.5 text-right flex items-center justify-end gap-1.5 h-full">
                       {/* Copy Link */}
                       <button
                         type="button"
@@ -605,10 +606,11 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                           setModalPax(1);
                           setModalTable(guest.tableNo || '');
                         }}
-                        className={`p-1.5 border rounded-lg transition-all ${!canAccess(packageId, 'canQR')
+                        className={`min-h-11 min-w-11 inline-flex items-center justify-center p-1.5 border rounded-lg transition-all ${!canAccess(packageId, 'canQR')
                             ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
-                            : 'bg-white text-rose-500 border-zinc-200 hover:bg-rose-50 hover:border-rose-200'
+                            : 'bg-[var(--rh-paper)] text-[var(--rh-primary)] border-[var(--rh-line)] hover:bg-[var(--rh-primary-soft)] hover:border-[var(--rh-primary)]'
                           }`}
+                        aria-label={`Tiket QR dan check-in untuk ${guest.name}`}
                         title={!canAccess(packageId, 'canQR') ? `Fitur Premium (Upgrade ke ${PACKAGE_NAMES[getLimits(packageId).canQR ? packageId as PackageId : 'premium']})` : "Lihat Tiket QR Code & Simulasikan Registrasi"}
                       >
                         <QrCode className="w-3.5 h-3.5" />
@@ -619,7 +621,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         href={generateInvitationLink(guest)}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1.5 bg-white text-sky-500 border border-zinc-200 hover:bg-sky-50 hover:border-sky-200 rounded-lg transition-all"
+                        className="min-h-11 min-w-11 inline-flex items-center justify-center p-1.5 bg-[var(--rh-paper)] text-[var(--rh-ink-2)] border border-[var(--rh-line)] hover:bg-[var(--rh-ivory)] hover:border-[var(--rh-line-strong)] rounded-lg transition-all"
+                        aria-label={`Buka undangan untuk ${guest.name}`}
                         title="Buka Sebagai Tamu ini"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -629,7 +632,8 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                       <button
                         type="button"
                         onClick={() => onRemoveGuest(guest.id)}
-                        className="p-1.5 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 border border-red-100 rounded-lg transition-all"
+                        className="min-h-11 min-w-11 inline-flex items-center justify-center p-1.5 bg-[var(--rh-ivory)] text-[var(--rh-danger)] hover:bg-[var(--rh-linen)] border border-[var(--rh-line)] rounded-lg transition-all"
+                        aria-label={`Hapus tamu ${guest.name}`}
                         title="Hapus Penerima"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -660,9 +664,11 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
         </div>
       </div>
 
+      </div>
+
       {/* GLOWING MODAL SHOWING THE SELECTED GUEST TICKET QR & CHECK-IN SYSTEM SIMULATOR */}
       {selectedQRBoxGuest && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fadeIn select-none">
+        <div className="rh-guest-overlay fixed inset-0 bg-black/80 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fadeIn select-none">
           <div className="bg-surface-container-lowest border border-outline-variant rounded-[2.5rem] p-6 max-w-sm w-full space-y-5 text-center text-zinc-100 shadow-[0_0_35px_rgba(220,38,38,0.3)] relative overflow-hidden">
             {/* Header notch accent */}
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-650 via-red-500 to-red-650" />
@@ -788,10 +794,10 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
 
       {/* ====== ADVANCED CUSTOM EXPORT & PDF PRINT CONFIGURATION DIALOG ====== */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 bg-[#000]/80 backdrop-blur-md z-[180] flex items-center justify-center p-4 animate-fadeIn select-none md:p-6">
-          <div className="bg-white text-[var(--color-on-surface)] rounded-3xl w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden shadow-2xl border border-outline-variant">
+        <div className="rh-guest-overlay fixed inset-0 bg-[#000]/80 backdrop-blur-md z-[180] flex items-center justify-center p-4 animate-fadeIn select-none md:p-6">
+          <div className="rh-guest-export-card bg-white text-[var(--color-on-surface)] rounded-3xl w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden shadow-2xl border border-outline-variant">
             {/* Sidebar Controls */}
-            <div className="w-full md:w-80 bg-surface-container-low border-b md:border-b-0 md:border-r border-[var(--color-outline-variant)] p-5 shrink-0 flex flex-col justify-between overflow-y-auto">
+            <div className="rh-guest-export-controls w-full md:w-80 bg-surface-container-low border-b md:border-b-0 md:border-r border-[var(--color-outline-variant)] p-5 shrink-0 flex flex-col justify-between overflow-y-auto">
               <div className="space-y-5">
                 <div>
                   <span className="text-[9px] font-mono tracking-widest text-primary font-black uppercase block">ruanghadir.net Export Wizard</span>
@@ -836,7 +842,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includeSignatureColumn}
                         onChange={(e) => setIncludeSignatureColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Tanda Tangan</span>
@@ -849,7 +855,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includePhoneColumn}
                         onChange={(e) => setIncludePhoneColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Kontak WA</span>
@@ -862,7 +868,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                         type="checkbox"
                         checked={includeStatusColumn}
                         onChange={(e) => setIncludeStatusColumn(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary"
+                        className="w-4 h-4 rounded accent-[var(--rh-primary)]"
                       />
                       <div>
                         <span className="font-bold text-slate-705 block text-left">Kolom Kehadiran Digital</span>
@@ -887,7 +893,7 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
                 <button
                   type="button"
                   onClick={handleTriggerPrint}
-                  className="w-full py-2.5 bg-primary hover:bg-primary/90 hover:border-outline-variant text-primary-foreground border border-indigo-600 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  className="w-full py-2.5 bg-[var(--rh-primary)] hover:bg-[var(--rh-primary-hover)] text-white border border-[var(--rh-primary)] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Cetak PDF / Print Fisik</span>
@@ -903,17 +909,23 @@ export default function GuestManager({ guests, appUrl, slug, coupleNames, onAddG
               </div>
             </div>
 
-            {/* WYSIWYG Print Preview Canvas Sheet */}
-            <div className="flex-1 bg-surface-container-low p-6 overflow-y-auto flex justify-center">
-              <div className="bg-white w-[210mm] min-h-[297mm] h-fit p-10 shadow-lg border border-outline-variant flex flex-col justify-between text-[var(--color-on-surface)] scale-95 origin-top relative rounded-sm">
+            {/* Screen-only A4 canvas: both edges remain reachable by scrolling. */}
+            <div
+              role="region"
+              aria-label="Pratinjau laporan A4, gulir untuk melihat seluruh lembar"
+              tabIndex={0}
+              className="rh-guest-export-canvas flex-1 bg-surface-container-low p-6"
+            >
+              <p className="mb-4 text-[11px] leading-relaxed text-[var(--rh-muted)]">Pratinjau A4. Gulir ke samping dan ke bawah untuk melihat seluruh lembar.</p>
+              <div className="rh-guest-export-sheet bg-white w-[210mm] min-h-[297mm] h-fit p-10 shadow-lg border border-outline-variant flex flex-col justify-between text-[var(--color-on-surface)] relative rounded-sm">
 
                 {/* Visual Watermarked Badge */}
-                <div className="absolute top-2 right-4 text-[9px] font-mono tracking-widest text-slate-350 select-none uppercase">Print Preview Sheet A4 (Skala 95%)</div>
+                <div className="absolute top-2 right-4 text-[9px] font-mono tracking-widest text-slate-350 select-none uppercase">Pratinjau A4 · gulir untuk melihat seluruh lembar</div>
 
                 <div className="space-y-6">
                   {/* Ledger Header */}
                   <div className="text-center border-b-2 border-slate-800 pb-3">
-                    <span className="text-[9px] font-mono font-bold tracking-widest text-[#4f46e5]/80 uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
+                    <span className="text-[9px] font-mono font-bold tracking-widest text-[var(--rh-muted)] uppercase block">REKAP DAFTAR TAMU & LEMBAR ABSENSI FISIK</span>
                     <h2 className="saas-ui-title text-lg font-black uppercase mt-0.5 tracking-tight">PERNIKAHAN {coupleNames}</h2>
                     <div className="flex justify-between items-center text-[9px] text-[var(--color-outline)] font-mono mt-2">
                       <span>Platform Portal: ruanghadir.net</span>

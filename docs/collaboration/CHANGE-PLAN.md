@@ -1,5 +1,10 @@
 # Rencana perubahan — kontributor A dan B
 
+> Status26November: sinkronisasi reviewPR8 dengan maina00ce96 menyelesaikan konflik dokumen saja; kode fitur tamu tetap kandidatQA121 dan CSSgabungan diverifikasi. Tidak merge PRkemain/deploy. Validasi integrasi dan batas ada B-REVIEW-MAIN-SYNC.md.
+
+Riwayat dua status25November di bawah dipertahankan sebagai catatan historis, bukan keadaanmain/QA terkini.
+
+> Status 25 November: main253e333 sudah memuat perbaikan CSS marketing PR10 (merged oleh pihak lain), QA A114 lulus. B menyinkronkan main KE branch review PR8/9 sesuai room118 dan menyelesaikan konflik dokumen; source fitur masing-masing harus byteidentik kandidat QA, source marketing byteidentik main. PR8 punya kartu/overlay/export (QA A83/90/91), PR9 punya berbagi/clipboard/fallback (QA A98/101/104), atribusiCodex PR11 terpisah. Lihat B-REVIEW-MAIN-SYNC.md. HPfisik/SR/keyboarddialog belum diuji, tidakmerge PR ke main atau deploy.
 > Status25November: main253e tetap. A127 guardPR12e3d1906 lulus termasukuntracked; PR8/9sinkron lulusQA A121. B128 mulai follow-upmodal di codex/publish-dialog-focus berbasisPR9: namadialog/fokusjudul/Tab/Escape/restore danalertstack, closebusyditahan. TesmodelDOM danReactkomponenasli/queue/pendingstub, Share/marketingSSR/tsc lulus, buildfinalNode22lulus (warningDB/paymentbelumkonfig), QAbrowserkandidat belumada. Lihat B-PUBLISH-DIALOG-FOCUS.md. Preview/tema/font/harga/kuota/ZoomLock tidakdiubah, tidakmerge/deploy.
 
 Arahan pemilik, 24 November 2026: **A = Claude, B = GPT/Codex**. Fokus dimulai dari
