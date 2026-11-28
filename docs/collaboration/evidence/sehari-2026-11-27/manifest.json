@@ -1,0 +1,82 @@
+{
+  "url": "https://www.ruanghadir.net/preview/sehari-selamanya",
+  "observed_main": "7fcb1aecef81d8edec10f90213b3f16557211ee6",
+  "date_wib": "2026-11-27",
+  "browser": "CUA Chrome desktop",
+  "iframe_width_css_px": 430,
+  "post_fix": false,
+  "screenshots": [
+    {
+      "file": "01-cover.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 172363,
+      "sha256": "d97d3d8d415fd6373052e1693db0b31540c7b91a9e54d91a149fd1a1477b9cff"
+    },
+    {
+      "file": "02-hero.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 241668,
+      "sha256": "109cf11ed63c50f0e85405a4ef10db436ee0604eaa0926a9ef94b156500d5a37"
+    },
+    {
+      "file": "03-couple.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 179042,
+      "sha256": "a4aaf2e184feed92fbceb6db5649270b37be9a5440560431277cad717eb05690"
+    },
+    {
+      "file": "04-events.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 158845,
+      "sha256": "c973e8e6807127d1876ae309154fdcba872c64001798a44a94f5b06c8efd2f9c"
+    },
+    {
+      "file": "05-story.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 195034,
+      "sha256": "0866396b2960e80208eef983610adc68e25c0c4f5a541035e87c043cb249c2a0"
+    },
+    {
+      "file": "06-gallery-dialog.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 147153,
+      "sha256": "f3f30847e6f2a359ddcbfa73eca9040af2604e90664fe37c9359c00df57ecf88"
+    },
+    {
+      "file": "07-rsvp-before.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 152826,
+      "sha256": "e31aadc9ca54a511f04aba57bd711a57e6e5112496c294b58d64836551e0dbf5"
+    },
+    {
+      "file": "08-ending-before.jpg",
+      "dimensions": [
+        1363,
+        936
+      ],
+      "bytes": 121849,
+      "sha256": "cfaba5b9f311a00b746378da76533992353df1af8e26ccfd60788fd017b906bc"
+    }
+  ]
+}
