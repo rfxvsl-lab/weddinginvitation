@@ -1,0 +1,22 @@
+/** Real registry and picker interactions, with no saved invitation changes. */
+import assert from 'node:assert/strict';
+import {build} from 'esbuild';
+import {createRequire} from 'node:module';
+import React from 'react';
+import {act,create} from 'react-test-renderer';
+const output=await build({stdin:{contents:'export * from "./src/lib/availableThemes";export {DEFAULT_THEMES} from "./src/data/defaultData";export {getKitTheme} from "./src/themes/catalog";export {default as Picker} from "./src/components/ThemeSelector";',resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,platform:'node',format:'cjs',jsx:'automatic',external:['react']});
+const mod={exports:{}};new Function('require','module','exports',output.outputFiles[0].text)(createRequire(import.meta.url),mod,mod.exports);
+const {AVAILABLE_THEMES,DEFAULT_THEMES,getKitTheme,Picker,hasAvailableThemeCategory}=mod.exports;
+assert.deepEqual(AVAILABLE_THEMES.map(t=>t.id).sort(),['storybook-interactive','sunda-kujang']);
+assert.equal(DEFAULT_THEMES.length,13,'legacy registry retained for saved invitations');
+for(const theme of DEFAULT_THEMES)assert.equal(getKitTheme(theme.id).id,theme.id,'each old theme still resolves');
+assert.equal(hasAvailableThemeCategory('floral'),false);assert.equal(hasAvailableThemeCategory('classic'),true);
+let selected=[],view;globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+await act(async()=>{view=create(React.createElement(Picker,{currentThemeId:'sage-garden',onSelectTheme:id=>selected.push(id)}))});
+assert.equal(selected.length,0,'retired selection never silently replaced on mount');
+const choices=view.root.findAllByType('button').filter(b=>b.findAllByType('img').length);
+assert.equal(choices.length,2);
+for(const button of choices)await act(async()=>button.props.onClick());
+assert.deepEqual(selected.sort(),['storybook-interactive','sunda-kujang']);
+await act(async()=>view.unmount());
+console.log('PASS: exactly two owner-retained choices; picker only selects those; old theme on mount unchanged; all13 legacy themes resolve. No persistence/API calls.');

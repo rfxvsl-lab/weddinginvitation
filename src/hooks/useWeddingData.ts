@@ -16,6 +16,7 @@ import type {
 } from '../types';
 import { DEFAULT_THEMES, DEFAULT_WEDDING_DATA, INITIAL_ANALYTICS } from '../data/defaultData';
 import { getLimits } from '../lib/packageLimits';
+import { NEW_INVITATION_THEME_ID } from '../lib/availableThemes';
 import * as api from '../lib/api';
 import { toastSingleton } from './useToast';
 
@@ -127,7 +128,7 @@ function computeDailyTraffic(
 
 export function useWeddingData(): UseWeddingDataReturn {
   const [weddingData, setWeddingDataLocal] = useState<WeddingData>(DEFAULT_WEDDING_DATA);
-  const [themeId, setThemeIdLocal] = useState<string>('rfx-dark');
+  const [themeId, setThemeIdLocal] = useState<string>(NEW_INVITATION_THEME_ID);
   const [guests, setGuestsLocal] = useState<Guest[]>([]);
   const [rsvps, setRsvpsLocal] = useState<RSVP[]>([]);
   const [analytics, setAnalyticsLocal] = useState<WeddingAnalytics>(INITIAL_ANALYTICS);
@@ -239,7 +240,7 @@ export function useWeddingData(): UseWeddingDataReturn {
         const invId = await api.createInvitation(
           user.id,
           `Undangan ${user.coupleGroom} & ${user.coupleBride}`,
-          'rfx-dark',
+          NEW_INVITATION_THEME_ID,
           defaultData
         );
         inv = {
@@ -247,7 +248,7 @@ export function useWeddingData(): UseWeddingDataReturn {
           userId: user.id,
           title: `Undangan ${user.coupleGroom} & ${user.coupleBride}`,
           slug: null,
-          themeId: 'rfx-dark',
+          themeId: NEW_INVITATION_THEME_ID,
           weddingData: defaultData,
           isPublished: false,
           publishedAt: null,
@@ -743,7 +744,7 @@ export function useWeddingData(): UseWeddingDataReturn {
         },
       };
 
-      const invId = await api.createInvitation(user.id, title || `Undangan ${currentCount + 1}`, 'rfx-dark', defaultData);
+      const invId = await api.createInvitation(user.id, title || `Undangan ${currentCount + 1}`, NEW_INVITATION_THEME_ID, defaultData);
 
       // Activate the new invitation if user is paid/demo
       if (user.packageId === 'demo' || user.paymentStatus === 'success') {

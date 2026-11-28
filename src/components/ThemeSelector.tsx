@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Check, Palette, Eye, BookOpen } from 'lucide-react';
-import { DEFAULT_THEMES } from '../data/defaultData';
+import { AVAILABLE_THEMES, hasAvailableThemeCategory } from '../lib/availableThemes';
 import { themeShot } from '../themes/shots';
 import { getKitTheme, isNewTheme } from '../themes/catalog';
 
@@ -38,11 +38,14 @@ export default function ThemeSelector({
   const activeVariant = variants.find((v) => v.id === currentVariant)?.id || variants[0]?.id;
 
   // Tema baru (14 hari) tampil paling depan
-  const sorted = [...DEFAULT_THEMES].sort((a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || ''));
+  const sorted = [...AVAILABLE_THEMES].sort((a, b) => Number(isNewTheme(b.addedAt)) - Number(isNewTheme(a.addedAt)) || (b.addedAt || '').localeCompare(a.addedAt || ''));
   const filteredThemes = filter === 'all' ? sorted : sorted.filter((t) => (filter === 'special' ? t.tier === 'special' : t.pattern === filter));
 
   return (
     <div className="space-y-6">
+      {!AVAILABLE_THEMES.some(theme => theme.id === currentThemeId) && (
+        <p className="text-sm text-[var(--rh-ink-2)]">Tema undangan Anda tetap tersimpan. Pilih salah satu tema di bawah jika ingin menggantinya.</p>
+      )}
       {/* Varian warna tema aktif */}
       {variants.length > 1 && onSelectVariant && (
         <div className="rounded-2xl border border-[#E8DFD4] bg-white p-4">
@@ -79,7 +82,7 @@ export default function ThemeSelector({
         <div>
           <div className="flex items-center gap-2 text-[12px] font-medium text-[var(--rh-primary)]">
             <Palette className="h-3.5 w-3.5" />
-            <span>Semua {DEFAULT_THEMES.length} Tema Gratis</span>
+            <span>{AVAILABLE_THEMES.length} Tema Gratis</span>
           </div>
           <h2 className="mt-1 font-serif text-[24px] leading-tight text-[var(--rh-ink)]">
             Pilih Tema Undangan
@@ -90,7 +93,7 @@ export default function ThemeSelector({
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {Object.entries(PATTERN_LABELS).map(([key, label]) => {
+          {Object.entries(PATTERN_LABELS).filter(([key]) => hasAvailableThemeCategory(key)).map(([key, label]) => {
             const active = filter === key;
             return (
               <button
