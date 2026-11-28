@@ -42,4 +42,6 @@ export const RESERVED_SLUGS = new Set([
   'admin', 'api', 'auth', 'dashboard', 'demo', 'preview', 'login', 'register', 'daftar', 'masuk',
   'privacy-policy', 'terms-of-service', 'cookie-policy', 'refund-policy', 'robots.txt', 'sitemap.xml',
   'enterprise', 'pricing', 'harga', 'tema', 'help', 'bantuan', 'super-admin', '_next', 'assets', 'static',
+  // halaman undangan khusus (route statis)
+  'kharis-lia', 'dani-tia',
 ]);
