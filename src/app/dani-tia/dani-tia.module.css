@@ -1,0 +1,1827 @@
+/* Undangan Tia & Dhany — tema khusus "Kelir" (layar wayang).
+   Kertas putih undangan cetak + tinta olive-sage; suasana malam hanya datang dari foto.
+   Semua selektor di-scope oleh CSS Module; tidak ada selector global. */
+
+.root {
+  --paper: #fbfaf6;
+  --ink: #2e2f24;
+  --ink-soft: #55574a;
+  --olive: #77733f;
+  --olive-soft: #9c9862;
+  --sage-light: #ddd7a8;
+  --line: rgba(119, 115, 63, 0.28);
+  --night: #0e110f;
+  --lamp: #f2c76e;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --display: var(--dt-display), 'Bodoni 72', Didot, Georgia, serif;
+  --script: var(--dt-script), cursive;
+  --sans: var(--dt-sans), 'Helvetica Neue', Arial, sans-serif;
+  background: var(--night);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+.root img {
+  display: block;
+  max-width: none;
+}
+.root :where(a) {
+  color: inherit;
+}
+.root :focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------ monogram */
+.mono {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--olive);
+  line-height: 1;
+}
+.mono i {
+  display: block;
+  width: 1px;
+  height: 26px;
+  background: currentColor;
+  transform: rotate(24deg);
+  opacity: 0.8;
+}
+.monoLight {
+  color: var(--sage-light);
+}
+
+/* ------------------------------------------------------------ gunungan (CSS mask dari SVG tatahan) */
+.kayon {
+  display: block;
+  -webkit-mask: url('/assets/dani-tia/gunungan.svg') center / contain no-repeat;
+  mask: url('/assets/dani-tia/gunungan.svg') center / contain no-repeat;
+  background: var(--olive);
+  aspect-ratio: 680 / 1040;
+}
+.kayonMark {
+  width: 46px;
+  margin: 0 auto 24px;
+}
+.kayonClose {
+  width: 118px;
+  margin: 0 auto;
+}
+.kayonBig {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: #15140e;
+}
+
+/* ------------------------------------------------------------ sampul */
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  background: var(--night);
+  overflow: hidden;
+  padding: max(26px, 5vh) 24px max(26px, 4.5vh);
+}
+.coverPhoto {
+  position: absolute;
+  inset: -3%;
+  will-change: transform;
+}
+.coverPhoto picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: kenburns 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes kenburns {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.13) translate3d(-1.6%, -2.2%, 0);
+  }
+}
+.coverShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 10, 9, 0.82) 0%,
+    rgba(8, 10, 9, 0.34) 30%,
+    rgba(8, 10, 9, 0.06) 48%,
+    rgba(8, 10, 9, 0.5) 70%,
+    rgba(8, 10, 9, 0.9) 100%
+  );
+}
+.coverTop,
+.coverBottom {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.coverKicker {
+  margin: 14px 0 2px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.86);
+}
+.coverNames {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: min(15vw, 8.6vh, 74px);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+.coverWith {
+  font-family: var(--script);
+  font-size: 0.52em;
+  color: var(--sage-light);
+  line-height: 1.1;
+  margin: 0.04em 0 -0.06em;
+}
+.coverDate {
+  margin: 14px 0 0;
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 15px;
+  letter-spacing: 0.34em;
+  padding-left: 0.34em;
+}
+.coverTo {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.coverGuest {
+  margin: 2px 0 0;
+  max-width: 320px;
+  font-family: var(--display);
+  font-size: min(24px, 6.4vw);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.openBtn {
+  margin-top: 18px;
+  min-height: 48px;
+  padding: 0 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(251, 250, 246, 0.94);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), background 0.25s;
+}
+.openBtn:hover {
+  background: #fff;
+}
+.openBtn:active {
+  transform: scale(0.97);
+}
+.coverNote {
+  margin: 12px 0 0;
+  max-width: 280px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.6);
+}
+.coverIn {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  animation: rise 1.1s var(--ease) forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cover[data-leaving] {
+  pointer-events: none;
+  animation: coverOut 0.5s 0.5s ease-in forwards;
+}
+.cover[data-leaving] .coverPhoto {
+  transition: transform 1.1s var(--ease);
+  transform: scale(1.14) !important;
+}
+@keyframes coverOut {
+  to {
+    opacity: 0;
+  }
+}
+@media (max-height: 640px) {
+  .coverKicker {
+    margin-top: 8px;
+  }
+  .coverDate {
+    margin-top: 8px;
+  }
+  .openBtn {
+    margin-top: 12px;
+  }
+  .coverNote {
+    margin-top: 8px;
+  }
+}
+
+/* ------------------------------------------------------------ transisi gunungan (kebyok dalang) */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+.curtain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #0b0a07;
+  opacity: 0;
+  animation: kelir 1.9s ease-in-out forwards;
+}
+@keyframes kelir {
+  0% {
+    opacity: 0;
+  }
+  28%,
+  60% {
+    opacity: 0.88;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.curtainSweep {
+  --gh: 118vh;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: var(--gh);
+  width: calc(var(--gh) * 0.654);
+  margin-left: calc(var(--gh) * -0.327);
+  margin-top: calc(var(--gh) * -0.5);
+  transform-origin: 50% 92%;
+  animation: kebyok 1.9s cubic-bezier(0.55, 0, 0.3, 1) forwards;
+  will-change: transform;
+}
+.blencong {
+  position: absolute;
+  inset: -12% -30%;
+  background: radial-gradient(closest-side, rgba(255, 221, 150, 0.98), rgba(242, 199, 110, 0.85) 45%, rgba(242, 199, 110, 0) 100%);
+  animation: lamp 1.9s ease-in-out forwards;
+}
+@keyframes kebyok {
+  0% {
+    transform: translate3d(62vw, 92vh, 0) rotate(30deg);
+  }
+  38% {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+  50% {
+    transform: translate3d(-1vw, -1vh, 0) rotate(4deg);
+  }
+  60% {
+    transform: translate3d(0, 0, 0) rotate(-1.5deg);
+  }
+  100% {
+    transform: translate3d(-82vw, -104vh, 0) rotate(-32deg);
+  }
+}
+@keyframes lamp {
+  0% {
+    opacity: 0;
+  }
+  30%,
+  62% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------ panggung kiri (desktop) */
+.stage {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .stage {
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 460px;
+    overflow: hidden;
+    background: var(--night);
+  }
+  .stageImg {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s var(--ease);
+  }
+  .stageImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.1);
+    transition: transform 9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .stageOn {
+    opacity: 1;
+  }
+  .stageOn img {
+    transform: scale(1);
+  }
+  .stageShade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(8, 10, 9, 0.78) 0%, rgba(8, 10, 9, 0.1) 46%, rgba(8, 10, 9, 0.05) 100%);
+  }
+  .stageText {
+    position: absolute;
+    left: clamp(40px, 5vw, 80px);
+    bottom: clamp(40px, 7vh, 80px);
+    color: #fff;
+  }
+  .stageNames {
+    margin: 14px 0 4px;
+    font-family: var(--display);
+    font-size: clamp(48px, 5.2vw, 84px);
+    line-height: 1;
+  }
+  .stageNames em {
+    font-family: var(--script);
+    font-style: normal;
+    color: var(--sage-light);
+    font-size: 0.7em;
+    margin: 0 0.12em;
+  }
+  .stageDate {
+    margin: 0;
+    font-weight: 300;
+    letter-spacing: 0.34em;
+    font-size: 16px;
+  }
+}
+
+/* ------------------------------------------------------------ kolom undangan */
+.col {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--paper);
+  /* clip (bukan hidden) agar position: sticky di adegan mempelai tetap bekerja */
+  overflow-x: clip;
+}
+@media (min-width: 1024px) {
+  .col {
+    max-width: none;
+    width: 460px;
+    margin: 0 0 0 auto;
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.35);
+  }
+}
+.sec {
+  position: relative;
+  padding: 60px 22px;
+  text-align: center;
+}
+.secTitle {
+  margin: 0 0 18px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.15;
+  color: var(--olive);
+}
+.secLead {
+  margin: -4px auto 26px;
+  max-width: 34ch;
+  color: var(--ink-soft);
+}
+.salam {
+  margin: 0 auto 30px;
+  max-width: 22ch;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.4;
+  color: var(--olive);
+}
+.lede {
+  margin: 0 auto 34px;
+  max-width: 34ch;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.verse {
+  margin: 0 auto;
+  max-width: 36ch;
+}
+.verse p {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 450;
+  font-size: 17.5px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.verse cite {
+  display: block;
+  margin-top: 14px;
+  font-style: normal;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--olive);
+}
+.note {
+  margin: 22px auto 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.muted {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------ plate foto berparalaks */
+.plate {
+  position: relative;
+  margin: 0 -22px 34px;
+  overflow: hidden;
+  background: #151815;
+}
+.plateInner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -9%;
+  bottom: -9%;
+}
+.plateZoom {
+  width: 100%;
+  height: 100%;
+}
+.plateZoom img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plateTop .plateInner {
+  top: 0;
+  bottom: 0;
+  transform-origin: 50% 0;
+}
+.plateWalk {
+  margin: 8px -22px 0;
+}
+.plateBg {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+.plateBg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 10, 9, 0.35) 0%, rgba(8, 10, 9, 0.08) 30%, rgba(8, 10, 9, 0.55) 62%, rgba(8, 10, 9, 0.92) 100%);
+}
+
+/* ------------------------------------------------------------ save the date */
+.secDate {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0;
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+}
+.dateInner {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  width: 100%;
+  padding: 120px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dateLead {
+  margin: 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.86);
+}
+.dateBig {
+  margin: 6px 0 2px;
+  font-family: var(--display);
+  font-size: min(15vw, 66px);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+.dateLong {
+  margin: 0 0 22px;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--sage-light);
+}
+.cd {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  min-height: 84px;
+  margin: 0 auto 26px;
+}
+.cdCell {
+  padding: 12px 4px 10px;
+  border: 1px solid rgba(221, 215, 168, 0.35);
+  background: rgba(8, 10, 9, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.cdNum {
+  display: block;
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1.1;
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow: hidden;
+}
+.cdDigit {
+  display: inline-block;
+  animation: flip 0.5s var(--ease);
+}
+@keyframes flip {
+  from {
+    transform: translate3d(0, -55%, 0);
+    opacity: 0;
+  }
+}
+.cdLabel {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.cdDone {
+  margin: 0 0 24px;
+  font-family: var(--display);
+  font-size: 20px;
+}
+
+/* ------------------------------------------------------------ tombol */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 26px;
+  border: 1px solid var(--olive);
+  border-radius: 999px;
+  background: var(--olive);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s var(--ease);
+}
+.btn:hover {
+  background: #66622f;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.btnLight {
+  background: rgba(251, 250, 246, 0.95);
+  color: var(--ink);
+  border-color: transparent;
+}
+.btnLight:hover {
+  background: #fff;
+}
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: var(--olive);
+  font-family: var(--sans);
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--line);
+  cursor: pointer;
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ------------------------------------------------------------ acara */
+
+.event {
+  position: relative;
+  padding: 30px 22px 18px;
+  border: 1px solid var(--line);
+  background: #fff;
+  overflow: hidden;
+}
+.event::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/assets/dani-tia/truntum.svg') repeat;
+  background-size: 30px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+.event > * {
+  position: relative;
+}
+.eventName {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 30px;
+  color: var(--olive);
+}
+.eventDate {
+  margin: 0;
+  font-weight: 500;
+}
+.eventTime {
+  margin: 2px 0 12px;
+  font-family: var(--display);
+  font-size: 22px;
+}
+.eventPlace {
+  margin: 0 auto 8px;
+  max-width: 30ch;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------ lokasi */
+
+.address {
+  margin: 0 auto 18px;
+  max-width: 28ch;
+  font-family: var(--display);
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------ rsvp & ucapan */
+
+.rsvp {
+  text-align: left;
+}
+.form {
+  display: grid;
+  gap: 18px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.field > span,
+.field legend {
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+.field textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--olive);
+  box-shadow: 0 0 0 3px rgba(119, 115, 63, 0.16);
+}
+.count {
+  justify-self: end;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.choice:has(input:focus-visible) {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+.choiceOn {
+  background: var(--olive);
+  border-color: var(--olive);
+  color: #fff;
+}
+.fieldErr {
+  font-style: normal;
+  font-size: 13px;
+  color: #9a3b2b;
+}
+.formErr {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 2px solid #9a3b2b;
+  background: #f7ebe7;
+  color: #7a2d20;
+  font-size: 14px;
+}
+.form .btn {
+  justify-self: center;
+  min-width: 220px;
+}
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.thanks {
+  padding: 26px 20px;
+  border: 1px solid var(--line);
+  background: #fff;
+  text-align: center;
+}
+.thanksTitle {
+  margin: 0 0 4px;
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--olive);
+}
+.thanks p {
+  margin: 0;
+}
+.wishes {
+  margin-top: 36px;
+  text-align: left;
+}
+.tally {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--olive);
+  text-align: center;
+}
+.wishList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.wish {
+  padding: 14px 16px;
+  border-left: 2px solid var(--olive-soft);
+  background: #fff;
+}
+.wishHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.wishHead strong {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.badge {
+  flex: none;
+  font-size: 12px;
+  color: var(--olive);
+}
+.badge[data-s='Tidak Hadir'] {
+  color: #8a5a45;
+}
+.badge[data-s='Masih Ragu'] {
+  color: var(--ink-soft);
+}
+.wishMsg {
+  margin: 6px 0 4px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.wishTime {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.wishes > .linkBtn {
+  display: flex;
+  margin: 12px auto 0;
+}
+
+/* ------------------------------------------------------------ penutup */
+.secClose {
+  position: relative;
+  background: var(--paper);
+}
+.secClose::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 520px;
+  background: url('/assets/dani-tia/truntum.svg') repeat;
+  background-size: 30px;
+  opacity: 0.06;
+  -webkit-mask-image: linear-gradient(0deg, #000 30%, transparent);
+  mask-image: linear-gradient(0deg, #000 30%, transparent);
+  pointer-events: none;
+}
+.closeText {
+  margin: 0 auto 26px;
+  max-width: 34ch;
+  font-family: var(--display);
+  font-size: 18px;
+  line-height: 1.65;
+}
+.tancep {
+  margin: 10px auto 26px;
+  width: 118px;
+}
+.berbahagia {
+  margin: 0 0 6px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+.families {
+  list-style: none;
+  margin: 0 0 30px;
+  padding: 0;
+  font-family: var(--display);
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--olive);
+}
+.closeMono {
+  margin: 0 auto 46px;
+}
+.closeMono .mono {
+  font-size: 30px;
+}
+.closeMono .mono i {
+  height: 34px;
+}
+.foot {
+  position: relative;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.foot p {
+  margin: 2px 0;
+}
+
+/* ------------------------------------------------------------ musik */
+.music {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(251, 250, 246, 0.94);
+  color: var(--olive);
+  cursor: pointer;
+}
+.musicOn svg {
+  animation: spin 6s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------ lightbox */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 9, 8, 0.96);
+  touch-action: pan-y;
+}
+.lbImg {
+  max-width: 94vw;
+  max-height: 84vh;
+  object-fit: contain;
+  animation: lbIn 0.5s var(--ease);
+  user-select: none;
+}
+.lbImg[data-dir='1'] {
+  animation-name: lbNext;
+}
+.lbImg[data-dir='-1'] {
+  animation-name: lbPrev;
+}
+@keyframes lbIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@keyframes lbNext {
+  from {
+    opacity: 0;
+    transform: translate3d(8%, 0, 0);
+  }
+}
+@keyframes lbPrev {
+  from {
+    opacity: 0;
+    transform: translate3d(-8%, 0, 0);
+  }
+}
+.lbCap {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+}
+.lbBtn,
+.lbClose {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+.lbPrev {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.lbNext {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.lbClose {
+  right: 12px;
+  top: 12px;
+}
+
+/* ------------------------------------------------------------ reveal (aktif setelah JS siap) */
+.motion [data-rv] {
+  opacity: 0;
+  transition:
+    opacity 0.9s var(--ease) var(--d, 0ms),
+    transform 1.1s var(--ease) var(--d, 0ms),
+    clip-path 1.2s var(--ease) var(--d, 0ms);
+}
+.motion [data-rv='up'] {
+  transform: translate3d(0, 26px, 0);
+}
+.motion [data-rv='zoom'] {
+  transform: scale(0.86);
+}
+.motion [data-rv='tilt'] {
+  transform: perspective(900px) rotateX(24deg) translate3d(0, 26px, 0);
+  transform-origin: 50% 100%;
+}
+.motion [data-rv='left'] {
+  transform: perspective(1000px) translate3d(-34px, 0, 0) rotateY(14deg);
+}
+.motion [data-rv='right'] {
+  transform: perspective(1000px) translate3d(34px, 0, 0) rotateY(-14deg);
+}
+.motion [data-rv='wipe'] {
+  opacity: 1;
+  clip-path: inset(0 50% 0 50%);
+}
+.motion [data-rv='photo'] {
+  opacity: 1;
+  transform: scale(1.18);
+  transition: transform 2.2s var(--ease);
+}
+.motion [data-rv='tancep'] {
+  opacity: 0;
+  transform-origin: 50% 100%;
+}
+.motion [data-rv='tancep'][data-in] {
+  animation: tancep 1.8s var(--ease) forwards;
+}
+@keyframes tancep {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 46px, 0) rotate(9deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-4deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.motion [data-rv][data-in] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion [data-rv] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .coverImg,
+  .cdDigit,
+  .musicOn svg {
+    animation: none;
+  }
+  .coverIn {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .stageImg img {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ============================================================ edisi 2: kelir, simpingan, adegan mempelai */
+
+/* ---------- kelir gelap (layar wayang diterangi blencong) */
+.kelir {
+  background:
+    radial-gradient(ellipse 85% 55% at 50% 34%, rgba(242, 199, 110, 0.2), transparent 70%),
+    linear-gradient(180deg, #12140f, #0b0c0a);
+  color: var(--paper);
+  overflow: hidden;
+}
+.kelir > * {
+  position: relative;
+  z-index: 1;
+}
+.onDark {
+  color: var(--sage-light);
+}
+.verseDark p {
+  color: rgba(251, 250, 246, 0.95);
+  text-shadow: 0 1px 14px rgba(8, 8, 6, 0.9), 0 0 2px rgba(8, 8, 6, 0.8);
+}
+.verseDark cite {
+  color: var(--sage-light);
+}
+.secOpen {
+  min-height: 92vh;
+  min-height: 92svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 26px 72px;
+}
+.secOpen .salam {
+  margin: 18px auto 22px;
+}
+.kelir > .kelirKayon {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: min(82%, 360px);
+  transform: translate(-50%, -48%);
+  pointer-events: none;
+}
+.kelirLamp {
+  position: absolute;
+  inset: -22% -30%;
+  background: radial-gradient(closest-side, rgba(250, 214, 140, 0.78), rgba(242, 199, 110, 0.22) 55%, transparent);
+  animation: flicker 5.5s ease-in-out infinite;
+}
+.kayonGlow {
+  position: relative;
+  background: #15130d;
+  transform-origin: 50% 100%;
+  animation: sway 9s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from {
+    transform: rotate(-1.8deg);
+  }
+  to {
+    transform: rotate(1.8deg);
+  }
+}
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  35% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.72;
+  }
+  70% {
+    opacity: 0.95;
+  }
+}
+
+/* ---------- bara lampu */
+.sparks {
+  position: absolute !important;
+  inset: 0;
+  z-index: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sparks i {
+  position: absolute;
+  bottom: -12px;
+  width: var(--sz);
+  height: var(--sz);
+  border-radius: 50%;
+  background: #f7dc9a;
+  box-shadow: 0 0 6px 2px rgba(242, 199, 110, 0.55);
+  opacity: 0;
+  animation: spark var(--dur) linear var(--del) infinite;
+  will-change: transform, opacity;
+}
+.sparksWarm i {
+  background: #ffe2a8;
+}
+@keyframes spark {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(var(--dx), -760px, 0);
+    opacity: 0;
+  }
+}
+
+/* ---------- pita batik kawung */
+.batik {
+  height: 24px;
+  background: url('/assets/dani-tia/kawung.svg') center / 24px 24px repeat-x;
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  margin: 22px 0 0;
+}
+
+/* ---------- adegan mempelai */
+.coupleLede {
+  margin: 0 auto 50px;
+  padding: 0 14px;
+  max-width: 36ch;
+  font-size: 15px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.coupleScene {
+  position: relative;
+  height: 250vh;
+}
+.coupleSticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 20px 14px 20px;
+  overflow: hidden;
+  background: radial-gradient(ellipse 70% 45% at 50% 40%, rgba(242, 199, 110, 0.16), transparent 70%);
+}
+.pairWrap {
+  display: flex;
+  justify-content: center;
+  perspective: 1100px;
+}
+.pair {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 60vh, 430px);
+  width: min(100%, 60svh, 430px);
+  transform-style: preserve-3d;
+}
+.pHalf {
+  position: relative;
+  aspect-ratio: 1680 / 3180;
+  overflow: hidden;
+  background: #151815;
+  will-change: transform;
+  box-shadow: 0 22px 44px rgba(30, 30, 20, 0.22);
+}
+.pHalfL {
+  transform-origin: 0% 50%;
+  transform: translate3d(-24%, 14px, 0) rotateY(40deg) scale(0.84);
+}
+.pHalfR {
+  transform-origin: 100% 50%;
+  transform: translate3d(24%, -14px, 0) rotateY(-40deg) scale(0.84);
+}
+.pHalf img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pShade {
+  position: absolute;
+  inset: 0;
+  background: #0b0a07;
+  opacity: 0.55;
+}
+.pTag {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  text-align: center;
+  font-family: var(--script);
+  font-size: 36px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+.pGlow {
+  position: absolute;
+  left: 50%;
+  top: 71%;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 236, 182, 0.95), rgba(242, 199, 110, 0.5) 42%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  pointer-events: none;
+}
+.pKayon {
+  position: absolute;
+  left: 50%;
+  top: -60px;
+  width: 32px;
+  aspect-ratio: 680 / 1040;
+  background: var(--olive);
+  -webkit-mask: url('/assets/dani-tia/gunungan.svg') center / contain no-repeat;
+  mask: url('/assets/dani-tia/gunungan.svg') center / contain no-repeat;
+  opacity: 0;
+  transform: translate(-50%, 30px) scale(0.4);
+}
+.pNames {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 10px;
+  width: min(100%, 440px);
+  margin: 0 auto;
+}
+.pName {
+  opacity: 0;
+}
+.pName:first-child {
+  text-align: right;
+}
+.pName:last-child {
+  text-align: left;
+}
+.pName h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(20px, 5.8vw, 25px);
+  line-height: 1.15;
+  color: var(--olive);
+  overflow-wrap: anywhere;
+}
+.pName p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.pWith {
+  margin: 0;
+  padding-top: 2px;
+  font-family: var(--script);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--olive-soft);
+  opacity: 0;
+}
+
+/* ---------- an-nuur: kartu ayat menumpuk */
+.secNuur {
+  padding-top: 0;
+}
+.secNuur .plate {
+  margin-bottom: -64px;
+}
+.verseCard {
+  position: relative;
+  z-index: 1;
+  margin: 0 4px;
+  padding: 36px 22px 26px;
+  max-width: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 50px rgba(40, 40, 20, 0.12);
+}
+.cardKawung {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 120px;
+  height: 24px;
+  transform: translateX(-50%);
+  background: #fff url('/assets/dani-tia/kawung.svg') center / 24px 24px repeat-x;
+}
+
+/* ---------- acara: linimasa */
+.eventsHead {
+  margin-bottom: 26px;
+}
+.eventsHead .secTitle {
+  margin-bottom: 6px;
+}
+.eventsDay {
+  margin: 0;
+  font-weight: 500;
+}
+.secEvents {
+  background:
+    linear-gradient(180deg, var(--paper), rgba(251, 250, 246, 0.92) 40%, var(--paper)),
+    url('/assets/dani-tia/kawung.svg') 0 0 / 24px 24px;
+}
+.timeline {
+  list-style: none;
+  position: relative;
+  margin: 0 0 30px;
+  padding: 0;
+  text-align: left;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 14px;
+  bottom: 18px;
+  width: 1px;
+  background: linear-gradient(var(--olive-soft), var(--line));
+}
+.tlItem {
+  position: relative;
+  padding-left: 56px;
+}
+.tlItem + .tlItem {
+  margin-top: 24px;
+}
+.tlNode {
+  position: absolute;
+  left: 7px;
+  top: 0;
+  width: 30px;
+  padding: 4px 0;
+  background: var(--paper);
+}
+.tlKayon {
+  width: 22px;
+  margin: 0 auto;
+}
+.tlTime {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--olive);
+  font-variant-numeric: lining-nums;
+}
+.timeline .event {
+  padding: 18px 18px 8px;
+  text-align: left;
+}
+.timeline .eventName {
+  font-size: 26px;
+  margin-bottom: 2px;
+}
+.timeline .eventTime {
+  margin: 0 0 8px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+}
+.timeline .eventPlace {
+  margin: 0 0 4px;
+  max-width: none;
+}
+.timeline .linkBtn {
+  padding-left: 0;
+}
+.plateCap {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 60px 20px 18px;
+  background: linear-gradient(transparent, rgba(8, 10, 9, 0.82));
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- lokasi: kartu menumpuk */
+.secMap {
+  padding-top: 0;
+  padding-bottom: 46px;
+}
+.secMap .plate {
+  margin-bottom: 0;
+}
+.mapCard {
+  position: relative;
+  z-index: 1;
+  margin: -70px 4px 0;
+  padding: 26px 20px 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 50px rgba(40, 40, 20, 0.12);
+}
+.mapCard .secTitle {
+  margin-bottom: 10px;
+}
+.mapKayon {
+  width: 26px;
+  margin: 0 auto 8px;
+}
+
+/* ---------- galeri: simpingan 3D */
+.secGallery {
+  padding: 56px 0 44px;
+}
+.secGallery .secTitle {
+  margin-bottom: 4px;
+}
+.simp {
+  position: relative;
+}
+.simpStage {
+  --cw: min(44vw, 190px);
+  --r: calc(var(--cw) * 2.05);
+  position: relative;
+  height: calc(var(--cw) * 1.53 + 84px);
+  perspective: 1100px;
+  perspective-origin: 50% 28%;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+@media (min-width: 1024px) {
+  .simpStage {
+    --cw: 170px;
+  }
+}
+.simpStage:active {
+  cursor: grabbing;
+}
+.simpStage:focus-visible {
+  outline: 1px solid var(--sage-light);
+  outline-offset: -6px;
+}
+.simpLamp {
+  position: absolute;
+  left: 50%;
+  top: -30px;
+  width: 130%;
+  height: 80%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(242, 199, 110, 0.3), transparent);
+  pointer-events: none;
+}
+.simpScene {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  width: var(--cw);
+  height: calc(var(--cw) * 1.53);
+  margin-left: calc(var(--cw) / -2);
+  transform-style: preserve-3d;
+}
+.simpRing {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--r) * -1));
+  will-change: transform;
+}
+.simpCard {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.simpPhoto,
+.simpShade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask: url('/assets/dani-tia/gunungan-outline.svg') center / 100% 100% no-repeat;
+  mask: url('/assets/dani-tia/gunungan-outline.svg') center / 100% 100% no-repeat;
+}
+.simpPhoto {
+  object-fit: cover;
+  pointer-events: none;
+}
+.simpShade {
+  background: #0b0a07;
+  opacity: 0;
+}
+.simpFrame {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #f6dc98, #c49a45 48%, #7a5d24);
+  -webkit-mask: url('/assets/dani-tia/gunungan-frame.svg') center / 100% 100% no-repeat;
+  mask: url('/assets/dani-tia/gunungan-frame.svg') center / 100% 100% no-repeat;
+}
+.simpFloor {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: calc(var(--r) * 2.4);
+  height: calc(var(--r) * 2.4);
+  margin: calc(var(--r) * -1.2) 0 0 calc(var(--r) * -1.2);
+  border-radius: 50%;
+  transform: rotateX(90deg);
+  background: radial-gradient(closest-side, rgba(242, 199, 110, 0.28), rgba(242, 199, 110, 0.06) 72%, transparent);
+  pointer-events: none;
+}
+.gedebog {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: calc(30px + var(--cw) * 1.53 - 12px);
+  height: 18px;
+  border-radius: 9px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 10px),
+    linear-gradient(180deg, #848a57, #4d5331 55%, #2a2e18);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+.simpBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: -6px;
+}
+.simpBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(221, 215, 168, 0.4);
+  background: transparent;
+  color: var(--sage-light);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.simpCap {
+  margin: 0;
+  min-width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+.simpCap span {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--sage-light);
+}
+.simpCap small {
+  font-size: 12px;
+  color: rgba(251, 250, 246, 0.65);
+}
+.simpZoom {
+  display: block;
+  margin: 10px auto 0;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: rgba(251, 250, 246, 0.8);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(221, 215, 168, 0.4);
+  cursor: pointer;
+}
+
+/* ---------- rsvp */
+.secRsvp {
+  padding-top: 0;
+}
+.secRsvp .plate {
+  margin-bottom: 0;
+}
+.rsvpCard {
+  position: relative;
+  z-index: 1;
+  margin: -46px -6px 0;
+  padding: 30px 18px 6px;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- penutup */
+.plateClose {
+  margin: 0;
+}
+.closeOver {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 140px 26px 34px;
+  background: linear-gradient(transparent, rgba(8, 10, 9, 0.86));
+  color: #fff;
+  text-align: center;
+}
+.closeOver p {
+  margin: 0 auto;
+  max-width: 32ch;
+  font-family: var(--display);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.closeBody {
+  position: relative;
+  padding: 40px 22px 34px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coupleScene {
+    height: auto;
+  }
+  .coupleSticky {
+    position: relative;
+    height: auto;
+  }
+  .sparks,
+  .kelirLamp,
+  .kayonGlow {
+    animation: none !important;
+  }
+  .sparks {
+    display: none;
+  }
+}
