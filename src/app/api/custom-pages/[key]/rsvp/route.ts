@@ -24,6 +24,17 @@ function dbUnavailable(e: unknown) {
   return e instanceof Error && /not initialized/i.test(e.message);
 }
 
+/** Kode singkat penyebab galat DB (tanpa membocorkan pesan internal) untuk diagnosis produksi. */
+function errCode(e: unknown) {
+  const m = e instanceof Error ? `${e.message} ${(e as { code?: string }).code || ''}` : String(e);
+  if (/no such table/i.test(m)) return 'no_table';
+  if (/mismatch/i.test(m)) return 'type';
+  if (/param|bind/i.test(m)) return 'param';
+  if (/auth|permission|not allowed|readonly|read-only/i.test(m)) return 'auth';
+  if (/fetch|network|timeout|ECONN/i.test(m)) return 'net';
+  return 'other';
+}
+
 export async function GET(req: Request, { params }: Ctx) {
   const { key } = await params;
   if (!CUSTOM_PAGE_KEYS.has(key)) return jsonError('Halaman tidak ditemukan.', 404);
@@ -38,7 +49,7 @@ export async function GET(req: Request, { params }: Ctx) {
   } catch (e) {
     if (dbUnavailable(e)) return jsonError('Ucapan belum bisa dimuat.', 503);
     console.error('[custom-rsvp:get]', e);
-    return jsonError('Ucapan belum bisa dimuat.', 500);
+    return jsonError('Ucapan belum bisa dimuat.', 500, { code: errCode(e) });
   }
 }
 
@@ -71,6 +82,6 @@ export async function POST(req: Request, { params }: Ctx) {
   } catch (e) {
     if (dbUnavailable(e)) return jsonError('Konfirmasi belum bisa disimpan. Coba lagi nanti.', 503);
     console.error('[custom-rsvp:post]', e);
-    return jsonError('Konfirmasi belum bisa disimpan. Coba lagi nanti.', 500);
+    return jsonError('Konfirmasi belum bisa disimpan. Coba lagi nanti.', 500, { code: errCode(e) });
   }
 }

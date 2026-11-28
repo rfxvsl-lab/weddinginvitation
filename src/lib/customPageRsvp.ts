@@ -59,20 +59,27 @@ function rowTo(r: Record<string, unknown>): CustomRsvp {
 
 export async function listCustomRsvps(pageKey: string, before: string | null, limit: number) {
   await ensureSchema();
-  const res = await dbExecute(
-    before
-      ? 'SELECT * FROM custom_page_rsvps WHERE page_key = :k AND created_at < :before ORDER BY created_at DESC LIMIT :lim'
-      : 'SELECT * FROM custom_page_rsvps WHERE page_key = :k ORDER BY created_at DESC LIMIT :lim',
-    { k: pageKey, before, lim: limit + 1 }
-  );
+  // Klien Turso remote mengirim angka JS sebagai REAL; LIMIT wajib INTEGER (kalau tidak: "datatype mismatch"),
+  // jadi batas dikirim sebagai BigInt. `before` hanya dikirim bila dipakai di SQL.
+  const lim = BigInt(Math.max(1, Math.floor(limit)) + 1);
+  const res = before
+    ? await dbExecute(
+        'SELECT * FROM custom_page_rsvps WHERE page_key = :k AND created_at < :before ORDER BY created_at DESC LIMIT :lim',
+        { k: pageKey, before, lim }
+      )
+    : await dbExecute('SELECT * FROM custom_page_rsvps WHERE page_key = :k ORDER BY created_at DESC LIMIT :lim', {
+        k: pageKey,
+        lim,
+      });
   const rows = res.rows.map((r) => rowTo(r as unknown as Record<string, unknown>));
+  const max = Math.max(1, Math.floor(limit));
   const counts = await dbExecute(
     "SELECT status, COUNT(*) AS n FROM custom_page_rsvps WHERE page_key = :k GROUP BY status",
     { k: pageKey }
   );
   const tally: Record<string, number> = {};
   for (const r of counts.rows as unknown as { status: string; n: number }[]) tally[r.status] = Number(r.n) || 0;
-  return { items: rows.slice(0, limit), hasMore: rows.length > limit, tally };
+  return { items: rows.slice(0, max), hasMore: rows.length > max, tally };
 }
 
 export async function addCustomRsvp(pageKey: string, input: Omit<CustomRsvp, 'id' | 'createdAt'>) {
@@ -85,7 +92,7 @@ export async function addCustomRsvp(pageKey: string, input: Omit<CustomRsvp, 'id
   await dbExecute(
     `INSERT INTO custom_page_rsvps (id, page_key, guest_name, status, pax, message, created_at)
      VALUES (:id, :k, :name, :status, :pax, :message, :at)`,
-    { id: rsvp.id, k: pageKey, name: rsvp.name, status: rsvp.status, pax: rsvp.pax, message: rsvp.message, at: rsvp.createdAt }
+    { id: rsvp.id, k: pageKey, name: rsvp.name, status: rsvp.status, pax: BigInt(Math.round(rsvp.pax)), message: rsvp.message, at: rsvp.createdAt }
   );
   return rsvp;
 }
