@@ -2,13 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import s from './dani-tia.module.css';
-import { GALLERY, img } from './data';
+import { CAROUSEL, cImg } from './data';
 
 /** Galeri layar penuh: geser/panah/Esc; posisi gulir & fokus kembali saat ditutup. */
-export default function Lightbox({ chapter, index, onClose }: { chapter: number; index: number; onClose: () => void }) {
-  const flat = GALLERY.flatMap((c) => c.photos.map((p) => ({ p, chapter: c.title })));
-  const start = GALLERY.slice(0, chapter).reduce((a, c) => a + c.photos.length, 0) + index;
-  const [i, setI] = useState(start);
+export default function Lightbox({ index, onClose }: { index: number; onClose: () => void }) {
+  const flat = CAROUSEL;
+  const [i, setI] = useState(index);
   const [dir, setDir] = useState(0);
   const closeRef = useRef<HTMLButtonElement>(null);
   const downX = useRef<number | null>(null);
@@ -53,7 +52,7 @@ export default function Lightbox({ chapter, index, onClose }: { chapter: number;
         if (Math.abs(dx) > 48) go(dx < 0 ? 1 : -1);
       }}
     >
-      <img key={cur.p.id} className={s.lbImg} data-dir={dir} src={img(cur.p, 1)} alt={cur.p.alt} draggable={false} />
+      <img key={cur.id} className={s.lbImg} data-dir={dir} src={cImg(cur, true)} alt={cur.alt} draggable={false} />
       <p className={s.lbCap}>
         {cur.chapter}, {i + 1} dari {flat.length}
       </p>

@@ -109,57 +109,34 @@ const P = (id: string, alt: string, w: [number, number], ratio: number, focus?: 
 export const PHOTOS = {
   cover: P('cover', 'Tia dan Dhany duduk di atas Vespa biru di depan rolling door, malam hari', [720, 1200], 2 / 3, '50% 62%'),
   hands: P('hands', 'Genggaman tangan Tia dan Dhany, Vespa biru di belakang', [720, 1280], 3 / 2, '42% 40%'),
-  tia: P('tia', 'Tia Ifawati', [480, 900], 2 / 3, '50% 30%'),
-  dhany: P('dhany', 'Mohamad Dhany Azar', [480, 900], 2 / 3, '50% 30%'),
+  tia: P('tia', 'Tia Ifawati', [480, 900], 1680 / 3180, '50% 30%'),
+  dhany: P('dhany', 'Mohamad Dhany Azar', [480, 900], 1680 / 3180, '50% 30%'),
   ride: P('ride', 'Tia dan Dhany berboncengan Vespa di jalan malam, lampu menyala', [720, 1200], 0.668, '38% 50%'),
   walk: P('walk', 'Tia dan Dhany bergandengan menyeberang jalan malam', [720, 1200], 2 / 3, '50% 55%'),
   helmet: P('helmet', 'Dhany memasangkan helm untuk Tia sebelum berangkat', [720, 1280], 3 / 2, '64% 45%'),
   duo: P('duo', 'Tia dan Dhany berboncengan Vespa dengan helm', [720, 1280], 1.5, '40% 50%'),
+  wide: P('g-m1', 'Tia dan Dhany duduk di samping Vespa biru', [720, 1400], 1.5, '50% 60%'),
   field: P('field', 'Tia dan Dhany berjalan di padang rumput di samping motor', [720, 1200], 2 / 3, '60% 70%'),
 };
 
-export interface Chapter {
+export interface CarouselPhoto {
   id: string;
-  title: string;
-  photos: Photo[];
+  alt: string;
+  chapter: 'Malam' | 'Jalanan' | 'Padang';
 }
-export const GALLERY: Chapter[] = [
-  {
-    id: 'malam',
-    title: 'Malam',
-    photos: [
-      P('g-m1', 'Tia dan Dhany duduk di samping Vespa biru', [720, 1400], 1.5),
-      P('g-m5', 'Tia memegang mawar putih di samping Vespa', [640, 1100], 2 / 3),
-      P('g-m2', 'Tia dan Dhany di atas Vespa di depan toko', [640, 1100], 2 / 3),
-      P('g-m3', 'Tia dan Dhany tersenyum di samping Vespa', [640, 1100], 2 / 3),
-      P('g-m4', 'Dhany memberi bunga untuk Tia', [640, 1100], 2 / 3),
-      P('g-m6', 'Tia duduk di Vespa memakai helm', [640, 1100], 2 / 3),
-      P('g-m7', 'Dhany memeriksa Vespa, Tia menunggu', [640, 1100], 2 / 3),
-    ],
-  },
-  {
-    id: 'jalanan',
-    title: 'Jalanan',
-    photos: [
-      P('g-j1', 'Tia dan Dhany bergandengan di jalan malam', [640, 1100], 2 / 3),
-      P('g-j3', 'Tia membetulkan kerah Dhany di samping Vespa', [720, 1400], 1.5),
-      P('g-j2', 'Tia dan Dhany menuntun Vespa di trotoar', [640, 1100], 2 / 3),
-      P('g-j4', 'Tia dan Dhany berdiri berdampingan di samping Vespa', [720, 1400], 1.5),
-      P('g-j5', 'Tia dan Dhany bercanda di Vespa', [720, 1400], 1.5),
-      P('g-j6', 'Tia dan Dhany berboncengan, lensa fisheye', [720, 1400], 1.5),
-    ],
-  },
-  {
-    id: 'padang',
-    title: 'Padang',
-    photos: [
-      P('g-p6', 'Tia dan Dhany bergandengan berlari di padang rumput', [720, 1400], 1.5),
-      P('g-p1', 'Tia dan Dhany berdiri di samping motor di padang', [640, 1100], 2 / 3),
-      P('g-p3', 'Dhany bersandar pada motor, Tia duduk', [720, 1400], 1.5),
-      P('g-p2', 'Tia dan Dhany duduk bersandar pada motor', [640, 1100], 2 / 3),
-      P('g-p5', 'Tia dan Dhany melompat di padang rumput', [720, 1400], 1.5),
-      P('g-p4', 'Tia dan Dhany duduk di rumput, tertawa', [640, 1100], 2 / 3),
-      P('g-p7', 'Tia dan Dhany bersandar pada motor di padang', [640, 1100], 2 / 3),
-    ],
-  },
+/** 12 foto galeri (urutan malam → jalanan → padang, Vespa didahulukan). File: c01-400.webp / c01-760.webp */
+export const CAROUSEL: CarouselPhoto[] = [
+  { id: 'c01', chapter: 'Malam', alt: 'Tia dan Dhany di atas Vespa biru di depan Toko Djojo' },
+  { id: 'c02', chapter: 'Malam', alt: 'Tia memegang mawar putih di samping Vespa' },
+  { id: 'c03', chapter: 'Malam', alt: 'Tia dan Dhany tersenyum di samping Vespa' },
+  { id: 'c04', chapter: 'Malam', alt: 'Dhany memberi bunga, Tia tersipu' },
+  { id: 'c05', chapter: 'Malam', alt: 'Tia duduk di Vespa memakai helm' },
+  { id: 'c06', chapter: 'Malam', alt: 'Dhany memeriksa Vespa, Tia menunggu' },
+  { id: 'c07', chapter: 'Jalanan', alt: 'Dhany menuntun Vespa, Tia berhelm merah' },
+  { id: 'c08', chapter: 'Jalanan', alt: 'Tia dan Dhany bergandengan di jalan malam' },
+  { id: 'c09', chapter: 'Jalanan', alt: 'Tia dan Dhany menuntun Vespa di trotoar' },
+  { id: 'c10', chapter: 'Padang', alt: 'Tia dan Dhany berdiri di samping motor di padang rumput' },
+  { id: 'c11', chapter: 'Padang', alt: 'Tia dan Dhany duduk bersandar pada motor' },
+  { id: 'c12', chapter: 'Padang', alt: 'Tia dan Dhany bersandar pada motor di padang' },
 ];
+export const cImg = (c: CarouselPhoto, big = false) => `${A}/${c.id}-${big ? 760 : 400}.webp`;

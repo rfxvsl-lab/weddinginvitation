@@ -9,7 +9,6 @@ import {
   DATE_DOTS,
   DATE_LONG,
   EVENTS,
-  GALLERY,
   GIFTS,
   MAPS_URL,
   MUSIC_URL,
@@ -23,6 +22,8 @@ import {
 import { useCountdown, useMediaQuery, usePointerTilt, useReducedMotion, useReveal, useScrollScene } from './motion';
 import Wishes from './Wishes';
 import Lightbox from './Lightbox';
+import Simpingan from './Simpingan';
+import CoupleScene from './CoupleScene';
 
 type Phase = 'cover' | 'opening' | 'open';
 
@@ -54,6 +55,38 @@ function Plate({ p, mode = 'drift', amp = 1, ratio, fade, className, children }:
       {children}
     </figure>
   );
+}
+
+/** Bara lampu blencong yang naik pelan — angka acak berbenih agar SSR = klien. */
+function Sparks({ n, warm }: { n: number; warm?: boolean }) {
+  let seed = n * 97 + (warm ? 13 : 0);
+  const r = () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+  return (
+    <span className={`${s.sparks} ${warm ? s.sparksWarm : ''}`} aria-hidden>
+      {Array.from({ length: n }, (_, i) => (
+        <i
+          key={i}
+          style={
+            {
+              left: `${(r() * 100).toFixed(1)}%`,
+              '--sz': `${(1.5 + r() * 2.5).toFixed(1)}px`,
+              '--dur': `${(7 + r() * 8).toFixed(1)}s`,
+              '--del': `${(-r() * 14).toFixed(1)}s`,
+              '--dx': `${((r() - 0.5) * 60).toFixed(0)}px`,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </span>
+  );
+}
+
+/** Pita batik kawung sebagai pembatas bagian. */
+function Batik() {
+  return <div className={s.batik} aria-hidden />;
 }
 
 function Gunungan({ className }: { className?: string }) {
@@ -119,7 +152,7 @@ function PinIcon() {
 
 export default function DaniTiaInvitation({ guest }: { guest: string }) {
   const [phase, setPhase] = useState<Phase>('cover');
-  const [lightbox, setLightbox] = useState<{ chapter: number; index: number } | null>(null);
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const [copied, setCopied] = useState<'idle' | 'ok' | 'fail'>('idle');
   const [playing, setPlaying] = useState(false);
   const [stagePhoto, setStagePhoto] = useState('cover');
@@ -209,7 +242,7 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
     { id: 'couple', p: PHOTOS.walk },
     { id: 'ride', p: PHOTOS.ride },
     { id: 'helmet', p: PHOTOS.helmet },
-    { id: 'gallery', p: GALLERY[0].photos[0] },
+    { id: 'gallery', p: PHOTOS.wide },
     { id: 'duo', p: PHOTOS.duo },
     { id: 'field', p: PHOTOS.field },
   ];
@@ -290,48 +323,32 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
 
       {/* ---------------------------------------------------------------- isi undangan */}
       <main ref={contentRef} className={s.col} aria-hidden={phase === 'cover' ? true : undefined} inert={phase === 'cover' ? true : undefined}>
-        {/* pembuka */}
-        <section className={`${s.sec} ${s.secOpen}`} data-stage="hands" id="pembuka">
-          <Gunungan className={s.kayonMark} />
-          <p className={s.salam} data-rv="up">
+        {/* pembuka — kelir gelap, gunungan bercahaya di balik ayat */}
+        <section className={`${s.sec} ${s.kelir} ${s.secOpen}`} data-stage="cover" id="pembuka">
+          <Sparks n={16} />
+          <div className={s.kelirKayon} aria-hidden>
+            <span className={s.kelirLamp} />
+            <Gunungan className={s.kayonGlow} />
+          </div>
+          <Monogram light />
+          <p className={`${s.salam} ${s.onDark}`} data-rv="up">
             {TEXT.salam}
           </p>
-          <Plate p={PHOTOS.hands} mode="zoom-top" ratio="4 / 3" className={`${s.plateHands} ${s.plateTop}`} />
-          <blockquote className={s.verse} data-rv="up">
+          <blockquote className={`${s.verse} ${s.verseDark}`} data-rv="up" style={{ '--d': '120ms' } as React.CSSProperties}>
             <p>{TEXT.arRuum}</p>
             <cite>{TEXT.arRuumSrc}</cite>
           </blockquote>
         </section>
+        <Batik />
 
-        {/* mempelai */}
-        <section className={`${s.sec} ${s.secCouple}`} data-stage="couple" id="mempelai">
-          <p className={s.lede} data-rv="up">
-            {TEXT.pembuka}
-          </p>
-          <div className={s.diptych} data-rv="join">
-            <div className={s.half}>
-              <Img p={PHOTOS.tia} sizes="(min-width: 1024px) 230px, 50vw" />
-            </div>
-            <div className={s.half}>
-              <Img p={PHOTOS.dhany} sizes="(min-width: 1024px) 230px, 50vw" />
-            </div>
-          </div>
-          <div className={s.person} data-rv="up">
-            <h2 className={s.personName}>{COUPLE.bride.full}</h2>
-            <p className={s.personParents}>{COUPLE.bride.parents}</p>
-          </div>
-          <p className={s.amp} data-rv="zoom" aria-hidden>
-            with
-          </p>
-          <div className={s.person} data-rv="up">
-            <h2 className={s.personName}>{COUPLE.groom.full}</h2>
-            <p className={s.personParents}>{COUPLE.groom.parents}</p>
-          </div>
-        </section>
+        {/* mempelai — dua belahan dipertemukan oleh gulir */}
+        <CoupleScene active={phase !== 'cover'} lede={TEXT.pembuka} />
 
-        {/* an-nuur */}
-        <section className={`${s.sec} ${s.secVerse}`} data-stage="couple">
-          <blockquote className={s.verse} data-rv="up">
+        {/* an-nuur — kartu ayat menumpuk di atas foto genggaman */}
+        <section className={`${s.sec} ${s.secNuur}`} data-stage="hands">
+          <Plate p={PHOTOS.hands} mode="zoom-top" ratio="5 / 4" className={`${s.plateHands} ${s.plateTop}`} />
+          <blockquote className={`${s.verse} ${s.verseCard}`} data-rv="tilt">
+            <span className={s.cardKawung} aria-hidden />
             <p>{TEXT.anNuur}</p>
             <cite>{TEXT.anNuurSrc}</cite>
           </blockquote>
@@ -340,6 +357,7 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
         {/* save the date */}
         <section className={`${s.sec} ${s.secDate}`} data-stage="ride" id="tanggal">
           <Plate p={PHOTOS.ride} mode="zoom-in" amp={1} className={s.plateBg} />
+          <Sparks n={10} warm />
           <div className={s.dateInner}>
             <p className={s.dateLead} data-rv="up">
               {TEXT.dilaksanakan}
@@ -359,93 +377,82 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
           </div>
         </section>
 
-        {/* acara */}
+        {/* acara — linimasa satu hari */}
         <section className={`${s.sec} ${s.secEvents}`} data-stage="couple" id="acara">
-          <h2 className={s.secTitle} data-rv="up">
-            Rangkaian Acara
-          </h2>
-          {EVENTS.map((e, i) => (
-            <React.Fragment key={e.id}>
-              <article className={s.event} data-rv={i === 0 ? 'left' : 'right'}>
-                <h3 className={s.eventName}>{e.name}</h3>
-                <p className={s.eventDate}>{e.date}</p>
-                <p className={s.eventTime}>Pukul {e.time}</p>
-                <p className={s.eventPlace}>{ADDRESS}</p>
-                <a className={s.linkBtn} href={calendarUrl(e)} target="_blank" rel="noopener noreferrer">
-                  <CalIcon /> Simpan ke Google Calendar
-                </a>
-              </article>
-              {i === 0 && <Plate p={PHOTOS.walk} mode="drift" ratio="4 / 5" className={s.plateWalk} />}
-            </React.Fragment>
-          ))}
-          <p className={s.note} data-rv="fade">
-            Akad dan resepsi di hari dan alamat yang sama.
-          </p>
+          <div className={s.eventsHead}>
+            <h2 className={s.secTitle} data-rv="up">
+              Rangkaian Acara
+            </h2>
+            <p className={s.eventsDay} data-rv="up">
+              {DATE_LONG}
+            </p>
+          </div>
+          <ol className={s.timeline}>
+            {EVENTS.map((e, i) => (
+              <li key={e.id} className={s.tlItem} data-rv={i === 0 ? 'left' : 'right'} style={{ '--d': `${i * 140}ms` } as React.CSSProperties}>
+                <span className={s.tlNode} aria-hidden>
+                  <Gunungan className={s.tlKayon} />
+                </span>
+                <p className={s.tlTime}>{e.time.replace(' – Selesai', '')}</p>
+                <article className={s.event}>
+                  <h3 className={s.eventName}>{e.name}</h3>
+                  <p className={s.eventTime}>Pukul {e.time}</p>
+                  <p className={s.eventPlace}>{ADDRESS}</p>
+                  <a className={s.linkBtn} href={calendarUrl(e)} target="_blank" rel="noopener noreferrer">
+                    <CalIcon /> Simpan ke Google Calendar
+                  </a>
+                </article>
+              </li>
+            ))}
+          </ol>
+          <Plate p={PHOTOS.walk} mode="drift" ratio="4 / 5" className={s.plateWalk}>
+            <figcaption className={s.plateCap}>Akad dan resepsi di hari dan alamat yang sama.</figcaption>
+          </Plate>
         </section>
 
-        {/* lokasi */}
+        {/* lokasi — kartu menumpuk di atas foto */}
         <section className={`${s.sec} ${s.secMap}`} data-stage="helmet" id="lokasi">
           <Plate p={PHOTOS.helmet} mode="zoom-out" ratio="4 / 3" fade />
-          <h2 className={s.secTitle} data-rv="up">
-            Lokasi
-          </h2>
-          <p className={s.address} data-rv="up">
-            {ADDRESS}
-          </p>
-          <div className={s.actions} data-rv="up">
-            {/* PLACEHOLDER: MAPS_URL masih pencarian alamat — ganti dengan pin asli dari QR undangan */}
-            <a className={s.btn} href={MAPS_URL} target="_blank" rel="noopener noreferrer">
-              <PinIcon /> Buka Google Maps
-            </a>
-            <button type="button" className={s.linkBtn} onClick={copyAddress}>
-              {copied === 'ok' ? 'Alamat tersalin' : copied === 'fail' ? 'Gagal menyalin — tekan lama alamat di atas' : 'Salin alamat'}
-            </button>
+          <div className={s.mapCard} data-rv="up">
+            <Gunungan className={s.mapKayon} />
+            <h2 className={s.secTitle}>Lokasi</h2>
+            <p className={s.address}>{ADDRESS}</p>
+            <div className={s.actions}>
+              {/* PLACEHOLDER: MAPS_URL masih pencarian alamat — ganti dengan pin asli dari QR undangan */}
+              <a className={s.btn} href={MAPS_URL} target="_blank" rel="noopener noreferrer">
+                <PinIcon /> Buka Google Maps
+              </a>
+              <button type="button" className={s.linkBtn} onClick={copyAddress}>
+                {copied === 'ok' ? 'Alamat tersalin' : copied === 'fail' ? 'Gagal menyalin — tekan lama alamat di atas' : 'Salin alamat'}
+              </button>
+            </div>
           </div>
         </section>
+        <Batik />
 
-        {/* galeri */}
-        <section className={`${s.sec} ${s.secGallery}`} data-stage="gallery" id="galeri" aria-label="Galeri foto">
-          <h2 className={s.secTitle} data-rv="up">
+        {/* galeri — simpingan 3D di atas kelir */}
+        <section className={`${s.sec} ${s.kelir} ${s.secGallery}`} data-stage="gallery" id="galeri">
+          <Sparks n={12} />
+          <h2 className={`${s.secTitle} ${s.onDark}`} data-rv="up">
             Galeri
           </h2>
-          {GALLERY.map((ch, ci) => (
-            <div key={ch.id} className={s.chapter}>
-              <h3 className={s.chapterTitle} data-rv="wipe">
-                <span>{ch.title}</span>
-              </h3>
-              <div className={s.grid}>
-                {ch.photos.map((p, pi) => {
-                  const wide = p.ratio > 1;
-                  const variant = wide ? 'tilt' : pi % 2 ? 'right' : 'left';
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className={`${s.gItem} ${wide ? s.gWide : ''}`}
-                      style={{ aspectRatio: wide ? '3 / 2' : '2 / 3', '--d': `${(pi % 2) * 120}ms` } as React.CSSProperties}
-                      onClick={() => setLightbox({ chapter: ci, index: pi })}
-                      aria-label={`Perbesar foto: ${p.alt}`}
-                      data-rv={variant}
-                    >
-                      <Img p={p} sizes={wide ? '(min-width: 1024px) 460px, 100vw' : '(min-width: 1024px) 230px, 50vw'} />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          <div data-rv="zoom">
+            <Simpingan onOpen={(i) => setLightbox(i)} />
+          </div>
         </section>
 
         {/* rsvp & ucapan */}
         <section className={`${s.sec} ${s.secRsvp}`} data-stage="duo" id="rsvp">
-          <Plate p={PHOTOS.duo} mode="drift" ratio="3 / 2" />
-          <h2 className={s.secTitle} data-rv="up">
-            Konfirmasi Kehadiran
-          </h2>
-          <p className={s.secLead} data-rv="up">
-            Mohon kabari kami kehadiran Anda, dan titipkan doa untuk kedua mempelai.
-          </p>
-          <Wishes guest={guest} />
+          <Plate p={PHOTOS.duo} mode="drift" ratio="16 / 10" />
+          <div className={s.rsvpCard}>
+            <h2 className={s.secTitle} data-rv="up">
+              Konfirmasi Kehadiran
+            </h2>
+            <p className={s.secLead} data-rv="up">
+              Mohon kabari kami kehadiran Anda, dan titipkan doa untuk kedua mempelai.
+            </p>
+            <Wishes guest={guest} />
+          </div>
         </section>
 
         {/* amplop digital — hanya tampil bila ada data rekening */}
@@ -463,34 +470,37 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
         )}
 
         {/* penutup */}
-        <section className={`${s.sec} ${s.secClose}`} data-stage="field" id="penutup">
-          <Plate p={PHOTOS.field} mode="rise" ratio="4 / 5" />
-          <p className={s.closeText} data-rv="up">
-            {TEXT.kehormatan}
-          </p>
-          <p className={s.salam} data-rv="up">
-            {TEXT.penutup}
-          </p>
-          <div className={s.tancep} data-rv="tancep">
-            <Gunungan className={s.kayonClose} />
-          </div>
-          <p className={s.berbahagia} data-rv="up">
-            {TEXT.berbahagia}
-          </p>
-          <ul className={s.families} data-rv="up">
-            {TEXT.keluarga.map((k) => (
-              <li key={k}>{k}</li>
-            ))}
-          </ul>
-          <div className={s.closeMono} data-rv="zoom">
-            <Monogram />
-          </div>
-          <footer className={s.foot}>
-            <p>Foto prewedding oleh @rfx.visual</p>
-            <p>
-              Undangan digital oleh <a href="https://www.ruanghadir.net">RuangHadir</a>
+        <section className={`${s.secClose}`} data-stage="field" id="penutup">
+          <Plate p={PHOTOS.field} mode="rise" ratio="3 / 4" className={s.plateClose}>
+            <figcaption className={s.closeOver}>
+              <p data-rv="up">{TEXT.kehormatan}</p>
+            </figcaption>
+          </Plate>
+          <div className={s.closeBody}>
+            <p className={s.salam} data-rv="up">
+              {TEXT.penutup}
             </p>
-          </footer>
+            <div className={s.tancep} data-rv="tancep">
+              <Gunungan className={s.kayonClose} />
+            </div>
+            <p className={s.berbahagia} data-rv="up">
+              {TEXT.berbahagia}
+            </p>
+            <ul className={s.families} data-rv="up">
+              {TEXT.keluarga.map((k) => (
+                <li key={k}>{k}</li>
+              ))}
+            </ul>
+            <div className={s.closeMono} data-rv="zoom">
+              <Monogram />
+            </div>
+            <footer className={s.foot}>
+              <p>Foto prewedding oleh @rfx.visual</p>
+              <p>
+                Undangan digital oleh <a href="https://www.ruanghadir.net">RuangHadir</a>
+              </p>
+            </footer>
+          </div>
         </section>
       </main>
 
@@ -504,7 +514,7 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
         </button>
       )}
 
-      {lightbox && <Lightbox chapter={lightbox.chapter} index={lightbox.index} onClose={() => setLightbox(null)} />}
+      {lightbox !== null && <Lightbox index={lightbox} onClose={() => setLightbox(null)} />}
     </div>
   );
 }
