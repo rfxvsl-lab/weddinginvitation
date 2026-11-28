@@ -581,8 +581,7 @@ export function useWeddingData(): UseWeddingDataReturn {
     const currentThemeId = themeIdRef.current;
     console.log('[DEBUG] 🚀 publishInvitationAction called, invId =', invId);
     if (!invId) {
-      console.error('[DEBUG] ❌ PUBLISH ABORTED — invitationId is null!');
-      return;
+      throw new Error('Undangan belum tersedia untuk dipublikasikan.');
     }
     try {
       // Cancel any pending debounced save
@@ -611,6 +610,7 @@ export function useWeddingData(): UseWeddingDataReturn {
     } catch (err) {
       console.error('[DEBUG] ❌ PUBLISH FAILED:', err);
       toastSingleton.error('Gagal mempublikasi undangan', String(err));
+      throw err;
     }
   }, [saveDesignSnapshot]); // Only depends on saveDesignSnapshot, rest via refs
 

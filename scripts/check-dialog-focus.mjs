@@ -18,17 +18,17 @@ class Element {
  matches(){return this.disabled;}
  closest(){return this.blocked?this:null;}
  getClientRects(){return this.hidden||!this.isConnected?[]:[{}];}
- focus(options){assert.equal(options.preventScroll,true,'focus must not jump tall modal scroll');this.ownerDocument.activeElement=this;this.ownerDocument.fire('focusin',{target:this});}
+ focus(options){this.lastPreventScroll=options.preventScroll;this.ownerDocument.activeElement=this;this.ownerDocument.fire('focusin',{target:this});}
 }
 const doc=new Doc(),trigger=new Element(doc,'trigger');trigger.focus({preventScroll:true});
 const root=new Element(doc,'publish',-1),heading=new Element(doc,'heading',-1),close=new Element(doc,'close'),hidden=new Element(doc,'hidden'),disabled=new Element(doc,'disabled'),link=new Element(doc,'link'),last=new Element(doc,'last');
 hidden.hidden=true;disabled.disabled=true;root.children=[close,heading,hidden,disabled,link,last];
 let publishEscapes=0,busy=false;
 const release=manageDialogFocus(root,{onEscape(){if(!busy)publishEscapes++;},initialFocus:()=>heading});
-assert.equal(doc.activeElement,heading,'initial focus gives context, not publish');
+assert.equal(doc.activeElement,heading,'initial focus gives context, not publish');assert.equal(heading.lastPreventScroll,true);
 assert.equal(doc.key('Tab').defaultPrevented,true);assert.equal(doc.activeElement,close);
-doc.key('Tab',true);assert.equal(doc.activeElement,last);
-doc.key('Tab');assert.equal(doc.activeElement,close);
+doc.key('Tab',true);assert.equal(doc.activeElement,last);assert.equal(last.lastPreventScroll,false,'reverse wrap reveals destination');
+doc.key('Tab');assert.equal(doc.activeElement,close);assert.equal(close.lastPreventScroll,false,'wrap reveals destination');
 assert.equal(doc.key('Tab').defaultPrevented,false,'normal middle tab uses browser order');
 last.disabled=true;doc.key('Tab',true);assert.equal(doc.activeElement,link,'disabled/hidden controls skipped');
 trigger.focus({preventScroll:true});assert.equal(doc.activeElement,close,'outside programmatic focus redirected');
@@ -42,7 +42,7 @@ const releaseAgain=manageDialogFocus(alert,{onEscape(){}});close.disabled=true;
 releaseAgain();assert.equal(doc.activeElement,link,'disabled trigger falls back to eligible underlying control');
 const releaseMissing=manageDialogFocus(alert,{onEscape(){}});link.isConnected=false;
 releaseMissing();assert.equal(doc.activeElement,root,'removed trigger and empty controls fall back to underlying dialog');link.isConnected=true;
-release();assert.equal(doc.activeElement,trigger,'final close restores original trigger');
+release();assert.equal(doc.activeElement,trigger,'final close restores original trigger');assert.equal(trigger.lastPreventScroll,true);
 assert.equal([...doc.handlers.values()].flat().length,0,'all event listeners removed');
 const empty=new Element(doc,'empty',-1),releaseEmpty=manageDialogFocus(empty,{onEscape(){}});
 assert.equal(doc.activeElement,empty);doc.key('Tab');assert.equal(doc.activeElement,empty);releaseEmpty();
@@ -90,3 +90,19 @@ assert.equal(node('Tutup dialog publikasi').props.disabled,true,'alert dismissal
 await act(async()=>{settlePublish();await publishing});assert.equal(dialog.props['aria-busy'],false);assert.equal(node('Tutup dialog publikasi').props.disabled,false);
 await act(async()=>view.unmount());
 console.log('PASS: actual PublishModal has named dialog/context heading; controlled pending publish disables close/back, queued alerts preserve order and do not close/reset underlying work; completion restores close.');
+
+// End-to-end frontend contract: actual hook callback -> actual modal -> actual alert queue.
+const {makePublish}=await import('./check-publish-failure.mjs');
+for(const options of [{id:null},{saveFails:true},{publishFails:true}]){
+ const stub=makePublish(options);
+ const errorProps={...props,wedding:{...props.wedding,publishInvitation:stub.publish}};
+ await act(async()=>{view=create(React.createElement(AlertModalProvider,null,React.createElement(Publish,errorProps)))});
+ await act(async()=>{await node('Salin tautan publikasi').props.onClick()});
+ await act(async()=>{await publishButton().props.onClick()});
+ assert.equal(view.root.findByProps({id:'rh-alert-title'}).children[0],'Gagal Publish');
+ assert.equal(view.root.findAll(n=>n.type==='h3'&&n.children.includes('Berhasil Dipublikasikan!')).length,0);
+ assert.equal(stub.record().isPublished,false);
+ assert.equal(view.root.findByProps({role:'dialog'}).props['aria-busy'],false);
+ await act(async()=>view.unmount());
+}
+console.log('PASS actual hook-to-PublishModal failures: error alert shown, no success heading, busy reset, no backend mutation.');
