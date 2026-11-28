@@ -83,8 +83,8 @@ export const TEXT = {
   kepada: 'Kepada Yth. Bapak/Ibu/Saudara/i',
 };
 
-/** PLACEHOLDER — musik latar belum dipilih. Isi URL mp3 untuk menampilkan tombol musik. */
-export const MUSIC_URL: string | null = null;
+/** Musik latar pilihan pemilik (28 Nov 2026); diputar setelah tombol Buka Undangan, berulang. */
+export const MUSIC_URL: string | null = '/assets/dani-tia/music.mp3';
 
 /** PLACEHOLDER — undangan cetak tidak mencantumkan rekening; seksi amplop disembunyikan selama kosong. */
 export const GIFTS: { bank: string; number: string; holder: string }[] = [];

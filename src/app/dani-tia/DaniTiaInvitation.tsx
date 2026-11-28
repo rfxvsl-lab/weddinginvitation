@@ -171,6 +171,17 @@ export default function DaniTiaInvitation({ guest }: { guest: string }) {
 
   useEffect(() => setMotionReady(true), []);
 
+  // mulai unduh musik sejak sampul tampil agar langsung berbunyi saat undangan dibuka
+  useEffect(() => {
+    if (!MUSIC_URL || audioRef.current) return;
+    const a = new Audio();
+    a.preload = 'auto';
+    a.loop = true;
+    a.src = MUSIC_URL;
+    audioRef.current = a;
+    return () => a.pause();
+  }, []);
+
   // kunci gulir selama sampul tampil
   useEffect(() => {
     const html = document.documentElement;
