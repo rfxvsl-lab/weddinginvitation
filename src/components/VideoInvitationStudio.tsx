@@ -36,9 +36,13 @@ import { isEnterpriseTier, ENTERPRISE_CONTACT_EMAIL } from '@/lib/packageLimits'
 import EnterpriseMotionPlayer, {
   MOTION_FONT_CSS_URL,
   MOTION_FONT_FAMILIES,
+  toFilmData,
   type MotionPlayerCouple,
 } from '@/components/EnterpriseMotionPlayer';
-import type { WeddingData, SaaSUser, VideoStudioSettings, Guest } from '@/types';
+import { StoryPlayer, STORY_FONT_FAMILIES, type StoryFilmData } from '@/components/motion/StoryFilm';
+import StoryEditor from '@/components/video/StoryEditor';
+import { STORY_LIMITS, momentReady, storyDuration, type ResolvedStory } from '@/lib/video/story/model';
+import type { WeddingData, SaaSUser, VideoStudioSettings, Guest, StoryProject } from '@/types';
 import { VIDEO_THEMES, VIDEO_FPS, VIDEO_DURATION_SEC, type VideoAspectId, type VideoThemeId } from '@/lib/invitationVideoEngine';
 import {
   resolveVideoSettings,
@@ -134,15 +138,15 @@ interface ExportStageHandle {
 
 const ExportStage = forwardRef<
   ExportStageHandle,
-  { themeId: VideoThemeId; couple: MotionPlayerCouple; cssWidth: number; cssHeight: number }
->(function ExportStage({ themeId, couple, cssWidth, cssHeight }, ref) {
-  const [progress, setProgress] = useState(0);
+  { themeId: VideoThemeId; couple: MotionPlayerCouple; cssWidth: number; cssHeight: number; story?: StoryFilmData | null }
+>(function ExportStage({ themeId, couple, cssWidth, cssHeight, story }, ref) {
+  const [time, setTime] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(
     ref,
     () => ({
       node: () => (rootRef.current?.firstElementChild as HTMLElement | null) ?? null,
-      seek: (timeSec: number) => flushSync(() => setProgress(timeSec / VIDEO_DURATION_SEC)),
+      seek: (timeSec: number) => flushSync(() => setTime(timeSec)),
     }),
     []
   );
@@ -152,7 +156,11 @@ const ExportStage = forwardRef<
       aria-hidden
       style={{ position: 'fixed', left: -20000, top: 0, width: cssWidth, height: cssHeight, pointerEvents: 'none', contain: 'strict' }}
     >
-      <EnterpriseMotionPlayer themeId={themeId} couple={couple} progress={progress} showWatermark={false} />
+      {story ? (
+        <StoryPlayer data={story} time={time} showWatermark={false} />
+      ) : (
+        <EnterpriseMotionPlayer themeId={themeId} couple={couple} progress={time / VIDEO_DURATION_SEC} showWatermark={false} />
+      )}
     </div>
   );
 });
@@ -184,9 +192,16 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     },
     [onSettingsChange]
   );
-  const { themeId, aspect: aspectId, quality } = settings;
+  const { themeId, quality } = settings;
+  const isStory = settings.mode === 'story';
+  const story = settings.story as ResolvedStory;
+  /** Video Cerita selalu vertikal: latar AI dibuat 9:16. */
+  const aspectId: VideoAspectId = isStory ? '9:16' : settings.aspect;
   const activeTheme = VIDEO_THEMES.find((p) => p.id === themeId) || VIDEO_THEMES[0];
   const size = outputSize(aspectId, quality);
+  const storyMoments = story.moments.filter(momentReady);
+  const dur = isStory ? storyDuration(Math.max(storyMoments.length, 1)) : VIDEO_DURATION_SEC;
+  const storyRenderable = storyMoments.filter((m) => story.assets[m.id]?.bg && story.assets[m.id]?.chars).length >= STORY_LIMITS.minMoments;
 
   // ---- Tamu (versi personal) ----
   const guests = useMemo(() => guestList.filter((g) => g?.name?.trim()), [guestList]);
@@ -268,6 +283,8 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
   const [job, setJob] = useState<Job | null>(null);
   const isRendering = job !== null;
 
+  const durRef = useRef(dur);
+  durRef.current = dur;
   useEffect(() => {
     if (!isPlaying || isRendering) return;
     let raf = 0;
@@ -275,7 +292,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     const tick = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
-      setProgress((p) => (p + dt / VIDEO_DURATION_SEC) % 1);
+      setProgress((p) => (p + dt / durRef.current) % 1);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -292,10 +309,10 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
       a.pause();
       return;
     }
-    const want = settings.music.offsetSec + progress * VIDEO_DURATION_SEC;
+    const want = settings.music.offsetSec + progress * dur;
     if (Math.abs(a.currentTime - want) > 0.35) a.currentTime = want;
     if (a.paused) a.play().catch(() => setPreviewSound(false));
-  }, [previewSound, isPlaying, isRendering, musicUrl, progress, settings.music.offsetSec, settings.music.volume]);
+  }, [previewSound, isPlaying, isRendering, musicUrl, progress, dur, settings.music.offsetSec, settings.music.volume]);
 
   useEffect(() => {
     setMusicDuration(null);
@@ -332,10 +349,34 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
   useEffect(() => () => {
     if (batchResult) URL.revokeObjectURL(batchResult.url);
   }, [batchResult]);
+  const buildStoryData = useCallback(
+    (c: MotionPlayerCouple): StoryFilmData => {
+      const fd = toFilmData(c);
+      return {
+        groom: fd.groom,
+        bride: fd.bride,
+        dateLong: fd.dateLong,
+        day: fd.day,
+        monthNum: fd.monthNum,
+        year: fd.year,
+        events: fd.events,
+        slug: fd.slug,
+        guest: fd.guest,
+        closingNarration: story.closingNarration || undefined,
+        style: story.style,
+        moments: storyMoments.map((m) => ({ ...m, bg: story.assets[m.id]?.bg, chars: story.assets[m.id]?.chars })),
+        finale: story.finale ? { bg: story.finale.bg, chars: story.finale.chars } : undefined,
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(story)]
+  );
   const stageCouple = useMemo(
     () => (stageGuest === undefined ? coupleData : { ...coupleData, guestName: stageGuest || undefined }),
     [coupleData, stageGuest]
   );
+  const previewStory = useMemo(() => (isStory ? buildStoryData(coupleData) : null), [isStory, buildStoryData, coupleData]);
+  const stageStory = useMemo(() => (isStory ? buildStoryData(stageCouple) : null), [isStory, buildStoryData, stageCouple]);
 
   useEffect(() => {
     if (!isRendering) return;
@@ -349,6 +390,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
   /** Satu job render: tunggal (guestIds = [satu id atau null]) atau massal (beberapa tamu → ZIP). */
   const startRender = async ({ skipMusic = false, batch = false }: { skipMusic?: boolean; batch?: boolean } = {}) => {
     if (!isEnt || isRendering) return;
+    if (isStory && !storyRenderable) return;
     const { exportFilmVideo, supportsVideoExport, VideoExportError } = await import('@/lib/video/exportVideo');
     const { createRasterCache } = await import('@/lib/video/frameRasterizer');
     setError(null);
@@ -372,7 +414,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     abortRef.current = ctrl;
     const startedAt = performance.now();
     const useMusic = !skipMusic && !!musicUrl;
-    const total = Math.round(VIDEO_DURATION_SEC * VIDEO_FPS);
+    const total = Math.round(dur * VIDEO_FPS);
     setIsPlaying(false);
     setJob({
       phase: useMusic ? 'music' : 'prepare',
@@ -396,7 +438,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
         const { buildSoundtrack } = await import('@/lib/video/soundtrack');
         try {
           audio = await buildSoundtrack(musicUrl, {
-            durationSec: VIDEO_DURATION_SEC,
+            durationSec: dur,
             offsetSec: settings.music.offsetSec,
             volume: settings.music.volume,
             signal: ctrl.signal,
@@ -429,11 +471,11 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             width: size.width,
             height: size.height,
             fps: VIDEO_FPS,
-            durationSec: VIDEO_DURATION_SEC,
+            durationSec: dur,
             seek: (t) => stageRef.current?.seek(t),
             audio,
             fontCssUrls: [MOTION_FONT_CSS_URL],
-            fontFamilies: MOTION_FONT_FAMILIES[themeId],
+            fontFamilies: isStory ? STORY_FONT_FAMILIES : MOTION_FONT_FAMILIES[themeId],
             rasterCache: cache,
             signal: ctrl.signal,
             onProgress: (p) => {
@@ -446,7 +488,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             },
           });
           out.warnings.forEach((w) => warnings.add(w));
-          const name = videoFileName({ groom: coupleData.groom, bride: coupleData.bride, themeId, aspect: aspectId, guestName: target.name, ext: out.container });
+          const name = videoFileName({ groom: coupleData.groom, bride: coupleData.bride, themeId: isStory ? 'cerita' : themeId, aspect: aspectId, guestName: target.name, ext: out.container });
           last = { out, name };
           if (batch) files.push({ name: uniqueName(name, files), data: new Uint8Array(await out.blob.arrayBuffer()) });
         } catch (e) {
@@ -588,8 +630,8 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
     zip: 'Menyusun file ZIP…',
   };
 
-  const elapsed = progress * VIDEO_DURATION_SEC;
-  const fmtSec = (s: number) => `0:${String(Math.floor(s)).padStart(2, '0')}`;
+  const elapsed = progress * dur;
+  const fmtSec = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
   const chip = (active: boolean) =>
     `rounded-2xl text-left transition cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rh-primary)]/50 disabled:cursor-not-allowed disabled:opacity-55 ${
@@ -608,7 +650,10 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
           </div>
           <h2 className="text-[22px] sm:text-[26px] font-bold tracking-[-0.025em] text-[var(--rh-ink)]">Video Undangan</h2>
           <p className="text-[13.5px] text-[var(--rh-ink-2)] max-w-2xl">
-            Film undangan {VIDEO_DURATION_SEC} detik dari data undangan Anda: nama, foto, tanggal, lokasi, dan musik. Hasil unduhan sama persis dengan pratinjau.
+            {isStory
+              ? 'Video cerita ilustrasi: karakter mirip kalian digambar AI dari foto, adegan dari kisah kalian sendiri, ditutup dengan undangan.'
+              : `Film undangan ${VIDEO_DURATION_SEC} detik dari data undangan Anda: nama, foto, tanggal, lokasi, dan musik.`}{' '}
+            Hasil unduhan sama persis dengan pratinjau.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
@@ -627,18 +672,45 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-1 rounded-full bg-[var(--rh-ink)]/[0.05] p-1 max-w-md" role="tablist" aria-label="Jenis video">
+        {(
+          [
+            ['story', 'Video Cerita (AI)'],
+            ['template', 'Film Template'],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={settings.mode === id}
+            disabled={isRendering}
+            onClick={() => {
+              update({ mode: id });
+              setProgress(0);
+              setIsPlaying(true);
+            }}
+            className={`rounded-full px-4 py-2.5 text-[13px] font-semibold transition disabled:opacity-55 ${
+              settings.mode === id ? 'bg-white text-[var(--rh-ink)] shadow-sm' : 'text-[var(--rh-ink-2)] hover:text-[var(--rh-ink)]'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Kiri: panggung */}
         <div className="xl:col-span-7 glx-strong rounded-[30px] p-4 sm:p-6 space-y-5 xl:sticky xl:top-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--rh-muted)]">Pratinjau · {activeTheme.name}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--rh-muted)]">Pratinjau · {isStory ? 'Video Cerita' : activeTheme.name}</p>
               <p className="text-[14px] font-semibold text-[var(--rh-ink)] truncate">
                 {ASPECTS.find((a) => a.id === aspectId)?.label} · {guest ? `Untuk ${guest.name}` : 'Tamu Undangan'}
               </p>
             </div>
             <span className="rounded-full bg-[var(--rh-ink)]/6 px-3 py-1 font-mono text-[12px] font-semibold text-[var(--rh-ink)] tabular">
-              {fmtSec(elapsed)} / {fmtSec(VIDEO_DURATION_SEC)}
+              {fmtSec(elapsed)} / {fmtSec(dur)}
             </span>
           </div>
 
@@ -654,7 +726,11 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             >
               {/* Saat render, film pratinjau dilepas supaya CPU penuh untuk panggung ekspor. */}
               {!isRendering && (
-                <EnterpriseMotionPlayer themeId={themeId} couple={coupleData} progress={progress} isPlaying={isPlaying} showWatermark={!isEnt} />
+                previewStory ? (
+                  <StoryPlayer data={previewStory} time={progress * dur} showWatermark={!isEnt} />
+                ) : (
+                  <EnterpriseMotionPlayer themeId={themeId} couple={coupleData} progress={progress} isPlaying={isPlaying} showWatermark={!isEnt} />
+                )
               )}
             </div>
             {isRendering && (
@@ -750,6 +826,18 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
 
         {/* Kanan: pengaturan & ekspor */}
         <div className="xl:col-span-5 space-y-5">
+          {isStory && (
+            <StoryEditor
+              story={story}
+              onChange={(next: StoryProject) => update({ story: next })}
+              groomName={coupleData.groom}
+              brideName={coupleData.bride}
+              venue={wedding?.events?.resepsi?.venueName || wedding?.events?.akad?.venueName || ''}
+              isEnt={isEnt}
+              disabled={isRendering}
+            />
+          )}
+          {!isStory && (
           <section className="glx rounded-[26px] p-5 space-y-3.5" aria-labelledby="vs-format">
             <h3 id="vs-format" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
               <SlidersHorizontal className="h-4 w-4 text-[var(--rh-primary)]" /> Format
@@ -778,7 +866,9 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               {size.width}×{size.height} px · {ASPECTS.find((a) => a.id === aspectId)?.desc}
             </p>
           </section>
+          )}
 
+          {!isStory && (
           <section className="glx rounded-[26px] p-5 space-y-3.5" aria-labelledby="vs-theme">
             <h3 id="vs-theme" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
               <Layers className="h-4 w-4 text-[var(--rh-primary)]" /> Tema film
@@ -815,6 +905,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               })}
             </div>
           </section>
+          )}
 
           <section className="glx rounded-[26px] p-5 space-y-3" aria-labelledby="vs-guest">
             <h3 id="vs-guest" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
@@ -930,6 +1021,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
             )}
           </section>
 
+          {!isStory && (
           <section className="glx rounded-[26px] p-5 space-y-3" aria-labelledby="vs-copy">
             <h3 id="vs-copy" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
               <Type className="h-4 w-4 text-[var(--rh-primary)]" /> Teks di video
@@ -966,6 +1058,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               <p className="text-[11.5px] text-[var(--rh-muted)]">Teks khusus tersedia untuk film Perjalanan dan Pasundan. Film ini memakai teks bawaannya.</p>
             )}
           </section>
+          )}
 
           <section className="glx rounded-[26px] p-5 space-y-3.5" aria-labelledby="vs-music">
             <h3 id="vs-music" className="flex items-center gap-2 text-[13px] font-bold text-[var(--rh-ink)]">
@@ -1107,13 +1200,16 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
               <div className="space-y-3">
                 <p className="text-[12px] text-[var(--rh-ink-2)]">
                   {guestMode === 'batch' ? `${batchIds.length || 'Belum ada'} video, masing-masing ` : ''}MP4 {size.width}×{size.height}, {VIDEO_FPS} fps,{' '}
-                  {VIDEO_DURATION_SEC} detik{musicUrl ? `, musik: ${musicTitle}` : ', tanpa musik'}. Render berjalan di perangkat Anda
+                  {Math.round(dur)} detik{musicUrl ? `, musik: ${musicTitle}` : ', tanpa musik'}. Render berjalan di perangkat Anda
                   {guestMode === 'batch' ? '; batch besar bisa memakan waktu lama.' : '; biasanya 1–3 menit untuk HD.'}
                 </p>
+                {isStory && !storyRenderable && (
+                  <p className="text-[11.5px] text-[#8C6B34]">Buat gambar AI untuk minimal {STORY_LIMITS.minMoments} momen dulu (bagian Gambar AI di atas).</p>
+                )}
                 <button
                   type="button"
                   onClick={() => startRender({ batch: guestMode === 'batch' })}
-                  disabled={isRendering || (guestMode === 'batch' && !batchIds.length)}
+                  disabled={isRendering || (isStory && !storyRenderable) || (guestMode === 'batch' && !batchIds.length)}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--rh-primary)] px-5 py-3 text-[13.5px] font-semibold text-white transition hover:bg-[var(--rh-primary-hover)] active:scale-[0.98] cursor-pointer disabled:opacity-60"
                 >
                   {isRendering ? <Loader2 className="h-4 w-4 animate-spin" /> : <Film className="h-4 w-4" />}
@@ -1297,7 +1393,7 @@ export default function VideoInvitationStudio({ wedding, guests: guestList = [],
         </div>
       </div>
 
-      {isRendering && <ExportStage ref={stageRef} themeId={themeId} couple={stageCouple} cssWidth={size.cssWidth} cssHeight={size.cssHeight} />}
+      {isRendering && <ExportStage ref={stageRef} themeId={themeId} couple={stageCouple} story={stageStory} cssWidth={size.cssWidth} cssHeight={size.cssHeight} />}
     </div>
   );
 }

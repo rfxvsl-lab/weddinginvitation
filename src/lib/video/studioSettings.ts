@@ -1,4 +1,5 @@
-import type { VideoStudioSettings } from '@/types';
+import type { StoryProject, VideoStudioSettings } from '@/types';
+import { resolveStory } from './story/model';
 import { VIDEO_THEMES, type VideoAspectId, type VideoThemeId } from '@/lib/invitationVideoEngine';
 
 export type VideoQuality = 'hd' | 'fast';
@@ -12,6 +13,8 @@ export interface ResolvedVideoSettings {
   music: { source: MusicSource; customUrl: string; customTitle: string; offsetSec: number; volume: number };
   shared: { url: string; themeId: string; aspect: string; guestName?: string | null; bytes: number; createdAt: string } | null;
   copy: { tagline: string; closing: string };
+  mode: 'story' | 'template';
+  story: StoryProject;
 }
 
 export const COPY_LIMITS = { tagline: 32, closing: 60 } as const;
@@ -26,6 +29,8 @@ export const DEFAULT_VIDEO_SETTINGS: ResolvedVideoSettings = {
   music: { source: 'invitation', customUrl: '', customTitle: '', offsetSec: 0, volume: 0.85 },
   shared: null,
   copy: { tagline: '', closing: '' },
+  mode: 'story',
+  story: {},
 };
 
 const ASPECTS: VideoAspectId[] = ['9:16', '1:1', '16:9'];
@@ -51,6 +56,8 @@ export function resolveVideoSettings(raw?: VideoStudioSettings | null): Resolved
       offsetSec: clamp(m?.offsetSec, 0, 600, 0),
       volume: clamp(m?.volume, 0, 1, d.music.volume),
     },
+    mode: raw?.mode === 'template' ? 'template' : 'story',
+    story: resolveStory(raw?.story),
     copy: {
       tagline: typeof raw?.copy?.tagline === 'string' ? raw.copy.tagline.slice(0, COPY_LIMITS.tagline) : '',
       closing: typeof raw?.copy?.closing === 'string' ? raw.copy.closing.slice(0, COPY_LIMITS.closing) : '',

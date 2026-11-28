@@ -67,6 +67,57 @@ export interface DigitalGift {
   accountHolder: string;
 }
 
+/** Video Cerita (Enterprise): pemeran, momen kisah, dan aset gambar AI per adegan. */
+export interface StoryCast {
+  /** Foto wajah (URL Cloudinary), maks. 3. */
+  photos: string[];
+  /** Ciri penampilan singkat, mis. "berhijab, berkacamata". */
+  look?: string;
+}
+export interface StoryMoment {
+  id: string;
+  /** Judul singkat, mis. "Pertama kenal". */
+  title: string;
+  /** Tempat/latar, mis. "toko oleh-oleh di Jogja". */
+  place: string;
+  /** Apa yang terjadi, mis. "Ana menerima pesan dari Naufal di grup Telegram". */
+  action: string;
+  /** Siapa yang tampil. */
+  who: 'groom' | 'bride' | 'both';
+  /** Teks cerita yang tampil di layar. */
+  narration?: string;
+  /** Balon dialog. */
+  dialogue?: { speaker: 'groom' | 'bride'; text: string } | null;
+  /** Kutipan chat di layar HP. */
+  chat?: { from: 'groom' | 'bride'; text: string }[];
+  /** Angka besar, mis. "4721 KM". */
+  stat?: string;
+}
+export interface StoryAsset {
+  /** Latar adegan tanpa orang. */
+  bg?: string;
+  /** Karakter berlatar transparan (PNG). */
+  chars?: string;
+  /** Sidik isi momen saat aset dibuat; beda = perlu dibuat ulang. */
+  sig?: string;
+}
+export interface StoryProject {
+  style?: 'warm-digital' | 'watercolor' | 'soft-anime';
+  groom?: StoryCast;
+  bride?: StoryCast;
+  moments?: StoryMoment[];
+  closingNarration?: string;
+  /** Pemilik undangan menyetujui foto dikirim ke layanan AI. */
+  consent?: boolean;
+  /** Lembar karakter (referensi wajah untuk semua adegan). */
+  characterSheet?: string;
+  /** Sidik foto+ciri+gaya saat lembar karakter dibuat. */
+  characterSheetSig?: string;
+  assets?: Record<string, StoryAsset>;
+  /** Aset adegan pernikahan (penutup). */
+  finale?: StoryAsset;
+}
+
 /** Pengaturan Video Studio (Enterprise), disimpan bersama data undangan. Semua opsional. */
 export interface VideoStudioSettings {
   themeId?: 'javanese-classic' | 'grand-ballroom' | 'luxury-pink' | 'storybook-journey' | 'pasundan';
@@ -84,6 +135,10 @@ export interface VideoStudioSettings {
     /** 0..1 */
     volume?: number;
   };
+  /** Video Cerita berbasis AI. */
+  story?: StoryProject;
+  /** Mode studio terakhir. */
+  mode?: 'story' | 'template';
   /** Teks yang bisa diubah (berlaku untuk film Perjalanan & Pasundan). */
   copy?: { tagline?: string; closing?: string };
   /** Video terakhir yang diunggah untuk dibagikan lewat tautan. */
